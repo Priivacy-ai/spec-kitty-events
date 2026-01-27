@@ -1,5 +1,6 @@
 """Topological sorting of events by causation relationships."""
-from typing import List, Dict
+from collections import deque
+from typing import Deque, List, Dict
 from spec_kitty_events.models import Event, CyclicDependencyError
 
 
@@ -43,12 +44,14 @@ def topological_sort(events: List[Event]) -> List[Event]:
             children[event.causation_id].append(event.event_id)
 
     # Kahn's algorithm: start with nodes that have no parents (in-degree = 0)
-    queue: List[str] = [eid for eid, degree in in_degree.items() if degree == 0]
+    queue: Deque[str] = deque(
+        eid for eid, degree in in_degree.items() if degree == 0
+    )
     result: List[Event] = []
 
     while queue:
         # Pop event with no remaining dependencies
-        current_id = queue.pop(0)
+        current_id = queue.popleft()
         result.append(event_map[current_id])
 
         # Reduce in-degree for all children
