@@ -20,7 +20,7 @@ Event log library with Lamport clocks and systematic error tracking for distribu
 ### From Git (Recommended for Alpha)
 
 ```bash
-pip install git+https://github.com/robdouglass/spec-kitty-events.git@v0.1.0-alpha
+pip install git+https://github.com/robertDouglass/spec-kitty-events.git@v0.1.0-alpha
 ```
 
 Or add to `requirements.txt` or `pyproject.toml`:
@@ -28,14 +28,14 @@ Or add to `requirements.txt` or `pyproject.toml`:
 ```toml
 # pyproject.toml
 dependencies = [
-    "spec-kitty-events @ git+https://github.com/robdouglass/spec-kitty-events.git@v0.1.0-alpha",
+    "spec-kitty-events @ git+https://github.com/robertDouglass/spec-kitty-events.git@v0.1.0-alpha",
 ]
 ```
 
 ### Development Installation
 
 ```bash
-git clone https://github.com/robdouglass/spec-kitty-events.git
+git clone https://github.com/robertDouglass/spec-kitty-events.git
 cd spec-kitty-events
 pip install -e ".[dev]"
 ```
