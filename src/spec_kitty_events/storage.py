@@ -24,7 +24,7 @@ class EventStore(ABC):
         Raises:
             StorageError: If save fails
         """
-        pass
+        pass  # pragma: no cover
 
     @abstractmethod
     def load_events(self, aggregate_id: str) -> List[Event]:
@@ -39,7 +39,7 @@ class EventStore(ABC):
         Raises:
             StorageError: If load fails
         """
-        pass
+        pass  # pragma: no cover
 
     @abstractmethod
     def load_all_events(self) -> List[Event]:
@@ -51,7 +51,7 @@ class EventStore(ABC):
         Raises:
             StorageError: If load fails
         """
-        pass
+        pass  # pragma: no cover
 
 
 class ClockStorage(ABC):
@@ -77,7 +77,7 @@ class ClockStorage(ABC):
         Raises:
             StorageError: If load fails
         """
-        pass
+        pass  # pragma: no cover
 
     @abstractmethod
     def save(self, node_id: str, clock_value: int) -> None:
@@ -91,7 +91,7 @@ class ClockStorage(ABC):
             StorageError: If save fails
             ValueError: If clock_value < 0
         """
-        pass
+        pass  # pragma: no cover
 
 
 class ErrorStorage(ABC):
@@ -115,7 +115,7 @@ class ErrorStorage(ABC):
         Raises:
             StorageError: If append fails
         """
-        pass
+        pass  # pragma: no cover
 
     @abstractmethod
     def load_recent(self, limit: int = 10) -> List[ErrorEntry]:
@@ -131,7 +131,7 @@ class ErrorStorage(ABC):
             StorageError: If load fails
             ValueError: If limit < 1
         """
-        pass
+        pass  # pragma: no cover
 
 
 class InMemoryEventStore(EventStore):
