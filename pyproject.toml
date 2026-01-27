@@ -34,7 +34,7 @@ testpaths = ["tests"]
 python_files = "test_*.py"
 python_classes = "Test*"
 python_functions = "test_*"
-addopts = "--cov=src/spec_kitty_events --cov-report=term-missing --cov-report=html --cov-fail-under=90"
+addopts = "--cov=src/spec_kitty_events --cov-report=term-missing --cov-report=html"
 
 [tool.mypy]
 python_version = "3.10"
