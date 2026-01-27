@@ -1,4 +1,5 @@
 """Unit tests for storage adapters."""
+import inspect
 import pytest
 from datetime import datetime
 from spec_kitty_events.storage import (
@@ -17,8 +18,7 @@ class TestEventStore:
 
     def test_cannot_instantiate_abc(self):
         """Test EventStore ABC cannot be instantiated."""
-        with pytest.raises(TypeError):
-            EventStore()  # type: ignore
+        assert inspect.isabstract(EventStore)
 
     def test_in_memory_save_and_load(self):
         """Test in-memory event store saves and loads events."""
@@ -103,8 +103,7 @@ class TestClockStorage:
 
     def test_cannot_instantiate_abc(self):
         """Test ClockStorage ABC cannot be instantiated."""
-        with pytest.raises(TypeError):
-            ClockStorage()  # type: ignore
+        assert inspect.isabstract(ClockStorage)
 
     def test_in_memory_save_and_load(self):
         """Test in-memory clock storage saves and loads values."""
@@ -136,8 +135,7 @@ class TestErrorStorage:
 
     def test_cannot_instantiate_abc(self):
         """Test ErrorStorage ABC cannot be instantiated."""
-        with pytest.raises(TypeError):
-            ErrorStorage()  # type: ignore
+        assert inspect.isabstract(ErrorStorage)
 
     def test_in_memory_append_and_load(self):
         """Test in-memory error storage appends and loads entries."""

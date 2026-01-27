@@ -61,7 +61,7 @@ class TestEvent:
             lamport_clock=0
         )
         with pytest.raises(Exception):  # Pydantic raises FrozenInstanceError
-            event.lamport_clock = 10  # type: ignore
+            setattr(event, "lamport_clock", 10)
 
     def test_event_serialization(self):
         """Test event serialization to dict."""
