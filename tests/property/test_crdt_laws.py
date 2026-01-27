@@ -130,8 +130,9 @@ class TestCounterLaws:
         partial2 = merge_counter(group_a) + merge_counter(group_b + group_c)
 
         # Note: Deduplication makes this tricky - only works if groups don't overlap
-        # For proper test, we verify total is consistent
-        assert all_merged == merge_counter(events)
+        # For proper test, we verify totals match
+        assert partial1 == all_merged
+        assert partial2 == all_merged
 
     @given(st.lists(event_with_delta(), min_size=1, max_size=10, unique_by=lambda e: e.event_id))
     def test_counter_idempotent(self, events):
