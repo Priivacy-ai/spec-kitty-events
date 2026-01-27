@@ -71,5 +71,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-[Unreleased]: https://github.com/robertDouglass/spec-kitty-events/compare/v0.1.0-alpha...HEAD
-[0.1.0-alpha]: https://github.com/robertDouglass/spec-kitty-events/releases/tag/v0.1.0-alpha
+[Unreleased]: https://github.com/Priivacy-ai/spec-kitty-events/compare/v0.1.0-alpha...HEAD
+[0.1.0-alpha]: https://github.com/Priivacy-ai/spec-kitty-events/releases/tag/v0.1.0-alpha

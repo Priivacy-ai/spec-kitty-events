@@ -24,7 +24,7 @@ The v0.1.0-alpha tag has been created locally and is ready to push once the GitH
 - ✅ README.md complete with installation and usage examples
 - ✅ CHANGELOG.md documents all features
 - ✅ Git tag v0.1.0-alpha created locally
-- ✅ Remote origin configured (git@github.com:robertDouglass/spec-kitty-events.git)
+- ✅ Remote origin configured (https://github.com/Priivacy-ai/spec-kitty-events.git)
 - ✅ GitHub repository created
 - ✅ main branch pushed
 - ✅ v0.1.0-alpha tag pushed
