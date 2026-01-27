@@ -160,7 +160,7 @@ mypy src/spec_kitty_events --strict
 
 ## License
 
-All Rights Reserved. This software is proprietary.
+No license information provided. This is a private repository.
 
 ## Contributing
 

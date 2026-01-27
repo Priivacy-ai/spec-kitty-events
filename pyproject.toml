@@ -4,7 +4,6 @@ version = "0.1.0-alpha"
 description = "Event log library with Lamport clocks and systematic error tracking"
 readme = "README.md"
 requires-python = ">=3.10"
-license = {text = "All Rights Reserved"}
 authors = [
     {name = "Robert Douglass", email = "rob@example.com"}
 ]
