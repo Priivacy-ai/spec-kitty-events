@@ -26,6 +26,9 @@ class LamportClock:
     Note:
         Thread-safety is the responsibility of the ClockStorage adapter.
         This class does NOT provide thread-safe operations on its own.
+        Clock values are expected to fit in a signed 64-bit range for
+        interoperability. Python ints are unbounded, so overflow is
+        practically impossible; exceeding 2^63 events is unrealistic.
     """
 
     def __init__(self, node_id: str, storage: ClockStorage) -> None:
