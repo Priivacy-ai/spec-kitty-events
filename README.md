@@ -133,9 +133,10 @@ For production, implement adapters for your database (PostgreSQL, SQLite, etc.).
 
 ## Documentation
 
-- [Quickstart Guide](https://github.com/robdouglass/spec-kitty-events/blob/main/docs/quickstart.md)
-- [API Contract](https://github.com/robdouglass/spec-kitty-events/blob/main/docs/contracts/library-api.md)
-- [Design Specification](https://github.com/robdouglass/spec-kitty-events/blob/main/docs/spec.md)
+API reference documentation coming in v0.2.0. For now, refer to:
+- Type hints in source code (fully type-annotated with mypy --strict)
+- Integration tests in `tests/integration/` for usage examples
+- Docstrings in `src/spec_kitty_events/`
 
 ## Testing
 
@@ -159,7 +160,7 @@ mypy src/spec_kitty_events --strict
 
 ## License
 
-MIT License - see [LICENSE](LICENSE) file for details.
+All Rights Reserved. This software is proprietary.
 
 ## Contributing
 
