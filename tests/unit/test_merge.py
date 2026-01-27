@@ -186,10 +186,10 @@ class TestStateMachineMerge:
             timestamp=datetime.now(),
             node_id="alice",
             lamport_clock=5,
-            payload={}  # No "state" key
+            payload={}  # No "state" or "status" key
         )
 
-        with pytest.raises(ValidationError, match="missing 'state' in payload"):
+        with pytest.raises(ValidationError, match="missing 'state' or 'status' in payload"):
             state_machine_merge([e1], priority_map)
 
     def test_merge_state_not_in_priority_map_raises_error(self):
@@ -233,3 +233,33 @@ class TestStateMachineMerge:
         resolution = state_machine_merge([e1], priority_map, state_key="status")
 
         assert resolution.merged_event.payload["status"] == "active"
+
+    def test_merge_fallback_to_status_key(self):
+        """Test merge falls back to 'status' key when using default state_key and 'state' not found."""
+        priority_map = {"done": 4, "for_review": 3, "doing": 2, "planned": 1}
+
+        e1 = Event(
+            event_id="01HRN7QMQJT8XVKP9YZ2ABCDEF",
+            event_type="WPStatusChanged",
+            aggregate_id="WP001",
+            timestamp=datetime.now(),
+            node_id="alice",
+            lamport_clock=5,
+            payload={"status": "doing"}  # Using "status" not "state"
+        )
+        e2 = Event(
+            event_id="01HRN7QMQJT8XVKP9YZ2ABCDEG",
+            event_type="WPStatusChanged",
+            aggregate_id="WP001",
+            timestamp=datetime.now(),
+            node_id="bob",
+            lamport_clock=5,
+            payload={"status": "done"}  # Using "status" not "state"
+        )
+
+        # Using default state_key (no explicit parameter), should fallback to "status"
+        resolution = state_machine_merge([e1, e2], priority_map)
+
+        assert resolution.merged_event.event_id == "01HRN7QMQJT8XVKP9YZ2ABCDEG"  # e2 has higher priority
+        assert resolution.merged_event.payload["status"] == "done"
+        assert len(resolution.conflicting_events) == 2
