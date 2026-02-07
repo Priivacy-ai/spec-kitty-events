@@ -1,7 +1,7 @@
 ---
 work_package_id: WP03
 title: Version Bump & Changelog
-lane: "doing"
+lane: "for_review"
 dependencies:
 - WP01
 base_branch: main
@@ -229,3 +229,4 @@ Bump the library version to `0.2.0-alpha`, write a complete changelog entry docu
 ## Activity Log
 
 - 2026-02-07T00:00:00Z – system – lane=planned – Prompt created.
+- 2026-02-07T20:41:24Z – unknown – shell_pid=52812 – lane=for_review – Version bumped, changelog complete, quickstart validated
