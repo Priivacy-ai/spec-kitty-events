@@ -1,26 +1,29 @@
 ---
-work_package_id: "WP02"
+work_package_id: WP02
+title: Conclusion Mapping & Tests
+lane: "doing"
+dependencies: [WP01]
+base_branch: main
+base_commit: cc3cfc9cfafbdd09c2146c5ad6003e6a3109c3b0
+created_at: '2026-02-07T20:37:06.691436+00:00'
 subtasks:
-  - "T006"
-  - "T007"
-  - "T008"
-  - "T009"
-  - "T010"
-title: "Conclusion Mapping & Tests"
-phase: "Phase 1 - Implementation & Verification"
-lane: "planned"
-assignee: ""
-agent: ""
-shell_pid: ""
-review_status: ""
-reviewed_by: ""
-dependencies: ["WP01"]
+- T006
+- T007
+- T008
+- T009
+- T010
+phase: Phase 1 - Implementation & Verification
+assignee: ''
+agent: ''
+shell_pid: "51548"
+review_status: ''
+reviewed_by: ''
 history:
-  - timestamp: "2026-02-07T00:00:00Z"
-    lane: "planned"
-    agent: "system"
-    shell_pid: ""
-    action: "Prompt generated via /spec-kitty.tasks"
+- timestamp: '2026-02-07T00:00:00Z'
+  lane: planned
+  agent: system
+  shell_pid: ''
+  action: Prompt generated via /spec-kitty.tasks
 ---
 
 # Work Package Prompt: WP02 – Conclusion Mapping & Tests
