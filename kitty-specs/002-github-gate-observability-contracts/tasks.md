@@ -58,11 +58,11 @@
 **Estimated prompt size**: ~450 lines
 
 ### Included Subtasks
-- [ ] T006 Implement `map_check_run_conclusion()` function with logging and callback in `src/spec_kitty_events/gates.py`
-- [ ] T007 [P] Write unit tests for payload model validation and serialization in `tests/unit/test_gates.py`
-- [ ] T008 [P] Write unit tests for conclusion mapping (all 8 conclusions + unknown + edge cases) in `tests/unit/test_gates.py`
-- [ ] T009 [P] Write Hypothesis property tests for mapping determinism in `tests/property/test_gates_determinism.py`
-- [ ] T010 Run full test suite and verify coverage targets met
+- [x] T006 Implement `map_check_run_conclusion()` function with logging and callback in `src/spec_kitty_events/gates.py`
+- [x] T007 [P] Write unit tests for payload model validation and serialization in `tests/unit/test_gates.py`
+- [x] T008 [P] Write unit tests for conclusion mapping (all 8 conclusions + unknown + edge cases) in `tests/unit/test_gates.py`
+- [x] T009 [P] Write Hypothesis property tests for mapping determinism in `tests/property/test_gates_determinism.py`
+- [x] T010 Run full test suite and verify coverage targets met
 
 ### Implementation Notes
 - T006: Mapping dict is a module-level `_CONCLUSION_MAP: Dict[str, Optional[str]]`. The function looks up the dict, handles ignored conclusions (log + callback), and raises `UnknownConclusionError` for missing keys.
