@@ -1,0 +1,14 @@
+{
+  "wp_id": "WP03",
+  "feature_slug": "001-event-model-project-identity",
+  "worktree_path": ".worktrees/001-event-model-project-identity-WP03",
+  "branch_name": "001-event-model-project-identity-WP03",
+  "base_branch": "001-event-model-project-identity-WP01",
+  "base_commit": "517c99c138c27cc72fe7e59ad175e59524de0344",
+  "dependencies": [
+    "WP01"
+  ],
+  "created_at": "2026-02-07T07:04:43.015763+00:00",
+  "created_by": "implement-command",
+  "vcs_backend": "git"
+}
