@@ -14,7 +14,7 @@ subtasks:
 - T005
 phase: Phase 0 - Foundation
 assignee: ''
-agent: ''
+agent: "claude-opus"
 shell_pid: "18753"
 review_status: ''
 reviewed_by: ''
@@ -206,3 +206,4 @@ Note: `pytest` will FAIL after this WP because existing tests don't supply `proj
 ## Activity Log
 
 - 2026-02-07T00:00:00Z – system – lane=planned – Prompt created.
+- 2026-02-07T07:01:58Z – claude-opus – shell_pid=18753 – lane=doing – Assigned agent via workflow command
