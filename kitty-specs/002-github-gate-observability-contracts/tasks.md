@@ -91,9 +91,9 @@
 **Estimated prompt size**: ~250 lines
 
 ### Included Subtasks
-- [ ] T011 Bump version to `0.2.0-alpha` in `pyproject.toml` and `src/spec_kitty_events/__init__.py`
-- [ ] T012 Update `CHANGELOG.md` with new version entry documenting all additions
-- [ ] T013 Validate quickstart.md code examples against actual implementation
+- [x] T011 Bump version to `0.2.0-alpha` in `pyproject.toml` and `src/spec_kitty_events/__init__.py`
+- [x] T012 Update `CHANGELOG.md` with new version entry documenting all additions
+- [x] T013 Validate quickstart.md code examples against actual implementation
 
 ### Implementation Notes
 - T011: Two files to update — `pyproject.toml` line `version = "0.1.1-alpha"` → `"0.2.0-alpha"`, and `__init__.py` line `__version__ = "0.1.1-alpha"` → `"0.2.0-alpha"`.
