@@ -1,9 +1,12 @@
 ---
 work_package_id: WP03
 title: Version Bump & Changelog
-lane: planned
+lane: "doing"
 dependencies:
 - WP01
+base_branch: main
+base_commit: 6f5649455c9e1d561f7436829e62b95b5034826f
+created_at: '2026-02-07T20:39:52.965991+00:00'
 subtasks:
 - T011
 - T012
@@ -11,7 +14,7 @@ subtasks:
 phase: Phase 2 - Release Prep
 assignee: ''
 agent: ''
-shell_pid: ''
+shell_pid: "52812"
 review_status: ''
 reviewed_by: ''
 history:
