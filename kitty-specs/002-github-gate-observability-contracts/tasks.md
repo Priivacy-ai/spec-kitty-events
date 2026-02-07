@@ -23,11 +23,11 @@
 **Estimated prompt size**: ~350 lines
 
 ### Included Subtasks
-- [ ] T001 Create `GatePayloadBase` model with all fields and Pydantic constraints in `src/spec_kitty_events/gates.py`
-- [ ] T002 Create `GatePassedPayload` and `GateFailedPayload` subclasses in `src/spec_kitty_events/gates.py`
-- [ ] T003 Create `UnknownConclusionError(SpecKittyEventsError)` exception in `src/spec_kitty_events/gates.py`
-- [ ] T004 Update `src/spec_kitty_events/__init__.py` with new public API exports and `__all__` entries
-- [ ] T005 Verify `mypy --strict` passes for the new `gates.py` module
+- [x] T001 Create `GatePayloadBase` model with all fields and Pydantic constraints in `src/spec_kitty_events/gates.py`
+- [x] T002 Create `GatePassedPayload` and `GateFailedPayload` subclasses in `src/spec_kitty_events/gates.py`
+- [x] T003 Create `UnknownConclusionError(SpecKittyEventsError)` exception in `src/spec_kitty_events/gates.py`
+- [x] T004 Update `src/spec_kitty_events/__init__.py` with new public API exports and `__all__` entries
+- [x] T005 Verify `mypy --strict` passes for the new `gates.py` module
 
 ### Implementation Notes
 - Start by creating `src/spec_kitty_events/gates.py` with all imports from `pydantic` and the existing exception base from `models.py`.
