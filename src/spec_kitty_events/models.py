@@ -1,4 +1,6 @@
 """Core data models for spec-kitty-events library."""
+import uuid
+
 from pydantic import BaseModel, Field, ConfigDict
 from datetime import datetime
 from typing import Optional, Dict, Any, List
@@ -50,6 +52,14 @@ class Event(BaseModel):
         max_length=26,
         description="Event ID of the parent event (None for root events)"
     )
+    project_uuid: uuid.UUID = Field(
+        ...,
+        description="UUID of the project this event belongs to"
+    )
+    project_slug: Optional[str] = Field(
+        None,
+        description="Human-readable project identifier (optional)"
+    )
 
     def __repr__(self) -> str:
         """Human-readable representation."""
@@ -57,6 +67,7 @@ class Event(BaseModel):
             f"Event(event_id={self.event_id[:8]}..., "
             f"type={self.event_type}, "
             f"aggregate={self.aggregate_id}, "
+            f"project={str(self.project_uuid)[:8]}..., "
             f"lamport={self.lamport_clock})"
         )
 
