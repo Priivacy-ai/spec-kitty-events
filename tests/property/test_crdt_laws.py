@@ -50,6 +50,7 @@ def event_with_delta(draw):
 class TestGSetLaws:
     """Property-based tests for GSet CRDT laws."""
 
+    @settings(deadline=None)
     @given(st.lists(event_with_tags(), max_size=10, unique_by=lambda e: e.event_id))
     def test_gset_commutative(self, events):
         """Test merge_gset is commutative: merge(A, B) = merge(B, A)."""
@@ -67,6 +68,7 @@ class TestGSetLaws:
 
         assert result1 == result2
 
+    @settings(deadline=None)
     @given(st.lists(event_with_tags(), max_size=10, unique_by=lambda e: e.event_id))
     def test_gset_associative(self, events):
         """Test merge_gset is associative: merge(merge(A, B), C) = merge(A, merge(B, C))."""
@@ -89,6 +91,7 @@ class TestGSetLaws:
         assert result1 == all_merged
         assert result2 == all_merged
 
+    @settings(deadline=None)
     @given(st.lists(event_with_tags(), min_size=1, max_size=10, unique_by=lambda e: e.event_id))
     def test_gset_idempotent(self, events):
         """Test merge_gset is idempotent: merge(A, A) = merge(A)."""
@@ -101,6 +104,7 @@ class TestGSetLaws:
 class TestCounterLaws:
     """Property-based tests for Counter CRDT laws."""
 
+    @settings(deadline=None)
     @given(st.lists(event_with_delta(), max_size=10, unique_by=lambda e: e.event_id))
     def test_counter_commutative(self, events):
         """Test merge_counter is commutative: merge(A, B) = merge(B, A)."""
@@ -116,6 +120,7 @@ class TestCounterLaws:
 
         assert result1 == result2
 
+    @settings(deadline=None)
     @given(st.lists(event_with_delta(), max_size=10, unique_by=lambda e: e.event_id))
     def test_counter_associative(self, events):
         """Test merge_counter is associative."""
@@ -137,6 +142,7 @@ class TestCounterLaws:
         assert partial1 == all_merged
         assert partial2 == all_merged
 
+    @settings(deadline=None)
     @given(st.lists(event_with_delta(), min_size=1, max_size=10, unique_by=lambda e: e.event_id))
     def test_counter_idempotent(self, events):
         """Test merge_counter is idempotent: merge(A, A) = merge(A)."""

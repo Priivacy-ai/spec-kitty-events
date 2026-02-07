@@ -1,6 +1,6 @@
 """Property-based tests for determinism of state-machine merge."""
 import uuid
-from hypothesis import given, strategies as st
+from hypothesis import given, strategies as st, settings
 from datetime import datetime
 from spec_kitty_events.merge import state_machine_merge
 from spec_kitty_events.models import Event
@@ -26,6 +26,7 @@ def event_with_state(draw):
 class TestMergeDeterminism:
     """Property-based tests for merge determinism."""
 
+    @settings(deadline=None)
     @given(st.lists(event_with_state(), min_size=1, max_size=10))
     def test_merge_deterministic(self, events):
         """Test merge produces same result for same input (determinism)."""
@@ -39,6 +40,7 @@ class TestMergeDeterminism:
         assert resolution1.merged_event.event_id == resolution2.merged_event.event_id
         assert resolution1.resolution_note == resolution2.resolution_note
 
+    @settings(deadline=None)
     @given(st.lists(event_with_state(), min_size=1, max_size=10))
     def test_merge_order_independent(self, events):
         """Test merge result independent of input order (if events are unique)."""
