@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1-alpha] - 2026-02-07
+
+### Added
+- `project_uuid` field on `Event` model (required, `uuid.UUID` type)
+- `project_slug` field on `Event` model (optional, `str` type, defaults to `None`)
+
+### Changed
+- `Event` now requires `project_uuid` in all constructors (breaking change from 0.1.0-alpha)
+- `to_dict()` / `from_dict()` include project identity fields
+- `__repr__()` displays truncated project UUID
+
+### Breaking Changes
+- All `Event()` constructors must now include `project_uuid` parameter
+- This is a coordinated release with spec-kitty CLI and spec-kitty-saas
+
 ## [0.1.0-alpha] - 2026-01-27
 
 ### Added
@@ -71,5 +86,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-[Unreleased]: https://github.com/Priivacy-ai/spec-kitty-events/compare/v0.1.0-alpha...HEAD
+[Unreleased]: https://github.com/Priivacy-ai/spec-kitty-events/compare/v0.1.1-alpha...HEAD
+[0.1.1-alpha]: https://github.com/Priivacy-ai/spec-kitty-events/compare/v0.1.0-alpha...v0.1.1-alpha
 [0.1.0-alpha]: https://github.com/Priivacy-ai/spec-kitty-events/releases/tag/v0.1.0-alpha
