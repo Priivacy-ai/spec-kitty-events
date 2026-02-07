@@ -16,8 +16,8 @@ def merge_gset(events: List[Event]) -> Set[Any]:
         Union of all tag sets
 
     Example:
-        >>> e1 = Event(payload={"tags": {"bug", "urgent"}}, ...)
-        >>> e2 = Event(payload={"tags": {"bug", "resolved"}}, ...)
+        >>> e1 = Event(payload={"tags": {"bug", "urgent"}}, project_uuid=..., ...)
+        >>> e2 = Event(payload={"tags": {"bug", "resolved"}}, project_uuid=..., ...)
         >>> merge_gset([e1, e2])
         {"bug", "urgent", "resolved"}
 
@@ -50,8 +50,8 @@ def merge_counter(events: List[Event]) -> int:
         Sum of all deltas (deduplicated by event_id)
 
     Example:
-        >>> e1 = Event(event_id="ID1", payload={"delta": 5}, ...)
-        >>> e2 = Event(event_id="ID2", payload={"delta": 3}, ...)
+        >>> e1 = Event(event_id="ID1", payload={"delta": 5}, project_uuid=..., ...)
+        >>> e2 = Event(event_id="ID2", payload={"delta": 3}, project_uuid=..., ...)
         >>> merge_counter([e1, e2])
         8
         >>> merge_counter([e1, e1, e2])  # e1 counted once (idempotent)

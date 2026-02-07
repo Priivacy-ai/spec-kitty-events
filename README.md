@@ -58,6 +58,7 @@ from spec_kitty_events import (
 clock_storage = InMemoryClockStorage()
 event_store = InMemoryEventStore()
 clock = LamportClock(node_id="alice", storage=clock_storage)
+PROJECT_UUID = uuid.uuid4()
 
 # Emit event
 clock.tick()
@@ -68,7 +69,7 @@ event = Event(
     timestamp=datetime.now(),
     node_id="alice",
     lamport_clock=clock.current(),
-    project_uuid=uuid.uuid4(),
+    project_uuid=PROJECT_UUID,
     project_slug="my-project",
     payload={"state": "doing"}
 )
@@ -79,6 +80,8 @@ event_store.save_event(event)
 
 ```python
 from spec_kitty_events import is_concurrent, state_machine_merge
+
+# Assume event1/event2 are valid Event instances (including project_uuid)
 
 # Detect concurrent events
 if is_concurrent(event1, event2):
@@ -92,6 +95,8 @@ if is_concurrent(event1, event2):
 
 ```python
 from spec_kitty_events import merge_gset, merge_counter
+
+# Assume event1/event2/event3 are valid Event instances (including project_uuid)
 
 # Merge grow-only set (tags)
 tags = merge_gset([event1, event2, event3])

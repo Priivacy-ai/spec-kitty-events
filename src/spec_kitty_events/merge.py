@@ -31,8 +31,8 @@ def state_machine_merge(
 
     Example:
         >>> priority_map = {"done": 4, "for_review": 3, "doing": 2, "planned": 1}
-        >>> e1 = Event(payload={"state": "doing"}, node_id="alice", lamport_clock=5, ...)
-        >>> e2 = Event(payload={"state": "done"}, node_id="bob", lamport_clock=5, ...)
+        >>> e1 = Event(payload={"state": "doing"}, node_id="alice", lamport_clock=5, project_uuid=..., ...)
+        >>> e2 = Event(payload={"state": "done"}, node_id="bob", lamport_clock=5, project_uuid=..., ...)
         >>> resolution = state_machine_merge([e1, e2], priority_map)
         >>> resolution.merged_event.payload["state"]
         "done"  # Higher priority

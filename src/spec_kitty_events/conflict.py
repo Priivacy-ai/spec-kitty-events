@@ -22,12 +22,12 @@ def is_concurrent(event1: Event, event2: Event) -> bool:
         True if events are concurrent (conflicting), False otherwise
 
     Example:
-        >>> e1 = Event(event_id="ID1", aggregate_id="WP001", lamport_clock=5, ...)
-        >>> e2 = Event(event_id="ID2", aggregate_id="WP001", lamport_clock=5, ...)
+        >>> e1 = Event(event_id="ID1", aggregate_id="WP001", lamport_clock=5, project_uuid=..., ...)
+        >>> e2 = Event(event_id="ID2", aggregate_id="WP001", lamport_clock=5, project_uuid=..., ...)
         >>> is_concurrent(e1, e2)
         True
 
-        >>> e3 = Event(event_id="ID3", aggregate_id="WP002", lamport_clock=5, ...)
+        >>> e3 = Event(event_id="ID3", aggregate_id="WP002", lamport_clock=5, project_uuid=..., ...)
         >>> is_concurrent(e1, e3)  # Different aggregate
         False
     """

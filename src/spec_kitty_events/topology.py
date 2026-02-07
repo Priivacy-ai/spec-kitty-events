@@ -20,9 +20,9 @@ def topological_sort(events: List[Event]) -> List[Event]:
         CyclicDependencyError: If events form a cycle in causation graph
 
     Example:
-        >>> e1 = Event(event_id="ID1", causation_id=None, ...)  # Root
-        >>> e2 = Event(event_id="ID2", causation_id="ID1", ...)  # Child of e1
-        >>> e3 = Event(event_id="ID3", causation_id="ID2", ...)  # Child of e2
+        >>> e1 = Event(event_id="ID1", causation_id=None, project_uuid=..., ...)  # Root
+        >>> e2 = Event(event_id="ID2", causation_id="ID1", project_uuid=..., ...)  # Child of e1
+        >>> e3 = Event(event_id="ID3", causation_id="ID2", project_uuid=..., ...)  # Child of e2
         >>> sorted_events = topological_sort([e3, e1, e2])
         >>> # Result: [e1, e2, e3] (parent before child)
     """
