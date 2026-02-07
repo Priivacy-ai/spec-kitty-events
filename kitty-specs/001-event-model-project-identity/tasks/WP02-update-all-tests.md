@@ -1,28 +1,31 @@
 ---
-work_package_id: "WP02"
+work_package_id: WP02
+title: Update All Tests
+lane: "doing"
+dependencies: [WP01]
+base_branch: 001-event-model-project-identity-WP01
+base_commit: 517c99c138c27cc72fe7e59ad175e59524de0344
+created_at: '2026-02-07T07:04:41.398627+00:00'
 subtasks:
-  - "T006"
-  - "T007"
-  - "T008"
-  - "T009"
-  - "T010"
-  - "T011"
-  - "T012"
-title: "Update All Tests"
-phase: "Phase 1 - Implementation"
-lane: "planned"
-assignee: ""
-agent: ""
-shell_pid: ""
-review_status: ""
-reviewed_by: ""
-dependencies: ["WP01"]
+- T006
+- T007
+- T008
+- T009
+- T010
+- T011
+- T012
+phase: Phase 1 - Implementation
+assignee: ''
+agent: ''
+shell_pid: "19707"
+review_status: ''
+reviewed_by: ''
 history:
-  - timestamp: "2026-02-07T00:00:00Z"
-    lane: "planned"
-    agent: "system"
-    shell_pid: ""
-    action: "Prompt generated via /spec-kitty.tasks"
+- timestamp: '2026-02-07T00:00:00Z'
+  lane: planned
+  agent: system
+  shell_pid: ''
+  action: Prompt generated via /spec-kitty.tasks
 ---
 
 # Work Package Prompt: WP02 – Update All Tests
