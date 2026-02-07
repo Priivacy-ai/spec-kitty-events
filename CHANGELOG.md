@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0-alpha] - 2026-02-07
+
+### Added
+- `GatePayloadBase` — shared Pydantic base model for CI gate outcome event payloads (frozen, validated)
+- `GatePassedPayload(GatePayloadBase)` — typed payload for successful gate conclusions (`success`)
+- `GateFailedPayload(GatePayloadBase)` — typed payload for failed gate conclusions (`failure`, `timed_out`, `cancelled`, `action_required`)
+- `map_check_run_conclusion(conclusion, on_ignored=None)` — deterministic mapping from GitHub `check_run` conclusion strings to event type strings (`"GatePassed"`, `"GateFailed"`, or `None` for ignored)
+- `UnknownConclusionError(SpecKittyEventsError)` — raised for unrecognized conclusion values
+- Ignored conclusions (`neutral`, `skipped`, `stale`) logged via `logging.getLogger("spec_kitty_events.gates")` with optional `on_ignored` callback
+- All new types exported from `spec_kitty_events` package public API
+- Unit tests for payload model validation, field constraints, and serialization round-trips
+- Hypothesis property tests for mapping determinism and exhaustiveness
+
 ## [0.1.1-alpha] - 2026-02-07
 
 ### Added
@@ -86,6 +99,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-[Unreleased]: https://github.com/Priivacy-ai/spec-kitty-events/compare/v0.1.1-alpha...HEAD
+[Unreleased]: https://github.com/Priivacy-ai/spec-kitty-events/compare/v0.2.0-alpha...HEAD
+[0.2.0-alpha]: https://github.com/Priivacy-ai/spec-kitty-events/compare/v0.1.1-alpha...v0.2.0-alpha
 [0.1.1-alpha]: https://github.com/Priivacy-ai/spec-kitty-events/compare/v0.1.0-alpha...v0.1.1-alpha
 [0.1.0-alpha]: https://github.com/Priivacy-ai/spec-kitty-events/releases/tag/v0.1.0-alpha
