@@ -19,11 +19,11 @@
 **Estimated prompt size**: ~350 lines
 
 ### Included Subtasks
-- [ ] T001 Add `project_uuid: uuid.UUID` (required) and `project_slug: Optional[str]` (optional) fields to `Event` in `src/spec_kitty_events/models.py`
-- [ ] T002 Update `Event.to_dict()` to include new fields via `model_dump()`
-- [ ] T003 Update `Event.from_dict()` to accept new fields (Pydantic coercion handles UUID string → UUID)
-- [ ] T004 Update `Event.__repr__()` to include `project_uuid` (truncated)
-- [ ] T005 Bump version from `0.1.0-alpha` to `0.1.1-alpha` in `pyproject.toml` and `src/spec_kitty_events/__init__.py`
+- [x] T001 Add `project_uuid: uuid.UUID` (required) and `project_slug: Optional[str]` (optional) fields to `Event` in `src/spec_kitty_events/models.py`
+- [x] T002 Update `Event.to_dict()` to include new fields via `model_dump()`
+- [x] T003 Update `Event.from_dict()` to accept new fields (Pydantic coercion handles UUID string → UUID)
+- [x] T004 Update `Event.__repr__()` to include `project_uuid` (truncated)
+- [x] T005 Bump version from `0.1.0-alpha` to `0.1.1-alpha` in `pyproject.toml` and `src/spec_kitty_events/__init__.py`
 
 ### Implementation Notes
 - Pydantic v2 natively supports `uuid.UUID` — accepts string input, stores as UUID, serializes via `model_dump()`.
