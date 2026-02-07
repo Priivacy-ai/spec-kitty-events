@@ -60,6 +60,15 @@ from spec_kitty_events.merge import state_machine_merge
 # Error logging
 from spec_kitty_events.error_log import ErrorLog
 
+# Gate observability contracts
+from spec_kitty_events.gates import (
+    GatePayloadBase,
+    GatePassedPayload,
+    GateFailedPayload,
+    UnknownConclusionError,
+    map_check_run_conclusion,
+)
+
 # Public API (controls what's exported with "from spec_kitty_events import *")
 __all__ = [
     # Version
@@ -92,4 +101,10 @@ __all__ = [
     "state_machine_merge",
     # Error logging
     "ErrorLog",
+    # Gate observability
+    "GatePayloadBase",
+    "GatePassedPayload",
+    "GateFailedPayload",
+    "UnknownConclusionError",
+    "map_check_run_conclusion",
 ]
