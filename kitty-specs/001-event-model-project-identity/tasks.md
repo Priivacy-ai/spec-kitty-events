@@ -85,10 +85,10 @@
 **Estimated prompt size**: ~250 lines
 
 ### Included Subtasks
-- [ ] T013 Update README.md quickstart example to include `project_uuid` and `project_slug`
-- [ ] T014 Update README.md API overview to list `project_uuid` and `project_slug` as Event fields
-- [ ] T015 Update README.md version references from `0.1.0-alpha` to `0.1.1-alpha`
-- [ ] T016 Add `0.1.1-alpha` entry to CHANGELOG.md documenting new project identity fields
+- [x] T013 Update README.md quickstart example to include `project_uuid` and `project_slug`
+- [x] T014 Update README.md API overview to list `project_uuid` and `project_slug` as Event fields
+- [x] T015 Update README.md version references from `0.1.0-alpha` to `0.1.1-alpha`
+- [x] T016 Add `0.1.1-alpha` entry to CHANGELOG.md documenting new project identity fields
 
 ### Implementation Notes
 - The quickstart example in README.md creates an Event on line 63–72. Add `project_uuid` param with `import uuid` at top.
