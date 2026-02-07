@@ -35,9 +35,9 @@ A consumer receives a raw GitHub `check_run` conclusion string and needs to know
 
 1. **Given** `conclusion="success"`, **When** the mapping helper is called, **Then** it returns `"GatePassed"`.
 2. **Given** `conclusion="failure"`, **When** the mapping helper is called, **Then** it returns `"GateFailed"`.
-3. **Given** `conclusion="timed_out"`, **When** the mapping helper is called, **Then** it returns `"GateFailed"`.
-4. **Given** `conclusion="neutral"`, **When** the mapping helper is called, **Then** it returns `None` and increments/logs an ignored-conclusion counter.
-5. **Given** `conclusion="skipped"`, **When** the mapping helper is called, **Then** it returns `None` and increments/logs an ignored-conclusion counter.
+3. **Given** `conclusion="cancelled"` or `conclusion="timed_out"`, **When** the mapping helper is called, **Then** it returns `"GateFailed"`.
+4. **Given** `conclusion="action_required"`, **When** the mapping helper is called, **Then** it returns `"GateFailed"`.
+5. **Given** `conclusion="neutral"` or `conclusion="skipped"` or `conclusion="stale"`, **When** the mapping helper is called, **Then** it returns `None` and increments/logs an ignored-conclusion counter.
 6. **Given** an unrecognized conclusion string (e.g., `"unknown_value"`), **When** the mapping helper is called, **Then** it raises an explicit error rather than silently dropping the event.
 
 ---
@@ -78,7 +78,7 @@ A downstream library consumer needs to know what changed, whether the new versio
 - What happens when a GitHub conclusion string has unexpected casing (e.g., `"SUCCESS"` vs `"success"`)? The mapping helper must define whether it normalizes or rejects non-lowercase input.
 - What happens when `check_run_url` is not a valid URL format? The payload model should validate URL structure.
 - What happens when `delivery_id` is empty string vs `None`? The contract must distinguish between "not provided" and "provided but empty."
-- How does the system handle a `check_run` conclusion of `"stale"` (added by GitHub after initial implementation)? Unknown conclusions must raise explicitly.
+- How does the system handle a `check_run` conclusion of `"stale"`? It is explicitly treated as ignored (`None`) and counted/logged as ignored.
 
 ## Requirements
 
@@ -90,8 +90,8 @@ A downstream library consumer needs to know what changed, whether the new versio
 - **FR-004**: Both payload models MUST be frozen (immutable after construction), consistent with the existing `Event` model.
 - **FR-005**: Library MUST provide a mapping function that accepts a GitHub `check_run` conclusion string and returns the corresponding event type string (`"GatePassed"` or `"GateFailed"`) or `None` for ignored conclusions.
 - **FR-006**: The mapping function MUST map `"success"` to `"GatePassed"`.
-- **FR-007**: The mapping function MUST map `"failure"`, `"timed_out"`, `"cancelled"`, `"action_required"`, and `"startup_failure"` to `"GateFailed"`.
-- **FR-008**: The mapping function MUST return `None` for `"neutral"` and `"skipped"` conclusions and log/count the ignored conclusion.
+- **FR-007**: The mapping function MUST map `"failure"`, `"timed_out"`, `"cancelled"`, and `"action_required"` to `"GateFailed"`.
+- **FR-008**: The mapping function MUST return `None` for `"neutral"`, `"skipped"`, and `"stale"` conclusions and log/count the ignored conclusion.
 - **FR-009**: The mapping function MUST raise an explicit error for any conclusion string not in the known set.
 - **FR-010**: Library MUST export the new payload models and mapping function from the package's public API.
 - **FR-011**: Library MUST include unit tests validating schema construction, required field enforcement, and serialization round-trips.
@@ -102,7 +102,7 @@ A downstream library consumer needs to know what changed, whether the new versio
 
 - **GatePassedPayload**: Validated payload model representing a CI gate that concluded successfully. Attached to a generic `Event` with `event_type="GatePassed"`.
 - **GateFailedPayload**: Validated payload model representing a CI gate that concluded with a failure condition. Attached to a generic `Event` with `event_type="GateFailed"`.
-- **GitHub Check Run Conclusion**: A string value from the GitHub API (`success`, `failure`, `timed_out`, `cancelled`, `action_required`, `startup_failure`, `neutral`, `skipped`) that determines which event type to emit or whether to ignore.
+- **GitHub Check Run Conclusion**: A string value from the GitHub API (`success`, `failure`, `timed_out`, `cancelled`, `action_required`, `neutral`, `skipped`, `stale`) that determines which event type to emit or whether to ignore.
 - **Delivery ID**: A unique identifier from the GitHub webhook delivery, used as an idempotency key to prevent duplicate event emission.
 
 ## Success Criteria
