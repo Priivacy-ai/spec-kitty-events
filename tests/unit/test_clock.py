@@ -1,5 +1,4 @@
 """Unit tests for Lamport clock."""
-import pytest
 from spec_kitty_events.clock import LamportClock
 from spec_kitty_events.storage import InMemoryClockStorage
 

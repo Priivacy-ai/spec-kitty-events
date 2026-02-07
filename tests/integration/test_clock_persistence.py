@@ -1,5 +1,4 @@
 """Integration tests for clock persistence."""
-import pytest
 from spec_kitty_events.clock import LamportClock
 from spec_kitty_events.storage import InMemoryClockStorage
 

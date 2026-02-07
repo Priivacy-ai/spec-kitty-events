@@ -1,6 +1,6 @@
 """Property-based tests for CRDT laws using Hypothesis."""
 import uuid
-from hypothesis import given, strategies as st, settings, HealthCheck
+from hypothesis import given, strategies as st, settings
 from datetime import datetime, timezone
 from spec_kitty_events.crdt import merge_gset, merge_counter
 from spec_kitty_events.models import Event

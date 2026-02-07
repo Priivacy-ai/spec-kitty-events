@@ -1,6 +1,5 @@
 """Unit tests for CRDT merge functions."""
 import uuid
-import pytest
 from datetime import datetime
 from spec_kitty_events.crdt import merge_gset, merge_counter
 from spec_kitty_events.models import Event

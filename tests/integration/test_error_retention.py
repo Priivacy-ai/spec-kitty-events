@@ -1,5 +1,4 @@
 """Integration tests for error retention policy."""
-import pytest
 from datetime import datetime, timedelta
 from spec_kitty_events.error_log import ErrorLog
 from spec_kitty_events.storage import InMemoryErrorStorage
