@@ -1,7 +1,7 @@
 ---
 work_package_id: WP03
 title: Documentation & Changelog
-lane: "for_review"
+lane: "doing"
 dependencies: [WP01]
 base_branch: 001-event-model-project-identity-WP01
 base_commit: 517c99c138c27cc72fe7e59ad175e59524de0344
@@ -14,7 +14,7 @@ subtasks:
 phase: Phase 2 - Polish
 assignee: ''
 agent: "claude-opus"
-shell_pid: "19778"
+shell_pid: "28647"
 review_status: ''
 reviewed_by: ''
 history:
@@ -243,3 +243,4 @@ print('Quickstart OK:', event)
 - 2026-02-07T00:00:00Z – system – lane=planned – Prompt created.
 - 2026-02-07T07:04:43Z – claude-opus – shell_pid=19778 – lane=doing – Assigned agent via workflow command
 - 2026-02-07T07:06:10Z – claude-opus – shell_pid=19778 – lane=for_review – README quickstart, API overview, version refs, and CHANGELOG updated for 0.1.1-alpha
+- 2026-02-07T07:15:52Z – claude-opus – shell_pid=28647 – lane=doing – Started review via workflow command
