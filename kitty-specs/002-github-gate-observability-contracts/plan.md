@@ -1,108 +1,100 @@
-# Implementation Plan: [FEATURE]
-*Path: [templates/plan-template.md](templates/plan-template.md)*
+# Implementation Plan: GitHub Gate Observability Contracts
+*Path: kitty-specs/002-github-gate-observability-contracts/plan.md*
 
-
-**Branch**: `[###-feature-name]` | **Date**: [DATE] | **Spec**: [link]
-**Input**: Feature specification from `/kitty-specs/[###-feature-name]/spec.md`
-
-**Note**: This template is filled in by the `/spec-kitty.plan` command. See `src/specify_cli/missions/software-dev/command-templates/plan.md` for the execution workflow.
-
-The planner will not begin until all planning questions have been answered—capture those answers in this document before progressing to later phases.
+**Branch**: `002-github-gate-observability-contracts` | **Date**: 2026-02-07 | **Spec**: [spec.md](spec.md)
+**Input**: Feature specification from `kitty-specs/002-github-gate-observability-contracts/spec.md`
 
 ## Summary
 
-[Extract from feature spec: primary requirement + technical approach from research]
+Add typed Pydantic payload models (`GatePassedPayload`, `GateFailedPayload`) and a deterministic GitHub `check_run` conclusion mapping helper to the `spec-kitty-events` library. All new code lives in a new `gates.py` module, preserving the existing generic `Event` architecture. Ignored conclusions (`neutral`, `skipped`, `stale`) emit no event but are logged via stdlib and an optional callback. Unknown conclusions raise an explicit error.
 
 ## Technical Context
 
-<!--
-  ACTION REQUIRED: Replace the content in this section with the technical details
-  for the project. The structure here is presented in advisory capacity to guide
-  the iteration process.
--->
-
-**Language/Version**: [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION]  
-**Primary Dependencies**: [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION]  
-**Storage**: [if applicable, e.g., PostgreSQL, CoreData, files or N/A]  
-**Testing**: [e.g., pytest, XCTest, cargo test or NEEDS CLARIFICATION]  
-**Target Platform**: [e.g., Linux server, iOS 15+, WASM or NEEDS CLARIFICATION]
-**Project Type**: [single/web/mobile - determines source structure]  
-**Performance Goals**: [domain-specific, e.g., 1000 req/s, 10k lines/sec, 60 fps or NEEDS CLARIFICATION]  
-**Constraints**: [domain-specific, e.g., <200ms p95, <100MB memory, offline-capable or NEEDS CLARIFICATION]  
-**Scale/Scope**: [domain-specific, e.g., 10k users, 1M LOC, 50 screens or NEEDS CLARIFICATION]
+**Language/Version**: Python 3.10+ (matches existing `pyproject.toml`)
+**Primary Dependencies**: Pydantic >=2.0.0,<3.0.0 (existing), python-ulid >=1.1.0 (existing). No new dependencies.
+**Storage**: N/A — payload models are pure data contracts, no persistence logic added.
+**Testing**: pytest + pytest-cov (existing), Hypothesis (existing for property tests), mypy --strict (existing)
+**Target Platform**: Library (PyPI package), consumed by CLI and SaaS
+**Project Type**: Single Python library with src/ layout
+**Performance Goals**: N/A — validation and mapping are synchronous, sub-millisecond operations
+**Constraints**: Must maintain mypy --strict compliance. Must not break existing `Event` model or public API. Additive-only changes (minor version bump).
+**Scale/Scope**: 8 known GitHub conclusion values. 2 payload models. 1 mapping function. ~150-200 lines of production code + ~200 lines of tests.
 
 ## Constitution Check
 
-*GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
-
-[Gates determined based on constitution file]
+*No constitution file found (`.kittify/memory/constitution.md` absent). Section skipped.*
 
 ## Project Structure
 
 ### Documentation (this feature)
 
 ```
-kitty-specs/[###-feature]/
-├── plan.md              # This file (/spec-kitty.plan command output)
-├── research.md          # Phase 0 output (/spec-kitty.plan command)
-├── data-model.md        # Phase 1 output (/spec-kitty.plan command)
-├── quickstart.md        # Phase 1 output (/spec-kitty.plan command)
-├── contracts/           # Phase 1 output (/spec-kitty.plan command)
-└── tasks.md             # Phase 2 output (/spec-kitty.tasks command - NOT created by /spec-kitty.plan)
+kitty-specs/002-github-gate-observability-contracts/
+├── plan.md              # This file
+├── spec.md              # Feature specification
+├── meta.json            # Feature metadata
+├── research.md          # Phase 0 output
+├── data-model.md        # Phase 1 output
+├── contracts/           # Phase 1 output
+│   └── gates-api.md     # API contract for gates module
+├── quickstart.md        # Phase 1 output
+└── checklists/
+    └── requirements.md  # Spec quality checklist
 ```
 
 ### Source Code (repository root)
-<!--
-  ACTION REQUIRED: Replace the placeholder tree below with the concrete layout
-  for this feature. Delete unused options and expand the chosen structure with
-  real paths (e.g., apps/admin, packages/something). The delivered plan must
-  not include Option labels.
--->
 
 ```
-# [REMOVE IF UNUSED] Option 1: Single project (DEFAULT)
-src/
-├── models/
-├── services/
-├── cli/
-└── lib/
+src/spec_kitty_events/
+├── __init__.py          # Add exports: GatePassedPayload, GateFailedPayload,
+│                        #   GatePayloadBase, map_check_run_conclusion,
+│                        #   UnknownConclusionError
+├── models.py            # UNCHANGED — generic Event, ErrorEntry, exceptions
+└── gates.py             # NEW — payload models + mapping helper
 
 tests/
-├── contract/
-├── integration/
-└── unit/
-
-# [REMOVE IF UNUSED] Option 2: Web application (when "frontend" + "backend" detected)
-backend/
-├── src/
-│   ├── models/
-│   ├── services/
-│   └── api/
-└── tests/
-
-frontend/
-├── src/
-│   ├── components/
-│   ├── pages/
-│   └── services/
-└── tests/
-
-# [REMOVE IF UNUSED] Option 3: Mobile + API (when "iOS/Android" detected)
-api/
-└── [same as backend above]
-
-ios/ or android/
-└── [platform-specific structure: feature modules, UI flows, platform tests]
+├── unit/
+│   └── test_gates.py    # NEW — payload validation, field enforcement,
+│                        #   serialization round-trips
+├── property/
+│   └── test_gates_determinism.py  # NEW — mapping determinism property tests
+└── conftest.py          # UNCHANGED (no new fixtures needed)
 ```
 
-**Structure Decision**: [Document the selected structure and reference the real
-directories captured above]
+**Structure Decision**: Single new module `src/spec_kitty_events/gates.py` co-locates payload models and mapping logic. This avoids over-engineering (no subpackage) while keeping gate concerns separate from the generic event envelope in `models.py`.
+
+## Design Decisions
+
+### D1: Shared Base Payload Model
+
+`GatePassedPayload` and `GateFailedPayload` share a common `GatePayloadBase` that holds all required fields (FR-001, FR-002). The two subclasses exist primarily for type discrimination — they enable consumers to use `isinstance()` checks and type narrowing. The base class is also exported for consumers who want to accept either payload type.
+
+### D2: Literal Type Constraints
+
+`gate_type` is typed as `Literal["ci"]` and `external_provider` as `Literal["github"]`. This makes the contract self-documenting and extensible — future gate types or providers add new literal values without breaking the base structure.
+
+### D3: Conclusion Mapping as Pure Function + Logging
+
+`map_check_run_conclusion(conclusion, on_ignored=None)` is a pure mapping function that:
+- Returns `"GatePassed"` for `success`
+- Returns `"GateFailed"` for `failure`, `timed_out`, `cancelled`, `action_required`
+- Returns `None` for `neutral`, `skipped`, `stale` (and logs via `logging.getLogger("spec_kitty_events.gates")`)
+- Raises `UnknownConclusionError` for any other value
+
+The optional `on_ignored` callback has signature `Callable[[str, str], None]` → `(conclusion, reason)`.
+
+### D4: Case Sensitivity
+
+The mapping function accepts lowercase only and raises `UnknownConclusionError` for non-lowercase input (e.g., `"SUCCESS"`). GitHub's API returns lowercase values; accepting mixed case would mask upstream bugs.
+
+### D5: URL Validation
+
+`check_run_url` uses Pydantic's `AnyHttpUrl` type for structural validation. This ensures the field contains a well-formed HTTP/HTTPS URL without requiring network access.
+
+### D6: Version Bump
+
+This is an additive, non-breaking change → bump to `0.2.0-alpha` (minor version bump per semver).
 
 ## Complexity Tracking
 
-*Fill ONLY if Constitution Check has violations that must be justified*
-
-| Violation | Why Needed | Simpler Alternative Rejected Because |
-|-----------|------------|-------------------------------------|
-| [e.g., 4th project] | [current need] | [why 3 projects insufficient] |
-| [e.g., Repository pattern] | [specific problem] | [why direct DB access insufficient] |
+*No constitution violations to justify. Feature adds one module with straightforward models and a lookup function.*
