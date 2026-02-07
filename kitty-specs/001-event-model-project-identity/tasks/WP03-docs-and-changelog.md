@@ -1,25 +1,28 @@
 ---
-work_package_id: "WP03"
+work_package_id: WP03
+title: Documentation & Changelog
+lane: "doing"
+dependencies: [WP01]
+base_branch: 001-event-model-project-identity-WP01
+base_commit: 517c99c138c27cc72fe7e59ad175e59524de0344
+created_at: '2026-02-07T07:04:43.015763+00:00'
 subtasks:
-  - "T013"
-  - "T014"
-  - "T015"
-  - "T016"
-title: "Documentation & Changelog"
-phase: "Phase 2 - Polish"
-lane: "planned"
-assignee: ""
-agent: ""
-shell_pid: ""
-review_status: ""
-reviewed_by: ""
-dependencies: ["WP01"]
+- T013
+- T014
+- T015
+- T016
+phase: Phase 2 - Polish
+assignee: ''
+agent: ''
+shell_pid: "19778"
+review_status: ''
+reviewed_by: ''
 history:
-  - timestamp: "2026-02-07T00:00:00Z"
-    lane: "planned"
-    agent: "system"
-    shell_pid: ""
-    action: "Prompt generated via /spec-kitty.tasks"
+- timestamp: '2026-02-07T00:00:00Z'
+  lane: planned
+  agent: system
+  shell_pid: ''
+  action: Prompt generated via /spec-kitty.tasks
 ---
 
 # Work Package Prompt: WP03 – Documentation & Changelog
