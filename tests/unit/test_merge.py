@@ -1,8 +1,11 @@
 """Unit tests for state-machine merge logic."""
+import uuid
 import pytest
 from datetime import datetime
 from spec_kitty_events.merge import state_machine_merge
 from spec_kitty_events.models import Event, ValidationError
+
+TEST_PROJECT_UUID = uuid.UUID("12345678-1234-5678-1234-567812345678")
 
 
 class TestStateMachineMerge:
@@ -19,7 +22,8 @@ class TestStateMachineMerge:
             timestamp=datetime.now(),
             node_id="alice",
             lamport_clock=5,
-            payload={"state": "doing"}  # Priority 2
+            payload={"state": "doing"},  # Priority 2
+            project_uuid=TEST_PROJECT_UUID,
         )
         e2 = Event(
             event_id="01HRN7QMQJT8XVKP9YZ2ABCDEG",
@@ -28,7 +32,8 @@ class TestStateMachineMerge:
             timestamp=datetime.now(),
             node_id="bob",
             lamport_clock=5,
-            payload={"state": "done"}  # Priority 4 (highest)
+            payload={"state": "done"},  # Priority 4 (highest)
+            project_uuid=TEST_PROJECT_UUID,
         )
         e3 = Event(
             event_id="01HRN7QMQJT8XVKP9YZ2ABCDEH",
@@ -37,7 +42,8 @@ class TestStateMachineMerge:
             timestamp=datetime.now(),
             node_id="charlie",
             lamport_clock=5,
-            payload={"state": "for_review"}  # Priority 3
+            payload={"state": "for_review"},  # Priority 3
+            project_uuid=TEST_PROJECT_UUID,
         )
 
         resolution = state_machine_merge([e1, e2, e3], priority_map)
@@ -57,7 +63,8 @@ class TestStateMachineMerge:
             timestamp=datetime.now(),
             node_id="charlie",  # Later alphabetically
             lamport_clock=5,
-            payload={"state": "done"}
+            payload={"state": "done"},
+            project_uuid=TEST_PROJECT_UUID,
         )
         e2 = Event(
             event_id="01HRN7QMQJT8XVKP9YZ2ABCDEG",
@@ -66,7 +73,8 @@ class TestStateMachineMerge:
             timestamp=datetime.now(),
             node_id="alice",  # Earlier alphabetically (wins)
             lamport_clock=5,
-            payload={"state": "done"}
+            payload={"state": "done"},
+            project_uuid=TEST_PROJECT_UUID,
         )
 
         resolution = state_machine_merge([e1, e2], priority_map)
@@ -85,7 +93,8 @@ class TestStateMachineMerge:
             timestamp=datetime.now(),
             node_id="alice",
             lamport_clock=5,
-            payload={"state": "planned"}
+            payload={"state": "planned"},
+            project_uuid=TEST_PROJECT_UUID,
         )
 
         resolution = state_machine_merge([e1], priority_map)
@@ -104,7 +113,8 @@ class TestStateMachineMerge:
             timestamp=datetime.now(),
             node_id="alice",
             lamport_clock=5,
-            payload={"state": "done"}
+            payload={"state": "done"},
+            project_uuid=TEST_PROJECT_UUID,
         )
         e2 = Event(
             event_id="01HRN7QMQJT8XVKP9YZ2ABCDEG",
@@ -113,7 +123,8 @@ class TestStateMachineMerge:
             timestamp=datetime.now(),
             node_id="bob",
             lamport_clock=5,
-            payload={"state": "done"}
+            payload={"state": "done"},
+            project_uuid=TEST_PROJECT_UUID,
         )
 
         resolution = state_machine_merge([e1, e2], priority_map)
@@ -134,7 +145,8 @@ class TestStateMachineMerge:
             timestamp=datetime.now(),
             node_id="alice",
             lamport_clock=5,  # Different clock
-            payload={"state": "done"}
+            payload={"state": "done"},
+            project_uuid=TEST_PROJECT_UUID,
         )
         e2 = Event(
             event_id="01HRN7QMQJT8XVKP9YZ2ABCDEG",
@@ -143,7 +155,8 @@ class TestStateMachineMerge:
             timestamp=datetime.now(),
             node_id="bob",
             lamport_clock=6,  # Different clock
-            payload={"state": "planned"}
+            payload={"state": "planned"},
+            project_uuid=TEST_PROJECT_UUID,
         )
 
         with pytest.raises(ValidationError, match="different lamport_clocks"):
@@ -160,7 +173,8 @@ class TestStateMachineMerge:
             timestamp=datetime.now(),
             node_id="alice",
             lamport_clock=5,
-            payload={"state": "done"}
+            payload={"state": "done"},
+            project_uuid=TEST_PROJECT_UUID,
         )
         e2 = Event(
             event_id="01HRN7QMQJT8XVKP9YZ2ABCDEG",
@@ -169,7 +183,8 @@ class TestStateMachineMerge:
             timestamp=datetime.now(),
             node_id="bob",
             lamport_clock=5,
-            payload={"state": "done"}
+            payload={"state": "done"},
+            project_uuid=TEST_PROJECT_UUID,
         )
 
         with pytest.raises(ValidationError, match="different aggregate_ids"):
@@ -186,7 +201,8 @@ class TestStateMachineMerge:
             timestamp=datetime.now(),
             node_id="alice",
             lamport_clock=5,
-            payload={}  # No "state" or "status" key
+            payload={},  # No "state" or "status" key
+            project_uuid=TEST_PROJECT_UUID,
         )
 
         with pytest.raises(ValidationError, match="missing 'state' or 'status' in payload"):
@@ -203,7 +219,8 @@ class TestStateMachineMerge:
             timestamp=datetime.now(),
             node_id="alice",
             lamport_clock=5,
-            payload={"state": "invalid_state"}
+            payload={"state": "invalid_state"},
+            project_uuid=TEST_PROJECT_UUID,
         )
 
         with pytest.raises(ValidationError, match="not in priority_map"):
@@ -227,7 +244,8 @@ class TestStateMachineMerge:
             timestamp=datetime.now(),
             node_id="alice",
             lamport_clock=5,
-            payload={"status": "active"}  # Using "status" instead of "state"
+            payload={"status": "active"},  # Using "status" instead of "state"
+            project_uuid=TEST_PROJECT_UUID,
         )
 
         resolution = state_machine_merge([e1], priority_map, state_key="status")
@@ -245,7 +263,8 @@ class TestStateMachineMerge:
             timestamp=datetime.now(),
             node_id="alice",
             lamport_clock=5,
-            payload={"status": "doing"}  # Using "status" not "state"
+            payload={"status": "doing"},  # Using "status" not "state"
+            project_uuid=TEST_PROJECT_UUID,
         )
         e2 = Event(
             event_id="01HRN7QMQJT8XVKP9YZ2ABCDEG",
@@ -254,7 +273,8 @@ class TestStateMachineMerge:
             timestamp=datetime.now(),
             node_id="bob",
             lamport_clock=5,
-            payload={"status": "done"}  # Using "status" not "state"
+            payload={"status": "done"},  # Using "status" not "state"
+            project_uuid=TEST_PROJECT_UUID,
         )
 
         # Using default state_key (no explicit parameter), should fallback to "status"

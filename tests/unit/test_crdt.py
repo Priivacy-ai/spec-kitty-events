@@ -1,8 +1,11 @@
 """Unit tests for CRDT merge functions."""
+import uuid
 import pytest
 from datetime import datetime
 from spec_kitty_events.crdt import merge_gset, merge_counter
 from spec_kitty_events.models import Event
+
+TEST_PROJECT_UUID = uuid.UUID("12345678-1234-5678-1234-567812345678")
 
 
 class TestMergeGSet:
@@ -17,7 +20,8 @@ class TestMergeGSet:
             timestamp=datetime.now(),
             node_id="node1",
             lamport_clock=1,
-            payload={"tags": {"bug", "urgent"}}
+            payload={"tags": {"bug", "urgent"}},
+            project_uuid=TEST_PROJECT_UUID,
         )
         e2 = Event(
             event_id="01ARZ3NDEKTSV4RRFFQ69G5FAW",
@@ -26,7 +30,8 @@ class TestMergeGSet:
             timestamp=datetime.now(),
             node_id="node2",
             lamport_clock=1,
-            payload={"tags": {"bug", "resolved"}}
+            payload={"tags": {"bug", "resolved"}},
+            project_uuid=TEST_PROJECT_UUID,
         )
         result = merge_gset([e1, e2])
         assert result == {"bug", "urgent", "resolved"}
@@ -45,7 +50,8 @@ class TestMergeGSet:
             timestamp=datetime.now(),
             node_id="node1",
             lamport_clock=1,
-            payload={}  # No "tags" key
+            payload={},  # No "tags" key
+            project_uuid=TEST_PROJECT_UUID,
         )
         result = merge_gset([e1])
         assert result == set()
@@ -59,7 +65,8 @@ class TestMergeGSet:
             timestamp=datetime.now(),
             node_id="node1",
             lamport_clock=1,
-            payload={"tags": ["bug", "urgent"]}  # List instead of set
+            payload={"tags": ["bug", "urgent"]},  # List instead of set
+            project_uuid=TEST_PROJECT_UUID,
         )
         result = merge_gset([e1])
         assert result == {"bug", "urgent"}
@@ -77,7 +84,8 @@ class TestMergeCounter:
             timestamp=datetime.now(),
             node_id="node1",
             lamport_clock=1,
-            payload={"delta": 5}
+            payload={"delta": 5},
+            project_uuid=TEST_PROJECT_UUID,
         )
         e2 = Event(
             event_id="01ARZ3NDEKTSV4RRFFQ69G5FAW",
@@ -86,7 +94,8 @@ class TestMergeCounter:
             timestamp=datetime.now(),
             node_id="node2",
             lamport_clock=1,
-            payload={"delta": 3}
+            payload={"delta": 3},
+            project_uuid=TEST_PROJECT_UUID,
         )
         result = merge_counter([e1, e2])
         assert result == 8
@@ -100,7 +109,8 @@ class TestMergeCounter:
             timestamp=datetime.now(),
             node_id="node1",
             lamport_clock=1,
-            payload={"delta": 5}
+            payload={"delta": 5},
+            project_uuid=TEST_PROJECT_UUID,
         )
         # Pass e1 twice
         result = merge_counter([e1, e1])
@@ -120,7 +130,8 @@ class TestMergeCounter:
             timestamp=datetime.now(),
             node_id="node1",
             lamport_clock=1,
-            payload={}  # No "delta" key
+            payload={},  # No "delta" key
+            project_uuid=TEST_PROJECT_UUID,
         )
         result = merge_counter([e1])
         assert result == 0
@@ -134,7 +145,8 @@ class TestMergeCounter:
             timestamp=datetime.now(),
             node_id="node1",
             lamport_clock=1,
-            payload={"delta": 10}
+            payload={"delta": 10},
+            project_uuid=TEST_PROJECT_UUID,
         )
         e2 = Event(
             event_id="01ARZ3NDEKTSV4RRFFQ69G5FAW",
@@ -143,7 +155,8 @@ class TestMergeCounter:
             timestamp=datetime.now(),
             node_id="node2",
             lamport_clock=1,
-            payload={"delta": -3}
+            payload={"delta": -3},
+            project_uuid=TEST_PROJECT_UUID,
         )
         result = merge_counter([e1, e2])
         assert result == 7  # 10 + (-3)

@@ -1,4 +1,5 @@
 """Unit tests for storage adapters."""
+import uuid
 import inspect
 import pytest
 from datetime import datetime
@@ -11,6 +12,8 @@ from spec_kitty_events.storage import (
     InMemoryErrorStorage,
 )
 from spec_kitty_events.models import Event, ErrorEntry
+
+TEST_PROJECT_UUID = uuid.UUID("12345678-1234-5678-1234-567812345678")
 
 
 class TestEventStore:
@@ -29,7 +32,8 @@ class TestEventStore:
             aggregate_id="AGG001",
             timestamp=datetime.now(),
             node_id="node1",
-            lamport_clock=5
+            lamport_clock=5,
+            project_uuid=TEST_PROJECT_UUID,
         )
         store.save_event(event)
         loaded = store.load_events("AGG001")
@@ -45,7 +49,8 @@ class TestEventStore:
             aggregate_id="AGG001",
             timestamp=datetime.now(),
             node_id="node1",
-            lamport_clock=5
+            lamport_clock=5,
+            project_uuid=TEST_PROJECT_UUID,
         )
         event2 = Event(
             event_id="01ARZ3NDEKTSV4RRFFQ69G5FAV",  # Same event_id
@@ -53,7 +58,8 @@ class TestEventStore:
             aggregate_id="AGG001",
             timestamp=datetime.now(),
             node_id="node1",
-            lamport_clock=6
+            lamport_clock=6,
+            project_uuid=TEST_PROJECT_UUID,
         )
         store.save_event(event1)
         store.save_event(event2)
@@ -70,7 +76,8 @@ class TestEventStore:
             aggregate_id="AGG001",
             timestamp=datetime.now(),
             node_id="node2",
-            lamport_clock=5
+            lamport_clock=5,
+            project_uuid=TEST_PROJECT_UUID,
         )
         e2 = Event(
             event_id="01ARZ3NDEKTSV4RRFFQ69G5FA2",
@@ -78,7 +85,8 @@ class TestEventStore:
             aggregate_id="AGG001",
             timestamp=datetime.now(),
             node_id="node1",
-            lamport_clock=5
+            lamport_clock=5,
+            project_uuid=TEST_PROJECT_UUID,
         )
         e3 = Event(
             event_id="01ARZ3NDEKTSV4RRFFQ69G5FA3",
@@ -86,7 +94,8 @@ class TestEventStore:
             aggregate_id="AGG001",
             timestamp=datetime.now(),
             node_id="node1",
-            lamport_clock=3
+            lamport_clock=3,
+            project_uuid=TEST_PROJECT_UUID,
         )
         store.save_event(e1)
         store.save_event(e2)

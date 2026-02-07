@@ -1,4 +1,5 @@
 """Integration test demonstrating custom adapter implementation."""
+import uuid
 from typing import List, Dict
 from spec_kitty_events import (
     EventStore,
@@ -7,6 +8,8 @@ from spec_kitty_events import (
     LamportClock,
 )
 from datetime import datetime
+
+TEST_PROJECT_UUID = uuid.UUID("12345678-1234-5678-1234-567812345678")
 
 
 class DictEventStore(EventStore):
@@ -54,7 +57,8 @@ class TestCustomAdapters:
             aggregate_id="AGG001",
             timestamp=datetime.now(),
             node_id="node1",
-            lamport_clock=1
+            lamport_clock=1,
+            project_uuid=TEST_PROJECT_UUID,
         )
 
         store.save_event(e1)
@@ -89,7 +93,8 @@ class TestCustomAdapters:
             aggregate_id="AGG001",
             timestamp=datetime.now(),
             node_id="node1",
-            lamport_clock=1
+            lamport_clock=1,
+            project_uuid=TEST_PROJECT_UUID,
         )
         store1.save_event(event)
 
