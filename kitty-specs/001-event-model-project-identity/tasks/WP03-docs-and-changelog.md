@@ -13,7 +13,7 @@ subtasks:
 - T016
 phase: Phase 2 - Polish
 assignee: ''
-agent: ''
+agent: "claude-opus"
 shell_pid: "19778"
 review_status: ''
 reviewed_by: ''
@@ -241,3 +241,4 @@ print('Quickstart OK:', event)
 ## Activity Log
 
 - 2026-02-07T00:00:00Z – system – lane=planned – Prompt created.
+- 2026-02-07T07:04:43Z – claude-opus – shell_pid=19778 – lane=doing – Assigned agent via workflow command
