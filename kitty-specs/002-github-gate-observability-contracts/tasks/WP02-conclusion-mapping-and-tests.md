@@ -1,7 +1,7 @@
 ---
 work_package_id: WP02
 title: Conclusion Mapping & Tests
-lane: "doing"
+lane: "for_review"
 dependencies: [WP01]
 base_branch: main
 base_commit: cc3cfc9cfafbdd09c2146c5ad6003e6a3109c3b0
@@ -453,3 +453,4 @@ Implement the `map_check_run_conclusion()` function in `gates.py` (replacing the
 ## Activity Log
 
 - 2026-02-07T00:00:00Z – system – lane=planned – Prompt created.
+- 2026-02-07T20:39:24Z – unknown – shell_pid=51548 – lane=for_review – 69 tests passing, 100% coverage on gates.py
