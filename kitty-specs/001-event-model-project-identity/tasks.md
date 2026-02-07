@@ -51,13 +51,13 @@
 **Estimated prompt size**: ~500 lines
 
 ### Included Subtasks
-- [ ] T006 [P] Update `tests/unit/test_models.py` — add `project_uuid` to all 7 `Event()` calls + add new validation tests for project_uuid/project_slug
-- [ ] T007 [P] Update `tests/unit/test_conflict.py` — add `project_uuid` to all 25 `Event()` calls
-- [ ] T008 [P] Update `tests/unit/test_merge.py` — add `project_uuid` to all 17 `Event()` calls
-- [ ] T009 [P] Update `tests/unit/test_crdt.py` — add `project_uuid` to all 10 `Event()` calls
-- [ ] T010 [P] Update `tests/unit/test_storage.py` — add `project_uuid` to all 6 `Event()` calls
-- [ ] T011 [P] Update `tests/integration/test_quickstart.py` — add `project_uuid` to all 11 `Event()` calls
-- [ ] T012 [P] Update remaining test files — `test_conflict_resolution.py` (7), `test_event_emission.py` (4), `test_adapters.py` (2), `test_crdt_laws.py` (2), `test_determinism.py` (1)
+- [x] T006 [P] Update `tests/unit/test_models.py` — add `project_uuid` to all 7 `Event()` calls + add new validation tests for project_uuid/project_slug
+- [x] T007 [P] Update `tests/unit/test_conflict.py` — add `project_uuid` to all 25 `Event()` calls
+- [x] T008 [P] Update `tests/unit/test_merge.py` — add `project_uuid` to all 17 `Event()` calls
+- [x] T009 [P] Update `tests/unit/test_crdt.py` — add `project_uuid` to all 10 `Event()` calls
+- [x] T010 [P] Update `tests/unit/test_storage.py` — add `project_uuid` to all 6 `Event()` calls
+- [x] T011 [P] Update `tests/integration/test_quickstart.py` — add `project_uuid` to all 11 `Event()` calls
+- [x] T012 [P] Update remaining test files — `test_conflict_resolution.py` (7), `test_event_emission.py` (4), `test_adapters.py` (2), `test_crdt_laws.py` (2), `test_determinism.py` (1)
 
 ### Implementation Notes
 - Use a consistent test UUID across files: `TEST_PROJECT_UUID = uuid.UUID("550e8400-e29b-41d4-a716-446655440000")`.
