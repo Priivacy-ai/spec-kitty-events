@@ -2,7 +2,7 @@
 
 Event log library with Lamport clocks and systematic error tracking for distributed systems.
 
-**Status**: Alpha (v0.1.0-alpha)
+**Status**: Alpha (v0.1.1-alpha)
 
 ## Features
 
@@ -20,7 +20,7 @@ Event log library with Lamport clocks and systematic error tracking for distribu
 ### From Git (Recommended for Alpha)
 
 ```bash
-pip install git+https://github.com/Priivacy-ai/spec-kitty-events.git@v0.1.0-alpha
+pip install git+https://github.com/Priivacy-ai/spec-kitty-events.git@v0.1.1-alpha
 ```
 
 Or add to `requirements.txt` or `pyproject.toml`:
@@ -28,7 +28,7 @@ Or add to `requirements.txt` or `pyproject.toml`:
 ```toml
 # pyproject.toml
 dependencies = [
-    "spec-kitty-events @ git+https://github.com/Priivacy-ai/spec-kitty-events.git@v0.1.0-alpha",
+    "spec-kitty-events @ git+https://github.com/Priivacy-ai/spec-kitty-events.git@v0.1.1-alpha",
 ]
 ```
 
@@ -45,6 +45,7 @@ pip install -e ".[dev]"
 ### Basic Event Emission
 
 ```python
+import uuid
 from datetime import datetime
 from spec_kitty_events import (
     Event,
@@ -67,6 +68,8 @@ event = Event(
     timestamp=datetime.now(),
     node_id="alice",
     lamport_clock=clock.current(),
+    project_uuid=uuid.uuid4(),
+    project_slug="my-project",
     payload={"state": "doing"}
 )
 event_store.save_event(event)
@@ -112,7 +115,7 @@ For production, implement adapters for your database (PostgreSQL, SQLite, etc.).
 ### API Overview
 
 **Core Models**:
-- `Event`: Immutable event with causal metadata (lamport_clock, causation_id)
+- `Event`: Immutable event with causal metadata (lamport_clock, causation_id, project_uuid, project_slug)
 - `ErrorEntry`: Error log entry (timestamp, action_attempted, error_message)
 - `ConflictResolution`: Result of merge operation
 
@@ -173,12 +176,13 @@ This is an alpha release. Contributions are welcome! Please:
 
 ## Roadmap
 
-**v0.1.0-alpha** (Current):
+**v0.1.1-alpha** (Current):
 - ✅ Lamport clocks
 - ✅ Event immutability
 - ✅ Conflict detection
 - ✅ CRDT and state-machine merge
 - ✅ Error logging
+- ✅ Project identity (project_uuid, project_slug)
 
 **v0.2.0** (Planned):
 - [ ] Vector clocks (full happens-before ordering)
