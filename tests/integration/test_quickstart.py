@@ -1,4 +1,5 @@
 """Validation tests for quickstart.md examples."""
+import uuid
 from datetime import datetime
 from typing import List
 import ulid
@@ -16,6 +17,8 @@ from spec_kitty_events import (
     ErrorLog,
     total_order_key,
 )
+
+TEST_PROJECT_UUID = uuid.UUID("12345678-1234-5678-1234-567812345678")
 
 
 class InMemoryClockStorage(ClockStorage):
@@ -76,7 +79,8 @@ class TestQuickstartExamples:
             payload={"state": "doing"},
             timestamp=datetime.now(),
             node_id="alice",
-            lamport_clock=1
+            lamport_clock=1,
+            project_uuid=TEST_PROJECT_UUID,
         )
         event_store.save_event(event)
 
@@ -102,7 +106,8 @@ class TestQuickstartExamples:
             timestamp=datetime.now(),
             node_id="alice-laptop",
             lamport_clock=clock.tick(),  # Increments clock to 1
-            causation_id=None  # Root event (no parent)
+            causation_id=None,  # Root event (no parent)
+            project_uuid=TEST_PROJECT_UUID,
         )
 
         event_store = InMemoryEventStore()
@@ -127,7 +132,8 @@ class TestQuickstartExamples:
             timestamp=datetime.now(),
             node_id="bob-laptop",
             lamport_clock=10,
-            causation_id=None
+            causation_id=None,
+            project_uuid=TEST_PROJECT_UUID,
         )
 
         # Update local clock when receiving
@@ -144,7 +150,8 @@ class TestQuickstartExamples:
             payload={"state": "doing"},
             node_id="alice-laptop",
             lamport_clock=5,
-            timestamp=datetime.now()
+            timestamp=datetime.now(),
+            project_uuid=TEST_PROJECT_UUID,
         )
 
         bob_event = Event(
@@ -154,7 +161,8 @@ class TestQuickstartExamples:
             payload={"state": "for_review"},
             node_id="bob-laptop",
             lamport_clock=5,
-            timestamp=datetime.now()
+            timestamp=datetime.now(),
+            project_uuid=TEST_PROJECT_UUID,
         )
 
         # Detect conflict
@@ -177,7 +185,8 @@ class TestQuickstartExamples:
                 payload={"tags": {"urgent"}},
                 timestamp=datetime.now(),
                 node_id="alice",
-                lamport_clock=5
+                lamport_clock=5,
+                project_uuid=TEST_PROJECT_UUID,
             ),
             Event(
                 event_id=str(ulid.ULID()),
@@ -186,7 +195,8 @@ class TestQuickstartExamples:
                 payload={"tags": {"backend"}},
                 timestamp=datetime.now(),
                 node_id="bob",
-                lamport_clock=5
+                lamport_clock=5,
+                project_uuid=TEST_PROJECT_UUID,
             )
         ]
         merged_tags = merge_gset(tag_events)
@@ -201,7 +211,8 @@ class TestQuickstartExamples:
                 payload={"delta": 1},
                 timestamp=datetime.now(),
                 node_id="alice",
-                lamport_clock=5
+                lamport_clock=5,
+                project_uuid=TEST_PROJECT_UUID,
             ),
             Event(
                 event_id=str(ulid.ULID()),
@@ -210,7 +221,8 @@ class TestQuickstartExamples:
                 payload={"delta": 3},
                 timestamp=datetime.now(),
                 node_id="bob",
-                lamport_clock=5
+                lamport_clock=5,
+                project_uuid=TEST_PROJECT_UUID,
             )
         ]
         merged_count = merge_counter(counter_events)
@@ -249,7 +261,8 @@ class TestQuickstartExamples:
             payload={"state": "doing"},
             timestamp=datetime.now(),
             node_id="alice-laptop",
-            lamport_clock=alice_clock.tick()  # 1
+            lamport_clock=alice_clock.tick(),  # 1
+            project_uuid=TEST_PROJECT_UUID,
         )
         alice_store.save_event(alice_event)
 
@@ -265,7 +278,8 @@ class TestQuickstartExamples:
             payload={"state": "for_review"},
             timestamp=datetime.now(),
             node_id="bob-laptop",
-            lamport_clock=bob_clock.tick()  # 1 (concurrent with Alice)
+            lamport_clock=bob_clock.tick(),  # 1 (concurrent with Alice)
+            project_uuid=TEST_PROJECT_UUID,
         )
         bob_store.save_event(bob_event)
 

@@ -1,4 +1,5 @@
 """Integration test for conflict resolution workflow."""
+import uuid
 from datetime import datetime
 from spec_kitty_events import (
     Event,
@@ -7,6 +8,8 @@ from spec_kitty_events import (
     InMemoryEventStore,
     topological_sort,
 )
+
+TEST_PROJECT_UUID = uuid.UUID("12345678-1234-5678-1234-567812345678")
 
 
 class TestConflictResolution:
@@ -28,7 +31,8 @@ class TestConflictResolution:
             timestamp=datetime.now(),
             node_id="alice",
             lamport_clock=5,
-            payload={"state": "for_review"}
+            payload={"state": "for_review"},
+            project_uuid=TEST_PROJECT_UUID,
         )
 
         e_bob = Event(
@@ -38,7 +42,8 @@ class TestConflictResolution:
             timestamp=datetime.now(),
             node_id="bob",
             lamport_clock=5,  # Same clock = concurrent
-            payload={"state": "done"}
+            payload={"state": "done"},
+            project_uuid=TEST_PROJECT_UUID,
         )
 
         event_store.save_event(e_alice)
@@ -71,7 +76,8 @@ class TestConflictResolution:
             timestamp=datetime.now(),
             node_id="alice",
             lamport_clock=5,
-            payload={"state": "done"}
+            payload={"state": "done"},
+            project_uuid=TEST_PROJECT_UUID,
         )
 
         e2 = Event(
@@ -81,7 +87,8 @@ class TestConflictResolution:
             timestamp=datetime.now(),
             node_id="bob",
             lamport_clock=5,
-            payload={"state": "done"}
+            payload={"state": "done"},
+            project_uuid=TEST_PROJECT_UUID,
         )
 
         # Not concurrent (different aggregates)
@@ -96,7 +103,8 @@ class TestConflictResolution:
             timestamp=datetime.now(),
             node_id="alice",
             lamport_clock=1,
-            causation_id=None  # Root
+            causation_id=None,  # Root
+            project_uuid=TEST_PROJECT_UUID,
         )
 
         e2 = Event(
@@ -106,7 +114,8 @@ class TestConflictResolution:
             timestamp=datetime.now(),
             node_id="alice",
             lamport_clock=2,
-            causation_id="01ARZ3NDEKTSV4RRFFQ69G5001"  # Child of e1
+            causation_id="01ARZ3NDEKTSV4RRFFQ69G5001",  # Child of e1
+            project_uuid=TEST_PROJECT_UUID,
         )
 
         e3 = Event(
@@ -116,7 +125,8 @@ class TestConflictResolution:
             timestamp=datetime.now(),
             node_id="bob",
             lamport_clock=3,
-            causation_id="01ARZ3NDEKTSV4RRFFQ69G5002"  # Child of e2
+            causation_id="01ARZ3NDEKTSV4RRFFQ69G5002",  # Child of e2
+            project_uuid=TEST_PROJECT_UUID,
         )
 
         # Sort in reverse order (should produce e1, e2, e3)

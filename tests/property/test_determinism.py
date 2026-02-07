@@ -1,4 +1,5 @@
 """Property-based tests for determinism of state-machine merge."""
+import uuid
 from hypothesis import given, strategies as st
 from datetime import datetime
 from spec_kitty_events.merge import state_machine_merge
@@ -17,7 +18,8 @@ def event_with_state(draw):
         timestamp=datetime.now(),
         node_id=draw(st.text(min_size=1, max_size=10)),
         lamport_clock=5,  # Same clock for all (concurrent)
-        payload={"state": draw(st.sampled_from(states))}
+        payload={"state": draw(st.sampled_from(states))},
+        project_uuid=uuid.uuid4(),
     )
 
 

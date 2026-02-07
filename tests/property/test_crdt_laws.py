@@ -1,4 +1,5 @@
 """Property-based tests for CRDT laws using Hypothesis."""
+import uuid
 from hypothesis import given, strategies as st, settings, HealthCheck
 from datetime import datetime, timezone
 from spec_kitty_events.crdt import merge_gset, merge_counter
@@ -23,7 +24,8 @@ def event_with_tags(draw):
         timestamp=FIXED_TIMESTAMP,
         node_id=draw(st.text(min_size=1, max_size=10)),
         lamport_clock=draw(st.integers(min_value=0, max_value=100)),
-        payload={"tags": draw(st.sets(st.text(min_size=1, max_size=10), max_size=5))}
+        payload={"tags": draw(st.sets(st.text(min_size=1, max_size=10), max_size=5))},
+        project_uuid=uuid.uuid4(),
     )
 
 
@@ -40,7 +42,8 @@ def event_with_delta(draw):
         timestamp=FIXED_TIMESTAMP,
         node_id=draw(st.text(min_size=1, max_size=10)),
         lamport_clock=draw(st.integers(min_value=0, max_value=100)),
-        payload={"delta": draw(st.integers(min_value=-100, max_value=100))}
+        payload={"delta": draw(st.integers(min_value=-100, max_value=100))},
+        project_uuid=uuid.uuid4(),
     )
 
 

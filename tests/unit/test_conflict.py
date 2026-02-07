@@ -1,8 +1,11 @@
 """Unit tests for conflict detection."""
+import uuid
 import pytest
 from datetime import datetime
 from spec_kitty_events.conflict import is_concurrent, total_order_key
 from spec_kitty_events.models import Event
+
+TEST_PROJECT_UUID = uuid.UUID("12345678-1234-5678-1234-567812345678")
 
 
 class TestIsConcurrent:
@@ -16,7 +19,8 @@ class TestIsConcurrent:
             aggregate_id="WP001",
             timestamp=datetime.now(),
             node_id="node1",
-            lamport_clock=5
+            lamport_clock=5,
+            project_uuid=TEST_PROJECT_UUID,
         )
         e2 = Event(
             event_id="01HZQK9F9X0000000000000002",
@@ -24,7 +28,8 @@ class TestIsConcurrent:
             aggregate_id="WP001",
             timestamp=datetime.now(),
             node_id="node2",
-            lamport_clock=5
+            lamport_clock=5,
+            project_uuid=TEST_PROJECT_UUID,
         )
         assert is_concurrent(e1, e2) is True
 
@@ -36,7 +41,8 @@ class TestIsConcurrent:
             aggregate_id="WP001",
             timestamp=datetime.now(),
             node_id="node1",
-            lamport_clock=5
+            lamport_clock=5,
+            project_uuid=TEST_PROJECT_UUID,
         )
         e2 = Event(
             event_id="01HZQK9F9X0000000000000002",
@@ -44,7 +50,8 @@ class TestIsConcurrent:
             aggregate_id="WP002",  # Different aggregate
             timestamp=datetime.now(),
             node_id="node2",
-            lamport_clock=5
+            lamport_clock=5,
+            project_uuid=TEST_PROJECT_UUID,
         )
         assert is_concurrent(e1, e2) is False
 
@@ -56,7 +63,8 @@ class TestIsConcurrent:
             aggregate_id="WP001",
             timestamp=datetime.now(),
             node_id="node1",
-            lamport_clock=5
+            lamport_clock=5,
+            project_uuid=TEST_PROJECT_UUID,
         )
         e2 = Event(
             event_id="01HZQK9F9X0000000000000002",
@@ -64,7 +72,8 @@ class TestIsConcurrent:
             aggregate_id="WP001",
             timestamp=datetime.now(),
             node_id="node2",
-            lamport_clock=6  # Different clock
+            lamport_clock=6,  # Different clock
+            project_uuid=TEST_PROJECT_UUID,
         )
         assert is_concurrent(e1, e2) is False
 
@@ -76,7 +85,8 @@ class TestIsConcurrent:
             aggregate_id="WP001",
             timestamp=datetime.now(),
             node_id="node1",
-            lamport_clock=5
+            lamport_clock=5,
+            project_uuid=TEST_PROJECT_UUID,
         )
         assert is_concurrent(e1, e1) is False
 
@@ -92,7 +102,8 @@ class TestTotalOrderKey:
             aggregate_id="WP001",
             timestamp=datetime.now(),
             node_id="node1",
-            lamport_clock=5
+            lamport_clock=5,
+            project_uuid=TEST_PROJECT_UUID,
         )
         key = total_order_key(event)
         assert key == (5, "node1")
@@ -105,7 +116,8 @@ class TestTotalOrderKey:
             aggregate_id="WP001",
             timestamp=datetime.now(),
             node_id="node1",
-            lamport_clock=3
+            lamport_clock=3,
+            project_uuid=TEST_PROJECT_UUID,
         )
         e2 = Event(
             event_id="01HZQK9F9X0000000000000002",
@@ -113,7 +125,8 @@ class TestTotalOrderKey:
             aggregate_id="WP001",
             timestamp=datetime.now(),
             node_id="node2",
-            lamport_clock=1
+            lamport_clock=1,
+            project_uuid=TEST_PROJECT_UUID,
         )
         e3 = Event(
             event_id="01HZQK9F9X0000000000000003",
@@ -121,7 +134,8 @@ class TestTotalOrderKey:
             aggregate_id="WP001",
             timestamp=datetime.now(),
             node_id="node3",
-            lamport_clock=2
+            lamport_clock=2,
+            project_uuid=TEST_PROJECT_UUID,
         )
         events = [e1, e2, e3]
         sorted_events = sorted(events, key=total_order_key)
@@ -135,7 +149,8 @@ class TestTotalOrderKey:
             aggregate_id="WP001",
             timestamp=datetime.now(),
             node_id="node_charlie",
-            lamport_clock=5
+            lamport_clock=5,
+            project_uuid=TEST_PROJECT_UUID,
         )
         e2 = Event(
             event_id="01HZQK9F9X0000000000000002",
@@ -143,7 +158,8 @@ class TestTotalOrderKey:
             aggregate_id="WP001",
             timestamp=datetime.now(),
             node_id="node_alice",
-            lamport_clock=5
+            lamport_clock=5,
+            project_uuid=TEST_PROJECT_UUID,
         )
         e3 = Event(
             event_id="01HZQK9F9X0000000000000003",
@@ -151,7 +167,8 @@ class TestTotalOrderKey:
             aggregate_id="WP001",
             timestamp=datetime.now(),
             node_id="node_bob",
-            lamport_clock=5
+            lamport_clock=5,
+            project_uuid=TEST_PROJECT_UUID,
         )
         events = [e1, e2, e3]
         sorted_events = sorted(events, key=total_order_key)
@@ -167,7 +184,8 @@ class TestTotalOrderKey:
                 aggregate_id="WP001",
                 timestamp=datetime.now(),
                 node_id=f"node{i % 3}",
-                lamport_clock=i % 5
+                lamport_clock=i % 5,
+                project_uuid=TEST_PROJECT_UUID,
             )
             for i in range(10)
         ]
@@ -190,7 +208,8 @@ class TestTopologicalSort:
             timestamp=datetime.now(),
             node_id="node1",
             lamport_clock=1,
-            causation_id=None  # Root
+            causation_id=None,  # Root
+            project_uuid=TEST_PROJECT_UUID,
         )
         e2 = Event(
             event_id="01HZQK9F9X0000000000000002",
@@ -199,7 +218,8 @@ class TestTopologicalSort:
             timestamp=datetime.now(),
             node_id="node1",
             lamport_clock=2,
-            causation_id="01HZQK9F9X0000000000000001"  # Child of e1
+            causation_id="01HZQK9F9X0000000000000001",  # Child of e1
+            project_uuid=TEST_PROJECT_UUID,
         )
         e3 = Event(
             event_id="01HZQK9F9X0000000000000003",
@@ -208,7 +228,8 @@ class TestTopologicalSort:
             timestamp=datetime.now(),
             node_id="node1",
             lamport_clock=3,
-            causation_id="01HZQK9F9X0000000000000002"  # Child of e2
+            causation_id="01HZQK9F9X0000000000000002",  # Child of e2
+            project_uuid=TEST_PROJECT_UUID,
         )
         # Input in reverse order
         sorted_events = topological_sort([e3, e2, e1])
@@ -226,7 +247,8 @@ class TestTopologicalSort:
             timestamp=datetime.now(),
             node_id="node1",
             lamport_clock=1,
-            causation_id=None  # Root 1
+            causation_id=None,  # Root 1
+            project_uuid=TEST_PROJECT_UUID,
         )
         e2 = Event(
             event_id="01HZQK9F9X0000000000000002",
@@ -235,7 +257,8 @@ class TestTopologicalSort:
             timestamp=datetime.now(),
             node_id="node2",
             lamport_clock=1,
-            causation_id=None  # Root 2
+            causation_id=None,  # Root 2
+            project_uuid=TEST_PROJECT_UUID,
         )
         sorted_events = topological_sort([e2, e1])
         # Both are roots, order doesn't matter (both valid)
@@ -256,7 +279,8 @@ class TestTopologicalSort:
             timestamp=datetime.now(),
             node_id="node1",
             lamport_clock=1,
-            causation_id="01HZQK9F9X0000000000000003"  # Points to e3
+            causation_id="01HZQK9F9X0000000000000003",  # Points to e3
+            project_uuid=TEST_PROJECT_UUID,
         )
         e2 = Event(
             event_id="01HZQK9F9X0000000000000002",
@@ -265,7 +289,8 @@ class TestTopologicalSort:
             timestamp=datetime.now(),
             node_id="node1",
             lamport_clock=2,
-            causation_id="01HZQK9F9X0000000000000001"
+            causation_id="01HZQK9F9X0000000000000001",
+            project_uuid=TEST_PROJECT_UUID,
         )
         e3 = Event(
             event_id="01HZQK9F9X0000000000000003",
@@ -274,7 +299,8 @@ class TestTopologicalSort:
             timestamp=datetime.now(),
             node_id="node1",
             lamport_clock=3,
-            causation_id="01HZQK9F9X0000000000000002"
+            causation_id="01HZQK9F9X0000000000000002",
+            project_uuid=TEST_PROJECT_UUID,
         )
         with pytest.raises(CyclicDependencyError, match="Cyclic dependency detected"):
             topological_sort([e1, e2, e3])
@@ -297,7 +323,8 @@ class TestTopologicalSort:
             timestamp=datetime.now(),
             node_id="node1",
             lamport_clock=2,
-            causation_id="01HZQK9F9X0000000000999999"  # External parent not in list
+            causation_id="01HZQK9F9X0000000000999999",  # External parent not in list
+            project_uuid=TEST_PROJECT_UUID,
         )
         e2 = Event(
             event_id="01HZQK9F9X0000000000000002",
@@ -306,7 +333,8 @@ class TestTopologicalSort:
             timestamp=datetime.now(),
             node_id="node1",
             lamport_clock=3,
-            causation_id="01HZQK9F9X0000000000000001"  # Child of e1
+            causation_id="01HZQK9F9X0000000000000001",  # Child of e1
+            project_uuid=TEST_PROJECT_UUID,
         )
         # Should still work - external parent treated as root
         sorted_events = topological_sort([e1, e2])

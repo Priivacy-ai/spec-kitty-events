@@ -1,4 +1,5 @@
 """Integration test for event emission and clock synchronization."""
+import uuid
 from datetime import datetime
 from spec_kitty_events import (
     Event,
@@ -6,6 +7,8 @@ from spec_kitty_events import (
     InMemoryClockStorage,
     InMemoryEventStore,
 )
+
+TEST_PROJECT_UUID = uuid.UUID("12345678-1234-5678-1234-567812345678")
 
 
 class TestEventEmissionSync:
@@ -29,7 +32,8 @@ class TestEventEmissionSync:
             timestamp=datetime.now(),
             node_id="alice",
             lamport_clock=alice_clock.current(),
-            payload={"state": "doing"}
+            payload={"state": "doing"},
+            project_uuid=TEST_PROJECT_UUID,
         )
         event_store.save_event(e1)
 
@@ -43,7 +47,8 @@ class TestEventEmissionSync:
             node_id="alice",
             lamport_clock=alice_clock.current(),
             causation_id=e1.event_id,  # e2 caused by e1
-            payload={"state": "for_review"}
+            payload={"state": "for_review"},
+            project_uuid=TEST_PROJECT_UUID,
         )
         event_store.save_event(e2)
 
@@ -61,7 +66,8 @@ class TestEventEmissionSync:
             node_id="bob",
             lamport_clock=bob_clock.current(),
             causation_id=e2.event_id,  # e3 caused by e2
-            payload={"state": "done"}
+            payload={"state": "done"},
+            project_uuid=TEST_PROJECT_UUID,
         )
         event_store.save_event(e3)
 
@@ -90,7 +96,8 @@ class TestEventEmissionSync:
             aggregate_id="WP001",
             timestamp=datetime.now(),
             node_id="alice",
-            lamport_clock=1
+            lamport_clock=1,
+            project_uuid=TEST_PROJECT_UUID,
         )
 
         event_store.save_event(event)
