@@ -1,7 +1,7 @@
 ---
 work_package_id: WP01
 title: Gate Payload Models & Public API
-lane: "doing"
+lane: "for_review"
 dependencies: []
 base_branch: main
 base_commit: c817180e5bf8c3f5416f7ec6f4a7bcbb64851ae5
@@ -288,3 +288,4 @@ Wire all new types into the package's public API via `__init__.py`.
 ## Activity Log
 
 - 2026-02-07T00:00:00Z – system – lane=planned – Prompt created.
+- 2026-02-07T20:36:31Z – unknown – shell_pid=50177 – lane=for_review – Implementation complete, mypy strict passes, all smoke tests passing
