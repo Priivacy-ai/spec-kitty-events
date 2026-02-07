@@ -1,7 +1,7 @@
 ---
 work_package_id: WP01
 title: Core Model & Version Bump
-lane: "doing"
+lane: "done"
 dependencies: []
 base_branch: main
 base_commit: 26692accdfc21c2cb56ff84a728e8c1e87d45e46
@@ -16,8 +16,8 @@ phase: Phase 0 - Foundation
 assignee: ''
 agent: "claude-opus"
 shell_pid: "19446"
-review_status: ''
-reviewed_by: ''
+review_status: "approved"
+reviewed_by: "Robert Douglass"
 history:
 - timestamp: '2026-02-07T00:00:00Z'
   lane: planned
@@ -209,3 +209,4 @@ Note: `pytest` will FAIL after this WP because existing tests don't supply `proj
 - 2026-02-07T07:01:58Z – claude-opus – shell_pid=18753 – lane=doing – Assigned agent via workflow command
 - 2026-02-07T07:03:58Z – claude-opus – shell_pid=18753 – lane=for_review – Ready for review: project_uuid/project_slug added to Event, version bumped, mypy passes, smoke test passes. .gitignore change is pre-existing from main.
 - 2026-02-07T07:04:07Z – claude-opus – shell_pid=19446 – lane=doing – Started review via workflow command
+- 2026-02-07T07:04:30Z – claude-opus – shell_pid=19446 – lane=done – Review passed: project_uuid/project_slug added, version bumped, mypy passes, smoke test passes. .gitignore is pre-existing untracked change.
