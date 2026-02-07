@@ -43,3 +43,7 @@ env/
 *.swp
 *.swo
 .DS_Store
+
+# Agent directories (managed locally, may contain credentials)
+.claude/commands/
+.codex/
