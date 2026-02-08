@@ -1,7 +1,7 @@
 ---
 work_package_id: WP04
 title: Version Bump, Changelog, and Backward Compat
-lane: "doing"
+lane: "for_review"
 dependencies: []
 base_branch: main
 base_commit: 56ea49aeff0253fceb680ac0111f8a65f4c8cb63
@@ -265,3 +265,4 @@ Bump version to `0.3.0-alpha`, write CHANGELOG entry with graduation criteria, v
 
 - 2026-02-08T00:00:00Z – system – lane=planned – Prompt created.
 - 2026-02-08T14:31:54Z – claude-opus – shell_pid=42939 – lane=doing – Assigned agent via workflow command
+- 2026-02-08T14:34:31Z – claude-opus – shell_pid=42939 – lane=for_review – Ready for review: version 0.3.0-alpha, changelog, all 325 tests pass, mypy clean, all 21 imports verified
