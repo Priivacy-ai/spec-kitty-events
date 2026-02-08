@@ -44,11 +44,11 @@
 
 **Dependencies**: WP01 (needs Lane, StatusTransitionPayload, constants)
 
-- [ ] T008: Implement transition matrix data structure and programmatic rules
-- [ ] T009: Implement TransitionValidationResult frozen dataclass
-- [ ] T010: Implement validate_transition() with full guard conditions
-- [ ] T011: Write unit tests for all legal and illegal transitions (full matrix)
-- [ ] T012: Write unit tests for guard conditions and force override
+- [x] T008: Implement transition matrix data structure and programmatic rules
+- [x] T009: Implement TransitionValidationResult frozen dataclass
+- [x] T010: Implement validate_transition() with full guard conditions
+- [x] T011: Write unit tests for all legal and illegal transitions (full matrix)
+- [x] T012: Write unit tests for guard conditions and force override
 
 **Parallel opportunities**: T008+T009 are independent. T011 and T012 test different aspects.
 **Dependencies**: WP01 must be merged to main first.
