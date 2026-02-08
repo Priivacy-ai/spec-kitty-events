@@ -12,14 +12,17 @@ from spec_kitty_events import (
     ReviewVerdict,
     StatusTransitionPayload,
     TransitionError,
+    TransitionValidationResult,
     VerificationEntry,
     normalize_lane,
+    validate_transition,
     LANE_ALIASES,
     TERMINAL_LANES,
     WP_STATUS_CHANGED,
     SpecKittyEventsError,
     ValidationError,
 )
+from spec_kitty_events.status import _ALLOWED_TRANSITIONS
 
 
 # ---------------------------------------------------------------------------
@@ -524,3 +527,270 @@ class TestTransitionError:
         err = TransitionError(violations=("only-one",))
         assert err.violations == ("only-one",)
         assert "only-one" in str(err)
+
+
+# ---------------------------------------------------------------------------
+# Helpers for validation tests
+# ---------------------------------------------------------------------------
+
+
+def _make_payload(
+    from_lane: Lane | None = Lane.PLANNED,
+    to_lane: Lane = Lane.CLAIMED,
+    force: bool = False,
+    reason: str | None = None,
+    review_ref: str | None = None,
+    evidence: DoneEvidence | None = None,
+) -> StatusTransitionPayload:
+    return StatusTransitionPayload(
+        feature_slug="test-feature",
+        wp_id="WP01",
+        from_lane=from_lane,
+        to_lane=to_lane,
+        actor="test-actor",
+        force=force,
+        reason=reason,
+        execution_mode=ExecutionMode.WORKTREE,
+        review_ref=review_ref,
+        evidence=evidence,
+    )
+
+
+def _make_evidence() -> DoneEvidence:
+    return DoneEvidence(
+        repos=[RepoEvidence(repo="test", branch="main", commit="abc123")],
+        verification=[],
+        review=ReviewVerdict(reviewer="alice", verdict="approved"),
+    )
+
+
+# ---------------------------------------------------------------------------
+# TransitionValidationResult
+# ---------------------------------------------------------------------------
+
+
+class TestTransitionValidationResult:
+    """Test TransitionValidationResult dataclass."""
+
+    def test_valid_result(self) -> None:
+        r = TransitionValidationResult(valid=True)
+        assert r.valid is True
+        assert r.violations == ()
+
+    def test_invalid_result_with_violations(self) -> None:
+        r = TransitionValidationResult(valid=False, violations=("bad",))
+        assert r.valid is False
+        assert r.violations == ("bad",)
+
+    def test_frozen(self) -> None:
+        r = TransitionValidationResult(valid=True)
+        with pytest.raises(AttributeError):
+            r.valid = False  # type: ignore[misc]
+
+
+# ---------------------------------------------------------------------------
+# Transition matrix — legal transitions
+# ---------------------------------------------------------------------------
+
+
+class TestTransitionMatrix:
+    """Every legal transition should be accepted."""
+
+    @pytest.mark.parametrize(
+        "from_lane,to_lane,kwargs",
+        [
+            (None, Lane.PLANNED, {}),
+            (Lane.PLANNED, Lane.CLAIMED, {}),
+            (Lane.CLAIMED, Lane.IN_PROGRESS, {}),
+            (Lane.IN_PROGRESS, Lane.FOR_REVIEW, {}),
+            (
+                Lane.FOR_REVIEW,
+                Lane.DONE,
+                {"evidence": None},  # placeholder, replaced below
+            ),
+            (
+                Lane.FOR_REVIEW,
+                Lane.IN_PROGRESS,
+                {"review_ref": "PR#42"},
+            ),
+            (
+                Lane.IN_PROGRESS,
+                Lane.PLANNED,
+                {"reason": "Reassigning"},
+            ),
+            (Lane.BLOCKED, Lane.IN_PROGRESS, {}),
+            (Lane.PLANNED, Lane.BLOCKED, {}),
+            (Lane.IN_PROGRESS, Lane.CANCELED, {}),
+        ],
+        ids=[
+            "initial",
+            "claim",
+            "start",
+            "submit",
+            "approve",
+            "rollback",
+            "abandon",
+            "unblock",
+            "block",
+            "cancel",
+        ],
+    )
+    def test_legal_transition(
+        self,
+        from_lane: Lane | None,
+        to_lane: Lane,
+        kwargs: dict,  # type: ignore[type-arg]
+    ) -> None:
+        # Special handling for DONE which needs real evidence
+        if to_lane is Lane.DONE:
+            kwargs["evidence"] = _make_evidence()
+        payload = _make_payload(from_lane=from_lane, to_lane=to_lane, **kwargs)
+        result = validate_transition(payload)
+        assert result.valid is True, f"Expected valid, got violations: {result.violations}"
+
+
+# ---------------------------------------------------------------------------
+# All illegal transitions
+# ---------------------------------------------------------------------------
+
+
+def _build_legal_set() -> set[tuple[Lane | None, Lane]]:
+    """Build the full set of legal (from, to) pairs including dynamic ones."""
+    legal: set[tuple[Lane | None, Lane]] = set(_ALLOWED_TRANSITIONS)
+    non_terminal = [l for l in Lane if l not in TERMINAL_LANES]
+    for src in non_terminal:
+        legal.add((src, Lane.BLOCKED))
+        legal.add((src, Lane.CANCELED))
+    return legal
+
+
+class TestIllegalTransitions:
+    """Every transition NOT in the legal set should be rejected."""
+
+    def test_all_illegal_transitions(self) -> None:
+        legal = _build_legal_set()
+        all_sources: list[Lane | None] = [None] + list(Lane)
+        illegal_count = 0
+        for src in all_sources:
+            for dst in Lane:
+                if (src, dst) in legal:
+                    continue
+                # Build payload — some combos need special handling
+                # Skip combos that would fail Pydantic validation
+                # (e.g. force without reason, done without evidence)
+                kwargs: dict[str, object] = {
+                    "from_lane": src,
+                    "to_lane": dst,
+                }
+                if dst is Lane.DONE:
+                    kwargs["evidence"] = _make_evidence()
+                payload = _make_payload(**kwargs)  # type: ignore[arg-type]
+                result = validate_transition(payload)
+                assert result.valid is False, (
+                    f"Expected ({src} -> {dst}) to be rejected but it was accepted"
+                )
+                illegal_count += 1
+        # Sanity: we tested at least some illegal combos
+        assert illegal_count > 0
+
+
+# ---------------------------------------------------------------------------
+# Guard conditions
+# ---------------------------------------------------------------------------
+
+
+class TestGuardConditions:
+    """Test guard conditions on transitions."""
+
+    def test_for_review_to_in_progress_without_review_ref(self) -> None:
+        payload = _make_payload(
+            from_lane=Lane.FOR_REVIEW,
+            to_lane=Lane.IN_PROGRESS,
+        )
+        result = validate_transition(payload)
+        assert result.valid is False
+        assert any("review_ref" in v for v in result.violations)
+
+    def test_for_review_to_in_progress_with_review_ref(self) -> None:
+        payload = _make_payload(
+            from_lane=Lane.FOR_REVIEW,
+            to_lane=Lane.IN_PROGRESS,
+            review_ref="PR#42",
+        )
+        result = validate_transition(payload)
+        assert result.valid is True
+
+    def test_in_progress_to_planned_without_reason(self) -> None:
+        payload = _make_payload(
+            from_lane=Lane.IN_PROGRESS,
+            to_lane=Lane.PLANNED,
+        )
+        result = validate_transition(payload)
+        assert result.valid is False
+        assert any("reason" in v for v in result.violations)
+
+    def test_in_progress_to_planned_with_reason(self) -> None:
+        payload = _make_payload(
+            from_lane=Lane.IN_PROGRESS,
+            to_lane=Lane.PLANNED,
+            reason="Reassigning to another agent",
+        )
+        result = validate_transition(payload)
+        assert result.valid is True
+
+    def test_force_exit_from_done(self) -> None:
+        payload = _make_payload(
+            from_lane=Lane.DONE,
+            to_lane=Lane.IN_PROGRESS,
+            force=True,
+            reason="Reopening",
+        )
+        result = validate_transition(payload)
+        assert result.valid is True
+
+    def test_force_exit_from_canceled(self) -> None:
+        payload = _make_payload(
+            from_lane=Lane.CANCELED,
+            to_lane=Lane.PLANNED,
+            force=True,
+            reason="Un-canceling",
+        )
+        result = validate_transition(payload)
+        assert result.valid is True
+
+    def test_no_force_exit_from_done(self) -> None:
+        payload = _make_payload(
+            from_lane=Lane.DONE,
+            to_lane=Lane.IN_PROGRESS,
+        )
+        result = validate_transition(payload)
+        assert result.valid is False
+        assert any("terminal" in v for v in result.violations)
+
+    def test_force_allows_nonstandard_transition(self) -> None:
+        payload = _make_payload(
+            from_lane=Lane.PLANNED,
+            to_lane=Lane.FOR_REVIEW,
+            force=True,
+            reason="Skip",
+        )
+        result = validate_transition(payload)
+        assert result.valid is True
+
+    def test_multiple_violations_collected(self) -> None:
+        # DONE -> IN_PROGRESS without force: terminal violation + matrix violation
+        payload = _make_payload(
+            from_lane=Lane.DONE,
+            to_lane=Lane.IN_PROGRESS,
+        )
+        result = validate_transition(payload)
+        assert result.valid is False
+        assert len(result.violations) > 1
+
+    def test_self_transition_rejected(self) -> None:
+        payload = _make_payload(
+            from_lane=Lane.PLANNED,
+            to_lane=Lane.PLANNED,
+        )
+        result = validate_transition(payload)
+        assert result.valid is False
