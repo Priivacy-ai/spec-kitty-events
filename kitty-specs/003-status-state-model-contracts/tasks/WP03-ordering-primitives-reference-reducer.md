@@ -1,7 +1,7 @@
 ---
 work_package_id: WP03
 title: Ordering Primitives and Reference Reducer
-lane: "doing"
+lane: "for_review"
 dependencies: []
 base_branch: main
 base_commit: 20112f62248c9c9a7a0203b735453fb08a7faba6
@@ -467,3 +467,4 @@ Implement `status_event_sort_key()`, `dedup_events()`, reducer output models (WP
 
 - 2026-02-08T00:00:00Z – system – lane=planned – Prompt created.
 - 2026-02-08T14:25:05Z – claude-opus – shell_pid=41460 – lane=doing – Assigned agent via workflow command
+- 2026-02-08T14:31:28Z – claude-opus – shell_pid=41460 – lane=for_review – Ready for review: reducer with rollback-aware precedence, 325 tests, mypy clean
