@@ -16,7 +16,7 @@ subtasks:
 - T007
 phase: Phase 1 - Foundation
 assignee: ''
-agent: ''
+agent: "claude-opus"
 shell_pid: "39467"
 review_status: ''
 reviewed_by: ''
@@ -404,3 +404,4 @@ Create the `src/spec_kitty_events/status.py` module with all foundational data t
 ## Activity Log
 
 - 2026-02-08T00:00:00Z – system – lane=planned – Prompt created.
+- 2026-02-08T14:15:23Z – claude-opus – shell_pid=39467 – lane=doing – Assigned agent via workflow command
