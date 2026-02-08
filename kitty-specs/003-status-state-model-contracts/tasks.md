@@ -22,13 +22,13 @@
 
 **Prompt**: `tasks/WP01-enums-evidence-models-public-api.md`
 
-- [ ] T001: Create status.py with Lane, ExecutionMode enums, constants, normalize_lane()
-- [ ] T002: Implement evidence models (RepoEvidence, VerificationEntry, ReviewVerdict, DoneEvidence)
-- [ ] T003: Implement ForceMetadata and StatusTransitionPayload with cross-field validators
-- [ ] T004: Add TransitionError exception class
-- [ ] T005: Update __init__.py with 21 new exports
-- [ ] T006: Write unit tests for enums, normalize_lane, evidence models, payload validators
-- [ ] T007: Run mypy --strict and verify zero errors
+- [x] T001: Create status.py with Lane, ExecutionMode enums, constants, normalize_lane()
+- [x] T002: Implement evidence models (RepoEvidence, VerificationEntry, ReviewVerdict, DoneEvidence)
+- [x] T003: Implement ForceMetadata and StatusTransitionPayload with cross-field validators
+- [x] T004: Add TransitionError exception class
+- [x] T005: Update __init__.py with 21 new exports
+- [x] T006: Write unit tests for enums, normalize_lane, evidence models, payload validators
+- [x] T007: Run mypy --strict and verify zero errors
 
 **Parallel opportunities**: T001 and T002 touch separate in-file sections. T006 can start as soon as T001-T004 land.
 **Dependencies**: None (first WP).
