@@ -1,7 +1,7 @@
 ---
 work_package_id: WP01
 title: Enums, Evidence Models, and Public API
-lane: "doing"
+lane: "for_review"
 dependencies: []
 base_branch: main
 base_commit: 6d27fb7938b32b7b9f004ccb5bf29c82f80030d0
@@ -405,3 +405,4 @@ Create the `src/spec_kitty_events/status.py` module with all foundational data t
 
 - 2026-02-08T00:00:00Z – system – lane=planned – Prompt created.
 - 2026-02-08T14:15:23Z – claude-opus – shell_pid=39467 – lane=doing – Assigned agent via workflow command
+- 2026-02-08T14:19:31Z – claude-opus – shell_pid=39467 – lane=for_review – Ready for review: status.py with enums, evidence models, transition payload, 282 tests pass, mypy clean, 100% coverage
