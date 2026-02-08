@@ -1,12 +1,14 @@
 """Status state model contracts for work-package lane transitions."""
 
 from dataclasses import dataclass
+from datetime import datetime
 from enum import Enum
-from typing import Dict, FrozenSet, List, Optional, Tuple
+from itertools import groupby
+from typing import Any, Dict, FrozenSet, List, Optional, Sequence, Set, Tuple
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
-from spec_kitty_events.models import SpecKittyEventsError, ValidationError
+from spec_kitty_events.models import Event, SpecKittyEventsError, ValidationError
 
 
 class Lane(str, Enum):
@@ -279,4 +281,197 @@ def validate_transition(payload: StatusTransitionPayload) -> TransitionValidatio
     return TransitionValidationResult(
         valid=len(violations) == 0,
         violations=tuple(violations),
+    )
+
+
+# ---------------------------------------------------------------------------
+# Section 5: Ordering
+# ---------------------------------------------------------------------------
+
+
+def status_event_sort_key(event: Event) -> Tuple[int, str, str]:
+    """Deterministic sort key for status events.
+
+    Returns (lamport_clock, timestamp_isoformat, event_id).
+    """
+    return (event.lamport_clock, event.timestamp.isoformat(), event.event_id)
+
+
+def dedup_events(events: Sequence[Event]) -> List[Event]:
+    """Remove duplicate events by event_id, preserving first occurrence."""
+    seen: Set[str] = set()
+    result: List[Event] = []
+    for event in events:
+        if event.event_id not in seen:
+            seen.add(event.event_id)
+            result.append(event)
+    return result
+
+
+# ---------------------------------------------------------------------------
+# Section 6: Reducer
+# ---------------------------------------------------------------------------
+
+
+class WPState(BaseModel):
+    """Per-work-package current state from reducer."""
+
+    model_config = ConfigDict(frozen=True)
+
+    wp_id: str = Field(..., min_length=1)
+    current_lane: Lane
+    last_event_id: str = Field(..., min_length=1)
+    last_transition_at: datetime
+    evidence: Optional[DoneEvidence] = None
+
+
+class TransitionAnomaly(BaseModel):
+    """Records an invalid transition encountered during reduction."""
+
+    model_config = ConfigDict(frozen=True)
+
+    event_id: str = Field(..., min_length=1)
+    wp_id: str = Field(..., min_length=1)
+    from_lane: Optional[Lane] = None
+    to_lane: Lane
+    reason: str = Field(..., min_length=1)
+
+
+class ReducedStatus(BaseModel):
+    """Output of the reference reducer."""
+
+    model_config = ConfigDict(frozen=True)
+
+    wp_states: Dict[str, WPState] = Field(default_factory=dict)
+    anomalies: List[TransitionAnomaly] = Field(default_factory=list)
+    event_count: int = Field(default=0, ge=0)
+    last_processed_event_id: Optional[str] = None
+
+
+def _rollback_aware_order(
+    group: List[Tuple[Event, StatusTransitionPayload]],
+) -> List[Tuple[Event, StatusTransitionPayload]]:
+    """Within a concurrent group, ensure reviewer rollbacks are applied last."""
+
+    def _is_rollback(payload: StatusTransitionPayload) -> bool:
+        return (
+            payload.from_lane == Lane.FOR_REVIEW
+            and payload.to_lane == Lane.IN_PROGRESS
+            and payload.review_ref is not None
+        )
+
+    non_rollbacks: List[Tuple[Event, StatusTransitionPayload]] = [
+        (e, p) for e, p in group if not _is_rollback(p)
+    ]
+    rollbacks: List[Tuple[Event, StatusTransitionPayload]] = [
+        (e, p) for e, p in group if _is_rollback(p)
+    ]
+    return non_rollbacks + rollbacks
+
+
+def reduce_status_events(events: Sequence[Event]) -> ReducedStatus:
+    """Reduce status events to per-WP current lane state.
+
+    Pipeline: filter -> sort -> dedup -> rollback-aware reduce.
+    Pure function, no I/O. Deterministic for any permutation.
+    """
+    # 1. Filter: keep only WPStatusChanged events
+    status_events = [e for e in events if e.event_type == WP_STATUS_CHANGED]
+
+    # 2. Sort: deterministic ordering
+    sorted_events = sorted(status_events, key=status_event_sort_key)
+
+    # 3. Dedup
+    unique_events = dedup_events(sorted_events)
+
+    if not unique_events:
+        return ReducedStatus()
+
+    # 4. Parse payloads
+    parsed: List[Tuple[Event, StatusTransitionPayload]] = []
+    for event in unique_events:
+        try:
+            payload = StatusTransitionPayload.model_validate(event.payload)
+            parsed.append((event, payload))
+        except Exception:
+            continue
+
+    if not parsed:
+        return ReducedStatus(
+            event_count=len(unique_events),
+            last_processed_event_id=unique_events[-1].event_id,
+        )
+
+    # 5. Rollback-aware reordering: group by (wp_id, lamport_clock)
+    grouped: List[List[Tuple[Event, StatusTransitionPayload]]] = []
+    for _key, group_iter in groupby(
+        parsed, key=lambda ep: (ep[1].wp_id, ep[0].lamport_clock)
+    ):
+        group_list = list(group_iter)
+        grouped.append(_rollback_aware_order(group_list))
+
+    # 6. Sequential reduce with concurrent-group awareness
+    wp_states: Dict[str, WPState] = {}
+    anomalies: List[TransitionAnomaly] = []
+
+    for group in grouped:
+        # Snapshot state at the start of each concurrent group.
+        # Within a group, all events are validated against the snapshot,
+        # and the last valid transition wins (overwriting earlier ones).
+        snapshot: Dict[str, Optional[WPState]] = {}
+        for _evt, p in group:
+            if p.wp_id not in snapshot:
+                snapshot[p.wp_id] = wp_states.get(p.wp_id)
+
+        for event, payload in group:
+            wp_id = payload.wp_id
+            snapped = snapshot[wp_id]
+
+            # Check from_lane matches state at group start
+            expected_lane = snapped.current_lane if snapped else None
+            if payload.from_lane != expected_lane:
+                anomalies.append(
+                    TransitionAnomaly(
+                        event_id=event.event_id,
+                        wp_id=wp_id,
+                        from_lane=payload.from_lane,
+                        to_lane=payload.to_lane,
+                        reason=(
+                            f"from_lane mismatch: expected {expected_lane}, "
+                            f"got {payload.from_lane}"
+                        ),
+                    )
+                )
+                continue
+
+            # Validate transition
+            validation = validate_transition(payload)
+            if not validation.valid:
+                anomalies.append(
+                    TransitionAnomaly(
+                        event_id=event.event_id,
+                        wp_id=wp_id,
+                        from_lane=payload.from_lane,
+                        to_lane=payload.to_lane,
+                        reason="; ".join(validation.violations),
+                    )
+                )
+                continue
+
+            # Apply transition (last valid in group wins)
+            evidence = payload.evidence if payload.to_lane == Lane.DONE else None
+            wp_states[wp_id] = WPState(
+                wp_id=wp_id,
+                current_lane=payload.to_lane,
+                last_event_id=event.event_id,
+                last_transition_at=event.timestamp,
+                evidence=evidence,
+            )
+
+    # 7. Return
+    return ReducedStatus(
+        wp_states=wp_states,
+        anomalies=anomalies,
+        event_count=len(unique_events),
+        last_processed_event_id=unique_events[-1].event_id,
     )
