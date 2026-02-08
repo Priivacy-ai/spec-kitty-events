@@ -383,6 +383,10 @@ class TestForceMetadata:
         with pytest.raises(pydantic.ValidationError):
             f.actor = "changed"  # type: ignore[misc]
 
+    def test_force_must_be_true(self) -> None:
+        with pytest.raises(pydantic.ValidationError):
+            ForceMetadata(force=False, actor="admin", reason="reason")
+
 
 # ---------------------------------------------------------------------------
 # StatusTransitionPayload
@@ -730,6 +734,16 @@ class TestGuardConditions:
         result = validate_transition(payload)
         assert result.valid is True
 
+    def test_for_review_to_in_progress_with_blank_review_ref(self) -> None:
+        payload = _make_payload(
+            from_lane=Lane.FOR_REVIEW,
+            to_lane=Lane.IN_PROGRESS,
+            review_ref="   ",
+        )
+        result = validate_transition(payload)
+        assert result.valid is False
+        assert any("review_ref" in v for v in result.violations)
+
     def test_in_progress_to_planned_without_reason(self) -> None:
         payload = _make_payload(
             from_lane=Lane.IN_PROGRESS,
@@ -747,6 +761,16 @@ class TestGuardConditions:
         )
         result = validate_transition(payload)
         assert result.valid is True
+
+    def test_in_progress_to_planned_with_blank_reason(self) -> None:
+        payload = _make_payload(
+            from_lane=Lane.IN_PROGRESS,
+            to_lane=Lane.PLANNED,
+            reason="  ",
+        )
+        result = validate_transition(payload)
+        assert result.valid is False
+        assert any("reason" in v for v in result.violations)
 
     def test_force_exit_from_done(self) -> None:
         payload = _make_payload(
@@ -986,6 +1010,30 @@ class TestReduceStatusEvents:
         assert result.anomalies[0].wp_id == "WP01"
         assert result.wp_states["WP01"].current_lane == Lane.PLANNED
 
+    def test_malformed_payload_records_anomaly(self) -> None:
+        event = Event(
+            event_id="01HV0000000000000000000007",
+            event_type=WP_STATUS_CHANGED,
+            aggregate_id="test-feature/WP01",
+            payload={
+                "feature_slug": "test-feature",
+                "wp_id": "WP01",
+                "from_lane": None,
+                "to_lane": "planned",
+                # Missing required fields like actor/execution_mode
+            },
+            timestamp=datetime.now(timezone.utc),
+            node_id="test-node",
+            lamport_clock=1,
+            project_uuid=_PROJECT_UUID,
+        )
+        result = reduce_status_events([event])
+        assert result.event_count == 1
+        assert len(result.anomalies) == 1
+        assert result.anomalies[0].wp_id == "WP01"
+        assert "payload validation failed" in result.anomalies[0].reason
+        assert result.wp_states == {}
+
     def test_from_lane_mismatch_flagged(self) -> None:
         """Event claims from_lane=claimed when WP is in planned -> anomaly."""
         base_t = datetime(2026, 1, 1, tzinfo=timezone.utc)
@@ -1029,6 +1077,37 @@ class TestReduceStatusEvents:
             review_ref="PR#42",
         )
         events.extend([e_done, e_rollback])
+        result = reduce_status_events(events)
+        assert result.wp_states["WP01"].current_lane == Lane.IN_PROGRESS
+
+    def test_rollback_precedence_with_interleaved_other_wp(self) -> None:
+        """Rollback still wins when same-key concurrent events are interleaved."""
+        base_t = datetime(2026, 1, 1, tzinfo=timezone.utc)
+        evidence = DoneEvidence(
+            repos=[RepoEvidence(repo="test", branch="main", commit="abc123")],
+            verification=[],
+            review=ReviewVerdict(reviewer="alice", verdict="approved"),
+        )
+        events = [
+            _make_event("01HV0000000000000000000010", "WP01", None, Lane.PLANNED, 1, timestamp=base_t),
+            _make_event("01HV0000000000000000000011", "WP01", Lane.PLANNED, Lane.CLAIMED, 2, timestamp=base_t + timedelta(seconds=1)),
+            _make_event("01HV0000000000000000000012", "WP01", Lane.CLAIMED, Lane.IN_PROGRESS, 3, timestamp=base_t + timedelta(seconds=2)),
+            _make_event("01HV0000000000000000000013", "WP01", Lane.IN_PROGRESS, Lane.FOR_REVIEW, 4, timestamp=base_t + timedelta(seconds=3)),
+            _make_event(
+                "01HV0000000000000000000014", "WP01", Lane.FOR_REVIEW, Lane.DONE, 5,
+                timestamp=base_t + timedelta(seconds=4),
+                evidence=evidence,
+            ),
+            _make_event(
+                "01HV0000000000000000000015", "WP02", None, Lane.PLANNED, 5,
+                timestamp=base_t + timedelta(seconds=5),
+            ),
+            _make_event(
+                "01HV0000000000000000000016", "WP01", Lane.FOR_REVIEW, Lane.IN_PROGRESS, 5,
+                timestamp=base_t + timedelta(seconds=6),
+                review_ref="PR#42",
+            ),
+        ]
         result = reduce_status_events(events)
         assert result.wp_states["WP01"].current_lane == Lane.IN_PROGRESS
 

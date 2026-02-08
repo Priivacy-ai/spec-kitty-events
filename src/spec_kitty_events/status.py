@@ -3,8 +3,7 @@
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
-from itertools import groupby
-from typing import Any, Dict, FrozenSet, List, Optional, Sequence, Set, Tuple
+from typing import Dict, FrozenSet, List, Literal, Optional, Sequence, Set, Tuple
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
@@ -130,7 +129,7 @@ class ForceMetadata(BaseModel):
 
     model_config = ConfigDict(frozen=True)
 
-    force: bool = Field(True, description="Always True for forced transitions")
+    force: Literal[True] = Field(True, description="Always True for forced transitions")
     actor: str = Field(..., min_length=1, description="Who forced the transition")
     reason: str = Field(..., min_length=1, description="Why the transition was forced")
 
@@ -267,14 +266,14 @@ def validate_transition(payload: StatusTransitionPayload) -> TransitionValidatio
     if (
         payload.from_lane is Lane.FOR_REVIEW
         and payload.to_lane is Lane.IN_PROGRESS
-        and payload.review_ref is None
+        and (payload.review_ref is None or payload.review_ref.strip() == "")
     ):
         violations.append("for_review -> in_progress requires review_ref")
 
     if (
         payload.from_lane is Lane.IN_PROGRESS
         and payload.to_lane is Lane.PLANNED
-        and payload.reason is None
+        and (payload.reason is None or payload.reason.strip() == "")
     ):
         violations.append("in_progress -> planned requires reason")
 
@@ -333,7 +332,7 @@ class TransitionAnomaly(BaseModel):
     event_id: str = Field(..., min_length=1)
     wp_id: str = Field(..., min_length=1)
     from_lane: Optional[Lane] = None
-    to_lane: Lane
+    to_lane: Optional[Lane] = None
     reason: str = Field(..., min_length=1)
 
 
@@ -387,32 +386,60 @@ def reduce_status_events(events: Sequence[Event]) -> ReducedStatus:
     if not unique_events:
         return ReducedStatus()
 
+    anomalies: List[TransitionAnomaly] = []
+
+    def _safe_lane(raw_lane: object) -> Optional[Lane]:
+        if isinstance(raw_lane, Lane):
+            return raw_lane
+        if isinstance(raw_lane, str):
+            try:
+                return normalize_lane(raw_lane)
+            except ValidationError:
+                return None
+        return None
+
     # 4. Parse payloads
     parsed: List[Tuple[Event, StatusTransitionPayload]] = []
     for event in unique_events:
         try:
             payload = StatusTransitionPayload.model_validate(event.payload)
             parsed.append((event, payload))
-        except Exception:
+        except Exception as exc:
+            payload_dict = event.payload if isinstance(event.payload, dict) else {}
+            wp_id_raw = payload_dict.get("wp_id")
+            wp_id = wp_id_raw if isinstance(wp_id_raw, str) and wp_id_raw else "<unknown>"
+            anomalies.append(
+                TransitionAnomaly(
+                    event_id=event.event_id,
+                    wp_id=wp_id,
+                    from_lane=_safe_lane(payload_dict.get("from_lane")),
+                    to_lane=_safe_lane(payload_dict.get("to_lane")),
+                    reason=f"payload validation failed: {exc}",
+                )
+            )
             continue
 
     if not parsed:
         return ReducedStatus(
+            anomalies=anomalies,
             event_count=len(unique_events),
             last_processed_event_id=unique_events[-1].event_id,
         )
 
     # 5. Rollback-aware reordering: group by (wp_id, lamport_clock)
+    # Use insertion-order dict grouping to handle interleaving keys correctly.
     grouped: List[List[Tuple[Event, StatusTransitionPayload]]] = []
-    for _key, group_iter in groupby(
-        parsed, key=lambda ep: (ep[1].wp_id, ep[0].lamport_clock)
-    ):
-        group_list = list(group_iter)
-        grouped.append(_rollback_aware_order(group_list))
+    grouped_by_key: Dict[
+        Tuple[str, int], List[Tuple[Event, StatusTransitionPayload]]
+    ] = {}
+    for event, payload in parsed:
+        key = (payload.wp_id, event.lamport_clock)
+        grouped_by_key.setdefault(key, []).append((event, payload))
+    for group in grouped_by_key.values():
+        grouped.append(_rollback_aware_order(group))
 
     # 6. Sequential reduce with concurrent-group awareness
     wp_states: Dict[str, WPState] = {}
-    anomalies: List[TransitionAnomaly] = []
 
     for group in grouped:
         # Snapshot state at the start of each concurrent group.
