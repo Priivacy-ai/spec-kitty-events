@@ -15,7 +15,7 @@ subtasks:
 - T018
 phase: Phase 2 - Ordering and Reduction
 assignee: ''
-agent: ''
+agent: "claude-opus"
 shell_pid: "41460"
 review_status: ''
 reviewed_by: ''
@@ -466,3 +466,4 @@ Implement `status_event_sort_key()`, `dedup_events()`, reducer output models (WP
 ## Activity Log
 
 - 2026-02-08T00:00:00Z – system – lane=planned – Prompt created.
+- 2026-02-08T14:25:05Z – claude-opus – shell_pid=41460 – lane=doing – Assigned agent via workflow command
