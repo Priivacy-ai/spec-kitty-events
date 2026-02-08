@@ -1,0 +1,12 @@
+{
+  "wp_id": "WP01",
+  "feature_slug": "002-github-gate-observability-contracts",
+  "worktree_path": ".worktrees/002-github-gate-observability-contracts-WP01",
+  "branch_name": "002-github-gate-observability-contracts-WP01",
+  "base_branch": "main",
+  "base_commit": "c817180e5bf8c3f5416f7ec6f4a7bcbb64851ae5",
+  "dependencies": [],
+  "created_at": "2026-02-07T20:32:46.640369+00:00",
+  "created_by": "implement-command",
+  "vcs_backend": "git"
+}
