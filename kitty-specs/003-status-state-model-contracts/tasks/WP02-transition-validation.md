@@ -1,7 +1,7 @@
 ---
 work_package_id: WP02
 title: Transition Validation
-lane: "doing"
+lane: "for_review"
 dependencies: []
 base_branch: main
 base_commit: 8f0de9b196da64a17261c5a050b82dfeea1d91fc
@@ -335,3 +335,4 @@ def _make_evidence() -> DoneEvidence:
 
 - 2026-02-08T00:00:00Z – system – lane=planned – Prompt created.
 - 2026-02-08T14:20:39Z – claude-opus – shell_pid=40774 – lane=doing – Assigned agent via workflow command
+- 2026-02-08T14:24:42Z – claude-opus – shell_pid=40774 – lane=for_review – Ready for review: transition matrix, validate_transition(), 306 tests, 100% coverage
