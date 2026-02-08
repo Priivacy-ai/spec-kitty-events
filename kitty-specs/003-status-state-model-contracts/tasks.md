@@ -66,12 +66,12 @@
 
 **Dependencies**: WP01 (models), WP02 (validate_transition used internally by reducer)
 
-- [ ] T013: Implement status_event_sort_key()
-- [ ] T014: Implement dedup_events()
-- [ ] T015: Implement WPState, TransitionAnomaly, ReducedStatus frozen models
-- [ ] T016: Implement reduce_status_events() with rollback-aware precedence
-- [ ] T017: Write unit tests for sort key, dedup, reducer (happy path, rollback, anomalies, empty)
-- [ ] T018: Write property tests for determinism and dedup idempotency
+- [x] T013: Implement status_event_sort_key()
+- [x] T014: Implement dedup_events()
+- [x] T015: Implement WPState, TransitionAnomaly, ReducedStatus frozen models
+- [x] T016: Implement reduce_status_events() with rollback-aware precedence
+- [x] T017: Write unit tests for sort key, dedup, reducer (happy path, rollback, anomalies, empty)
+- [x] T018: Write property tests for determinism and dedup idempotency
 
 **Parallel opportunities**: T013+T014 are independent helper functions. T015 is independent of T013-T014.
 **Dependencies**: WP01 and WP02 must be merged to main first.
