@@ -1,9 +1,11 @@
 ---
 work_package_id: WP02
 title: Transition Validation
-lane: planned
+lane: "doing"
 dependencies: []
 base_branch: main
+base_commit: 8f0de9b196da64a17261c5a050b82dfeea1d91fc
+created_at: '2026-02-08T14:20:38.450163+00:00'
 subtasks:
 - T008
 - T009
@@ -13,7 +15,7 @@ subtasks:
 phase: Phase 1 - Foundation
 assignee: ''
 agent: ''
-shell_pid: ''
+shell_pid: "40774"
 review_status: ''
 reviewed_by: ''
 history:
