@@ -86,6 +86,12 @@ from spec_kitty_events.status import (
     TERMINAL_LANES,
     LANE_ALIASES,
     WP_STATUS_CHANGED,
+    status_event_sort_key,
+    dedup_events,
+    reduce_status_events,
+    WPState,
+    TransitionAnomaly,
+    ReducedStatus,
 )
 
 # Public API (controls what's exported with "from spec_kitty_events import *")
@@ -142,4 +148,10 @@ __all__ = [
     "TERMINAL_LANES",
     "LANE_ALIASES",
     "WP_STATUS_CHANGED",
+    "status_event_sort_key",
+    "dedup_events",
+    "reduce_status_events",
+    "WPState",
+    "TransitionAnomaly",
+    "ReducedStatus",
 ]

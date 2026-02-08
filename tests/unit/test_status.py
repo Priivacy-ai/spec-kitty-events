@@ -1,20 +1,30 @@
 """Unit tests for status state model contracts."""
 
+import uuid
+from datetime import datetime, timezone, timedelta
+
 import pydantic
 import pytest
 
 from spec_kitty_events import (
     DoneEvidence,
+    Event,
     ExecutionMode,
     ForceMetadata,
     Lane,
+    ReducedStatus,
     RepoEvidence,
     ReviewVerdict,
     StatusTransitionPayload,
+    TransitionAnomaly,
     TransitionError,
     TransitionValidationResult,
     VerificationEntry,
+    WPState,
+    dedup_events,
     normalize_lane,
+    reduce_status_events,
+    status_event_sort_key,
     validate_transition,
     LANE_ALIASES,
     TERMINAL_LANES,
@@ -794,3 +804,252 @@ class TestGuardConditions:
         )
         result = validate_transition(payload)
         assert result.valid is False
+
+
+# ---------------------------------------------------------------------------
+# Helpers for Section 5 & 6 tests
+# ---------------------------------------------------------------------------
+
+_PROJECT_UUID = uuid.UUID("12345678-1234-1234-1234-123456789012")
+
+
+def _make_event(
+    event_id: str,
+    wp_id: str,
+    from_lane: Lane | None,
+    to_lane: Lane,
+    lamport_clock: int,
+    timestamp: datetime | None = None,
+    **kwargs: object,
+) -> Event:
+    """Helper to create status events for testing."""
+    payload = StatusTransitionPayload(
+        feature_slug="test-feature",
+        wp_id=wp_id,
+        from_lane=from_lane,
+        to_lane=to_lane,
+        actor="test-actor",
+        execution_mode=ExecutionMode.WORKTREE,
+        **kwargs,  # type: ignore[arg-type]
+    )
+    return Event(
+        event_id=event_id,
+        event_type=WP_STATUS_CHANGED,
+        aggregate_id=f"test-feature/{wp_id}",
+        payload=payload.model_dump(),
+        timestamp=timestamp or datetime.now(timezone.utc),
+        node_id="test-node",
+        lamport_clock=lamport_clock,
+        project_uuid=_PROJECT_UUID,
+    )
+
+
+# ---------------------------------------------------------------------------
+# Section 5: Ordering tests
+# ---------------------------------------------------------------------------
+
+
+class TestStatusEventSortKey:
+    """Test status_event_sort_key function."""
+
+    def test_sort_by_lamport_clock(self) -> None:
+        e1 = _make_event("01HV0000000000000000000001", "WP01", None, Lane.PLANNED, 1)
+        e2 = _make_event("01HV0000000000000000000002", "WP01", Lane.PLANNED, Lane.CLAIMED, 2)
+        assert status_event_sort_key(e1) < status_event_sort_key(e2)
+
+    def test_tiebreak_by_timestamp(self) -> None:
+        t1 = datetime(2026, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
+        t2 = datetime(2026, 1, 1, 0, 0, 1, tzinfo=timezone.utc)
+        e1 = _make_event("01HV0000000000000000000002", "WP01", None, Lane.PLANNED, 1, timestamp=t1)
+        e2 = _make_event("01HV0000000000000000000001", "WP01", Lane.PLANNED, Lane.CLAIMED, 1, timestamp=t2)
+        assert status_event_sort_key(e1) < status_event_sort_key(e2)
+
+    def test_tiebreak_by_event_id(self) -> None:
+        t = datetime(2026, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
+        e1 = _make_event("01HV0000000000000000000001", "WP01", None, Lane.PLANNED, 1, timestamp=t)
+        e2 = _make_event("01HV0000000000000000000002", "WP01", Lane.PLANNED, Lane.CLAIMED, 1, timestamp=t)
+        assert status_event_sort_key(e1) < status_event_sort_key(e2)
+
+
+class TestDedupEvents:
+    """Test dedup_events function."""
+
+    def test_removes_duplicates(self) -> None:
+        e1 = _make_event("01HV0000000000000000000001", "WP01", None, Lane.PLANNED, 1)
+        e2 = _make_event("01HV0000000000000000000001", "WP01", None, Lane.PLANNED, 1)
+        result = dedup_events([e1, e2])
+        assert len(result) == 1
+        assert result[0] is e1
+
+    def test_preserves_first_occurrence(self) -> None:
+        t1 = datetime(2026, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
+        t2 = datetime(2026, 1, 1, 0, 0, 1, tzinfo=timezone.utc)
+        e1 = _make_event("01HV0000000000000000000001", "WP01", None, Lane.PLANNED, 1, timestamp=t1)
+        e2 = _make_event("01HV0000000000000000000001", "WP01", None, Lane.PLANNED, 2, timestamp=t2)
+        result = dedup_events([e1, e2])
+        assert len(result) == 1
+        assert result[0].timestamp == t1
+
+    def test_no_duplicates_passthrough(self) -> None:
+        e1 = _make_event("01HV0000000000000000000001", "WP01", None, Lane.PLANNED, 1)
+        e2 = _make_event("01HV0000000000000000000002", "WP01", Lane.PLANNED, Lane.CLAIMED, 2)
+        result = dedup_events([e1, e2])
+        assert len(result) == 2
+
+    def test_empty_input(self) -> None:
+        result = dedup_events([])
+        assert result == []
+
+
+# ---------------------------------------------------------------------------
+# Section 6: Reducer tests
+# ---------------------------------------------------------------------------
+
+
+class TestReduceStatusEvents:
+    """Test reduce_status_events function."""
+
+    def test_happy_path_full_lifecycle(self) -> None:
+        """planned -> claimed -> in_progress -> for_review -> done."""
+        base_t = datetime(2026, 1, 1, tzinfo=timezone.utc)
+        evidence = DoneEvidence(
+            repos=[RepoEvidence(repo="test", branch="main", commit="abc123")],
+            verification=[],
+            review=ReviewVerdict(reviewer="alice", verdict="approved"),
+        )
+        events = [
+            _make_event("01HV0000000000000000000001", "WP01", None, Lane.PLANNED, 1, timestamp=base_t),
+            _make_event("01HV0000000000000000000002", "WP01", Lane.PLANNED, Lane.CLAIMED, 2, timestamp=base_t + timedelta(seconds=1)),
+            _make_event("01HV0000000000000000000003", "WP01", Lane.CLAIMED, Lane.IN_PROGRESS, 3, timestamp=base_t + timedelta(seconds=2)),
+            _make_event("01HV0000000000000000000004", "WP01", Lane.IN_PROGRESS, Lane.FOR_REVIEW, 4, timestamp=base_t + timedelta(seconds=3)),
+            _make_event(
+                "01HV0000000000000000000005", "WP01", Lane.FOR_REVIEW, Lane.DONE, 5,
+                timestamp=base_t + timedelta(seconds=4),
+                evidence=evidence,
+            ),
+        ]
+        result = reduce_status_events(events)
+        assert "WP01" in result.wp_states
+        state = result.wp_states["WP01"]
+        assert state.current_lane == Lane.DONE
+        assert state.last_event_id == "01HV0000000000000000000005"
+        assert state.evidence is not None
+        assert result.anomalies == []
+        assert result.event_count == 5
+
+    def test_multiple_wps(self) -> None:
+        """Interleaved events for WP01 and WP02."""
+        base_t = datetime(2026, 1, 1, tzinfo=timezone.utc)
+        events = [
+            _make_event("01HV0000000000000000000001", "WP01", None, Lane.PLANNED, 1, timestamp=base_t),
+            _make_event("01HV0000000000000000000002", "WP02", None, Lane.PLANNED, 2, timestamp=base_t + timedelta(seconds=1)),
+            _make_event("01HV0000000000000000000003", "WP01", Lane.PLANNED, Lane.CLAIMED, 3, timestamp=base_t + timedelta(seconds=2)),
+            _make_event("01HV0000000000000000000004", "WP02", Lane.PLANNED, Lane.CLAIMED, 4, timestamp=base_t + timedelta(seconds=3)),
+        ]
+        result = reduce_status_events(events)
+        assert len(result.wp_states) == 2
+        assert result.wp_states["WP01"].current_lane == Lane.CLAIMED
+        assert result.wp_states["WP02"].current_lane == Lane.CLAIMED
+
+    def test_empty_events(self) -> None:
+        result = reduce_status_events([])
+        assert result.wp_states == {}
+        assert result.anomalies == []
+        assert result.event_count == 0
+        assert result.last_processed_event_id is None
+
+    def test_non_status_events_skipped(self) -> None:
+        """Events with wrong event_type are ignored."""
+        event = Event(
+            event_id="01HV0000000000000000000001",
+            event_type="SomethingElse",
+            aggregate_id="test/WP01",
+            payload={},
+            timestamp=datetime.now(timezone.utc),
+            node_id="test",
+            lamport_clock=1,
+            project_uuid=_PROJECT_UUID,
+        )
+        result = reduce_status_events([event])
+        assert result.wp_states == {}
+        assert result.event_count == 0
+
+    def test_invalid_transition_flagged(self) -> None:
+        """Jump planned -> done without force/evidence -> anomaly."""
+        base_t = datetime(2026, 1, 1, tzinfo=timezone.utc)
+        # First set up WP01 at PLANNED
+        e1 = _make_event("01HV0000000000000000000001", "WP01", None, Lane.PLANNED, 1, timestamp=base_t)
+        # Try illegal jump: planned -> for_review (skipping claimed/in_progress)
+        e2 = _make_event("01HV0000000000000000000002", "WP01", Lane.PLANNED, Lane.FOR_REVIEW, 2, timestamp=base_t + timedelta(seconds=1))
+        result = reduce_status_events([e1, e2])
+        assert len(result.anomalies) == 1
+        assert result.anomalies[0].wp_id == "WP01"
+        assert result.wp_states["WP01"].current_lane == Lane.PLANNED
+
+    def test_from_lane_mismatch_flagged(self) -> None:
+        """Event claims from_lane=claimed when WP is in planned -> anomaly."""
+        base_t = datetime(2026, 1, 1, tzinfo=timezone.utc)
+        e1 = _make_event("01HV0000000000000000000001", "WP01", None, Lane.PLANNED, 1, timestamp=base_t)
+        # Claims from_lane=claimed but WP is actually in planned
+        e2 = _make_event("01HV0000000000000000000002", "WP01", Lane.CLAIMED, Lane.IN_PROGRESS, 2, timestamp=base_t + timedelta(seconds=1))
+        result = reduce_status_events([e1, e2])
+        assert len(result.anomalies) == 1
+        assert "mismatch" in result.anomalies[0].reason
+        assert result.wp_states["WP01"].current_lane == Lane.PLANNED
+
+    def test_rollback_precedence(self) -> None:
+        """Two concurrent events (same lamport_clock) for same WP.
+
+        One moves for_review -> done, other is rollback (for_review -> in_progress
+        with review_ref). Final state should be in_progress because rollback
+        is applied last.
+        """
+        base_t = datetime(2026, 1, 1, tzinfo=timezone.utc)
+        evidence = DoneEvidence(
+            repos=[RepoEvidence(repo="test", branch="main", commit="abc123")],
+            verification=[],
+            review=ReviewVerdict(reviewer="alice", verdict="approved"),
+        )
+        # Build up to FOR_REVIEW
+        events = [
+            _make_event("01HV0000000000000000000001", "WP01", None, Lane.PLANNED, 1, timestamp=base_t),
+            _make_event("01HV0000000000000000000002", "WP01", Lane.PLANNED, Lane.CLAIMED, 2, timestamp=base_t + timedelta(seconds=1)),
+            _make_event("01HV0000000000000000000003", "WP01", Lane.CLAIMED, Lane.IN_PROGRESS, 3, timestamp=base_t + timedelta(seconds=2)),
+            _make_event("01HV0000000000000000000004", "WP01", Lane.IN_PROGRESS, Lane.FOR_REVIEW, 4, timestamp=base_t + timedelta(seconds=3)),
+        ]
+        # Two concurrent events at same lamport_clock=5
+        e_done = _make_event(
+            "01HV0000000000000000000005", "WP01", Lane.FOR_REVIEW, Lane.DONE, 5,
+            timestamp=base_t + timedelta(seconds=4),
+            evidence=evidence,
+        )
+        e_rollback = _make_event(
+            "01HV0000000000000000000006", "WP01", Lane.FOR_REVIEW, Lane.IN_PROGRESS, 5,
+            timestamp=base_t + timedelta(seconds=4),
+            review_ref="PR#42",
+        )
+        events.extend([e_done, e_rollback])
+        result = reduce_status_events(events)
+        assert result.wp_states["WP01"].current_lane == Lane.IN_PROGRESS
+
+    def test_event_count_correct(self) -> None:
+        """Verify count matches unique status events."""
+        base_t = datetime(2026, 1, 1, tzinfo=timezone.utc)
+        events = [
+            _make_event("01HV0000000000000000000001", "WP01", None, Lane.PLANNED, 1, timestamp=base_t),
+            _make_event("01HV0000000000000000000002", "WP01", Lane.PLANNED, Lane.CLAIMED, 2, timestamp=base_t + timedelta(seconds=1)),
+            # Duplicate of first event
+            _make_event("01HV0000000000000000000001", "WP01", None, Lane.PLANNED, 1, timestamp=base_t),
+        ]
+        result = reduce_status_events(events)
+        assert result.event_count == 2  # deduped
+
+    def test_last_processed_event_id(self) -> None:
+        """Verify it's the last event in sorted order."""
+        base_t = datetime(2026, 1, 1, tzinfo=timezone.utc)
+        events = [
+            _make_event("01HV0000000000000000000001", "WP01", None, Lane.PLANNED, 1, timestamp=base_t),
+            _make_event("01HV0000000000000000000002", "WP01", Lane.PLANNED, Lane.CLAIMED, 2, timestamp=base_t + timedelta(seconds=1)),
+        ]
+        result = reduce_status_events(events)
+        assert result.last_processed_event_id == "01HV0000000000000000000002"
