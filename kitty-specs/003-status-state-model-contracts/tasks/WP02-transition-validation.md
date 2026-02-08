@@ -14,7 +14,7 @@ subtasks:
 - T012
 phase: Phase 1 - Foundation
 assignee: ''
-agent: ''
+agent: "claude-opus"
 shell_pid: "40774"
 review_status: ''
 reviewed_by: ''
@@ -334,3 +334,4 @@ def _make_evidence() -> DoneEvidence:
 ## Activity Log
 
 - 2026-02-08T00:00:00Z – system – lane=planned – Prompt created.
+- 2026-02-08T14:20:39Z – claude-opus – shell_pid=40774 – lane=doing – Assigned agent via workflow command
