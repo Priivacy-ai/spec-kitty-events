@@ -7,6 +7,62 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0-alpha] - 2026-02-08
+
+### Added
+
+**Status State Model Contracts** — New `status.py` module establishing the library as the
+shared contract authority for feature/WP status lifecycle events.
+
+#### Enums
+- `Lane` — 7 canonical status lanes: planned, claimed, in_progress, for_review, done, blocked, canceled
+- `ExecutionMode` — worktree | direct_repo execution context
+
+#### Evidence Models
+- `RepoEvidence` — Repository contribution evidence (repo, branch, commit, files_touched)
+- `VerificationEntry` — Test/verification execution record (command, result, summary)
+- `ReviewVerdict` — Reviewer identity and verdict (reviewer, verdict, reference)
+- `DoneEvidence` — Composite evidence required for done transitions
+
+#### Transition Models
+- `ForceMetadata` — Actor and reason for forced transitions
+- `StatusTransitionPayload` — Immutable payload for lane transitions with cross-field validation
+
+#### Validation
+- `TransitionValidationResult` — Result type for transition validation (valid, violations)
+- `validate_transition()` — Pre-flight transition legality check against PRD state machine
+- `TransitionError` — Exception for consumers who want to raise on invalid transitions
+
+#### Ordering and Reduction
+- `status_event_sort_key()` — Deterministic sort key: (lamport_clock, timestamp, event_id)
+- `dedup_events()` — Remove duplicate events by event_id
+- `reduce_status_events()` — Pure reference reducer with rollback-aware precedence
+- `WPState` — Per-WP reduced state (current_lane, last_event_id, evidence)
+- `TransitionAnomaly` — Record of invalid transition encountered during reduction
+- `ReducedStatus` — Reducer output (wp_states, anomalies, event_count)
+
+#### Constants
+- `TERMINAL_LANES` — frozenset of terminal lanes (done, canceled)
+- `LANE_ALIASES` — Legacy alias map (doing -> in_progress)
+- `WP_STATUS_CHANGED` — Canonical event_type string
+
+### Key Features
+- **Lane alias normalization**: Legacy `doing` accepted on input, normalized to `in_progress`
+- **Data-driven transition matrix**: All legal transitions encoded as data, not branching logic
+- **Rollback-aware reducer**: Reviewer rollback outranks concurrent forward progression
+- **Pure functions**: Reducer has no I/O, no side effects, deterministic output
+
+### Backward Compatibility
+- Zero changes to existing modules or exports
+- All v0.2.0 tests pass without modification
+- 21 new exports added alongside existing 37 (total: 58)
+
+### Graduation Criteria (alpha → stable)
+- 2+ consumers integrated (spec-kitty CLI and spec-kitty-saas)
+- All property tests green for 30+ days in CI
+- No breaking API changes needed after consumer integration
+- Transition matrix validated against real-world workflow data
+
 ## [0.2.0-alpha] - 2026-02-07
 
 ### Added
@@ -99,7 +155,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-[Unreleased]: https://github.com/Priivacy-ai/spec-kitty-events/compare/v0.2.0-alpha...HEAD
+[Unreleased]: https://github.com/Priivacy-ai/spec-kitty-events/compare/v0.3.0-alpha...HEAD
+[0.3.0-alpha]: https://github.com/Priivacy-ai/spec-kitty-events/compare/v0.2.0-alpha...v0.3.0-alpha
 [0.2.0-alpha]: https://github.com/Priivacy-ai/spec-kitty-events/compare/v0.1.1-alpha...v0.2.0-alpha
 [0.1.1-alpha]: https://github.com/Priivacy-ai/spec-kitty-events/compare/v0.1.0-alpha...v0.1.1-alpha
 [0.1.0-alpha]: https://github.com/Priivacy-ai/spec-kitty-events/releases/tag/v0.1.0-alpha
