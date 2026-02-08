@@ -1,0 +1,10 @@
+{
+  "feature_number": "003",
+  "slug": "003-status-state-model-contracts",
+  "friendly_name": "Status State Model Contracts",
+  "mission": "software-dev",
+  "source_description": "Implement the events-library side of the remediation defined in prd-feature-status-state-model-remediation.md. Make this library the shared contract authority for feature/WP status events used by CLI and SaaS. Add typed event/payload contracts for status transitions and evidence-bearing completion. Add schemas/models covering lane transitions, force metadata, execution mode, review rollback reference, and done evidence. Add a pure reference reducer and deterministic ordering/reduction support primitives. Add validation helpers for transition legality and payload integrity. Version as 0.3.0-alpha.",
+  "created_at": "2026-02-08T00:00:00Z",
+  "target_branch": "main",
+  "vcs": "git"
+}
