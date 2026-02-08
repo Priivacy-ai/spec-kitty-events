@@ -40,6 +40,7 @@ class GatePayloadBase(BaseModel):
     check_run_id: int = Field(
         ...,
         gt=0,
+        strict=True,
         description="GitHub check run ID",
     )
     check_run_url: AnyHttpUrl = Field(
@@ -54,6 +55,7 @@ class GatePayloadBase(BaseModel):
     pr_number: Optional[int] = Field(
         None,
         gt=0,
+        strict=True,
         description="Pull request number, if the gate is associated with a PR",
     )
 
@@ -70,7 +72,10 @@ class GatePassedPayload(GatePayloadBase):
     Attached to a generic Event with event_type='GatePassed'.
     """
 
-    pass
+    conclusion: Literal["success"] = Field(
+        ...,
+        description="Allowed GitHub check_run conclusion for passed gates.",
+    )
 
 
 class GateFailedPayload(GatePayloadBase):
@@ -80,7 +85,10 @@ class GateFailedPayload(GatePayloadBase):
     Attached to a generic Event with event_type='GateFailed'.
     """
 
-    pass
+    conclusion: Literal["failure", "timed_out", "cancelled", "action_required"] = Field(
+        ...,
+        description="Allowed GitHub check_run conclusions for failed gates.",
+    )
 
 
 class UnknownConclusionError(SpecKittyEventsError):

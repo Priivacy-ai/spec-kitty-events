@@ -31,6 +31,8 @@ VALID_PAYLOAD_DATA: dict = {
     "delivery_id": "delivery-abc-123",
 }
 
+VALID_FAILED_PAYLOAD_DATA: dict = {**VALID_PAYLOAD_DATA, "conclusion": "failure"}
+
 
 # ---------------------------------------------------------------------------
 # Payload model construction
@@ -64,10 +66,35 @@ class TestGateFailedPayloadConstruction:
     """Test GateFailedPayload valid construction."""
 
     def test_valid_construction(self) -> None:
-        data = {**VALID_PAYLOAD_DATA, "conclusion": "failure"}
-        payload = GateFailedPayload(**data)
+        payload = GateFailedPayload(**VALID_FAILED_PAYLOAD_DATA)
         assert payload.conclusion == "failure"
         assert payload.gate_name == "ci/build"
+
+
+class TestConclusionDiscrimination:
+    """Verify each payload class enforces its allowed conclusion values."""
+
+    @pytest.mark.parametrize(
+        "invalid_conclusion",
+        ["failure", "timed_out", "cancelled", "action_required", "neutral", "skipped", "stale"],
+    )
+    def test_gate_passed_rejects_non_success_conclusions(
+        self,
+        invalid_conclusion: str,
+    ) -> None:
+        with pytest.raises(pydantic.ValidationError):
+            GatePassedPayload(**{**VALID_PAYLOAD_DATA, "conclusion": invalid_conclusion})
+
+    @pytest.mark.parametrize(
+        "invalid_conclusion",
+        ["success", "neutral", "skipped", "stale"],
+    )
+    def test_gate_failed_rejects_non_failure_conclusions(
+        self,
+        invalid_conclusion: str,
+    ) -> None:
+        with pytest.raises(pydantic.ValidationError):
+            GateFailedPayload(**{**VALID_PAYLOAD_DATA, "conclusion": invalid_conclusion})
 
 
 # ---------------------------------------------------------------------------
@@ -145,6 +172,11 @@ class TestFieldConstraints:
         with pytest.raises(pydantic.ValidationError):
             GatePassedPayload(**{**VALID_PAYLOAD_DATA, "check_run_id": -1})
 
+    @pytest.mark.parametrize("invalid_check_run_id", ["123", True, 12.0])
+    def test_check_run_id_non_strict_int_rejects(self, invalid_check_run_id: object) -> None:
+        with pytest.raises(pydantic.ValidationError):
+            GatePassedPayload(**{**VALID_PAYLOAD_DATA, "check_run_id": invalid_check_run_id})
+
     def test_check_run_url_invalid_rejects(self) -> None:
         with pytest.raises(pydantic.ValidationError):
             GatePassedPayload(**{**VALID_PAYLOAD_DATA, "check_run_url": "not-a-url"})
@@ -156,6 +188,11 @@ class TestFieldConstraints:
     def test_pr_number_negative_rejects(self) -> None:
         with pytest.raises(pydantic.ValidationError):
             GatePassedPayload(**{**VALID_PAYLOAD_DATA, "pr_number": -1})
+
+    @pytest.mark.parametrize("invalid_pr_number", ["42", True, 42.0])
+    def test_pr_number_non_strict_int_rejects(self, invalid_pr_number: object) -> None:
+        with pytest.raises(pydantic.ValidationError):
+            GatePassedPayload(**{**VALID_PAYLOAD_DATA, "pr_number": invalid_pr_number})
 
 
 # ---------------------------------------------------------------------------
@@ -172,7 +209,7 @@ class TestFrozenImmutability:
             payload.gate_name = "changed"  # type: ignore[misc]
 
     def test_gate_failed_is_frozen(self) -> None:
-        payload = GateFailedPayload(**VALID_PAYLOAD_DATA)
+        payload = GateFailedPayload(**VALID_FAILED_PAYLOAD_DATA)
         with pytest.raises(pydantic.ValidationError):
             payload.gate_name = "changed"  # type: ignore[misc]
 
@@ -194,8 +231,7 @@ class TestSerializationRoundTrip:
         assert reconstructed == payload
 
     def test_gate_failed_roundtrip(self) -> None:
-        data = {**VALID_PAYLOAD_DATA, "conclusion": "failure"}
-        payload = GateFailedPayload(**data)
+        payload = GateFailedPayload(**VALID_FAILED_PAYLOAD_DATA)
         dumped = payload.model_dump()
         reconstructed = GateFailedPayload.model_validate(dumped)
         assert reconstructed == payload
@@ -221,7 +257,7 @@ class TestTypeDiscrimination:
         assert isinstance(payload, GatePayloadBase)
 
     def test_failed_is_base(self) -> None:
-        payload = GateFailedPayload(**VALID_PAYLOAD_DATA)
+        payload = GateFailedPayload(**VALID_FAILED_PAYLOAD_DATA)
         assert isinstance(payload, GatePayloadBase)
 
     def test_passed_is_not_failed(self) -> None:
@@ -230,7 +266,7 @@ class TestTypeDiscrimination:
         assert not isinstance(payload, GateFailedPayload)
 
     def test_failed_is_not_passed(self) -> None:
-        payload = GateFailedPayload(**VALID_PAYLOAD_DATA)
+        payload = GateFailedPayload(**VALID_FAILED_PAYLOAD_DATA)
         assert isinstance(payload, GateFailedPayload)
         assert not isinstance(payload, GatePassedPayload)
 
