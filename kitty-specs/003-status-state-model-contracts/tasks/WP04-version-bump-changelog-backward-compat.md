@@ -14,7 +14,7 @@ subtasks:
 - T023
 phase: Phase 3 - Polish and Release
 assignee: ''
-agent: ''
+agent: "claude-opus"
 shell_pid: "42939"
 review_status: ''
 reviewed_by: ''
@@ -264,3 +264,4 @@ Bump version to `0.3.0-alpha`, write CHANGELOG entry with graduation criteria, v
 ## Activity Log
 
 - 2026-02-08T00:00:00Z – system – lane=planned – Prompt created.
+- 2026-02-08T14:31:54Z – claude-opus – shell_pid=42939 – lane=doing – Assigned agent via workflow command
