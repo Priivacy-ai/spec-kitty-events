@@ -1,5 +1,6 @@
 """Status state model contracts for work-package lane transitions."""
 
+from dataclasses import dataclass
 from enum import Enum
 from typing import Dict, FrozenSet, List, Optional, Tuple
 
@@ -188,3 +189,94 @@ class TransitionError(SpecKittyEventsError):
     def __init__(self, violations: Tuple[str, ...]) -> None:
         self.violations = violations
         super().__init__(f"Invalid transition: {'; '.join(violations)}")
+
+
+# ---------------------------------------------------------------------------
+# Section 4: Validation
+# ---------------------------------------------------------------------------
+
+_ALLOWED_TRANSITIONS: FrozenSet[Tuple[Optional[Lane], Lane]] = frozenset({
+    # Initial
+    (None, Lane.PLANNED),
+    # Happy path
+    (Lane.PLANNED, Lane.CLAIMED),
+    (Lane.CLAIMED, Lane.IN_PROGRESS),
+    (Lane.IN_PROGRESS, Lane.FOR_REVIEW),
+    (Lane.FOR_REVIEW, Lane.DONE),
+    # Review rollback
+    (Lane.FOR_REVIEW, Lane.IN_PROGRESS),
+    # Abandon/reassign
+    (Lane.IN_PROGRESS, Lane.PLANNED),
+    # Unblock
+    (Lane.BLOCKED, Lane.IN_PROGRESS),
+})
+
+
+@dataclass(frozen=True)
+class TransitionValidationResult:
+    """Result of validating a proposed status transition."""
+
+    valid: bool
+    violations: Tuple[str, ...] = ()
+
+
+def validate_transition(payload: StatusTransitionPayload) -> TransitionValidationResult:
+    """Validate a proposed status transition against business rules.
+
+    This function NEVER raises exceptions for business rule violations.
+    It always returns a TransitionValidationResult.
+
+    Args:
+        payload: The transition payload to validate.
+
+    Returns:
+        A TransitionValidationResult indicating whether the transition is valid,
+        and any violations found.
+    """
+    violations: List[str] = []
+
+    # Terminal lane check
+    if payload.from_lane is not None and payload.from_lane in TERMINAL_LANES and not payload.force:
+        violations.append(
+            f"{payload.from_lane.value} is terminal; requires force=True to exit"
+        )
+
+    # Force check — if force is True, skip matrix check
+    if not payload.force:
+        # Matrix check
+        pair = (payload.from_lane, payload.to_lane)
+        in_matrix = pair in _ALLOWED_TRANSITIONS
+        to_blocked = (
+            payload.to_lane is Lane.BLOCKED
+            and payload.from_lane is not None
+            and payload.from_lane not in TERMINAL_LANES
+        )
+        to_canceled = (
+            payload.to_lane is Lane.CANCELED
+            and payload.from_lane is not None
+            and payload.from_lane not in TERMINAL_LANES
+        )
+        if not (in_matrix or to_blocked or to_canceled):
+            violations.append(
+                f"Transition {payload.from_lane} -> {payload.to_lane} is not allowed"
+            )
+
+    # Guard conditions (checked regardless of force)
+    if (
+        payload.from_lane is Lane.FOR_REVIEW
+        and payload.to_lane is Lane.IN_PROGRESS
+        and payload.review_ref is None
+    ):
+        violations.append("for_review -> in_progress requires review_ref")
+
+    if (
+        payload.from_lane is Lane.IN_PROGRESS
+        and payload.to_lane is Lane.PLANNED
+        and payload.reason is None
+    ):
+        violations.append("in_progress -> planned requires reason")
+
+    return TransitionValidationResult(
+        valid=len(violations) == 0,
+        violations=tuple(violations),
+    )
