@@ -89,11 +89,11 @@
 
 **Dependencies**: WP01, WP02, WP03 (all code must be complete and merged)
 
-- [ ] T019: Bump version to 0.3.0-alpha in pyproject.toml and __init__.py
-- [ ] T020: Write CHANGELOG.md entry with graduation criteria
-- [ ] T021: Run full existing test suite and verify zero regressions
-- [ ] T022: Run mypy --strict on entire codebase
-- [ ] T023: Verify consumer integration checklists
+- [x] T019: Bump version to 0.3.0-alpha in pyproject.toml and __init__.py
+- [x] T020: Write CHANGELOG.md entry with graduation criteria
+- [x] T021: Run full existing test suite and verify zero regressions
+- [x] T022: Run mypy --strict on entire codebase
+- [x] T023: Verify consumer integration checklists
 
 **Parallel opportunities**: T019+T020 are independent edits. T021+T022 are independent verification steps.
 **Dependencies**: WP01-WP03 must all be merged to main first.
