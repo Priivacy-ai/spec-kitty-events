@@ -1,0 +1,12 @@
+{
+  "wp_id": "WP02",
+  "feature_slug": "003-status-state-model-contracts",
+  "worktree_path": ".worktrees/003-status-state-model-contracts-WP02",
+  "branch_name": "003-status-state-model-contracts-WP02",
+  "base_branch": "main",
+  "base_commit": "8f0de9b196da64a17261c5a050b82dfeea1d91fc",
+  "dependencies": [],
+  "created_at": "2026-02-08T14:20:38.450163+00:00",
+  "created_by": "implement-command",
+  "vcs_backend": "git"
+}
