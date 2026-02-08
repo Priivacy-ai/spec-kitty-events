@@ -69,6 +69,23 @@ from spec_kitty_events.gates import (
     map_check_run_conclusion,
 )
 
+# Status state model contracts
+from spec_kitty_events.status import (
+    Lane,
+    ExecutionMode,
+    RepoEvidence,
+    VerificationEntry,
+    ReviewVerdict,
+    DoneEvidence,
+    ForceMetadata,
+    StatusTransitionPayload,
+    TransitionError,
+    normalize_lane,
+    TERMINAL_LANES,
+    LANE_ALIASES,
+    WP_STATUS_CHANGED,
+)
+
 # Public API (controls what's exported with "from spec_kitty_events import *")
 __all__ = [
     # Version
@@ -107,4 +124,18 @@ __all__ = [
     "GateFailedPayload",
     "UnknownConclusionError",
     "map_check_run_conclusion",
+    # Status state model
+    "Lane",
+    "ExecutionMode",
+    "RepoEvidence",
+    "VerificationEntry",
+    "ReviewVerdict",
+    "DoneEvidence",
+    "ForceMetadata",
+    "StatusTransitionPayload",
+    "TransitionError",
+    "normalize_lane",
+    "TERMINAL_LANES",
+    "LANE_ALIASES",
+    "WP_STATUS_CHANGED",
 ]

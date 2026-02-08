@@ -1,0 +1,526 @@
+"""Unit tests for status state model contracts."""
+
+import pydantic
+import pytest
+
+from spec_kitty_events import (
+    DoneEvidence,
+    ExecutionMode,
+    ForceMetadata,
+    Lane,
+    RepoEvidence,
+    ReviewVerdict,
+    StatusTransitionPayload,
+    TransitionError,
+    VerificationEntry,
+    normalize_lane,
+    LANE_ALIASES,
+    TERMINAL_LANES,
+    WP_STATUS_CHANGED,
+    SpecKittyEventsError,
+    ValidationError,
+)
+
+
+# ---------------------------------------------------------------------------
+# Fixtures / shared data
+# ---------------------------------------------------------------------------
+
+VALID_REPO_EVIDENCE: dict = {
+    "repo": "org/my-repo",
+    "branch": "feat/branch",
+    "commit": "abc123def",
+}
+
+VALID_REVIEW_VERDICT: dict = {
+    "reviewer": "alice",
+    "verdict": "approved",
+}
+
+VALID_DONE_EVIDENCE: dict = {
+    "repos": [VALID_REPO_EVIDENCE],
+    "review": VALID_REVIEW_VERDICT,
+}
+
+VALID_TRANSITION_DATA: dict = {
+    "feature_slug": "003-status",
+    "wp_id": "WP01",
+    "from_lane": "planned",
+    "to_lane": "claimed",
+    "actor": "agent-1",
+    "execution_mode": "worktree",
+}
+
+
+# ---------------------------------------------------------------------------
+# Lane enum
+# ---------------------------------------------------------------------------
+
+
+class TestLane:
+    """Test Lane enum members and string behavior."""
+
+    def test_planned_value(self) -> None:
+        assert Lane.PLANNED.value == "planned"
+
+    def test_claimed_value(self) -> None:
+        assert Lane.CLAIMED.value == "claimed"
+
+    def test_in_progress_value(self) -> None:
+        assert Lane.IN_PROGRESS.value == "in_progress"
+
+    def test_for_review_value(self) -> None:
+        assert Lane.FOR_REVIEW.value == "for_review"
+
+    def test_done_value(self) -> None:
+        assert Lane.DONE.value == "done"
+
+    def test_blocked_value(self) -> None:
+        assert Lane.BLOCKED.value == "blocked"
+
+    def test_canceled_value(self) -> None:
+        assert Lane.CANCELED.value == "canceled"
+
+    def test_all_seven_members(self) -> None:
+        assert len(Lane) == 7
+
+    def test_string_equality(self) -> None:
+        assert Lane.PLANNED == "planned"
+        assert Lane.DONE == "done"
+
+    def test_iteration_yields_all(self) -> None:
+        values = [m.value for m in Lane]
+        assert "planned" in values
+        assert "canceled" in values
+        assert len(values) == 7
+
+    def test_from_value(self) -> None:
+        assert Lane("planned") is Lane.PLANNED
+        assert Lane("in_progress") is Lane.IN_PROGRESS
+
+    def test_invalid_value_raises(self) -> None:
+        with pytest.raises(ValueError):
+            Lane("nonexistent")
+
+
+# ---------------------------------------------------------------------------
+# ExecutionMode enum
+# ---------------------------------------------------------------------------
+
+
+class TestExecutionMode:
+    """Test ExecutionMode enum members."""
+
+    def test_worktree_value(self) -> None:
+        assert ExecutionMode.WORKTREE.value == "worktree"
+
+    def test_direct_repo_value(self) -> None:
+        assert ExecutionMode.DIRECT_REPO.value == "direct_repo"
+
+    def test_from_value(self) -> None:
+        assert ExecutionMode("worktree") is ExecutionMode.WORKTREE
+        assert ExecutionMode("direct_repo") is ExecutionMode.DIRECT_REPO
+
+    def test_two_members(self) -> None:
+        assert len(ExecutionMode) == 2
+
+
+# ---------------------------------------------------------------------------
+# Constants
+# ---------------------------------------------------------------------------
+
+
+class TestConstants:
+    """Test module-level constants."""
+
+    def test_terminal_lanes_contains_done(self) -> None:
+        assert Lane.DONE in TERMINAL_LANES
+
+    def test_terminal_lanes_contains_canceled(self) -> None:
+        assert Lane.CANCELED in TERMINAL_LANES
+
+    def test_terminal_lanes_size(self) -> None:
+        assert len(TERMINAL_LANES) == 2
+
+    def test_lane_aliases_doing(self) -> None:
+        assert LANE_ALIASES["doing"] is Lane.IN_PROGRESS
+
+    def test_wp_status_changed(self) -> None:
+        assert WP_STATUS_CHANGED == "WPStatusChanged"
+
+
+# ---------------------------------------------------------------------------
+# normalize_lane
+# ---------------------------------------------------------------------------
+
+
+class TestNormalizeLane:
+    """Test normalize_lane function."""
+
+    @pytest.mark.parametrize("value", [
+        "planned", "claimed", "in_progress", "for_review",
+        "done", "blocked", "canceled",
+    ])
+    def test_canonical_values(self, value: str) -> None:
+        result = normalize_lane(value)
+        assert result.value == value
+
+    def test_alias_doing_maps_to_in_progress(self) -> None:
+        result = normalize_lane("doing")
+        assert result is Lane.IN_PROGRESS
+
+    def test_unknown_raises_validation_error(self) -> None:
+        with pytest.raises(ValidationError, match="Unknown lane value"):
+            normalize_lane("nonexistent")
+
+    def test_error_is_spec_kitty_events_error_subclass(self) -> None:
+        with pytest.raises(SpecKittyEventsError):
+            normalize_lane("bogus")
+
+    def test_empty_string_raises(self) -> None:
+        with pytest.raises(ValidationError):
+            normalize_lane("")
+
+
+# ---------------------------------------------------------------------------
+# RepoEvidence
+# ---------------------------------------------------------------------------
+
+
+class TestRepoEvidence:
+    """Test RepoEvidence model."""
+
+    def test_construction(self) -> None:
+        r = RepoEvidence(**VALID_REPO_EVIDENCE)
+        assert r.repo == "org/my-repo"
+        assert r.branch == "feat/branch"
+        assert r.commit == "abc123def"
+        assert r.files_touched is None
+
+    def test_frozen(self) -> None:
+        r = RepoEvidence(**VALID_REPO_EVIDENCE)
+        with pytest.raises(pydantic.ValidationError):
+            r.repo = "changed"  # type: ignore[misc]
+
+    def test_files_touched_optional(self) -> None:
+        r = RepoEvidence(**VALID_REPO_EVIDENCE, files_touched=["a.py", "b.py"])
+        assert r.files_touched == ["a.py", "b.py"]
+
+    def test_empty_repo_rejected(self) -> None:
+        with pytest.raises(pydantic.ValidationError):
+            RepoEvidence(repo="", branch="b", commit="c")
+
+    def test_empty_branch_rejected(self) -> None:
+        with pytest.raises(pydantic.ValidationError):
+            RepoEvidence(repo="r", branch="", commit="c")
+
+    def test_empty_commit_rejected(self) -> None:
+        with pytest.raises(pydantic.ValidationError):
+            RepoEvidence(repo="r", branch="b", commit="")
+
+    def test_round_trip(self) -> None:
+        r = RepoEvidence(**VALID_REPO_EVIDENCE, files_touched=["x.py"])
+        dumped = r.model_dump()
+        reconstructed = RepoEvidence.model_validate(dumped)
+        assert reconstructed == r
+
+
+# ---------------------------------------------------------------------------
+# VerificationEntry
+# ---------------------------------------------------------------------------
+
+
+class TestVerificationEntry:
+    """Test VerificationEntry model."""
+
+    def test_construction(self) -> None:
+        v = VerificationEntry(command="pytest", result="passed")
+        assert v.command == "pytest"
+        assert v.result == "passed"
+        assert v.summary is None
+
+    def test_frozen(self) -> None:
+        v = VerificationEntry(command="pytest", result="passed")
+        with pytest.raises(pydantic.ValidationError):
+            v.command = "changed"  # type: ignore[misc]
+
+    def test_optional_summary(self) -> None:
+        v = VerificationEntry(command="pytest", result="ok", summary="All green")
+        assert v.summary == "All green"
+
+    def test_empty_command_rejected(self) -> None:
+        with pytest.raises(pydantic.ValidationError):
+            VerificationEntry(command="", result="ok")
+
+    def test_empty_result_rejected(self) -> None:
+        with pytest.raises(pydantic.ValidationError):
+            VerificationEntry(command="pytest", result="")
+
+    def test_round_trip(self) -> None:
+        v = VerificationEntry(command="mypy", result="clean", summary="No errors")
+        dumped = v.model_dump()
+        reconstructed = VerificationEntry.model_validate(dumped)
+        assert reconstructed == v
+
+
+# ---------------------------------------------------------------------------
+# ReviewVerdict
+# ---------------------------------------------------------------------------
+
+
+class TestReviewVerdict:
+    """Test ReviewVerdict model."""
+
+    def test_construction(self) -> None:
+        r = ReviewVerdict(**VALID_REVIEW_VERDICT)
+        assert r.reviewer == "alice"
+        assert r.verdict == "approved"
+        assert r.reference is None
+
+    def test_frozen(self) -> None:
+        r = ReviewVerdict(**VALID_REVIEW_VERDICT)
+        with pytest.raises(pydantic.ValidationError):
+            r.reviewer = "changed"  # type: ignore[misc]
+
+    def test_optional_reference(self) -> None:
+        r = ReviewVerdict(reviewer="bob", verdict="approved", reference="PR#42")
+        assert r.reference == "PR#42"
+
+    def test_empty_reviewer_rejected(self) -> None:
+        with pytest.raises(pydantic.ValidationError):
+            ReviewVerdict(reviewer="", verdict="ok")
+
+    def test_empty_verdict_rejected(self) -> None:
+        with pytest.raises(pydantic.ValidationError):
+            ReviewVerdict(reviewer="alice", verdict="")
+
+    def test_round_trip(self) -> None:
+        r = ReviewVerdict(reviewer="alice", verdict="approved", reference="url")
+        dumped = r.model_dump()
+        reconstructed = ReviewVerdict.model_validate(dumped)
+        assert reconstructed == r
+
+
+# ---------------------------------------------------------------------------
+# DoneEvidence
+# ---------------------------------------------------------------------------
+
+
+class TestDoneEvidence:
+    """Test DoneEvidence model."""
+
+    def test_construction(self) -> None:
+        d = DoneEvidence(**VALID_DONE_EVIDENCE)
+        assert len(d.repos) == 1
+        assert d.repos[0].repo == "org/my-repo"
+        assert d.verification == []
+        assert d.review.reviewer == "alice"
+
+    def test_repos_required_nonempty(self) -> None:
+        with pytest.raises(pydantic.ValidationError):
+            DoneEvidence(repos=[], review=VALID_REVIEW_VERDICT)
+
+    def test_verification_defaults_empty(self) -> None:
+        d = DoneEvidence(**VALID_DONE_EVIDENCE)
+        assert d.verification == []
+
+    def test_verification_with_entries(self) -> None:
+        d = DoneEvidence(
+            repos=[VALID_REPO_EVIDENCE],
+            verification=[{"command": "pytest", "result": "ok"}],
+            review=VALID_REVIEW_VERDICT,
+        )
+        assert len(d.verification) == 1
+
+    def test_round_trip(self) -> None:
+        d = DoneEvidence(
+            repos=[VALID_REPO_EVIDENCE],
+            verification=[{"command": "pytest", "result": "ok"}],
+            review=VALID_REVIEW_VERDICT,
+        )
+        dumped = d.model_dump()
+        reconstructed = DoneEvidence.model_validate(dumped)
+        assert reconstructed == d
+
+
+# ---------------------------------------------------------------------------
+# ForceMetadata
+# ---------------------------------------------------------------------------
+
+
+class TestForceMetadata:
+    """Test ForceMetadata model."""
+
+    def test_construction(self) -> None:
+        f = ForceMetadata(actor="admin", reason="emergency fix")
+        assert f.force is True
+        assert f.actor == "admin"
+        assert f.reason == "emergency fix"
+
+    def test_actor_required_nonempty(self) -> None:
+        with pytest.raises(pydantic.ValidationError):
+            ForceMetadata(actor="", reason="reason")
+
+    def test_reason_required_nonempty(self) -> None:
+        with pytest.raises(pydantic.ValidationError):
+            ForceMetadata(actor="admin", reason="")
+
+    def test_frozen(self) -> None:
+        f = ForceMetadata(actor="admin", reason="reason")
+        with pytest.raises(pydantic.ValidationError):
+            f.actor = "changed"  # type: ignore[misc]
+
+
+# ---------------------------------------------------------------------------
+# StatusTransitionPayload
+# ---------------------------------------------------------------------------
+
+
+class TestStatusTransitionPayload:
+    """Test StatusTransitionPayload model."""
+
+    def test_basic_construction(self) -> None:
+        p = StatusTransitionPayload(**VALID_TRANSITION_DATA)
+        assert p.feature_slug == "003-status"
+        assert p.wp_id == "WP01"
+        assert p.from_lane is Lane.PLANNED
+        assert p.to_lane is Lane.CLAIMED
+        assert p.actor == "agent-1"
+        assert p.force is False
+        assert p.reason is None
+        assert p.execution_mode is ExecutionMode.WORKTREE
+        assert p.review_ref is None
+        assert p.evidence is None
+
+    def test_alias_normalization_from_lane(self) -> None:
+        data = {**VALID_TRANSITION_DATA, "from_lane": "doing"}
+        p = StatusTransitionPayload(**data)
+        assert p.from_lane is Lane.IN_PROGRESS
+
+    def test_alias_normalization_to_lane(self) -> None:
+        data = {**VALID_TRANSITION_DATA, "to_lane": "doing"}
+        p = StatusTransitionPayload(**data)
+        assert p.to_lane is Lane.IN_PROGRESS
+
+    def test_from_lane_none_is_valid(self) -> None:
+        data = {**VALID_TRANSITION_DATA, "from_lane": None}
+        p = StatusTransitionPayload(**data)
+        assert p.from_lane is None
+
+    def test_force_requires_reason(self) -> None:
+        data = {**VALID_TRANSITION_DATA, "force": True}
+        with pytest.raises(pydantic.ValidationError, match="force=True requires"):
+            StatusTransitionPayload(**data)
+
+    def test_force_with_reason_valid(self) -> None:
+        data = {
+            **VALID_TRANSITION_DATA,
+            "force": True,
+            "reason": "emergency rollback",
+        }
+        p = StatusTransitionPayload(**data)
+        assert p.force is True
+        assert p.reason == "emergency rollback"
+
+    def test_force_with_empty_reason_rejected(self) -> None:
+        data = {
+            **VALID_TRANSITION_DATA,
+            "force": True,
+            "reason": "  ",
+        }
+        with pytest.raises(pydantic.ValidationError, match="force=True requires"):
+            StatusTransitionPayload(**data)
+
+    def test_done_requires_evidence(self) -> None:
+        data = {**VALID_TRANSITION_DATA, "to_lane": "done"}
+        with pytest.raises(pydantic.ValidationError, match="requires evidence"):
+            StatusTransitionPayload(**data)
+
+    def test_done_with_evidence_valid(self) -> None:
+        data = {
+            **VALID_TRANSITION_DATA,
+            "to_lane": "done",
+            "evidence": VALID_DONE_EVIDENCE,
+        }
+        p = StatusTransitionPayload(**data)
+        assert p.to_lane is Lane.DONE
+        assert p.evidence is not None
+        assert len(p.evidence.repos) == 1
+
+    def test_forced_done_still_requires_evidence(self) -> None:
+        data = {
+            **VALID_TRANSITION_DATA,
+            "to_lane": "done",
+            "force": True,
+            "reason": "override",
+        }
+        with pytest.raises(pydantic.ValidationError, match="requires evidence"):
+            StatusTransitionPayload(**data)
+
+    def test_forced_done_with_evidence_valid(self) -> None:
+        data = {
+            **VALID_TRANSITION_DATA,
+            "to_lane": "done",
+            "force": True,
+            "reason": "override",
+            "evidence": VALID_DONE_EVIDENCE,
+        }
+        p = StatusTransitionPayload(**data)
+        assert p.force is True
+        assert p.to_lane is Lane.DONE
+
+    def test_round_trip(self) -> None:
+        data = {
+            **VALID_TRANSITION_DATA,
+            "to_lane": "done",
+            "evidence": VALID_DONE_EVIDENCE,
+        }
+        p = StatusTransitionPayload(**data)
+        dumped = p.model_dump()
+        reconstructed = StatusTransitionPayload.model_validate(dumped)
+        assert reconstructed == p
+
+    def test_frozen(self) -> None:
+        p = StatusTransitionPayload(**VALID_TRANSITION_DATA)
+        with pytest.raises(pydantic.ValidationError):
+            p.actor = "changed"  # type: ignore[misc]
+
+    def test_empty_feature_slug_rejected(self) -> None:
+        data = {**VALID_TRANSITION_DATA, "feature_slug": ""}
+        with pytest.raises(pydantic.ValidationError):
+            StatusTransitionPayload(**data)
+
+    def test_empty_wp_id_rejected(self) -> None:
+        data = {**VALID_TRANSITION_DATA, "wp_id": ""}
+        with pytest.raises(pydantic.ValidationError):
+            StatusTransitionPayload(**data)
+
+    def test_empty_actor_rejected(self) -> None:
+        data = {**VALID_TRANSITION_DATA, "actor": ""}
+        with pytest.raises(pydantic.ValidationError):
+            StatusTransitionPayload(**data)
+
+
+# ---------------------------------------------------------------------------
+# TransitionError
+# ---------------------------------------------------------------------------
+
+
+class TestTransitionError:
+    """Test TransitionError exception."""
+
+    def test_construction_with_violations(self) -> None:
+        err = TransitionError(violations=("rule-1 violated", "rule-2 violated"))
+        assert err.violations == ("rule-1 violated", "rule-2 violated")
+        assert "rule-1 violated" in str(err)
+        assert "rule-2 violated" in str(err)
+        assert "Invalid transition" in str(err)
+
+    def test_is_spec_kitty_events_error(self) -> None:
+        err = TransitionError(violations=("oops",))
+        assert isinstance(err, SpecKittyEventsError)
+
+    def test_single_violation(self) -> None:
+        err = TransitionError(violations=("only-one",))
+        assert err.violations == ("only-one",)
+        assert "only-one" in str(err)
