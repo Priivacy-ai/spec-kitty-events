@@ -35,13 +35,13 @@ All WPs are sequential — each builds on the previous. WP01 must land first bec
 
 **Subtasks**:
 
-- [ ] T001: Add correlation_id, schema_version, data_tier fields to Event model in `src/spec_kitty_events/models.py`
-- [ ] T002: Create test helper function in `tests/conftest.py` for constructing Event objects with sensible defaults for new fields
-- [ ] T003: Update unit test files (7 files, ~78 Event() calls): test_conflict.py, test_merge.py, test_models.py, test_crdt.py, test_storage.py, test_status.py, test_gates.py
-- [ ] T004: Update integration test files (4 files, ~24 Event() calls): test_quickstart.py, test_conflict_resolution.py, test_event_emission.py, test_adapters.py
-- [ ] T005: Update property test files (3 files, ~4 Event() calls): test_crdt_laws.py, test_determinism.py, test_status_determinism.py
-- [ ] T006: Update docstring examples in source modules: merge.py, crdt.py, conflict.py, topology.py
-- [ ] T007: Add unit tests for new Event fields: correlation_id validation, schema_version pattern validation, data_tier range validation, default values, round-trip serialization
+- [x] T001: Add correlation_id, schema_version, data_tier fields to Event model in `src/spec_kitty_events/models.py`
+- [x] T002: Create test helper function in `tests/conftest.py` for constructing Event objects with sensible defaults for new fields
+- [x] T003: Update unit test files (7 files, ~78 Event() calls): test_conflict.py, test_merge.py, test_models.py, test_crdt.py, test_storage.py, test_status.py, test_gates.py
+- [x] T004: Update integration test files (4 files, ~24 Event() calls): test_quickstart.py, test_conflict_resolution.py, test_event_emission.py, test_adapters.py
+- [x] T005: Update property test files (3 files, ~4 Event() calls): test_crdt_laws.py, test_determinism.py, test_status_determinism.py
+- [x] T006: Update docstring examples in source modules: merge.py, crdt.py, conflict.py, topology.py
+- [x] T007: Add unit tests for new Event fields: correlation_id validation, schema_version pattern validation, data_tier range validation, default values, round-trip serialization
 
 **Parallel opportunities**: T003/T004/T005 can be done in parallel (different files). T006 is independent of test updates.
 
