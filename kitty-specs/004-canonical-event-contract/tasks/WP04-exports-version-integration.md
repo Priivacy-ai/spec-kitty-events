@@ -1,14 +1,16 @@
 ---
 work_package_id: WP04
 title: Exports + Version Bump + Integration Tests
-lane: "doing"
+lane: "done"
 dependencies: []
 base_branch: main
 base_commit: 3cfd49fe235c21f3d210df9e96903fea18916b89
 created_at: '2026-02-09T11:53:30.034480+00:00'
 subtasks: [T021, T022, T023, T024, T025, T026]
-agent: "claude-opus"
-shell_pid: "20928"
+agent: claude-opus
+shell_pid: '20928'
+reviewed_by: "Robert Douglass"
+review_status: "approved"
 history:
 - date: '2026-02-09'
   agent: claude-opus
@@ -247,3 +249,4 @@ Run `python3.11 -m pytest` and verify:
 - 2026-02-09T11:53:30Z – claude-opus – shell_pid=18715 – lane=doing – Assigned agent via workflow command
 - 2026-02-09T11:56:51Z – claude-opus – shell_pid=18715 – lane=for_review – Ready for review: 17 lifecycle exports, v0.4.0-alpha, 7 integration tests, 427 total tests pass, mypy clean
 - 2026-02-09T11:57:06Z – claude-opus – shell_pid=20928 – lane=doing – Started review via workflow command
+- 2026-02-09T11:59:06Z – claude-opus – shell_pid=20928 – lane=done – Review passed: All 17 lifecycle exports verified in __init__.py and __all__ (65 total, no duplicates). Version 0.4.0-alpha matches in both pyproject.toml and __init__.py. 7 integration tests cover 2E-07/2E-08 acceptance criteria (WP status delegation, replay determinism, full lifecycle). mypy --strict clean on 12 source files. 427 tests pass, 98% coverage. Backward compat verified for schema_version/data_tier defaults.
