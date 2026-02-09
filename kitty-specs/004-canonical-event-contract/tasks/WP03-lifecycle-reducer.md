@@ -1,14 +1,14 @@
 ---
 work_package_id: WP03
 title: Lifecycle Reducer + Precedence Rules
-lane: "for_review"
+lane: "doing"
 dependencies: []
 base_branch: 004-canonical-event-contract-WP02
 base_commit: 2cbbcb8e80e7d85853b0e984ad8d29f0a32ce61f
 created_at: '2026-02-09T11:46:09.591389+00:00'
 subtasks: [T014, T015, T016, T017, T018, T019, T020]
-agent: claude-opus
-shell_pid: '13053'
+agent: "claude-opus"
+shell_pid: "18661"
 history:
 - date: '2026-02-09'
   agent: claude-opus
@@ -333,3 +333,4 @@ def test_reducer_determinism_across_physical_orderings(seed: int) -> None:
 
 - 2026-02-09T11:46:09Z – claude-opus – shell_pid=13053 – lane=doing – Assigned agent via workflow command
 - 2026-02-09T11:53:11Z – claude-opus – shell_pid=13053 – lane=for_review – Ready for review: lifecycle reducer with cancel-beats-re-open, rollback handling, idempotent dedup, 420 tests pass, mypy clean
+- 2026-02-09T11:53:27Z – claude-opus – shell_pid=18661 – lane=doing – Started review via workflow command
