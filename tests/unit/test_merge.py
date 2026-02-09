@@ -2,6 +2,7 @@
 import uuid
 import pytest
 from datetime import datetime
+from ulid import ULID
 from spec_kitty_events.merge import state_machine_merge
 from spec_kitty_events.models import Event, ValidationError
 
@@ -24,6 +25,7 @@ class TestStateMachineMerge:
             lamport_clock=5,
             payload={"state": "doing"},  # Priority 2
             project_uuid=TEST_PROJECT_UUID,
+            correlation_id=str(ULID()),
         )
         e2 = Event(
             event_id="01HRN7QMQJT8XVKP9YZ2ABCDEG",
@@ -34,6 +36,7 @@ class TestStateMachineMerge:
             lamport_clock=5,
             payload={"state": "done"},  # Priority 4 (highest)
             project_uuid=TEST_PROJECT_UUID,
+            correlation_id=str(ULID()),
         )
         e3 = Event(
             event_id="01HRN7QMQJT8XVKP9YZ2ABCDEH",
@@ -44,6 +47,7 @@ class TestStateMachineMerge:
             lamport_clock=5,
             payload={"state": "for_review"},  # Priority 3
             project_uuid=TEST_PROJECT_UUID,
+            correlation_id=str(ULID()),
         )
 
         resolution = state_machine_merge([e1, e2, e3], priority_map)
@@ -65,6 +69,7 @@ class TestStateMachineMerge:
             lamport_clock=5,
             payload={"state": "done"},
             project_uuid=TEST_PROJECT_UUID,
+            correlation_id=str(ULID()),
         )
         e2 = Event(
             event_id="01HRN7QMQJT8XVKP9YZ2ABCDEG",
@@ -75,6 +80,7 @@ class TestStateMachineMerge:
             lamport_clock=5,
             payload={"state": "done"},
             project_uuid=TEST_PROJECT_UUID,
+            correlation_id=str(ULID()),
         )
 
         resolution = state_machine_merge([e1, e2], priority_map)
@@ -95,6 +101,7 @@ class TestStateMachineMerge:
             lamport_clock=5,
             payload={"state": "planned"},
             project_uuid=TEST_PROJECT_UUID,
+            correlation_id=str(ULID()),
         )
 
         resolution = state_machine_merge([e1], priority_map)
@@ -115,6 +122,7 @@ class TestStateMachineMerge:
             lamport_clock=5,
             payload={"state": "done"},
             project_uuid=TEST_PROJECT_UUID,
+            correlation_id=str(ULID()),
         )
         e2 = Event(
             event_id="01HRN7QMQJT8XVKP9YZ2ABCDEG",
@@ -125,6 +133,7 @@ class TestStateMachineMerge:
             lamport_clock=5,
             payload={"state": "done"},
             project_uuid=TEST_PROJECT_UUID,
+            correlation_id=str(ULID()),
         )
 
         resolution = state_machine_merge([e1, e2], priority_map)
@@ -147,6 +156,7 @@ class TestStateMachineMerge:
             lamport_clock=5,  # Different clock
             payload={"state": "done"},
             project_uuid=TEST_PROJECT_UUID,
+            correlation_id=str(ULID()),
         )
         e2 = Event(
             event_id="01HRN7QMQJT8XVKP9YZ2ABCDEG",
@@ -157,6 +167,7 @@ class TestStateMachineMerge:
             lamport_clock=6,  # Different clock
             payload={"state": "planned"},
             project_uuid=TEST_PROJECT_UUID,
+            correlation_id=str(ULID()),
         )
 
         with pytest.raises(ValidationError, match="different lamport_clocks"):
@@ -175,6 +186,7 @@ class TestStateMachineMerge:
             lamport_clock=5,
             payload={"state": "done"},
             project_uuid=TEST_PROJECT_UUID,
+            correlation_id=str(ULID()),
         )
         e2 = Event(
             event_id="01HRN7QMQJT8XVKP9YZ2ABCDEG",
@@ -185,6 +197,7 @@ class TestStateMachineMerge:
             lamport_clock=5,
             payload={"state": "done"},
             project_uuid=TEST_PROJECT_UUID,
+            correlation_id=str(ULID()),
         )
 
         with pytest.raises(ValidationError, match="different aggregate_ids"):
@@ -203,6 +216,7 @@ class TestStateMachineMerge:
             lamport_clock=5,
             payload={},  # No "state" or "status" key
             project_uuid=TEST_PROJECT_UUID,
+            correlation_id=str(ULID()),
         )
 
         with pytest.raises(ValidationError, match="missing 'state' or 'status' in payload"):
@@ -221,6 +235,7 @@ class TestStateMachineMerge:
             lamport_clock=5,
             payload={"state": "invalid_state"},
             project_uuid=TEST_PROJECT_UUID,
+            correlation_id=str(ULID()),
         )
 
         with pytest.raises(ValidationError, match="not in priority_map"):
@@ -246,6 +261,7 @@ class TestStateMachineMerge:
             lamport_clock=5,
             payload={"status": "active"},  # Using "status" instead of "state"
             project_uuid=TEST_PROJECT_UUID,
+            correlation_id=str(ULID()),
         )
 
         resolution = state_machine_merge([e1], priority_map, state_key="status")
@@ -265,6 +281,7 @@ class TestStateMachineMerge:
             lamport_clock=5,
             payload={"status": "doing"},  # Using "status" not "state"
             project_uuid=TEST_PROJECT_UUID,
+            correlation_id=str(ULID()),
         )
         e2 = Event(
             event_id="01HRN7QMQJT8XVKP9YZ2ABCDEG",
@@ -275,6 +292,7 @@ class TestStateMachineMerge:
             lamport_clock=5,
             payload={"status": "done"},  # Using "status" not "state"
             project_uuid=TEST_PROJECT_UUID,
+            correlation_id=str(ULID()),
         )
 
         # Using default state_key (no explicit parameter), should fallback to "status"

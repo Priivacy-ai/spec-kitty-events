@@ -60,6 +60,23 @@ class Event(BaseModel):
         None,
         description="Human-readable project identifier (optional)"
     )
+    correlation_id: str = Field(
+        ...,
+        min_length=26,
+        max_length=26,
+        description="ULID grouping all events in the same mission execution"
+    )
+    schema_version: str = Field(
+        default="1.0.0",
+        pattern=r"^\d+\.\d+\.\d+$",
+        description="Envelope schema version (semver)"
+    )
+    data_tier: int = Field(
+        default=0,
+        ge=0,
+        le=4,
+        description="Progressive data sharing tier (0=local, 4=telemetry)"
+    )
 
     def __repr__(self) -> str:
         """Human-readable representation."""

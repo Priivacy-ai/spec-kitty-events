@@ -4,6 +4,7 @@ from hypothesis import given, strategies as st, settings
 from datetime import datetime
 from spec_kitty_events.merge import state_machine_merge
 from spec_kitty_events.models import Event
+from ulid import ULID
 
 
 # Strategy for generating random events with state
@@ -20,6 +21,7 @@ def event_with_state(draw):
         lamport_clock=5,  # Same clock for all (concurrent)
         payload={"state": draw(st.sampled_from(states))},
         project_uuid=uuid.uuid4(),
+        correlation_id=str(ULID()),
     )
 
 

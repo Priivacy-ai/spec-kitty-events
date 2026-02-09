@@ -1,6 +1,7 @@
 """Integration test for conflict resolution workflow."""
 import uuid
 from datetime import datetime
+from ulid import ULID
 from spec_kitty_events import (
     Event,
     is_concurrent,
@@ -24,6 +25,7 @@ class TestConflictResolution:
         # Bob: doing -> done
         # Conflict! Both have clock 5, same aggregate, different states
 
+        corr_id = str(ULID())
         e_alice = Event(
             event_id="01ARZ3NDEKTSV4RRFFQ69G5FA1",
             event_type="WPStatusChanged",
@@ -33,6 +35,7 @@ class TestConflictResolution:
             lamport_clock=5,
             payload={"state": "for_review"},
             project_uuid=TEST_PROJECT_UUID,
+            correlation_id=corr_id,
         )
 
         e_bob = Event(
@@ -44,6 +47,7 @@ class TestConflictResolution:
             lamport_clock=5,  # Same clock = concurrent
             payload={"state": "done"},
             project_uuid=TEST_PROJECT_UUID,
+            correlation_id=corr_id,
         )
 
         event_store.save_event(e_alice)
@@ -78,6 +82,7 @@ class TestConflictResolution:
             lamport_clock=5,
             payload={"state": "done"},
             project_uuid=TEST_PROJECT_UUID,
+            correlation_id=str(ULID()),
         )
 
         e2 = Event(
@@ -89,6 +94,7 @@ class TestConflictResolution:
             lamport_clock=5,
             payload={"state": "done"},
             project_uuid=TEST_PROJECT_UUID,
+            correlation_id=str(ULID()),
         )
 
         # Not concurrent (different aggregates)
@@ -96,6 +102,7 @@ class TestConflictResolution:
 
     def test_topological_sort_causation_chain(self) -> None:
         """Test topological sort respects causation relationships."""
+        corr_id = str(ULID())
         e1 = Event(
             event_id="01ARZ3NDEKTSV4RRFFQ69G5001",
             event_type="WPCreated",
@@ -105,6 +112,7 @@ class TestConflictResolution:
             lamport_clock=1,
             causation_id=None,  # Root
             project_uuid=TEST_PROJECT_UUID,
+            correlation_id=corr_id,
         )
 
         e2 = Event(
@@ -116,6 +124,7 @@ class TestConflictResolution:
             lamport_clock=2,
             causation_id="01ARZ3NDEKTSV4RRFFQ69G5001",  # Child of e1
             project_uuid=TEST_PROJECT_UUID,
+            correlation_id=corr_id,
         )
 
         e3 = Event(
@@ -127,6 +136,7 @@ class TestConflictResolution:
             lamport_clock=3,
             causation_id="01ARZ3NDEKTSV4RRFFQ69G5002",  # Child of e2
             project_uuid=TEST_PROJECT_UUID,
+            correlation_id=corr_id,
         )
 
         # Sort in reverse order (should produce e1, e2, e3)

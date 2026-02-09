@@ -3,6 +3,7 @@ import uuid
 import inspect
 import pytest
 from datetime import datetime
+from ulid import ULID
 from spec_kitty_events.storage import (
     EventStore,
     ClockStorage,
@@ -34,6 +35,7 @@ class TestEventStore:
             node_id="node1",
             lamport_clock=5,
             project_uuid=TEST_PROJECT_UUID,
+            correlation_id=str(ULID()),
         )
         store.save_event(event)
         loaded = store.load_events("AGG001")
@@ -51,6 +53,7 @@ class TestEventStore:
             node_id="node1",
             lamport_clock=5,
             project_uuid=TEST_PROJECT_UUID,
+            correlation_id=str(ULID()),
         )
         event2 = Event(
             event_id="01ARZ3NDEKTSV4RRFFQ69G5FAV",  # Same event_id
@@ -60,6 +63,7 @@ class TestEventStore:
             node_id="node1",
             lamport_clock=6,
             project_uuid=TEST_PROJECT_UUID,
+            correlation_id=str(ULID()),
         )
         store.save_event(event1)
         store.save_event(event2)
@@ -78,6 +82,7 @@ class TestEventStore:
             node_id="node2",
             lamport_clock=5,
             project_uuid=TEST_PROJECT_UUID,
+            correlation_id=str(ULID()),
         )
         e2 = Event(
             event_id="01ARZ3NDEKTSV4RRFFQ69G5FA2",
@@ -87,6 +92,7 @@ class TestEventStore:
             node_id="node1",
             lamport_clock=5,
             project_uuid=TEST_PROJECT_UUID,
+            correlation_id=str(ULID()),
         )
         e3 = Event(
             event_id="01ARZ3NDEKTSV4RRFFQ69G5FA3",
@@ -96,6 +102,7 @@ class TestEventStore:
             node_id="node1",
             lamport_clock=3,
             project_uuid=TEST_PROJECT_UUID,
+            correlation_id=str(ULID()),
         )
         store.save_event(e1)
         store.save_event(e2)

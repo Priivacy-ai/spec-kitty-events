@@ -1,6 +1,7 @@
 """Integration test for event emission and clock synchronization."""
 import uuid
 from datetime import datetime
+from ulid import ULID
 from spec_kitty_events import (
     Event,
     LamportClock,
@@ -24,6 +25,7 @@ class TestEventEmissionSync:
         bob_clock = LamportClock(node_id="bob", storage=clock_storage)
 
         # Alice emits event 1
+        corr_id = str(ULID())
         alice_clock.tick()
         e1 = Event(
             event_id="01ARZ3NDEKTSV4RRFFQ69G5FA1",
@@ -34,6 +36,7 @@ class TestEventEmissionSync:
             lamport_clock=alice_clock.current(),
             payload={"state": "doing"},
             project_uuid=TEST_PROJECT_UUID,
+            correlation_id=corr_id,
         )
         event_store.save_event(e1)
 
@@ -49,6 +52,7 @@ class TestEventEmissionSync:
             causation_id=e1.event_id,  # e2 caused by e1
             payload={"state": "for_review"},
             project_uuid=TEST_PROJECT_UUID,
+            correlation_id=corr_id,
         )
         event_store.save_event(e2)
 
@@ -68,6 +72,7 @@ class TestEventEmissionSync:
             causation_id=e2.event_id,  # e3 caused by e2
             payload={"state": "done"},
             project_uuid=TEST_PROJECT_UUID,
+            correlation_id=corr_id,
         )
         event_store.save_event(e3)
 
@@ -98,6 +103,7 @@ class TestEventEmissionSync:
             node_id="alice",
             lamport_clock=1,
             project_uuid=TEST_PROJECT_UUID,
+            correlation_id=str(ULID()),
         )
 
         event_store.save_event(event)
