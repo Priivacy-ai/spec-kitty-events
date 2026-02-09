@@ -1,7 +1,11 @@
 """Unit tests for mission lifecycle event contracts."""
 
+import uuid
+from datetime import datetime, timezone
+
 import pytest
 from pydantic import ValidationError as PydanticValidationError
+from ulid import ULID
 
 from spec_kitty_events.lifecycle import (
     MISSION_CANCELLED,
@@ -12,13 +16,40 @@ from spec_kitty_events.lifecycle import (
     REVIEW_ROLLBACK,
     SCHEMA_VERSION,
     TERMINAL_MISSION_STATUSES,
+    LifecycleAnomaly,
     MissionCancelledPayload,
     MissionCompletedPayload,
     MissionStartedPayload,
     MissionStatus,
     PhaseEnteredPayload,
+    ReducedMissionState,
     ReviewRollbackPayload,
+    reduce_lifecycle_events,
 )
+from spec_kitty_events.models import Event
+
+_PROJECT_UUID = uuid.UUID("12345678-1234-5678-1234-567812345678")
+
+
+def _make_mission_event(
+    event_type: str,
+    payload: dict,  # type: ignore[type-arg]
+    lamport_clock: int,
+    event_id: str | None = None,
+    node_id: str = "node-1",
+) -> Event:
+    """Helper to build a mission event."""
+    return Event(
+        event_id=event_id or str(ULID()),
+        event_type=event_type,
+        aggregate_id="mission/M001",
+        payload=payload,
+        timestamp=datetime.now(timezone.utc),
+        node_id=node_id,
+        lamport_clock=lamport_clock,
+        project_uuid=_PROJECT_UUID,
+        correlation_id=str(ULID()),
+    )
 
 
 # ── MissionStatus Enum ───────────────────────────────────────────────────────
@@ -465,3 +496,402 @@ class TestReviewRollbackPayload:
         assert isinstance(dumped, dict)
         assert dumped["mission_id"] == "M001"
         assert dumped["review_ref"] == "PR-42"
+
+
+# ── Reducer Output Models ────────────────────────────────────────────────────
+
+
+class TestLifecycleAnomaly:
+    """Tests for LifecycleAnomaly model."""
+
+    def test_valid_construction(self) -> None:
+        a = LifecycleAnomaly(
+            event_id="01HV0000000000000000000001",
+            event_type="MissionStarted",
+            reason="Duplicate MissionStarted",
+        )
+        assert a.event_id == "01HV0000000000000000000001"
+        assert a.reason == "Duplicate MissionStarted"
+
+    def test_frozen(self) -> None:
+        a = LifecycleAnomaly(
+            event_id="01HV0000000000000000000001",
+            event_type="MissionStarted",
+            reason="test",
+        )
+        with pytest.raises(Exception):
+            setattr(a, "reason", "changed")
+
+
+class TestReducedMissionState:
+    """Tests for ReducedMissionState model."""
+
+    def test_default_state(self) -> None:
+        state = ReducedMissionState()
+        assert state.mission_id is None
+        assert state.mission_status is None
+        assert state.mission_type is None
+        assert state.current_phase is None
+        assert state.phases_entered == ()
+        assert state.wp_states == {}
+        assert state.anomalies == ()
+        assert state.event_count == 0
+        assert state.last_processed_event_id is None
+
+    def test_frozen(self) -> None:
+        state = ReducedMissionState()
+        with pytest.raises(Exception):
+            setattr(state, "mission_id", "M001")
+
+
+# ── Lifecycle Reducer ────────────────────────────────────────────────────────
+
+
+class TestReduceLifecycleEvents:
+    """Tests for reduce_lifecycle_events()."""
+
+    def test_empty_sequence(self) -> None:
+        result = reduce_lifecycle_events([])
+        assert result == ReducedMissionState()
+
+    def test_single_mission_started(self) -> None:
+        event = _make_mission_event(
+            MISSION_STARTED,
+            MissionStartedPayload(
+                mission_id="M001",
+                mission_type="software-dev",
+                initial_phase="specify",
+                actor="user-1",
+            ).model_dump(),
+            lamport_clock=1,
+        )
+        result = reduce_lifecycle_events([event])
+        assert result.mission_id == "M001"
+        assert result.mission_status == MissionStatus.ACTIVE
+        assert result.mission_type == "software-dev"
+        assert result.current_phase == "specify"
+        assert result.phases_entered == ("specify",)
+        assert result.event_count == 1
+
+    def test_full_happy_path(self) -> None:
+        events = [
+            _make_mission_event(
+                MISSION_STARTED,
+                MissionStartedPayload(
+                    mission_id="M001",
+                    mission_type="software-dev",
+                    initial_phase="specify",
+                    actor="user-1",
+                ).model_dump(),
+                lamport_clock=1,
+            ),
+            _make_mission_event(
+                PHASE_ENTERED,
+                PhaseEnteredPayload(
+                    mission_id="M001",
+                    phase_name="implement",
+                    previous_phase="specify",
+                    actor="user-1",
+                ).model_dump(),
+                lamport_clock=2,
+            ),
+            _make_mission_event(
+                PHASE_ENTERED,
+                PhaseEnteredPayload(
+                    mission_id="M001",
+                    phase_name="review",
+                    previous_phase="implement",
+                    actor="user-1",
+                ).model_dump(),
+                lamport_clock=3,
+            ),
+            _make_mission_event(
+                MISSION_COMPLETED,
+                MissionCompletedPayload(
+                    mission_id="M001",
+                    mission_type="software-dev",
+                    final_phase="review",
+                    actor="user-1",
+                ).model_dump(),
+                lamport_clock=4,
+            ),
+        ]
+        result = reduce_lifecycle_events(events)
+        assert result.mission_status == MissionStatus.COMPLETED
+        assert result.phases_entered == ("specify", "implement", "review")
+        assert result.event_count == 4
+        assert len(result.anomalies) == 0
+
+    def test_cancellation_path(self) -> None:
+        events = [
+            _make_mission_event(
+                MISSION_STARTED,
+                MissionStartedPayload(
+                    mission_id="M001",
+                    mission_type="software-dev",
+                    initial_phase="specify",
+                    actor="user-1",
+                ).model_dump(),
+                lamport_clock=1,
+            ),
+            _make_mission_event(
+                MISSION_CANCELLED,
+                MissionCancelledPayload(
+                    mission_id="M001",
+                    reason="Budget cut",
+                    actor="manager-1",
+                ).model_dump(),
+                lamport_clock=2,
+            ),
+        ]
+        result = reduce_lifecycle_events(events)
+        assert result.mission_status == MissionStatus.CANCELLED
+
+    def test_anomaly_event_before_start(self) -> None:
+        event = _make_mission_event(
+            PHASE_ENTERED,
+            PhaseEnteredPayload(
+                mission_id="M001",
+                phase_name="implement",
+                actor="user-1",
+            ).model_dump(),
+            lamport_clock=1,
+        )
+        result = reduce_lifecycle_events([event])
+        assert len(result.anomalies) == 1
+        assert "before MissionStarted" in result.anomalies[0].reason
+
+    def test_anomaly_event_after_terminal(self) -> None:
+        events = [
+            _make_mission_event(
+                MISSION_STARTED,
+                MissionStartedPayload(
+                    mission_id="M001",
+                    mission_type="software-dev",
+                    initial_phase="specify",
+                    actor="user-1",
+                ).model_dump(),
+                lamport_clock=1,
+            ),
+            _make_mission_event(
+                MISSION_COMPLETED,
+                MissionCompletedPayload(
+                    mission_id="M001",
+                    mission_type="software-dev",
+                    final_phase="specify",
+                    actor="user-1",
+                ).model_dump(),
+                lamport_clock=2,
+            ),
+            _make_mission_event(
+                PHASE_ENTERED,
+                PhaseEnteredPayload(
+                    mission_id="M001",
+                    phase_name="implement",
+                    actor="user-1",
+                ).model_dump(),
+                lamport_clock=3,
+            ),
+        ]
+        result = reduce_lifecycle_events(events)
+        assert result.mission_status == MissionStatus.COMPLETED
+        assert len(result.anomalies) == 1
+        assert "terminal" in result.anomalies[0].reason.lower()
+
+    def test_f_reducer_001_cancel_beats_reopen(self) -> None:
+        """F-Reducer-001: Cancel beats re-open in concurrent group."""
+        start = _make_mission_event(
+            MISSION_STARTED,
+            MissionStartedPayload(
+                mission_id="M001",
+                mission_type="software-dev",
+                initial_phase="specify",
+                actor="user-1",
+            ).model_dump(),
+            lamport_clock=1,
+        )
+        # Concurrent: same lamport_clock, different nodes
+        phase = _make_mission_event(
+            PHASE_ENTERED,
+            PhaseEnteredPayload(
+                mission_id="M001",
+                phase_name="implement",
+                actor="user-1",
+            ).model_dump(),
+            lamport_clock=5,
+            node_id="alice",
+        )
+        cancel = _make_mission_event(
+            MISSION_CANCELLED,
+            MissionCancelledPayload(
+                mission_id="M001",
+                reason="Abort",
+                actor="manager",
+            ).model_dump(),
+            lamport_clock=5,
+            node_id="bob",
+        )
+        # Order 1: [phase, cancel]
+        result1 = reduce_lifecycle_events([start, phase, cancel])
+        # Order 2: [cancel, phase]
+        result2 = reduce_lifecycle_events([start, cancel, phase])
+
+        assert result1.mission_status == MissionStatus.CANCELLED
+        assert result2.mission_status == MissionStatus.CANCELLED
+        # Both orderings produce identical state
+        assert result1.mission_status == result2.mission_status
+
+    def test_f_reducer_002_rollback_creates_new_event(self) -> None:
+        """F-Reducer-002: Rollback updates phase, all events counted."""
+        events = [
+            _make_mission_event(
+                MISSION_STARTED,
+                MissionStartedPayload(
+                    mission_id="M001",
+                    mission_type="software-dev",
+                    initial_phase="specify",
+                    actor="user-1",
+                ).model_dump(),
+                lamport_clock=1,
+            ),
+            _make_mission_event(
+                PHASE_ENTERED,
+                PhaseEnteredPayload(
+                    mission_id="M001",
+                    phase_name="implement",
+                    previous_phase="specify",
+                    actor="user-1",
+                ).model_dump(),
+                lamport_clock=2,
+            ),
+            _make_mission_event(
+                REVIEW_ROLLBACK,
+                ReviewRollbackPayload(
+                    mission_id="M001",
+                    review_ref="PR-42",
+                    target_phase="specify",
+                    actor="reviewer-1",
+                ).model_dump(),
+                lamport_clock=3,
+            ),
+        ]
+        result = reduce_lifecycle_events(events)
+        assert result.current_phase == "specify"
+        assert result.event_count == 3  # All events counted
+        assert "specify" in result.phases_entered
+        assert "implement" in result.phases_entered
+        # specify appears twice (initial + rollback)
+        assert result.phases_entered.count("specify") == 2
+
+    def test_f_reducer_003_idempotent_dedup(self) -> None:
+        """F-Reducer-003: Duplicate events produce same result."""
+        events = [
+            _make_mission_event(
+                MISSION_STARTED,
+                MissionStartedPayload(
+                    mission_id="M001",
+                    mission_type="software-dev",
+                    initial_phase="specify",
+                    actor="user-1",
+                ).model_dump(),
+                lamport_clock=1,
+                event_id="01HV0000000000000000000001",
+            ),
+            _make_mission_event(
+                PHASE_ENTERED,
+                PhaseEnteredPayload(
+                    mission_id="M001",
+                    phase_name="implement",
+                    actor="user-1",
+                ).model_dump(),
+                lamport_clock=2,
+                event_id="01HV0000000000000000000002",
+            ),
+            _make_mission_event(
+                MISSION_COMPLETED,
+                MissionCompletedPayload(
+                    mission_id="M001",
+                    mission_type="software-dev",
+                    final_phase="implement",
+                    actor="user-1",
+                ).model_dump(),
+                lamport_clock=3,
+                event_id="01HV0000000000000000000003",
+            ),
+        ]
+        # Duplicate every event
+        duplicated = events + events
+        result_original = reduce_lifecycle_events(events)
+        result_duplicated = reduce_lifecycle_events(duplicated)
+
+        assert result_original.mission_status == result_duplicated.mission_status
+        assert result_original.current_phase == result_duplicated.current_phase
+        assert result_original.phases_entered == result_duplicated.phases_entered
+        assert result_original.event_count == result_duplicated.event_count
+
+    def test_mixed_mission_and_wp_events(self) -> None:
+        """Mission + WP events produce both mission state and wp_states."""
+        from spec_kitty_events.status import Lane, StatusTransitionPayload
+
+        events = [
+            _make_mission_event(
+                MISSION_STARTED,
+                MissionStartedPayload(
+                    mission_id="M001",
+                    mission_type="software-dev",
+                    initial_phase="implement",
+                    actor="user-1",
+                ).model_dump(),
+                lamport_clock=1,
+            ),
+            Event(
+                event_id=str(ULID()),
+                event_type="WPStatusChanged",
+                aggregate_id="feat/WP01",
+                payload=StatusTransitionPayload(
+                    feature_slug="feat",
+                    wp_id="WP01",
+                    from_lane=None,
+                    to_lane=Lane.PLANNED,
+                    actor="user-1",
+                    execution_mode="worktree",
+                ).model_dump(),
+                timestamp=datetime.now(timezone.utc),
+                node_id="node-1",
+                lamport_clock=2,
+                project_uuid=_PROJECT_UUID,
+                correlation_id=str(ULID()),
+            ),
+        ]
+        result = reduce_lifecycle_events(events)
+        assert result.mission_status == MissionStatus.ACTIVE
+        assert "WP01" in result.wp_states
+        assert result.event_count == 2
+
+    def test_duplicate_mission_started_anomaly(self) -> None:
+        events = [
+            _make_mission_event(
+                MISSION_STARTED,
+                MissionStartedPayload(
+                    mission_id="M001",
+                    mission_type="software-dev",
+                    initial_phase="specify",
+                    actor="user-1",
+                ).model_dump(),
+                lamport_clock=1,
+            ),
+            _make_mission_event(
+                MISSION_STARTED,
+                MissionStartedPayload(
+                    mission_id="M002",
+                    mission_type="research",
+                    initial_phase="question",
+                    actor="user-2",
+                ).model_dump(),
+                lamport_clock=2,
+            ),
+        ]
+        result = reduce_lifecycle_events(events)
+        assert result.mission_id == "M001"  # First one wins
+        assert len(result.anomalies) == 1
+        assert "Duplicate" in result.anomalies[0].reason
