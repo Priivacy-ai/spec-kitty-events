@@ -1,14 +1,14 @@
 ---
 work_package_id: WP01
 title: Event Envelope Extension + Test Migration
-lane: "doing"
+lane: "for_review"
 dependencies: []
 base_branch: main
 base_commit: 3de3d25be62a16aa64f308cd90983ff668b81ae6
 created_at: '2026-02-09T11:37:20.985808+00:00'
 subtasks: [T001, T002, T003, T004, T005, T006, T007]
-shell_pid: "8128"
-agent: "claude-opus"
+agent: claude-opus
+shell_pid: '8128'
 history:
 - date: '2026-02-09'
   agent: claude-opus
@@ -221,3 +221,4 @@ Add tests for the three new fields:
 ## Activity Log
 
 - 2026-02-09T11:37:21Z – claude-opus – shell_pid=8128 – lane=doing – Assigned agent via workflow command
+- 2026-02-09T11:43:35Z – claude-opus – shell_pid=8128 – lane=for_review – Ready for review: Event model extended with correlation_id, schema_version, data_tier. 351 tests pass, 99% coverage, mypy clean.
