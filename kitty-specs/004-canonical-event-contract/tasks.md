@@ -60,12 +60,12 @@ All WPs are sequential — each builds on the previous. WP01 must land first bec
 
 **Subtasks**:
 
-- [ ] T008: Create `src/spec_kitty_events/lifecycle.py` with module docstring and section structure
-- [ ] T009: Implement MissionStatus enum (str, Enum) with ACTIVE, COMPLETED, CANCELLED + TERMINAL_MISSION_STATUSES frozenset
-- [ ] T010: Implement SCHEMA_VERSION constant and event type string constants (MISSION_STARTED, MISSION_COMPLETED, MISSION_CANCELLED, PHASE_ENTERED, REVIEW_ROLLBACK) + MISSION_EVENT_TYPES frozenset
-- [ ] T011: Implement MissionStartedPayload and MissionCompletedPayload frozen models
-- [ ] T012: Implement MissionCancelledPayload, PhaseEnteredPayload, and ReviewRollbackPayload frozen models
-- [ ] T013: Add comprehensive unit tests in `tests/unit/test_lifecycle.py`: valid construction, missing required fields, field validation, round-trip serialization, frozen enforcement
+- [x] T008: Create `src/spec_kitty_events/lifecycle.py` with module docstring and section structure
+- [x] T009: Implement MissionStatus enum (str, Enum) with ACTIVE, COMPLETED, CANCELLED + TERMINAL_MISSION_STATUSES frozenset
+- [x] T010: Implement SCHEMA_VERSION constant and event type string constants (MISSION_STARTED, MISSION_COMPLETED, MISSION_CANCELLED, PHASE_ENTERED, REVIEW_ROLLBACK) + MISSION_EVENT_TYPES frozenset
+- [x] T011: Implement MissionStartedPayload and MissionCompletedPayload frozen models
+- [x] T012: Implement MissionCancelledPayload, PhaseEnteredPayload, and ReviewRollbackPayload frozen models
+- [x] T013: Add comprehensive unit tests in `tests/unit/test_lifecycle.py`: valid construction, missing required fields, field validation, round-trip serialization, frozen enforcement
 
 **Parallel opportunities**: T011 and T012 can be done in parallel (different models). T013 can start once T009-T012 land.
 
@@ -122,5 +122,5 @@ All WPs are sequential — each builds on the previous. WP01 must land first bec
 
 <!-- status-model:start -->
 ## Canonical Status (Generated)
-- WP01: for_review
+- WP01: done
 <!-- status-model:end -->
