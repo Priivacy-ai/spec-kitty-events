@@ -1,14 +1,14 @@
 ---
 work_package_id: WP04
 title: Exports + Version Bump + Integration Tests
-lane: "doing"
+lane: "for_review"
 dependencies: []
 base_branch: main
 base_commit: 3cfd49fe235c21f3d210df9e96903fea18916b89
 created_at: '2026-02-09T11:53:30.034480+00:00'
 subtasks: [T021, T022, T023, T024, T025, T026]
-shell_pid: "18715"
-agent: "claude-opus"
+agent: claude-opus
+shell_pid: '18715'
 history:
 - date: '2026-02-09'
   agent: claude-opus
@@ -245,3 +245,4 @@ Run `python3.11 -m pytest` and verify:
 ## Activity Log
 
 - 2026-02-09T11:53:30Z – claude-opus – shell_pid=18715 – lane=doing – Assigned agent via workflow command
+- 2026-02-09T11:56:51Z – claude-opus – shell_pid=18715 – lane=for_review – Ready for review: 17 lifecycle exports, v0.4.0-alpha, 7 integration tests, 427 total tests pass, mypy clean
