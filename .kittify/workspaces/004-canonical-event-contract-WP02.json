@@ -1,0 +1,12 @@
+{
+  "wp_id": "WP02",
+  "feature_slug": "004-canonical-event-contract",
+  "worktree_path": ".worktrees/004-canonical-event-contract-WP02",
+  "branch_name": "004-canonical-event-contract-WP02",
+  "base_branch": "004-canonical-event-contract-WP01",
+  "base_commit": "9ad0795ce86fc43e76608f4aa0bf1c80b7dbe183",
+  "dependencies": [],
+  "created_at": "2026-02-09T11:43:55.157119+00:00",
+  "created_by": "implement-command",
+  "vcs_backend": "git"
+}
