@@ -1,6 +1,6 @@
 [project]
 name = "spec-kitty-events"
-version = "0.3.0-alpha"
+version = "0.4.0-alpha"
 description = "Event log library with Lamport clocks and systematic error tracking"
 readme = "README.md"
 requires-python = ">=3.10"
