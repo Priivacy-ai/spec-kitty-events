@@ -84,13 +84,13 @@ All WPs are sequential — each builds on the previous. WP01 must land first bec
 
 **Subtasks**:
 
-- [ ] T014: Implement LifecycleAnomaly and ReducedMissionState frozen models in lifecycle.py
-- [ ] T015: Implement reduce_lifecycle_events() core pipeline: sort → dedup → partition → reduce mission events → delegate WP events → merge
-- [ ] T016: Implement cancel-beats-re-open precedence within concurrent event groups (F-Reducer-001)
-- [ ] T017: Implement rollback handling: ReviewRollback updates current_phase, never overwrites events (F-Reducer-002)
-- [ ] T018: Verify idempotent dedup via existing dedup_events() reuse (F-Reducer-003)
-- [ ] T019: Add unit tests for reducer: empty sequence, single event, full mission lifecycle, anomaly detection, all 3 fixture scenarios
-- [ ] T020: Add property tests in `tests/property/test_lifecycle_determinism.py`: reducer determinism across 100 random physical orderings
+- [x] T014: Implement LifecycleAnomaly and ReducedMissionState frozen models in lifecycle.py
+- [x] T015: Implement reduce_lifecycle_events() core pipeline: sort → dedup → partition → reduce mission events → delegate WP events → merge
+- [x] T016: Implement cancel-beats-re-open precedence within concurrent event groups (F-Reducer-001)
+- [x] T017: Implement rollback handling: ReviewRollback updates current_phase, never overwrites events (F-Reducer-002)
+- [x] T018: Verify idempotent dedup via existing dedup_events() reuse (F-Reducer-003)
+- [x] T019: Add unit tests for reducer: empty sequence, single event, full mission lifecycle, anomaly detection, all 3 fixture scenarios
+- [x] T020: Add property tests in `tests/property/test_lifecycle_determinism.py`: reducer determinism across 100 random physical orderings
 
 **Parallel opportunities**: T016/T017/T018 are independent precedence implementations. T019/T020 can start once T015 lands.
 
@@ -123,4 +123,5 @@ All WPs are sequential — each builds on the previous. WP01 must land first bec
 <!-- status-model:start -->
 ## Canonical Status (Generated)
 - WP01: done
+- WP02: done
 <!-- status-model:end -->
