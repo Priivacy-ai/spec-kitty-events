@@ -1,0 +1,10 @@
+{
+  "feature_number": "004",
+  "slug": "004-canonical-event-contract",
+  "friendly_name": "Canonical Event Contract Consolidation",
+  "mission": "software-dev",
+  "source_description": "Canonical Event Contract Consolidation for spec-kitty-events (Phase 2 of the local-first runtime convergence plan). This feature freezes the canonical event schema for the entire mission and WP lifecycle. spec-kitty-events is the CONTRACT AUTHORITY -- spec-kitty CLI and spec-kitty-saas both consume the schema defined here.",
+  "created_at": "2026-02-09T00:00:00Z",
+  "target_branch": "main",
+  "vcs": "git"
+}
