@@ -13,7 +13,7 @@ Example:
     1
 """
 
-__version__ = "0.3.0-alpha"
+__version__ = "0.4.0-alpha"
 
 # Core data models
 from spec_kitty_events.models import (
@@ -67,6 +67,27 @@ from spec_kitty_events.gates import (
     GateFailedPayload,
     UnknownConclusionError,
     map_check_run_conclusion,
+)
+
+# Lifecycle event contracts
+from spec_kitty_events.lifecycle import (
+    SCHEMA_VERSION,
+    MISSION_STARTED,
+    MISSION_COMPLETED,
+    MISSION_CANCELLED,
+    PHASE_ENTERED,
+    REVIEW_ROLLBACK,
+    MISSION_EVENT_TYPES,
+    TERMINAL_MISSION_STATUSES,
+    MissionStatus,
+    MissionStartedPayload,
+    MissionCompletedPayload,
+    MissionCancelledPayload,
+    PhaseEnteredPayload,
+    ReviewRollbackPayload,
+    LifecycleAnomaly,
+    ReducedMissionState,
+    reduce_lifecycle_events,
 )
 
 # Status state model contracts
@@ -132,6 +153,24 @@ __all__ = [
     "GateFailedPayload",
     "UnknownConclusionError",
     "map_check_run_conclusion",
+    # Lifecycle event contracts
+    "SCHEMA_VERSION",
+    "MISSION_STARTED",
+    "MISSION_COMPLETED",
+    "MISSION_CANCELLED",
+    "PHASE_ENTERED",
+    "REVIEW_ROLLBACK",
+    "MISSION_EVENT_TYPES",
+    "TERMINAL_MISSION_STATUSES",
+    "MissionStatus",
+    "MissionStartedPayload",
+    "MissionCompletedPayload",
+    "MissionCancelledPayload",
+    "PhaseEnteredPayload",
+    "ReviewRollbackPayload",
+    "LifecycleAnomaly",
+    "ReducedMissionState",
+    "reduce_lifecycle_events",
     # Status state model
     "Lane",
     "ExecutionMode",
