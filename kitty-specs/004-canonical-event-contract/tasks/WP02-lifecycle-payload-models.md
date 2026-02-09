@@ -1,14 +1,14 @@
 ---
 work_package_id: WP02
 title: Lifecycle Payload Models
-lane: "doing"
+lane: "for_review"
 dependencies: []
 base_branch: 004-canonical-event-contract-WP01
 base_commit: 9ad0795ce86fc43e76608f4aa0bf1c80b7dbe183
 created_at: '2026-02-09T11:43:55.157119+00:00'
 subtasks: [T008, T009, T010, T011, T012, T013]
-shell_pid: "11768"
-agent: "claude-opus"
+agent: claude-opus
+shell_pid: '11768'
 history:
 - date: '2026-02-09'
   agent: claude-opus
@@ -254,3 +254,4 @@ Write comprehensive tests for all models and constants:
 ## Activity Log
 
 - 2026-02-09T11:43:55Z – claude-opus – shell_pid=11768 – lane=doing – Assigned agent via workflow command
+- 2026-02-09T11:45:57Z – claude-opus – shell_pid=11768 – lane=for_review – Ready for review: lifecycle.py with MissionStatus enum, 5 payload models, 5 event type constants. 402 tests pass, 99% coverage, mypy clean.
