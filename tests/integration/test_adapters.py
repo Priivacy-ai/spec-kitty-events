@@ -1,6 +1,7 @@
 """Integration test demonstrating custom adapter implementation."""
 import uuid
 from typing import List, Dict
+from ulid import ULID
 from spec_kitty_events import (
     EventStore,
     ClockStorage,
@@ -59,6 +60,7 @@ class TestCustomAdapters:
             node_id="node1",
             lamport_clock=1,
             project_uuid=TEST_PROJECT_UUID,
+            correlation_id=str(ULID()),
         )
 
         store.save_event(e1)
@@ -95,6 +97,7 @@ class TestCustomAdapters:
             node_id="node1",
             lamport_clock=1,
             project_uuid=TEST_PROJECT_UUID,
+            correlation_id=str(ULID()),
         )
         store1.save_event(event)
 

@@ -81,6 +81,7 @@ class TestQuickstartExamples:
             node_id="alice",
             lamport_clock=1,
             project_uuid=TEST_PROJECT_UUID,
+            correlation_id=str(ulid.ULID()),
         )
         event_store.save_event(event)
 
@@ -108,6 +109,7 @@ class TestQuickstartExamples:
             lamport_clock=clock.tick(),  # Increments clock to 1
             causation_id=None,  # Root event (no parent)
             project_uuid=TEST_PROJECT_UUID,
+            correlation_id=str(ulid.ULID()),
         )
 
         event_store = InMemoryEventStore()
@@ -134,6 +136,7 @@ class TestQuickstartExamples:
             lamport_clock=10,
             causation_id=None,
             project_uuid=TEST_PROJECT_UUID,
+            correlation_id=str(ulid.ULID()),
         )
 
         # Update local clock when receiving
@@ -143,6 +146,7 @@ class TestQuickstartExamples:
     def test_quickstart_conflict_detection(self) -> None:
         """Test conflict detection example from quickstart.md (Step 5)."""
         # Two concurrent events (same lamport_clock, same aggregate)
+        corr_id = str(ulid.ULID())
         alice_event = Event(
             event_id=str(ulid.ULID()),
             event_type="WPStatusChanged",
@@ -152,6 +156,7 @@ class TestQuickstartExamples:
             lamport_clock=5,
             timestamp=datetime.now(),
             project_uuid=TEST_PROJECT_UUID,
+            correlation_id=corr_id,
         )
 
         bob_event = Event(
@@ -163,6 +168,7 @@ class TestQuickstartExamples:
             lamport_clock=5,
             timestamp=datetime.now(),
             project_uuid=TEST_PROJECT_UUID,
+            correlation_id=corr_id,
         )
 
         # Detect conflict
@@ -177,6 +183,7 @@ class TestQuickstartExamples:
     def test_quickstart_crdt_merges(self) -> None:
         """Test CRDT merge examples from quickstart.md (Step 6)."""
         # Merge concurrent tag additions
+        tag_corr_id = str(ulid.ULID())
         tag_events = [
             Event(
                 event_id=str(ulid.ULID()),
@@ -187,6 +194,7 @@ class TestQuickstartExamples:
                 node_id="alice",
                 lamport_clock=5,
                 project_uuid=TEST_PROJECT_UUID,
+                correlation_id=tag_corr_id,
             ),
             Event(
                 event_id=str(ulid.ULID()),
@@ -197,12 +205,14 @@ class TestQuickstartExamples:
                 node_id="bob",
                 lamport_clock=5,
                 project_uuid=TEST_PROJECT_UUID,
+                correlation_id=tag_corr_id,
             )
         ]
         merged_tags = merge_gset(tag_events)
         assert merged_tags == {"urgent", "backend"}
 
         # Merge concurrent counter increments
+        counter_corr_id = str(ulid.ULID())
         counter_events = [
             Event(
                 event_id=str(ulid.ULID()),
@@ -213,6 +223,7 @@ class TestQuickstartExamples:
                 node_id="alice",
                 lamport_clock=5,
                 project_uuid=TEST_PROJECT_UUID,
+                correlation_id=counter_corr_id,
             ),
             Event(
                 event_id=str(ulid.ULID()),
@@ -223,6 +234,7 @@ class TestQuickstartExamples:
                 node_id="bob",
                 lamport_clock=5,
                 project_uuid=TEST_PROJECT_UUID,
+                correlation_id=counter_corr_id,
             )
         ]
         merged_count = merge_counter(counter_events)
@@ -254,6 +266,7 @@ class TestQuickstartExamples:
         alice_store = InMemoryEventStore()
 
         # Alice emits event
+        corr_id = str(ulid.ULID())
         alice_event = Event(
             event_id=str(ulid.ULID()),
             event_type="WPStatusChanged",
@@ -263,6 +276,7 @@ class TestQuickstartExamples:
             node_id="alice-laptop",
             lamport_clock=alice_clock.tick(),  # 1
             project_uuid=TEST_PROJECT_UUID,
+            correlation_id=corr_id,
         )
         alice_store.save_event(alice_event)
 
@@ -280,6 +294,7 @@ class TestQuickstartExamples:
             node_id="bob-laptop",
             lamport_clock=bob_clock.tick(),  # 1 (concurrent with Alice)
             project_uuid=TEST_PROJECT_UUID,
+            correlation_id=corr_id,
         )
         bob_store.save_event(bob_event)
 

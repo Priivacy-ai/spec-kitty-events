@@ -4,6 +4,7 @@ from hypothesis import given, strategies as st, settings
 from datetime import datetime, timezone
 from spec_kitty_events.crdt import merge_gset, merge_counter
 from spec_kitty_events.models import Event
+from ulid import ULID
 
 
 # Fixed timestamp to avoid slow generation
@@ -26,6 +27,7 @@ def event_with_tags(draw):
         lamport_clock=draw(st.integers(min_value=0, max_value=100)),
         payload={"tags": draw(st.sets(st.text(min_size=1, max_size=10), max_size=5))},
         project_uuid=uuid.uuid4(),
+        correlation_id=str(ULID()),
     )
 
 
@@ -44,6 +46,7 @@ def event_with_delta(draw):
         lamport_clock=draw(st.integers(min_value=0, max_value=100)),
         payload={"delta": draw(st.integers(min_value=-100, max_value=100))},
         project_uuid=uuid.uuid4(),
+        correlation_id=str(ULID()),
     )
 
 

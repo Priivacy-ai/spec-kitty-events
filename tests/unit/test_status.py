@@ -5,6 +5,7 @@ from datetime import datetime, timezone, timedelta
 
 import pydantic
 import pytest
+from ulid import ULID
 
 from spec_kitty_events import (
     DoneEvidence,
@@ -865,6 +866,7 @@ def _make_event(
         node_id="test-node",
         lamport_clock=lamport_clock,
         project_uuid=_PROJECT_UUID,
+        correlation_id=str(ULID()),
     )
 
 
@@ -993,6 +995,7 @@ class TestReduceStatusEvents:
             node_id="test",
             lamport_clock=1,
             project_uuid=_PROJECT_UUID,
+            correlation_id=str(ULID()),
         )
         result = reduce_status_events([event])
         assert result.wp_states == {}
@@ -1026,6 +1029,7 @@ class TestReduceStatusEvents:
             node_id="test-node",
             lamport_clock=1,
             project_uuid=_PROJECT_UUID,
+            correlation_id=str(ULID()),
         )
         result = reduce_status_events([event])
         assert result.event_count == 1

@@ -6,6 +6,7 @@ from datetime import datetime
 
 import pydantic
 import pytest
+from ulid import ULID
 
 from spec_kitty_events import (
     Event,
@@ -290,6 +291,7 @@ class TestEventIntegration:
             node_id="worker-1",
             lamport_clock=1,
             project_uuid=uuid.uuid4(),
+            correlation_id=str(ULID()),
         )
         assert event.payload["gate_name"] == "ci/build"
         assert event.event_type == "GatePassed"

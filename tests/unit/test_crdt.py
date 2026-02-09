@@ -1,6 +1,7 @@
 """Unit tests for CRDT merge functions."""
 import uuid
 from datetime import datetime
+from ulid import ULID
 from spec_kitty_events.crdt import merge_gset, merge_counter
 from spec_kitty_events.models import Event
 
@@ -21,6 +22,7 @@ class TestMergeGSet:
             lamport_clock=1,
             payload={"tags": {"bug", "urgent"}},
             project_uuid=TEST_PROJECT_UUID,
+            correlation_id=str(ULID()),
         )
         e2 = Event(
             event_id="01ARZ3NDEKTSV4RRFFQ69G5FAW",
@@ -31,6 +33,7 @@ class TestMergeGSet:
             lamport_clock=1,
             payload={"tags": {"bug", "resolved"}},
             project_uuid=TEST_PROJECT_UUID,
+            correlation_id=str(ULID()),
         )
         result = merge_gset([e1, e2])
         assert result == {"bug", "urgent", "resolved"}
@@ -51,6 +54,7 @@ class TestMergeGSet:
             lamport_clock=1,
             payload={},  # No "tags" key
             project_uuid=TEST_PROJECT_UUID,
+            correlation_id=str(ULID()),
         )
         result = merge_gset([e1])
         assert result == set()
@@ -66,6 +70,7 @@ class TestMergeGSet:
             lamport_clock=1,
             payload={"tags": ["bug", "urgent"]},  # List instead of set
             project_uuid=TEST_PROJECT_UUID,
+            correlation_id=str(ULID()),
         )
         result = merge_gset([e1])
         assert result == {"bug", "urgent"}
@@ -85,6 +90,7 @@ class TestMergeCounter:
             lamport_clock=1,
             payload={"delta": 5},
             project_uuid=TEST_PROJECT_UUID,
+            correlation_id=str(ULID()),
         )
         e2 = Event(
             event_id="01ARZ3NDEKTSV4RRFFQ69G5FAW",
@@ -95,6 +101,7 @@ class TestMergeCounter:
             lamport_clock=1,
             payload={"delta": 3},
             project_uuid=TEST_PROJECT_UUID,
+            correlation_id=str(ULID()),
         )
         result = merge_counter([e1, e2])
         assert result == 8
@@ -110,6 +117,7 @@ class TestMergeCounter:
             lamport_clock=1,
             payload={"delta": 5},
             project_uuid=TEST_PROJECT_UUID,
+            correlation_id=str(ULID()),
         )
         # Pass e1 twice
         result = merge_counter([e1, e1])
@@ -131,6 +139,7 @@ class TestMergeCounter:
             lamport_clock=1,
             payload={},  # No "delta" key
             project_uuid=TEST_PROJECT_UUID,
+            correlation_id=str(ULID()),
         )
         result = merge_counter([e1])
         assert result == 0
@@ -146,6 +155,7 @@ class TestMergeCounter:
             lamport_clock=1,
             payload={"delta": 10},
             project_uuid=TEST_PROJECT_UUID,
+            correlation_id=str(ULID()),
         )
         e2 = Event(
             event_id="01ARZ3NDEKTSV4RRFFQ69G5FAW",
@@ -156,6 +166,7 @@ class TestMergeCounter:
             lamport_clock=1,
             payload={"delta": -3},
             project_uuid=TEST_PROJECT_UUID,
+            correlation_id=str(ULID()),
         )
         result = merge_counter([e1, e2])
         assert result == 7  # 10 + (-3)

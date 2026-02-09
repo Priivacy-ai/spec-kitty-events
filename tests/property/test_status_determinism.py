@@ -6,6 +6,7 @@ from datetime import datetime, timezone, timedelta
 from typing import List
 
 from hypothesis import given, settings, strategies as st
+from ulid import ULID
 
 from spec_kitty_events import (
     Event,
@@ -51,6 +52,7 @@ def _make_lifecycle_events(wp_id: str, base_clock: int = 1) -> List[Event]:
                 node_id="n",
                 lamport_clock=base_clock + i,
                 project_uuid=_PROJECT_UUID,
+                correlation_id=str(ULID()),
             )
         )
     return events
