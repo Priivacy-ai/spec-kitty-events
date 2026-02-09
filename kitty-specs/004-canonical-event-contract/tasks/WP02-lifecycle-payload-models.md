@@ -8,6 +8,7 @@ base_commit: 9ad0795ce86fc43e76608f4aa0bf1c80b7dbe183
 created_at: '2026-02-09T11:43:55.157119+00:00'
 subtasks: [T008, T009, T010, T011, T012, T013]
 shell_pid: "11768"
+agent: "claude-opus"
 history:
 - date: '2026-02-09'
   agent: claude-opus
@@ -249,3 +250,7 @@ Write comprehensive tests for all models and constants:
 4. Verify constants match PascalCase event type convention
 5. Verify MISSION_EVENT_TYPES contains exactly 5 strings
 6. Run `python3.11 -m pytest tests/unit/test_lifecycle.py` — all pass
+
+## Activity Log
+
+- 2026-02-09T11:43:55Z – claude-opus – shell_pid=11768 – lane=doing – Assigned agent via workflow command
