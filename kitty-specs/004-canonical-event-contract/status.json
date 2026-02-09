@@ -1,0 +1,38 @@
+{
+  "event_count": 8,
+  "feature_slug": "004-canonical-event-contract",
+  "last_event_id": "01KH13Z7YABE3GGPEP5DDRJYQY",
+  "materialized_at": "2026-02-09T11:53:11.882553+00:00",
+  "summary": {
+    "blocked": 0,
+    "canceled": 0,
+    "claimed": 0,
+    "done": 2,
+    "for_review": 1,
+    "in_progress": 0,
+    "planned": 0
+  },
+  "work_packages": {
+    "WP01": {
+      "actor": "user",
+      "force_count": 1,
+      "lane": "done",
+      "last_event_id": "01KH13HBBF8BYT4GZHYKJRFT35",
+      "last_transition_at": "2026-02-09T11:45:36.624037+00:00"
+    },
+    "WP02": {
+      "actor": "user",
+      "force_count": 2,
+      "lane": "done",
+      "last_event_id": "01KH13MHVEXT0ZYF1EACZK87T0",
+      "last_transition_at": "2026-02-09T11:47:21.582855+00:00"
+    },
+    "WP03": {
+      "actor": "user",
+      "force_count": 1,
+      "lane": "for_review",
+      "last_event_id": "01KH13Z7YABE3GGPEP5DDRJYQY",
+      "last_transition_at": "2026-02-09T11:53:11.882330+00:00"
+    }
+  }
+}

@@ -124,4 +124,5 @@ All WPs are sequential — each builds on the previous. WP01 must land first bec
 ## Canonical Status (Generated)
 - WP01: done
 - WP02: done
+- WP03: for_review
 <!-- status-model:end -->
