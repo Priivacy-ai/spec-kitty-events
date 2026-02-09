@@ -109,12 +109,12 @@ All WPs are sequential — each builds on the previous. WP01 must land first bec
 
 **Subtasks**:
 
-- [ ] T021: Add all 17 new exports to `src/spec_kitty_events/__init__.py` and update `__all__`
-- [ ] T022: Bump version to 0.4.0-alpha in pyproject.toml and __init__.py
-- [ ] T023: Add integration tests for projection replay correctness (acceptance criteria 2E-07, 2E-08): build projection incrementally vs from-scratch replay, assert identical output
-- [ ] T024: Verify mypy --strict passes on all new and modified files
-- [ ] T025: Verify test coverage remains at 99%+ with `python3.11 -m pytest`
-- [ ] T026: Run full test suite, verify all existing tests still pass (backward compat), fix any remaining issues
+- [x] T021: Add all 17 new exports to `src/spec_kitty_events/__init__.py` and update `__all__`
+- [x] T022: Bump version to 0.4.0-alpha in pyproject.toml and __init__.py
+- [x] T023: Add integration tests for projection replay correctness (acceptance criteria 2E-07, 2E-08): build projection incrementally vs from-scratch replay, assert identical output
+- [x] T024: Verify mypy --strict passes on all new and modified files
+- [x] T025: Verify test coverage remains at 99%+ with `python3.11 -m pytest`
+- [x] T026: Run full test suite, verify all existing tests still pass (backward compat), fix any remaining issues
 
 **Parallel opportunities**: T021/T022 are independent file edits. T024/T025/T026 are sequential verification steps.
 
@@ -124,5 +124,5 @@ All WPs are sequential — each builds on the previous. WP01 must land first bec
 ## Canonical Status (Generated)
 - WP01: done
 - WP02: done
-- WP03: for_review
+- WP03: done
 <!-- status-model:end -->
