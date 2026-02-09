@@ -8,6 +8,7 @@ base_commit: 2cbbcb8e80e7d85853b0e984ad8d29f0a32ce61f
 created_at: '2026-02-09T11:46:09.591389+00:00'
 subtasks: [T014, T015, T016, T017, T018, T019, T020]
 shell_pid: "13053"
+agent: "claude-opus"
 history:
 - date: '2026-02-09'
   agent: claude-opus
@@ -327,3 +328,7 @@ def test_reducer_determinism_across_physical_orderings(seed: int) -> None:
 5. Verify anomaly detection for: events before start, events after terminal, invalid payloads
 6. Run `python3.11 -m pytest tests/unit/test_lifecycle.py tests/property/test_lifecycle_determinism.py`
 7. Run `python3.11 -m pytest` for full suite
+
+## Activity Log
+
+- 2026-02-09T11:46:09Z – claude-opus – shell_pid=13053 – lane=doing – Assigned agent via workflow command
