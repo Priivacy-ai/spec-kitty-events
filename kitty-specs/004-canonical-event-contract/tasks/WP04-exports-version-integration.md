@@ -8,6 +8,7 @@ base_commit: 3cfd49fe235c21f3d210df9e96903fea18916b89
 created_at: '2026-02-09T11:53:30.034480+00:00'
 subtasks: [T021, T022, T023, T024, T025, T026]
 shell_pid: "18715"
+agent: "claude-opus"
 history:
 - date: '2026-02-09'
   agent: claude-opus
@@ -240,3 +241,7 @@ Run `python3.11 -m pytest` and verify:
 4. Verify mypy and coverage gates pass
 5. Run `python3.11 -m pytest` — must have zero failures
 6. Verify backward compat: events without new optional fields deserialize correctly
+
+## Activity Log
+
+- 2026-02-09T11:53:30Z – claude-opus – shell_pid=18715 – lane=doing – Assigned agent via workflow command
