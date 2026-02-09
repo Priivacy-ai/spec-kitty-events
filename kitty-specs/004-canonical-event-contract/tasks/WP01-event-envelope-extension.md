@@ -1,14 +1,18 @@
 ---
-work_package_id: "WP01"
-title: "Event Envelope Extension + Test Migration"
-lane: "planned"
+work_package_id: WP01
+title: Event Envelope Extension + Test Migration
+lane: "doing"
 dependencies: []
-subtasks: ["T001", "T002", "T003", "T004", "T005", "T006", "T007"]
+base_branch: main
+base_commit: 3de3d25be62a16aa64f308cd90983ff668b81ae6
+created_at: '2026-02-09T11:37:20.985808+00:00'
+subtasks: [T001, T002, T003, T004, T005, T006, T007]
+shell_pid: "8128"
 history:
-  - date: "2026-02-09"
-    agent: "claude-opus"
-    action: "created"
-    note: "Generated from /spec-kitty.tasks"
+- date: '2026-02-09'
+  agent: claude-opus
+  action: created
+  note: Generated from /spec-kitty.tasks
 ---
 
 # WP01: Event Envelope Extension + Test Migration
