@@ -8,6 +8,7 @@ base_commit: 3de3d25be62a16aa64f308cd90983ff668b81ae6
 created_at: '2026-02-09T11:37:20.985808+00:00'
 subtasks: [T001, T002, T003, T004, T005, T006, T007]
 shell_pid: "8128"
+agent: "claude-opus"
 history:
 - date: '2026-02-09'
   agent: claude-opus
@@ -216,3 +217,7 @@ Add tests for the three new fields:
 3. Verify round-trip serialization (to_dict/from_dict) preserves new fields
 4. Run `python3.11 -m pytest` — must have zero failures
 5. Run `mypy --strict src/spec_kitty_events/models.py` — must pass
+
+## Activity Log
+
+- 2026-02-09T11:37:21Z – claude-opus – shell_pid=8128 – lane=doing – Assigned agent via workflow command
