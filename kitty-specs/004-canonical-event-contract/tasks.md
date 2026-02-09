@@ -119,3 +119,8 @@ All WPs are sequential — each builds on the previous. WP01 must land first bec
 **Parallel opportunities**: T021/T022 are independent file edits. T024/T025/T026 are sequential verification steps.
 
 **Risks**: Coverage may drop if lifecycle.py has untested branches. Add targeted tests for edge cases.
+
+<!-- status-model:start -->
+## Canonical Status (Generated)
+- WP01: for_review
+<!-- status-model:end -->
