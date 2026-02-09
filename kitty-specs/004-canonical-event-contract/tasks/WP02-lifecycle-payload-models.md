@@ -1,9 +1,13 @@
 ---
 work_package_id: WP02
 title: Lifecycle Payload Models
-lane: planned
+lane: "doing"
 dependencies: []
+base_branch: 004-canonical-event-contract-WP01
+base_commit: 9ad0795ce86fc43e76608f4aa0bf1c80b7dbe183
+created_at: '2026-02-09T11:43:55.157119+00:00'
 subtasks: [T008, T009, T010, T011, T012, T013]
+shell_pid: "11768"
 history:
 - date: '2026-02-09'
   agent: claude-opus
