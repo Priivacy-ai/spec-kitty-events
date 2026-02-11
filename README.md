@@ -2,7 +2,7 @@
 
 Event log library with Lamport clocks and systematic error tracking for distributed systems.
 
-**Status**: Alpha (v0.1.1-alpha)
+**Status**: Alpha (v0.4.0-alpha)
 
 ## Features
 
@@ -17,18 +17,25 @@ Event log library with Lamport clocks and systematic error tracking for distribu
 
 ## Installation
 
-### From Git (Recommended for Alpha)
+### From PyPI (Preferred)
+
+After the first trusted-publishing release:
 
 ```bash
-pip install git+https://github.com/Priivacy-ai/spec-kitty-events.git@v0.1.1-alpha
+pip install spec-kitty-events==<version>
 ```
 
-Or add to `requirements.txt` or `pyproject.toml`:
+### From Git (Fallback Until First PyPI Release)
+
+```bash
+pip install git+https://github.com/Priivacy-ai/spec-kitty-events.git@v0.4.0-alpha
+```
+
+Or add to `pyproject.toml`:
 
 ```toml
-# pyproject.toml
 dependencies = [
-    "spec-kitty-events @ git+https://github.com/Priivacy-ai/spec-kitty-events.git@v0.1.1-alpha",
+    "spec-kitty-events @ git+https://github.com/Priivacy-ai/spec-kitty-events.git@v0.4.0-alpha",
 ]
 ```
 
@@ -198,6 +205,21 @@ This is an alpha release. Contributions are welcome! Please:
 ## Support
 
 For issues, questions, or feature requests, please open an issue on GitHub.
+
+## Release and Publishing
+
+This repository uses GitHub Actions trusted publishing:
+
+1. `publish-testpypi.yml`: Manual TestPyPI dry run.
+2. `publish-pypi.yml`: Publish on `v*` tags (or manual dispatch) to PyPI.
+
+Release flow:
+
+1. Update `project.version` in `pyproject.toml`.
+2. Commit to `main`.
+3. Create and push matching tag (for example, `v0.5.0` for `version = "0.5.0"`).
+4. Approve the `pypi` GitHub environment (if required).
+5. Verify package on PyPI and install in a clean environment.
 
 ---
 
