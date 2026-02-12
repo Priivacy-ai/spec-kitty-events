@@ -1,13 +1,17 @@
 ---
-work_package_id: "WP01"
-title: "Lane Mapping Contract"
-lane: "planned"
+work_package_id: WP01
+title: Lane Mapping Contract
+lane: "doing"
 dependencies: []
-subtasks: ["T001", "T002", "T003", "T004", "T005", "T006"]
+base_branch: main
+base_commit: 1c16bd2a704cc44184e768fda496a645fe9356b1
+created_at: '2026-02-12T10:21:10.782442+00:00'
+subtasks: [T001, T002, T003, T004, T005, T006]
+shell_pid: "54078"
 history:
-  - date: "2026-02-12"
-    action: "created"
-    by: "spec-kitty.tasks"
+- date: '2026-02-12'
+  action: created
+  by: spec-kitty.tasks
 ---
 
 # WP01 — Lane Mapping Contract
