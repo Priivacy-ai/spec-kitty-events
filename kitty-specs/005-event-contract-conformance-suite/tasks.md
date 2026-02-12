@@ -61,7 +61,7 @@
 - [x] T015: Create `conformance/validators.py` with `ConformanceResult`, `ModelViolation`, `SchemaViolation`
 - [x] T016: Implement event-type-to-model resolver (maps event_type strings to Pydantic model classes)
 - [x] T017: Implement Pydantic validation layer (Layer 1) with `ModelViolation` extraction
-- [ ] T018: Implement JSON Schema validation layer (Layer 2) with graceful degradation (`schema_check_skipped`)
+- [x] T018: Implement JSON Schema validation layer (Layer 2) with graceful degradation (`schema_check_skipped`)
 - [ ] T019: Implement `validate_event()` function with `strict` parameter
 - [ ] T020: Unit tests for validator (valid payloads, invalid payloads, missing jsonschema, strict mode)
 
