@@ -57,7 +57,7 @@
 **Estimated size**: ~450 lines
 
 **Subtasks**:
-- [ ] T014: Create `conformance/__init__.py` with public API surface
+- [x] T014: Create `conformance/__init__.py` with public API surface
 - [ ] T015: Create `conformance/validators.py` with `ConformanceResult`, `ModelViolation`, `SchemaViolation`
 - [ ] T016: Implement event-type-to-model resolver (maps event_type strings to Pydantic model classes)
 - [ ] T017: Implement Pydantic validation layer (Layer 1) with `ModelViolation` extraction
