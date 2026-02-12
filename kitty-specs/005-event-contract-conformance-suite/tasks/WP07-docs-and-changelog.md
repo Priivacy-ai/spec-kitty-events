@@ -1,14 +1,14 @@
 ---
 work_package_id: WP07
 title: Compatibility Table, Changelog, and Migration Notes
-lane: "for_review"
+lane: "doing"
 dependencies: [WP06]
 base_branch: 005-event-contract-conformance-suite-WP06
 base_commit: 65a647b9980d95fd0de21cefef3a99b43b9e520a
 created_at: '2026-02-12T11:35:12.699714+00:00'
 subtasks: [T040, T041, T042, T043, T044]
-shell_pid: "22344"
-agent: "claude-opus"
+shell_pid: "25817"
+agent: "codex"
 history:
 - date: '2026-02-12'
   action: created
@@ -228,3 +228,4 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 - 2026-02-12T11:35:12Z – claude-opus – shell_pid=22344 – lane=doing – Assigned agent via workflow command
 - 2026-02-12T11:42:54Z – claude-opus – shell_pid=22344 – lane=for_review – Ready for review: CHANGELOG.md rewrite, COMPATIBILITY.md new, README.md updated for 2.0.0rc1. 552 tests pass, mypy strict clean.
+- 2026-02-12T11:42:58Z – codex – shell_pid=25817 – lane=doing – Started review via workflow command
