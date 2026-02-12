@@ -8,6 +8,7 @@ base_commit: 4d24abae1e2bbc4607685370ae08d4a0714efbae
 created_at: '2026-02-12T11:10:00.164040+00:00'
 subtasks: [T029, T030, T031, T032, T033]
 shell_pid: "5916"
+agent: "claude-opus"
 history:
 - date: '2026-02-12'
   action: created
@@ -359,3 +360,7 @@ def test_event_round_trip() -> None:
 - Verify lane mapping tests cover all 7 lanes.
 - Verify schema integrity tests cover all 11 schemas.
 - Verify coverage omit works (conformance test files not in coverage report).
+
+## Activity Log
+
+- 2026-02-12T11:10:00Z – claude-opus – shell_pid=5916 – lane=doing – Assigned agent via workflow command
