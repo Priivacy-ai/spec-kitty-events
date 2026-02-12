@@ -1,7 +1,7 @@
 ---
 work_package_id: WP05
 title: Pytest Conformance Entry Point
-lane: "doing"
+lane: "for_review"
 dependencies: [WP04]
 base_branch: 005-event-contract-conformance-suite-WP04
 base_commit: 4d24abae1e2bbc4607685370ae08d4a0714efbae
@@ -364,3 +364,4 @@ def test_event_round_trip() -> None:
 ## Activity Log
 
 - 2026-02-12T11:10:00Z – claude-opus – shell_pid=5916 – lane=doing – Assigned agent via workflow command
+- 2026-02-12T11:17:13Z – claude-opus – shell_pid=5916 – lane=for_review – Ready for review: pytest conformance entry point with 43 fixture-driven tests, conftest.py, pytest_helpers.py, pyargs-runnable test module. 545 total tests, mypy strict clean.
