@@ -13,7 +13,7 @@ Example:
     1
 """
 
-__version__ = "0.4.0-alpha"
+__version__ = "2.0.0rc1"
 
 # Core data models
 from spec_kitty_events.models import (
@@ -88,12 +88,6 @@ from spec_kitty_events.lifecycle import (
     LifecycleAnomaly,
     ReducedMissionState,
     reduce_lifecycle_events,
-)
-
-# Conformance fixtures
-from spec_kitty_events.conformance.loader import (
-    FixtureCase,
-    load_fixtures,
 )
 
 # Status state model contracts
@@ -180,9 +174,6 @@ __all__ = [
     "LifecycleAnomaly",
     "ReducedMissionState",
     "reduce_lifecycle_events",
-    # Conformance fixtures
-    "FixtureCase",
-    "load_fixtures",
     # Status state model
     "Lane",
     "SyncLaneV1",

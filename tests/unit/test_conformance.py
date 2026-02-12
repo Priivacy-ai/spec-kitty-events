@@ -302,3 +302,66 @@ def test_conformance_result_structure() -> None:
     assert isinstance(result.model_violations, tuple)
     assert isinstance(result.schema_violations, tuple)
     assert isinstance(result.schema_check_skipped, bool)
+
+
+# ── Pytest helpers tests ─────────────────────────────────────────────────────
+
+
+class TestAssertPayloadConforms:
+    """Tests for assert_payload_conforms helper."""
+
+    def test_valid_payload_returns_result(self) -> None:
+        from spec_kitty_events.conformance.pytest_helpers import assert_payload_conforms
+
+        payload = _make_valid_status_transition()
+        result = assert_payload_conforms(payload, "WPStatusChanged")
+        assert result.valid is True
+        assert result.event_type == "WPStatusChanged"
+
+    def test_invalid_payload_raises_assertion(self) -> None:
+        from spec_kitty_events.conformance.pytest_helpers import assert_payload_conforms
+
+        payload = {"bad": "data"}
+        with pytest.raises(AssertionError, match="failed conformance"):
+            assert_payload_conforms(payload, "WPStatusChanged")
+
+    def test_invalid_payload_error_message_contains_violations(self) -> None:
+        from spec_kitty_events.conformance.pytest_helpers import assert_payload_conforms
+
+        payload = {"bad": "data"}
+        with pytest.raises(AssertionError, match="Model:"):
+            assert_payload_conforms(payload, "WPStatusChanged")
+
+
+class TestAssertPayloadFails:
+    """Tests for assert_payload_fails helper."""
+
+    def test_invalid_payload_returns_result(self) -> None:
+        from spec_kitty_events.conformance.pytest_helpers import assert_payload_fails
+
+        payload = {"bad": "data"}
+        result = assert_payload_fails(payload, "WPStatusChanged")
+        assert result.valid is False
+
+    def test_valid_payload_raises_assertion(self) -> None:
+        from spec_kitty_events.conformance.pytest_helpers import assert_payload_fails
+
+        payload = _make_valid_status_transition()
+        with pytest.raises(AssertionError, match="expected to fail but passed"):
+            assert_payload_fails(payload, "WPStatusChanged")
+
+
+class TestAssertLaneMapping:
+    """Tests for assert_lane_mapping helper."""
+
+    def test_valid_mapping(self) -> None:
+        from spec_kitty_events.conformance.pytest_helpers import assert_lane_mapping
+
+        # planned maps to planned in SyncLaneV1
+        assert_lane_mapping("planned", "planned")
+
+    def test_invalid_mapping_raises_assertion(self) -> None:
+        from spec_kitty_events.conformance.pytest_helpers import assert_lane_mapping
+
+        with pytest.raises(AssertionError, match="Expected"):
+            assert_lane_mapping("planned", "done")
