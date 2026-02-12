@@ -1,0 +1,153 @@
+---
+work_package_id: WP06
+title: Version Graduation and Package Finalization
+lane: planned
+dependencies: []
+subtasks: [T034, T035, T036, T037, T038, T039]
+history:
+- date: '2026-02-12'
+  action: created
+  by: spec-kitty.tasks
+---
+
+# WP06 — Version Graduation and Package Finalization
+
+## Implementation Command
+
+```bash
+spec-kitty implement WP06 --base WP05
+```
+
+## Objective
+
+Graduate the package from `0.4.0-alpha` to `2.0.0-rc1`. Update all version references. Ensure all new symbols are exported. Run the full test suite and mypy to confirm everything is clean.
+
+## Context
+
+This is the "lock it down" step. After WP01–WP05, all code is implemented. This WP:
+- Bumps the version number
+- Updates `SCHEMA_VERSION`
+- Audits all exports
+- Runs the full quality gate (tests + mypy + conformance)
+
+**Key files to modify**:
+- `pyproject.toml` — version
+- `src/spec_kitty_events/__init__.py` — `__version__` and exports
+- `src/spec_kitty_events/lifecycle.py` — `SCHEMA_VERSION`
+
+## Subtask Guidance
+
+### T034: Update `pyproject.toml` version
+
+**Purpose**: Set the package version to `2.0.0-rc1`.
+
+**Steps**:
+1. In `pyproject.toml`, change `version = "0.4.0-alpha"` to `version = "2.0.0rc1"`.
+2. Note: PEP 440 uses `rc1` without a hyphen (not `2.0.0-rc1`). The hyphen form is not valid.
+
+**Validation**:
+- [ ] `pip install -e ".[dev,conformance]"` succeeds
+- [ ] `pip show spec-kitty-events` shows version `2.0.0rc1`
+
+### T035: Update `__version__` in `__init__.py`
+
+**Purpose**: Runtime version string matches package metadata.
+
+**Steps**:
+1. In `src/spec_kitty_events/__init__.py`, change `__version__ = "0.4.0-alpha"` to `__version__ = "2.0.0rc1"`.
+
+**Validation**:
+- [ ] `import spec_kitty_events; print(spec_kitty_events.__version__)` outputs `2.0.0rc1`
+
+### T036: Update `SCHEMA_VERSION` in `lifecycle.py`
+
+**Purpose**: The locked schema version constant reflects the 2.0.0 contract.
+
+**Steps**:
+1. In `src/spec_kitty_events/lifecycle.py`, change `SCHEMA_VERSION = "1.0.0"` to `SCHEMA_VERSION = "2.0.0"`.
+2. Note: This is the schema version, not the package version. It's `"2.0.0"` (stable, no `rc`).
+
+**Validation**:
+- [ ] `from spec_kitty_events import SCHEMA_VERSION; print(SCHEMA_VERSION)` outputs `2.0.0`
+
+### T037: Final audit of `__init__.py` exports
+
+**Purpose**: Ensure ALL new symbols from WP01–WP05 are exported.
+
+**Steps**:
+1. Verify these symbols are imported and in `__all__`:
+
+   **From WP01 (status.py)**:
+   - `SyncLaneV1`
+   - `CANONICAL_TO_SYNC_V1`
+   - `canonical_to_sync_v1`
+
+   **From WP03 (conformance)**:
+   - Do NOT export conformance symbols from the top-level `__init__.py`. Conformance is a subpackage consumers import directly: `from spec_kitty_events.conformance import validate_event`.
+
+   **From WP02 (schemas)**:
+   - Do NOT export schema loader from top-level. Consumers import: `from spec_kitty_events.schemas import load_schema`.
+
+2. Total new top-level exports: 3 (SyncLaneV1, CANONICAL_TO_SYNC_V1, canonical_to_sync_v1).
+3. Total top-level exports after update: 68 (65 existing + 3 new).
+
+**Validation**:
+- [ ] `from spec_kitty_events import SyncLaneV1, CANONICAL_TO_SYNC_V1, canonical_to_sync_v1` works
+- [ ] `from spec_kitty_events.conformance import validate_event, ConformanceResult` works
+- [ ] `from spec_kitty_events.schemas import load_schema, list_schemas` works
+- [ ] `len(spec_kitty_events.__all__)` is 68
+
+### T038: Run full test suite
+
+**Purpose**: Verify 98%+ coverage and all tests pass.
+
+**Steps**:
+1. Run `python3.11 -m pytest -v` from repo root.
+2. Verify:
+   - All existing tests still pass (no regressions)
+   - All new tests from WP01–WP05 pass
+   - Coverage is 98%+
+3. Also run `pytest --pyargs spec_kitty_events.conformance -v` separately.
+
+**Validation**:
+- [ ] `python3.11 -m pytest` exits 0
+- [ ] Coverage >= 98%
+- [ ] `pytest --pyargs spec_kitty_events.conformance` exits 0
+
+### T039: Run `mypy --strict`
+
+**Purpose**: Type checking passes with no errors.
+
+**Steps**:
+1. Run `mypy --strict src/spec_kitty_events/`.
+2. Fix any type errors in new code.
+3. Common issues:
+   - `MappingProxyType` type annotation: use `Mapping[Lane, SyncLaneV1]` if `MappingProxyType[...]` isn't accepted
+   - `from __future__ import annotations` + dataclass fields: ensure explicit defaults work
+   - `object` type in dataclass fields: mypy may want `Any` — use sparingly
+
+**Validation**:
+- [ ] `mypy --strict src/spec_kitty_events/` exits 0
+- [ ] No `# type: ignore` comments added (or minimized with justification)
+
+## Definition of Done
+
+- [ ] Package version is `2.0.0rc1` in both `pyproject.toml` and `__version__`
+- [ ] `SCHEMA_VERSION` is `"2.0.0"`
+- [ ] All 68 symbols exported from `__init__.py`
+- [ ] `python3.11 -m pytest` passes with 98%+ coverage
+- [ ] `pytest --pyargs spec_kitty_events.conformance` passes
+- [ ] `mypy --strict` passes
+
+## Risks
+
+- **PEP 440 version format**: `2.0.0-rc1` is NOT valid PEP 440. Use `2.0.0rc1` (no hyphen). pip will reject hyphenated versions.
+- **SCHEMA_VERSION vs package version**: These are different. `SCHEMA_VERSION` is `"2.0.0"` (the locked schema version). The package version is `"2.0.0rc1"` (release candidate). Don't confuse them.
+- **Coverage drop**: New conformance test files (test_pyargs_entrypoint.py, conftest.py) should be omitted from coverage source (done in WP05). But `validators.py` and `pytest_helpers.py` are library code and should be covered.
+
+## Reviewer Guidance
+
+- Verify version number is PEP 440 compliant: `2.0.0rc1` not `2.0.0-rc1`.
+- Verify `SCHEMA_VERSION` is `"2.0.0"` not `"2.0.0rc1"`.
+- Verify no regressions in existing 427+ tests.
+- Verify conformance suite runs independently via `--pyargs`.
