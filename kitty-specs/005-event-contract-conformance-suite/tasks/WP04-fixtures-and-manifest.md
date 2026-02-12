@@ -8,6 +8,7 @@ base_commit: 57c9ad089e6fb61d491586822a2e55354179f1e7
 created_at: '2026-02-12T10:54:01.027042+00:00'
 subtasks: [T021, T022, T023, T024, T025, T026, T027, T028]
 shell_pid: "93397"
+agent: "claude-opus"
 history:
 - date: '2026-02-12'
   action: created
@@ -271,3 +272,7 @@ Each fixture category has `valid/` and `invalid/` subdirectories. The `manifest.
 - Spot-check at least one valid and one invalid fixture against the Pydantic model.
 - Verify `expected_result` in manifest matches reality (valid fixtures actually pass, invalid actually fail).
 - Verify `load_fixtures()` returns correct data structure with payload loaded from JSON.
+
+## Activity Log
+
+- 2026-02-12T10:54:01Z – claude-opus – shell_pid=93397 – lane=doing – Assigned agent via workflow command
