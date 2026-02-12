@@ -1,161 +1,158 @@
 # Changelog
 
-All notable changes to this project will be documented in this file.
+All notable changes to spec-kitty-events will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [2.0.0rc1] - 2026-02-12
+
+### Added
+
+- **Lane Mapping Contract** (Feature 005, WP01): `SyncLaneV1` enum with 4 consumer-facing lanes
+  (`planned`, `doing`, `for_review`, `done`), `CANONICAL_TO_SYNC_V1` immutable mapping, and
+  `canonical_to_sync_v1()` function. Consumers import this instead of hardcoding the 7-to-4 lane
+  mapping. See [COMPATIBILITY.md](COMPATIBILITY.md) for the full mapping table.
+- **JSON Schema Artifacts** (Feature 005, WP02): 11 JSON Schema files generated from Pydantic v2
+  models, committed as canonical contract documents. Build-time generation script with CI drift
+  detection (`python -m spec_kitty_events.schemas.generate --check`). Schemas available via
+  `load_schema()` and `list_schemas()` from `spec_kitty_events.schemas`.
+- **Conformance Validator API** (Feature 005, WP03): `validate_event()` with dual-layer validation
+  (Pydantic primary + JSON Schema secondary). Returns structured `ConformanceResult` with separate
+  `model_violations` and `schema_violations` buckets. Graceful degradation when `jsonschema` is not
+  installed (unless `strict=True`).
+- **Canonical Fixtures** (Feature 005, WP04): Manifest-driven fixture suite with `load_fixtures()`
+  and `FixtureCase` dataclass for programmatic access. Categories: `events`, `lane_mapping`,
+  `edge_cases`. Bundled as package data.
+- **Conformance Test Suite** (Feature 005, WP05): Pytest-runnable via
+  `pytest --pyargs spec_kitty_events.conformance`. Manifest-driven tests covering all event types,
+  lane mappings, and edge cases. Consumer test helpers: `assert_payload_conforms()`,
+  `assert_payload_fails()`, `assert_lane_mapping()`.
+- **`[conformance]` Optional Extra** (Feature 005, WP06):
+  `pip install spec-kitty-events[conformance]` adds `jsonschema>=4.21.0,<5.0.0` for full
+  dual-layer validation.
+
+### Changed
+
+- **Version**: Graduated from `0.4.0-alpha` to `2.0.0rc1` (PEP 440 compliant).
+- **SCHEMA_VERSION**: Updated to `"2.0.0"` (locked for the 2.x series lifetime).
+- **Public API**: 68 exports in `__init__.py` (up from 65 in 0.4.0-alpha). Added `SyncLaneV1`,
+  `CANONICAL_TO_SYNC_V1`, and `canonical_to_sync_v1`.
+
+### Migration from 0.4.x
+
+> Full migration guide in [COMPATIBILITY.md](COMPATIBILITY.md).
+
+1. **Update dependency pin**:
+   ```toml
+   # pyproject.toml
+   dependencies = [
+       "spec-kitty-events>=2.0.0rc1,<3.0.0",
+   ]
+   ```
+
+2. **Replace hardcoded lane mappings** with the canonical contract:
+   ```python
+   # Before (consumer code):
+   LANE_MAP = {"planned": "planned", "in_progress": "doing", ...}
+   sync = LANE_MAP[lane_value]
+
+   # After:
+   from spec_kitty_events import Lane, SyncLaneV1, canonical_to_sync_v1
+   sync_lane = canonical_to_sync_v1(Lane.IN_PROGRESS)  # SyncLaneV1.DOING
+   ```
+
+3. **Replace local status enums** with `SyncLaneV1` import:
+   ```python
+   # Before:
+   class MyStatus(str, Enum):
+       PLANNED = "planned"
+       DOING = "doing"
+       ...
+
+   # After:
+   from spec_kitty_events import SyncLaneV1
+   # Use SyncLaneV1.PLANNED, SyncLaneV1.DOING, etc.
+   ```
+
+4. **Add conformance CI step** (recommended):
+   ```bash
+   pip install "spec-kitty-events[conformance]>=2.0.0rc1,<3.0.0"
+   pytest --pyargs spec_kitty_events.conformance -v
+   ```
+
+5. **Event model changes**: The `Event` model now requires `correlation_id` (ULID) and includes
+   `schema_version` (default `"1.0.0"`) and `data_tier` (default `0`). If you construct `Event`
+   instances directly, add `correlation_id` to your constructors.
+
+## [0.4.0-alpha] - 2026-02-09
+
+### Added
+
+- **Canonical Event Contract** (Feature 004): `correlation_id`, `schema_version`, `data_tier`
+  fields on `Event` model. Mission lifecycle event contracts: `MissionStarted`, `MissionCompleted`,
+  `MissionCancelled`, `PhaseEntered`, `ReviewRollback` with typed payload models.
+- **Lifecycle Reducer**: `reduce_lifecycle_events()` with cancel-beats-re-open precedence,
+  rollback-aware phase tracking, and deterministic ordering.
+- **Mission Constants**: `SCHEMA_VERSION`, `MISSION_EVENT_TYPES`, `TERMINAL_MISSION_STATUSES`,
+  `MissionStatus` enum.
+- **Lifecycle Output Models**: `LifecycleAnomaly`, `ReducedMissionState`.
 
 ## [0.3.0-alpha] - 2026-02-08
 
 ### Added
 
-**Status State Model Contracts** — New `status.py` module establishing the library as the
-shared contract authority for feature/WP status lifecycle events.
-
-#### Enums
-- `Lane` — 7 canonical status lanes: planned, claimed, in_progress, for_review, done, blocked, canceled
-- `ExecutionMode` — worktree | direct_repo execution context
-
-#### Evidence Models
-- `RepoEvidence` — Repository contribution evidence (repo, branch, commit, files_touched)
-- `VerificationEntry` — Test/verification execution record (command, result, summary)
-- `ReviewVerdict` — Reviewer identity and verdict (reviewer, verdict, reference)
-- `DoneEvidence` — Composite evidence required for done transitions
-
-#### Transition Models
-- `ForceMetadata` — Actor and reason for forced transitions
-- `StatusTransitionPayload` — Immutable payload for lane transitions with cross-field validation
-
-#### Validation
-- `TransitionValidationResult` — Result type for transition validation (valid, violations)
-- `validate_transition()` — Pre-flight transition legality check against PRD state machine
-- `TransitionError` — Exception for consumers who want to raise on invalid transitions
-
-#### Ordering and Reduction
-- `status_event_sort_key()` — Deterministic sort key: (lamport_clock, timestamp, event_id)
-- `dedup_events()` — Remove duplicate events by event_id
-- `reduce_status_events()` — Pure reference reducer with rollback-aware precedence
-- `WPState` — Per-WP reduced state (current_lane, last_event_id, evidence)
-- `TransitionAnomaly` — Record of invalid transition encountered during reduction
-- `ReducedStatus` — Reducer output (wp_states, anomalies, event_count)
-
-#### Constants
-- `TERMINAL_LANES` — frozenset of terminal lanes (done, canceled)
-- `LANE_ALIASES` — Legacy alias map (doing -> in_progress)
-- `WP_STATUS_CHANGED` — Canonical event_type string
-
-### Key Features
-- **Lane alias normalization**: Legacy `doing` accepted on input, normalized to `in_progress`
-- **Data-driven transition matrix**: All legal transitions encoded as data, not branching logic
-- **Rollback-aware reducer**: Reviewer rollback outranks concurrent forward progression
-- **Pure functions**: Reducer has no I/O, no side effects, deterministic output
-
-### Backward Compatibility
-- Zero changes to existing modules or exports
-- All v0.2.0 tests pass without modification
-- 21 new exports added alongside existing 37 (total: 58)
-
-### Graduation Criteria (alpha → stable)
-- 2+ consumers integrated (spec-kitty CLI and spec-kitty-saas)
-- All property tests green for 30+ days in CI
-- No breaking API changes needed after consumer integration
-- Transition matrix validated against real-world workflow data
+- **Status State Model Contracts** (Feature 003): 7-lane canonical status model with `Lane` enum,
+  transition validation, and deterministic reducer.
+- **Enums**: `Lane` (7 lanes), `ExecutionMode` (worktree | direct_repo).
+- **Evidence Models**: `RepoEvidence`, `VerificationEntry`, `ReviewVerdict`, `DoneEvidence`.
+- **Transition Models**: `ForceMetadata`, `StatusTransitionPayload` (immutable, cross-field
+  validated), `TransitionValidationResult`, `TransitionError`.
+- **Reducer**: `reduce_status_events()` with rollback-aware precedence, `WPState`,
+  `TransitionAnomaly`, `ReducedStatus`.
+- **Utilities**: `normalize_lane()` (alias handling), `validate_transition()`,
+  `status_event_sort_key()`, `dedup_events()`.
+- **Constants**: `TERMINAL_LANES`, `LANE_ALIASES`, `WP_STATUS_CHANGED`.
 
 ## [0.2.0-alpha] - 2026-02-07
 
 ### Added
-- `GatePayloadBase` — shared Pydantic base model for CI gate outcome event payloads (frozen, validated)
-- `GatePassedPayload(GatePayloadBase)` — typed payload for successful gate conclusions (`success`)
-- `GateFailedPayload(GatePayloadBase)` — typed payload for failed gate conclusions (`failure`, `timed_out`, `cancelled`, `action_required`)
-- `map_check_run_conclusion(conclusion, on_ignored=None)` — deterministic mapping from GitHub `check_run` conclusion strings to event type strings (`"GatePassed"`, `"GateFailed"`, or `None` for ignored)
-- `UnknownConclusionError(SpecKittyEventsError)` — raised for unrecognized conclusion values
-- Ignored conclusions (`neutral`, `skipped`, `stale`) logged via `logging.getLogger("spec_kitty_events.gates")` with optional `on_ignored` callback
-- All new types exported from `spec_kitty_events` package public API
-- Unit tests for payload model validation, field constraints, and serialization round-trips
-- Hypothesis property tests for mapping determinism and exhaustiveness
+
+- **GitHub Gate Observability Contracts** (Feature 002): `GatePayloadBase`, `GatePassedPayload`,
+  `GateFailedPayload` models. `map_check_run_conclusion()` for deterministic mapping from GitHub
+  `check_run` conclusion strings to event types. `UnknownConclusionError` exception.
+- Ignored conclusions (`neutral`, `skipped`, `stale`) logged with optional callback.
 
 ## [0.1.1-alpha] - 2026-02-07
 
 ### Added
-- `project_uuid` field on `Event` model (required, `uuid.UUID` type)
-- `project_slug` field on `Event` model (optional, `str` type, defaults to `None`)
 
-### Changed
-- `Event` now requires `project_uuid` in all constructors (breaking change from 0.1.0-alpha)
-- `to_dict()` / `from_dict()` include project identity fields
-- `__repr__()` displays truncated project UUID
+- `project_uuid` field on `Event` model (required, `uuid.UUID`).
+- `project_slug` field on `Event` model (optional, `str`, default `None`).
 
 ### Breaking Changes
-- All `Event()` constructors must now include `project_uuid` parameter
-- This is a coordinated release with spec-kitty CLI and spec-kitty-saas
+
+- All `Event()` constructors must now include `project_uuid` parameter.
 
 ## [0.1.0-alpha] - 2026-01-27
 
 ### Added
 
-**Core Features**:
-- Lamport logical clocks with `LamportClock` class
-  - `tick()`: Increment clock for local events
-  - `update(remote_clock)`: Synchronize with remote events
-  - `current()`: Get clock value without incrementing
-- Immutable `Event` model with causal metadata (Pydantic frozen)
-  - ULID event_id (26 characters, time-sortable)
-  - lamport_clock, node_id, causation_id, timestamp
-  - Opaque payload (dict)
-- Conflict detection with `is_concurrent(e1, e2)`
-- Deterministic total ordering with `total_order_key(event)`
-- Topological sorting by causation with `topological_sort(events)`
-
-**Merge Functions**:
-- CRDT merge for grow-only sets: `merge_gset(events)`
-- CRDT merge for counters: `merge_counter(events)` (with deduplication)
-- State-machine merge: `state_machine_merge(events, priority_map)`
-  - Priority-based winner selection
-  - Deterministic tiebreaker by node_id
-
-**Error Logging**:
-- `ErrorLog` class with append-only semantics
-- `ErrorEntry` model (timestamp, action_attempted, error_message, resolution, agent)
-- Retention policy (configurable max entries, FIFO eviction)
-
-**Storage Adapters**:
-- Abstract base classes: `EventStore`, `ClockStorage`, `ErrorStorage`
-- In-memory implementations for testing:
-  - `InMemoryEventStore` (idempotent save)
-  - `InMemoryClockStorage` (initial value 0)
-  - `InMemoryErrorStorage` (retention policy enforced)
-
-**Type Safety**:
-- mypy --strict compliance (zero errors)
-- py.typed marker for PEP 561
-- Comprehensive type hints (parameters, return types, variables)
-
-**Testing**:
-- 90%+ code coverage (pytest + pytest-cov)
-- Property-based testing (Hypothesis) for CRDT laws and determinism
-- Integration tests for event emission, conflict resolution, adapters
-- Quickstart validation tests
-
-### Changed
-- N/A (initial release)
-
-### Deprecated
-- N/A (initial release)
-
-### Removed
-- N/A (initial release)
-
-### Fixed
-- N/A (initial release)
-
-### Security
-- N/A (initial release)
+- **Core Event Model**: Immutable `Event` with causal metadata (Pydantic frozen). ULID event IDs,
+  Lamport clocks, causation chains.
+- **Lamport Clocks**: `LamportClock` with `tick()`, `update()`, `current()`.
+- **Conflict Detection**: `is_concurrent()`, `total_order_key()`, `topological_sort()`.
+- **CRDT Merge Functions**: `merge_gset()` (grow-only sets), `merge_counter()` (with dedup).
+- **State-Machine Merge**: `state_machine_merge()` with priority-based winner selection.
+- **Error Logging**: `ErrorLog` with append-only semantics and retention policy.
+- **Storage Adapters**: Abstract base classes (`EventStore`, `ClockStorage`, `ErrorStorage`) and
+  in-memory implementations.
+- **Type Safety**: Full `mypy --strict` compliance, `py.typed` marker (PEP 561).
 
 ---
 
-[Unreleased]: https://github.com/Priivacy-ai/spec-kitty-events/compare/v0.3.0-alpha...HEAD
+[2.0.0rc1]: https://github.com/Priivacy-ai/spec-kitty-events/compare/v0.4.0-alpha...v2.0.0rc1
+[0.4.0-alpha]: https://github.com/Priivacy-ai/spec-kitty-events/compare/v0.3.0-alpha...v0.4.0-alpha
 [0.3.0-alpha]: https://github.com/Priivacy-ai/spec-kitty-events/compare/v0.2.0-alpha...v0.3.0-alpha
 [0.2.0-alpha]: https://github.com/Priivacy-ai/spec-kitty-events/compare/v0.1.1-alpha...v0.2.0-alpha
 [0.1.1-alpha]: https://github.com/Priivacy-ai/spec-kitty-events/compare/v0.1.0-alpha...v0.1.1-alpha

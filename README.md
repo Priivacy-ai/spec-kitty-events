@@ -1,8 +1,9 @@
 # spec-kitty-events
 
-Event log library with Lamport clocks and systematic error tracking for distributed systems.
+Event log library with Lamport clocks, CRDT merge, and canonical event contracts for distributed
+systems.
 
-**Status**: Alpha (v0.4.0-alpha)
+**Version**: 2.0.0rc1 | **SCHEMA_VERSION**: 2.0.0 | **Python**: >= 3.10
 
 ## Features
 
@@ -11,32 +12,35 @@ Event log library with Lamport clocks and systematic error tracking for distribu
 - **Conflict Detection**: Detect concurrent events with `is_concurrent()`
 - **CRDT Merge Rules**: Merge grow-only sets and counters with CRDT semantics
 - **State-Machine Merge**: Resolve state conflicts with priority-based selection
-- **Error Logging**: Systematic error tracking with retention policies (Manus pattern)
+- **Status State Model**: 7-lane canonical lifecycle (`Lane`) with transition validation and reducer
+- **Lane Mapping Contract**: `SyncLaneV1` maps 7 canonical lanes to 4 consumer-facing sync lanes
+- **Gate Observability**: Typed payloads for GitHub `check_run` gate events
+- **Lifecycle Events**: Mission lifecycle contracts with typed payloads and reducer
+- **Conformance Suite**: Dual-layer validation (Pydantic + JSON Schema), manifest-driven fixtures,
+  pytest-runnable conformance tests
+- **JSON Schemas**: 11 committed schema artifacts generated from Pydantic models
+- **Error Logging**: Systematic error tracking with retention policies
 - **Storage Adapters**: Abstract storage interfaces (bring your own database)
-- **Type Safety**: Full mypy --strict compliance with py.typed marker
+- **Type Safety**: Full `mypy --strict` compliance with `py.typed` marker
 
 ## Installation
 
-### From PyPI (Preferred)
-
-After the first trusted-publishing release:
+### From PyPI
 
 ```bash
-pip install spec-kitty-events==<version>
+pip install "spec-kitty-events>=2.0.0rc1,<3.0.0"
 ```
 
-### From Git (Fallback Until First PyPI Release)
+With conformance testing support (adds `jsonschema`):
 
 ```bash
-pip install git+https://github.com/Priivacy-ai/spec-kitty-events.git@v0.4.0-alpha
+pip install "spec-kitty-events[conformance]>=2.0.0rc1,<3.0.0"
 ```
 
-Or add to `pyproject.toml`:
+### From Git
 
-```toml
-dependencies = [
-    "spec-kitty-events @ git+https://github.com/Priivacy-ai/spec-kitty-events.git@v0.4.0-alpha",
-]
+```bash
+pip install "git+https://github.com/Priivacy-ai/spec-kitty-events.git@v2.0.0rc1"
 ```
 
 ### Development Installation
@@ -44,12 +48,25 @@ dependencies = [
 ```bash
 git clone https://github.com/Priivacy-ai/spec-kitty-events.git
 cd spec-kitty-events
-pip install -e ".[dev]"
+pip install -e ".[dev,conformance]"
 ```
 
 ## Quick Start
 
-### Basic Event Emission
+### Lane Mapping (New in 2.0.0)
+
+```python
+from spec_kitty_events import Lane, SyncLaneV1, canonical_to_sync_v1
+
+# Convert canonical 7-lane model to consumer-facing 4-lane model
+sync_lane = canonical_to_sync_v1(Lane.IN_PROGRESS)
+assert sync_lane == SyncLaneV1.DOING
+
+sync_lane = canonical_to_sync_v1(Lane.BLOCKED)
+assert sync_lane == SyncLaneV1.DOING  # blocked collapses to doing
+```
+
+### Event Emission
 
 ```python
 import uuid
@@ -61,13 +78,10 @@ from spec_kitty_events import (
     InMemoryEventStore,
 )
 
-# Setup
 clock_storage = InMemoryClockStorage()
 event_store = InMemoryEventStore()
 clock = LamportClock(node_id="alice", storage=clock_storage)
-PROJECT_UUID = uuid.uuid4()
 
-# Emit event
 clock.tick()
 event = Event(
     event_id="01ARZ3NDEKTSV4RRFFQ69G5FAV",
@@ -76,89 +90,79 @@ event = Event(
     timestamp=datetime.now(),
     node_id="alice",
     lamport_clock=clock.current(),
-    project_uuid=PROJECT_UUID,
-    project_slug="my-project",
-    payload={"state": "doing"}
+    project_uuid=uuid.uuid4(),
+    correlation_id="01ARZ3NDEKTSV4RRFFQ69G5FAV",
+    payload={"state": "doing"},
 )
 event_store.save_event(event)
 ```
 
-### Conflict Detection & Resolution
+### Conformance Validation
+
+```python
+from spec_kitty_events.conformance import validate_event
+
+payload = {
+    "feature_slug": "005-my-feature",
+    "wp_id": "WP01",
+    "to_lane": "in_progress",
+    "actor": "ci-bot",
+    "execution_mode": "worktree",
+}
+result = validate_event(payload, "WPStatusChanged")
+assert result.valid
+```
+
+### Conflict Detection and Resolution
 
 ```python
 from spec_kitty_events import is_concurrent, state_machine_merge
 
-# Assume event1/event2 are valid Event instances (including project_uuid)
-
 # Detect concurrent events
 if is_concurrent(event1, event2):
-    # Resolve using state-machine merge
     priority_map = {"done": 4, "for_review": 3, "doing": 2, "planned": 1}
     resolution = state_machine_merge([event1, event2], priority_map)
     winner = resolution.merged_event
 ```
 
-### CRDT Merge
-
-```python
-from spec_kitty_events import merge_gset, merge_counter
-
-# Assume event1/event2/event3 are valid Event instances (including project_uuid)
-
-# Merge grow-only set (tags)
-tags = merge_gset([event1, event2, event3])
-
-# Merge counter (deltas)
-total = merge_counter([event1, event2, event3])
-```
-
-## Architecture
-
-### Storage Adapters
-
-The library provides abstract storage interfaces (`EventStore`, `ClockStorage`, `ErrorStorage`) that you can implement for your persistence layer:
-
-- **InMemoryEventStore**: For testing (not durable)
-- **InMemoryClockStorage**: For testing (not durable)
-- **InMemoryErrorStorage**: For testing (not durable)
-
-For production, implement adapters for your database (PostgreSQL, SQLite, etc.).
-
-### API Overview
-
-**Core Models**:
-- `Event`: Immutable event with causal metadata (lamport_clock, causation_id, project_uuid, project_slug)
-- `ErrorEntry`: Error log entry (timestamp, action_attempted, error_message)
-- `ConflictResolution`: Result of merge operation
-
-**Clocks**:
-- `LamportClock`: Lamport logical clock with tick(), update(), current()
-
-**Conflict Detection**:
-- `is_concurrent(e1, e2)`: Detect concurrent events
-- `total_order_key(event)`: Deterministic tiebreaker
-
-**Merge Functions**:
-- `merge_gset(events)`: CRDT merge for grow-only sets
-- `merge_counter(events)`: CRDT merge for counters
-- `state_machine_merge(events, priority_map)`: Priority-based state merge
-
-**Error Logging**:
-- `ErrorLog`: Append-only error log with retention policy
-
 ## Documentation
 
-API reference documentation coming in v0.2.0. For now, refer to:
-- Type hints in source code (fully type-annotated with mypy --strict)
-- Integration tests in `tests/integration/` for usage examples
-- Docstrings in `src/spec_kitty_events/`
+- **[CHANGELOG.md](CHANGELOG.md)**: Version history and migration notes
+- **[COMPATIBILITY.md](COMPATIBILITY.md)**: Lane mapping table, field reference, versioning policy,
+  CI integration guide
+- **Type hints**: Full mypy --strict compliance (source is the documentation)
+- **Conformance suite**: `pytest --pyargs spec_kitty_events.conformance -v`
+
+## Public API (68 Exports)
+
+The `spec_kitty_events` package exports 68 symbols covering:
+
+| Category | Count | Key Exports |
+|---|---|---|
+| Core models | 4 | `Event`, `ErrorEntry`, `ConflictResolution` |
+| Exceptions | 4 | `SpecKittyEventsError`, `StorageError`, `ValidationError`, `CyclicDependencyError` |
+| Storage | 6 | `EventStore`, `ClockStorage`, `ErrorStorage`, `InMemory*` |
+| Clocks | 1 | `LamportClock` |
+| Conflict detection | 3 | `is_concurrent`, `total_order_key`, `topological_sort` |
+| Merge functions | 3 | `merge_gset`, `merge_counter`, `state_machine_merge` |
+| Error logging | 1 | `ErrorLog` |
+| Gate observability | 5 | `GatePayloadBase`, `GatePassedPayload`, `GateFailedPayload`, `map_check_run_conclusion`, `UnknownConclusionError` |
+| Lifecycle events | 15 | `SCHEMA_VERSION`, `MissionStatus`, payload models, reducer, constants |
+| Status model | 25 | `Lane`, `SyncLaneV1`, `canonical_to_sync_v1`, `StatusTransitionPayload`, reducer, validators |
+| Version | 1 | `__version__` |
 
 ## Testing
 
-Run tests with pytest:
+Run the full test suite (552 tests, 98% coverage):
 
 ```bash
 pytest --cov --cov-report=html
+```
+
+Run conformance tests only:
+
+```bash
+pytest --pyargs spec_kitty_events.conformance -v
 ```
 
 Type checking:
@@ -167,44 +171,18 @@ Type checking:
 mypy src/spec_kitty_events --strict
 ```
 
+Schema drift check:
+
+```bash
+python -m spec_kitty_events.schemas.generate --check
+```
+
 ## Requirements
 
-- Python 3.10+
-- Pydantic 2.x
-- python-ulid
-
-## License
-
-No license information provided. This is a private repository.
-
-## Contributing
-
-This is an alpha release. Contributions are welcome! Please:
-
-1. Fork the repository
-2. Create a feature branch
-3. Run tests and type checking
-4. Submit a pull request
-
-## Roadmap
-
-**v0.1.1-alpha** (Current):
-- ✅ Lamport clocks
-- ✅ Event immutability
-- ✅ Conflict detection
-- ✅ CRDT and state-machine merge
-- ✅ Error logging
-- ✅ Project identity (project_uuid, project_slug)
-
-**v0.2.0** (Planned):
-- [ ] Vector clocks (full happens-before ordering)
-- [ ] Persistent storage adapters (SQLite, PostgreSQL)
-- [ ] Additional CRDT types (LWW-Register, OR-Set)
-- [ ] API reference documentation (Sphinx)
-
-## Support
-
-For issues, questions, or feature requests, please open an issue on GitHub.
+- Python >= 3.10
+- Pydantic >= 2.0.0, < 3.0.0
+- python-ulid >= 1.1.0
+- jsonschema >= 4.21.0, < 5.0.0 (optional, for `[conformance]` extra)
 
 ## Release and Publishing
 
@@ -217,9 +195,13 @@ Release flow:
 
 1. Update `project.version` in `pyproject.toml`.
 2. Commit to `main`.
-3. Create and push matching tag (for example, `v0.5.0` for `version = "0.5.0"`).
+3. Create and push matching tag (e.g., `v2.0.0rc1` for `version = "2.0.0rc1"`).
 4. Approve the `pypi` GitHub environment (if required).
 5. Verify package on PyPI and install in a clean environment.
+
+## License
+
+All rights reserved. This is a private repository owned by Priivacy AI.
 
 ---
 
