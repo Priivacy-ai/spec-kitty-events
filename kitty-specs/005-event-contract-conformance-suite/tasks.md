@@ -98,7 +98,7 @@
 **Estimated size**: ~400 lines
 
 **Subtasks**:
-- [ ] T029: Create `conformance/pytest_helpers.py` with reusable assertion helpers
+- [x] T029: Create `conformance/pytest_helpers.py` with reusable assertion helpers
 - [ ] T030: Create `conformance/conftest.py` with shared pytest fixtures
 - [ ] T031: Create `conformance/test_pyargs_entrypoint.py` with manifest-driven conformance tests
 - [ ] T032: Add coverage omit for `conformance/` directory in `pyproject.toml`
