@@ -8,6 +8,7 @@ base_commit: 65a647b9980d95fd0de21cefef3a99b43b9e520a
 created_at: '2026-02-12T11:35:12.699714+00:00'
 subtasks: [T040, T041, T042, T043, T044]
 shell_pid: "22344"
+agent: "claude-opus"
 history:
 - date: '2026-02-12'
   action: created
@@ -222,3 +223,7 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 - Verify migration guide code examples actually work (paste into a Python REPL and test).
 - Verify every FR from the spec has a traceable implementation in one of WP01–WP07.
 - Verify CI integration steps are complete and actionable.
+
+## Activity Log
+
+- 2026-02-12T11:35:12Z – claude-opus – shell_pid=22344 – lane=doing – Assigned agent via workflow command
