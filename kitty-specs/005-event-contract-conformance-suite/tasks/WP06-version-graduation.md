@@ -1,13 +1,13 @@
 ---
 work_package_id: WP06
 title: Version Graduation and Package Finalization
-lane: "for_review"
+lane: "doing"
 dependencies: [WP05]
 base_branch: 005-event-contract-conformance-suite-WP05
 base_commit: 7cf19ad7b4184c546e82d1f17e92ce82f9be7211
 created_at: '2026-02-12T11:20:40.207106+00:00'
 subtasks: [T034, T035, T036, T037, T038, T039]
-shell_pid: "19062"
+shell_pid: "21096"
 agent: "codex"
 review_status: "has_feedback"
 reviewed_by: "Robert Douglass"
@@ -180,3 +180,4 @@ This is the "lock it down" step. After WP01–WP05, all code is implemented. Thi
 - 2026-02-12T11:28:49Z – codex – shell_pid=19062 – lane=doing – Started review via workflow command
 - 2026-02-12T11:30:30Z – codex – shell_pid=19062 – lane=planned – Moved to planned
 - 2026-02-12T11:32:43Z – codex – shell_pid=19062 – lane=for_review – Round 2 fix: pytest_helpers.py at 100% coverage with 7 new tests, no longer excluded from omit. 552 tests, 98% total coverage.
+- 2026-02-12T11:32:47Z – codex – shell_pid=21096 – lane=doing – Started review via workflow command
