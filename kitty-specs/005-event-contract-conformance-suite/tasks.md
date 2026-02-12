@@ -36,13 +36,13 @@
 **Estimated size**: ~500 lines
 
 **Subtasks**:
-- [ ] T007: Create `schemas/__init__.py` with `load_schema()`, `schema_path()`, `list_schemas()`
-- [ ] T008: Create `schemas/generate.py` with model registry and generation logic
-- [ ] T009: Implement `--check` mode for CI drift detection
-- [ ] T010: Generate all 11 `.schema.json` files (event, payloads, enums)
-- [ ] T011: Update `pyproject.toml`: package-data for `schemas/*.json`, `[conformance]` optional extra
-- [ ] T012: Unit tests for schema loader API and generation script
-- [ ] T013: Integration test for schema drift detection (`--check` mode)
+- [x] T007: Create `schemas/__init__.py` with `load_schema()`, `schema_path()`, `list_schemas()`
+- [x] T008: Create `schemas/generate.py` with model registry and generation logic
+- [x] T009: Implement `--check` mode for CI drift detection
+- [x] T010: Generate all 11 `.schema.json` files (event, payloads, enums)
+- [x] T011: Update `pyproject.toml`: package-data for `schemas/*.json`, `[conformance]` optional extra
+- [x] T012: Unit tests for schema loader API and generation script
+- [x] T013: Integration test for schema drift detection (`--check` mode)
 
 ---
 
