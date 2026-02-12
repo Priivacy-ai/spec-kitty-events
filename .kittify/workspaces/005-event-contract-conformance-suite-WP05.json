@@ -1,0 +1,14 @@
+{
+  "wp_id": "WP05",
+  "feature_slug": "005-event-contract-conformance-suite",
+  "worktree_path": ".worktrees/005-event-contract-conformance-suite-WP05",
+  "branch_name": "005-event-contract-conformance-suite-WP05",
+  "base_branch": "005-event-contract-conformance-suite-WP04",
+  "base_commit": "4d24abae1e2bbc4607685370ae08d4a0714efbae",
+  "dependencies": [
+    "WP04"
+  ],
+  "created_at": "2026-02-12T11:10:00.164040+00:00",
+  "created_by": "implement-command",
+  "vcs_backend": "git"
+}
