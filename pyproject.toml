@@ -20,6 +20,9 @@ dev = [
     "hypothesis>=6.0.0",
     "mypy>=1.0.0",
 ]
+conformance = [
+    "jsonschema>=4.21.0,<5.0.0",
+]
 
 [build-system]
 requires = ["setuptools>=61.0", "wheel"]
@@ -29,7 +32,7 @@ build-backend = "setuptools.build_meta"
 where = ["src"]
 
 [tool.setuptools.package-data]
-spec_kitty_events = ["py.typed"]
+spec_kitty_events = ["py.typed", "schemas/*.json", "conformance/fixtures/**/*.json"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

@@ -1,0 +1,16 @@
+{
+  "$id": "spec-kitty-events/lane",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Work-package lifecycle lanes.",
+  "enum": [
+    "planned",
+    "claimed",
+    "in_progress",
+    "for_review",
+    "done",
+    "blocked",
+    "canceled"
+  ],
+  "title": "Lane",
+  "type": "string"
+}
