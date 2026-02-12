@@ -117,12 +117,12 @@
 **Estimated size**: ~300 lines
 
 **Subtasks**:
-- [ ] T034: Update `pyproject.toml` version to `2.0.0-rc1`
-- [ ] T035: Update `__version__` in `__init__.py` to `2.0.0-rc1`
-- [ ] T036: Update `SCHEMA_VERSION` constant in `lifecycle.py` to `"2.0.0"`
-- [ ] T037: Final audit of `__init__.py` exports and `__all__` list
-- [ ] T038: Run full `python3.11 -m pytest` suite and verify 98%+ coverage
-- [ ] T039: Run `mypy --strict` and fix any type errors
+- [x] T034: Update `pyproject.toml` version to `2.0.0-rc1`
+- [x] T035: Update `__version__` in `__init__.py` to `2.0.0-rc1`
+- [x] T036: Update `SCHEMA_VERSION` constant in `lifecycle.py` to `"2.0.0"`
+- [x] T037: Final audit of `__init__.py` exports and `__all__` list
+- [x] T038: Run full `python3.11 -m pytest` suite and verify 98%+ coverage
+- [x] T039: Run `mypy --strict` and fix any type errors
 
 ---
 
