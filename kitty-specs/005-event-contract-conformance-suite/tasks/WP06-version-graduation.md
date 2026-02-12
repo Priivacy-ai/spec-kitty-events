@@ -1,13 +1,13 @@
 ---
 work_package_id: WP06
 title: Version Graduation and Package Finalization
-lane: "for_review"
+lane: "doing"
 dependencies: [WP05]
 base_branch: 005-event-contract-conformance-suite-WP05
 base_commit: 7cf19ad7b4184c546e82d1f17e92ce82f9be7211
 created_at: '2026-02-12T11:20:40.207106+00:00'
 subtasks: [T034, T035, T036, T037, T038, T039]
-shell_pid: "16619"
+shell_pid: "19062"
 agent: "codex"
 review_status: "has_feedback"
 reviewed_by: "Robert Douglass"
@@ -173,3 +173,4 @@ This is the "lock it down" step. After WP01–WP05, all code is implemented. Thi
 - 2026-02-12T11:24:21Z – codex – shell_pid=16619 – lane=doing – Started review via workflow command
 - 2026-02-12T11:25:56Z – codex – shell_pid=16619 – lane=planned – Moved to planned
 - 2026-02-12T11:28:44Z – codex – shell_pid=16619 – lane=for_review – Review feedback addressed: exports count 68, coverage 98%, conformance symbols in subpackage only.
+- 2026-02-12T11:28:49Z – codex – shell_pid=19062 – lane=doing – Started review via workflow command
