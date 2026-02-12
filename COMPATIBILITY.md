@@ -89,7 +89,7 @@ The `Event` model is the top-level envelope for all events. All payload-specific
 | `from_lane` | `Lane` or `null` | No | `None` | Previous lane (null for initial) |
 | `to_lane` | `Lane` | Yes | — | Target lane |
 | `actor` | `str` | Yes | — | Actor performing the transition |
-| `force` | `ForceMetadata` or `null` | No | `None` | Force override metadata |
+| `force` | `bool` | No | `False` | Whether this is a forced transition |
 | `reason` | `str` or `null` | No | `None` | Transition reason |
 | `execution_mode` | `ExecutionMode` | Yes | — | Worktree or direct repo |
 | `review_ref` | `str` or `null` | No | `None` | Review reference (for rollbacks) |
