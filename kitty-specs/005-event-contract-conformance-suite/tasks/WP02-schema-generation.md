@@ -8,6 +8,7 @@ base_commit: 1c16bd2a704cc44184e768fda496a645fe9356b1
 created_at: '2026-02-12T10:25:26.669407+00:00'
 subtasks: [T007, T008, T009, T010, T011, T012, T013]
 shell_pid: "64094"
+agent: "claude-opus"
 history:
 - date: '2026-02-12'
   action: created
@@ -272,3 +273,7 @@ def list_schemas() -> list[str]:
 - Spot-check at least one schema file for correct structure (`$schema`, `$id`, `properties`, `required`).
 - Verify `--check` mode works by modifying one schema and confirming it catches the diff.
 - Verify `pyproject.toml` changes don't break the existing dev install.
+
+## Activity Log
+
+- 2026-02-12T10:25:27Z – claude-opus – shell_pid=64094 – lane=doing – Assigned agent via workflow command
