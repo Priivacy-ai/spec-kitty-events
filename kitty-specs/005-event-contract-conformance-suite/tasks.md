@@ -18,12 +18,12 @@
 **Estimated size**: ~350 lines
 
 **Subtasks**:
-- [ ] T001: Add `SyncLaneV1` enum to `status.py` [P]
-- [ ] T002: Add `CANONICAL_TO_SYNC_V1` mapping constant using `MappingProxyType` [P]
-- [ ] T003: Add `canonical_to_sync_v1()` function [P]
-- [ ] T004: Export new symbols from `__init__.py` and update `__all__`
-- [ ] T005: Unit tests for `SyncLaneV1`, mapping completeness, and function correctness
-- [ ] T006: Property tests for mapping determinism and totality
+- [x] T001: Add `SyncLaneV1` enum to `status.py` [P]
+- [x] T002: Add `CANONICAL_TO_SYNC_V1` mapping constant using `MappingProxyType` [P]
+- [x] T003: Add `canonical_to_sync_v1()` function [P]
+- [x] T004: Export new symbols from `__init__.py` and update `__all__`
+- [x] T005: Unit tests for `SyncLaneV1`, mapping completeness, and function correctness
+- [x] T006: Property tests for mapping determinism and totality
 
 ---
 
