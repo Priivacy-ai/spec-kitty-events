@@ -2,7 +2,7 @@
 work_package_id: WP04
 title: Canonical Fixtures and Manifest
 lane: planned
-dependencies: []
+dependencies: [WP03]
 subtasks: [T021, T022, T023, T024, T025, T026, T027, T028]
 history:
 - date: '2026-02-12'
@@ -62,9 +62,9 @@ Each fixture category has `valid/` and `invalid/` subdirectories. The `manifest.
 - [ ] All 7 directories exist
 - [ ] `__init__.py` exists in `fixtures/`
 
-### T022: Create valid event fixtures for all 8 event types
+### T022: Create valid event fixtures for all 9 conformance payload types
 
-**Purpose**: One valid JSON file per event type, used as positive conformance tests.
+**Purpose**: One valid JSON file per conformance payload type, used as positive tests.
 
 **Steps**:
 1. For each event type, create a minimal valid payload dict using the Pydantic model's required fields.
@@ -77,11 +77,12 @@ Each fixture category has `valid/` and `invalid/` subdirectories. The `manifest.
    - `mission_completed.json` — valid `MissionCompletedPayload`
    - `mission_cancelled.json` — valid `MissionCancelledPayload`
    - `phase_entered.json` — valid `PhaseEnteredPayload`
-   - `review_rollback.json` — valid `ReviewRollbackPayload` (note: this is the 9th event type but only 8 are distinct payload types since `Event` wraps payloads)
+   - `review_rollback.json` — valid `ReviewRollbackPayload`
 
 **Approach**: Use `ModelClass(**kwargs).model_dump(mode="json")` in a helper script or construct by hand. Ensure ULID fields are valid 26-char strings, timestamps are ISO format, etc.
 
 **Validation**:
+- [ ] 9 valid fixture files are present in `fixtures/events/valid/`
 - [ ] Each fixture file is valid JSON
 - [ ] Each fixture validates against its Pydantic model (i.e., `Model.model_validate(fixture_data)` succeeds)
 

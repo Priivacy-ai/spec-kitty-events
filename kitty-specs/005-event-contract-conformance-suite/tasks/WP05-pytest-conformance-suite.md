@@ -2,7 +2,7 @@
 work_package_id: WP05
 title: Pytest Conformance Entry Point
 lane: planned
-dependencies: []
+dependencies: [WP04]
 subtasks: [T029, T030, T031, T032, T033]
 history:
 - date: '2026-02-12'
@@ -284,6 +284,7 @@ def test_event_round_trip() -> None:
         timestamp="2026-01-01T00:00:00Z",
         node_id="node-1",
         lamport_clock=1,
+        project_uuid="550e8400-e29b-41d4-a716-446655440000",
         correlation_id="01JEXAMPLE00000000000000B",
     )
     data = event.model_dump(mode="json")

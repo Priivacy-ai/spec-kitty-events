@@ -2,7 +2,7 @@
 work_package_id: WP03
 title: Conformance Validator API
 lane: planned
-dependencies: []
+dependencies: [WP02]
 subtasks: [T014, T015, T016, T017, T018, T019, T020]
 history:
 - date: '2026-02-12'

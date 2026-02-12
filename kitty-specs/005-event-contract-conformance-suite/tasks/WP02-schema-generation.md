@@ -2,7 +2,7 @@
 work_package_id: WP02
 title: Schema Subpackage and Generation Script
 lane: planned
-dependencies: []
+dependencies: [WP01]
 subtasks: [T007, T008, T009, T010, T011, T012, T013]
 history:
 - date: '2026-02-12'

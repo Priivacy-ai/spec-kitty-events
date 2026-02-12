@@ -2,7 +2,7 @@
 work_package_id: WP06
 title: Version Graduation and Package Finalization
 lane: planned
-dependencies: []
+dependencies: [WP05]
 subtasks: [T034, T035, T036, T037, T038, T039]
 history:
 - date: '2026-02-12'

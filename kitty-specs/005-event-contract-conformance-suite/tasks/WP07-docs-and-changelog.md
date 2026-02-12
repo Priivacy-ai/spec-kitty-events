@@ -2,7 +2,7 @@
 work_package_id: WP07
 title: Compatibility Table, Changelog, and Migration Notes
 lane: planned
-dependencies: []
+dependencies: [WP06]
 subtasks: [T040, T041, T042, T043, T044]
 history:
 - date: '2026-02-12'
