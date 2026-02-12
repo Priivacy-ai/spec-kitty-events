@@ -1,7 +1,7 @@
 ---
 work_package_id: WP02
 title: Schema Subpackage and Generation Script
-lane: "doing"
+lane: "for_review"
 dependencies: [WP01]
 base_branch: 005-event-contract-conformance-suite-WP01
 base_commit: 1c16bd2a704cc44184e768fda496a645fe9356b1
@@ -277,3 +277,4 @@ def list_schemas() -> list[str]:
 ## Activity Log
 
 - 2026-02-12T10:25:27Z – claude-opus – shell_pid=64094 – lane=doing – Assigned agent via workflow command
+- 2026-02-12T10:31:23Z – claude-opus – shell_pid=64094 – lane=for_review – Ready for review: schemas/ subpackage with loader API, generate.py with --check mode, 11 JSON schemas, unit+integration tests. 449 tests pass, mypy clean.
