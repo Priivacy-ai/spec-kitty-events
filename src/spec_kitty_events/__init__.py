@@ -93,6 +93,9 @@ from spec_kitty_events.lifecycle import (
 # Status state model contracts
 from spec_kitty_events.status import (
     Lane,
+    SyncLaneV1,
+    CANONICAL_TO_SYNC_V1,
+    canonical_to_sync_v1,
     ExecutionMode,
     RepoEvidence,
     VerificationEntry,
@@ -173,6 +176,9 @@ __all__ = [
     "reduce_lifecycle_events",
     # Status state model
     "Lane",
+    "SyncLaneV1",
+    "CANONICAL_TO_SYNC_V1",
+    "canonical_to_sync_v1",
     "ExecutionMode",
     "RepoEvidence",
     "VerificationEntry",

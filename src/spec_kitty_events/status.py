@@ -3,7 +3,8 @@
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
-from typing import Dict, FrozenSet, List, Literal, Optional, Sequence, Set, Tuple
+from types import MappingProxyType
+from typing import Dict, FrozenSet, List, Literal, Mapping, Optional, Sequence, Set, Tuple
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
@@ -20,6 +21,41 @@ class Lane(str, Enum):
     DONE = "done"
     BLOCKED = "blocked"
     CANCELED = "canceled"
+
+
+class SyncLaneV1(str, Enum):
+    """V1 compatibility sync lanes for downstream consumers."""
+
+    PLANNED = "planned"
+    DOING = "doing"
+    FOR_REVIEW = "for_review"
+    DONE = "done"
+
+
+CANONICAL_TO_SYNC_V1: Mapping[Lane, SyncLaneV1] = MappingProxyType({
+    Lane.PLANNED: SyncLaneV1.PLANNED,
+    Lane.CLAIMED: SyncLaneV1.PLANNED,
+    Lane.IN_PROGRESS: SyncLaneV1.DOING,
+    Lane.FOR_REVIEW: SyncLaneV1.FOR_REVIEW,
+    Lane.DONE: SyncLaneV1.DONE,
+    Lane.BLOCKED: SyncLaneV1.DOING,
+    Lane.CANCELED: SyncLaneV1.PLANNED,
+})
+
+
+def canonical_to_sync_v1(lane: Lane) -> SyncLaneV1:
+    """Apply the V1 canonical-to-sync lane mapping.
+
+    Args:
+        lane: A canonical Lane enum value.
+
+    Returns:
+        The corresponding SyncLaneV1 value.
+
+    Raises:
+        KeyError: If lane is not in the V1 mapping.
+    """
+    return CANONICAL_TO_SYNC_V1[lane]
 
 
 class ExecutionMode(str, Enum):
