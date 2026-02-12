@@ -1,14 +1,14 @@
 ---
 work_package_id: WP03
 title: Conformance Validator API
-lane: "planned"
+lane: "doing"
 dependencies: [WP02]
 base_branch: 005-event-contract-conformance-suite-WP02
 base_commit: 1382e91bdfa19cefd94d3943317aa2591f2a9351
 created_at: '2026-02-12T10:39:25.027797+00:00'
 subtasks: [T014, T015, T016, T017, T018, T019, T020]
-shell_pid: "84319"
-agent: "codex"
+shell_pid: "87457"
+agent: "claude-opus"
 review_status: "has_feedback"
 reviewed_by: "Robert Douglass"
 history:
@@ -357,3 +357,4 @@ class ConformanceResult:
 - 2026-02-12T10:44:17Z – claude-opus – shell_pid=80468 – lane=for_review – Ready for review: conformance/ subpackage with dual-layer validator, 9 event types, 18 new tests, 468 total pass, mypy clean
 - 2026-02-12T10:44:30Z – codex – shell_pid=84319 – lane=doing – Started review via workflow command
 - 2026-02-12T10:46:09Z – codex – shell_pid=84319 – lane=planned – Moved to planned
+- 2026-02-12T10:46:37Z – claude-opus – shell_pid=87457 – lane=doing – Started implementation via workflow command
