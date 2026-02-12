@@ -10,9 +10,8 @@ strict=True is specified.
 
 from __future__ import annotations
 
-import importlib.resources
 from dataclasses import dataclass
-from typing import Any, Dict, Optional, Tuple, Type, Union
+from typing import Any, Dict, Tuple, Type, Union
 
 from pydantic import ValidationError as PydanticValidationError
 
@@ -73,17 +72,17 @@ _EVENT_TYPE_TO_MODEL: Dict[str, Type[Any]] = {
     "ReviewRollback": ReviewRollbackPayload,
 }
 
-# Event type to JSON Schema file name mapping
+# Event type to JSON Schema name mapping (used with load_schema())
 _EVENT_TYPE_TO_SCHEMA: Dict[str, str] = {
-    "Event": "event.schema.json",
-    "WPStatusChanged": "status_transition_payload.schema.json",
-    "GatePassed": "gate_passed_payload.schema.json",
-    "GateFailed": "gate_failed_payload.schema.json",
-    "MissionStarted": "mission_started_payload.schema.json",
-    "MissionCompleted": "mission_completed_payload.schema.json",
-    "MissionCancelled": "mission_cancelled_payload.schema.json",
-    "PhaseEntered": "phase_entered_payload.schema.json",
-    "ReviewRollback": "review_rollback_payload.schema.json",
+    "Event": "event",
+    "WPStatusChanged": "status_transition_payload",
+    "GatePassed": "gate_passed_payload",
+    "GateFailed": "gate_failed_payload",
+    "MissionStarted": "mission_started_payload",
+    "MissionCompleted": "mission_completed_payload",
+    "MissionCancelled": "mission_cancelled_payload",
+    "PhaseEntered": "phase_entered_payload",
+    "ReviewRollback": "review_rollback_payload",
 }
 
 
@@ -122,13 +121,14 @@ def _validate_with_model(
 def _validate_with_schema(
     payload: Dict[str, Any],
     schema_name: str,
+    *,
     strict: bool,
 ) -> Tuple[Tuple[SchemaViolation, ...], bool]:
     """Validate payload using JSON Schema.
 
     Args:
         payload: The event payload to validate.
-        schema_name: Name of the schema file in the schemas package.
+        schema_name: Name of the schema (passed to load_schema()).
         strict: If True, raise ImportError when jsonschema is unavailable.
                 If False, skip validation and return empty violations.
 
@@ -141,8 +141,6 @@ def _validate_with_schema(
         ImportError: If strict=True and jsonschema is unavailable.
     """
     try:
-        import json
-
         import jsonschema  # type: ignore[import-untyped]
         from jsonschema import Draft202012Validator
     except ImportError:
@@ -150,49 +148,27 @@ def _validate_with_schema(
             raise ImportError(
                 "jsonschema is required for strict conformance validation. "
                 "Install with: pip install 'spec-kitty-events[conformance]'"
-            )
+            ) from None
         # Graceful degradation
         return ((), True)
 
     # Load schema from package
-    try:
-        schema_path = importlib.resources.files("spec_kitty_events.schemas").joinpath(
-            schema_name
-        )
-        schema_json = schema_path.read_text()
-        schema = json.loads(schema_json)
-    except Exception as e:
-        # If we can't load schema, treat as validation error
-        return (
-            (
-                SchemaViolation(
-                    json_path="$",
-                    message=f"Failed to load schema: {e}",
-                    validator="schema_loading",
-                    validator_value=schema_name,
-                    schema_path=(),
-                ),
-            ),
-            False,
-        )
+    from spec_kitty_events.schemas import load_schema
+
+    schema = load_schema(schema_name)
 
     # Validate with jsonschema
     validator = Draft202012Validator(schema)
-    errors = list(validator.iter_errors(payload))
+    errors = sorted(validator.iter_errors(payload), key=lambda e: e.json_path)
 
     if not errors:
         return ((), False)
 
     violations = []
     for error in errors:
-        # Build JSON path from absolute_path
-        json_path = "$" + "".join(f"[{p}]" if isinstance(p, int) else f".{p}" for p in error.absolute_path)
-        if json_path == "$":
-            json_path = "$"  # Root path
-
         violations.append(
             SchemaViolation(
-                json_path=json_path,
+                json_path=error.json_path,
                 message=error.message,
                 validator=error.validator,
                 validator_value=error.validator_value,
@@ -204,19 +180,20 @@ def _validate_with_schema(
 
 
 def validate_event(
-    event_type: str,
     payload: Dict[str, Any],
+    event_type: str,
+    *,
     strict: bool = False,
 ) -> ConformanceResult:
-    """Validate an event payload against its contract.
+    """Validate an event payload against the canonical contract.
 
     This function performs dual-layer validation:
     1. Pydantic model validation (always performed)
     2. JSON Schema validation (optional, requires jsonschema package)
 
     Args:
-        event_type: The event type string (e.g., "WPStatusChanged").
         payload: The event payload dictionary to validate.
+        event_type: The event type string (e.g., "WPStatusChanged").
         strict: If True, require jsonschema and fail if unavailable.
                 If False, skip schema validation if jsonschema is missing.
 
@@ -230,7 +207,7 @@ def validate_event(
     if event_type not in _EVENT_TYPE_TO_MODEL:
         raise ValueError(
             f"Unknown event type: {event_type!r}. "
-            f"Known types: {list(_EVENT_TYPE_TO_MODEL.keys())}"
+            f"Known types: {sorted(_EVENT_TYPE_TO_MODEL)}"
         )
 
     model_class = _EVENT_TYPE_TO_MODEL[event_type]
@@ -241,7 +218,7 @@ def validate_event(
 
     # Layer 2: JSON Schema validation
     schema_violations, schema_skipped = _validate_with_schema(
-        payload, schema_name, strict
+        payload, schema_name, strict=strict
     )
 
     # Determine overall validity

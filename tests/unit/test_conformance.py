@@ -1,6 +1,8 @@
 """Tests for conformance validation API."""
 
-import sys
+from __future__ import annotations
+
+import builtins
 from datetime import datetime, timezone
 from typing import Any, Dict
 from unittest.mock import patch
@@ -14,7 +16,6 @@ from spec_kitty_events.conformance import (
     SchemaViolation,
     validate_event,
 )
-from spec_kitty_events.status import Lane
 
 
 def _make_ulid() -> str:
@@ -126,7 +127,7 @@ def _make_valid_event() -> Dict[str, Any]:
 def test_validate_event_valid_status_transition() -> None:
     """Test validation of a valid StatusTransitionPayload."""
     payload = _make_valid_status_transition()
-    result = validate_event("WPStatusChanged", payload)
+    result = validate_event(payload, "WPStatusChanged")
 
     assert result.valid is True
     assert result.event_type == "WPStatusChanged"
@@ -139,7 +140,7 @@ def test_validate_event_invalid_missing_field() -> None:
     payload = _make_valid_status_transition()
     del payload["actor"]  # Remove required field
 
-    result = validate_event("WPStatusChanged", payload)
+    result = validate_event(payload, "WPStatusChanged")
 
     assert result.valid is False
     assert len(result.model_violations) > 0
@@ -153,7 +154,7 @@ def test_validate_event_invalid_enum_value() -> None:
     payload = _make_valid_status_transition()
     payload["to_lane"] = "invalid_lane"  # Invalid lane value
 
-    result = validate_event("WPStatusChanged", payload)
+    result = validate_event(payload, "WPStatusChanged")
 
     assert result.valid is False
     assert len(result.model_violations) > 0
@@ -165,7 +166,7 @@ def test_validate_event_business_rule_force_without_reason() -> None:
     payload["force"] = True
     # No reason provided
 
-    result = validate_event("WPStatusChanged", payload)
+    result = validate_event(payload, "WPStatusChanged")
 
     assert result.valid is False
     assert len(result.model_violations) > 0
@@ -179,50 +180,45 @@ def test_validate_event_unknown_type_raises() -> None:
     payload = _make_valid_status_transition()
 
     with pytest.raises(ValueError, match="Unknown event type"):
-        validate_event("UnknownEventType", payload)
+        validate_event(payload, "UnknownEventType")
 
 
 def test_validate_event_strict_without_jsonschema() -> None:
     """Test that strict=True raises ImportError when jsonschema unavailable."""
     payload = _make_valid_status_transition()
 
-    # Create a mock that raises ImportError when trying to import jsonschema
-    import spec_kitty_events.conformance.validators as validators_module
+    # Patch builtins.__import__ to block jsonschema import
+    real_import = builtins.__import__
 
-    original_validate_with_schema = validators_module._validate_with_schema
+    def mock_import(name: str, *args: Any, **kwargs: Any) -> Any:
+        if name == "jsonschema":
+            raise ImportError("No module named 'jsonschema'")
+        return real_import(name, *args, **kwargs)
 
-    def mock_validate_with_schema(payload: Any, schema_name: str, strict: bool) -> Any:
-        # Simulate jsonschema not being available
-        if strict:
-            raise ImportError(
-                "jsonschema is required for strict conformance validation. "
-                "Install with: pip install 'spec-kitty-events[conformance]'"
-            )
-        return ((), True)
-
-    with patch.object(validators_module, "_validate_with_schema", mock_validate_with_schema):
+    with patch.object(builtins, "__import__", side_effect=mock_import):
         with pytest.raises(ImportError, match="jsonschema is required"):
-            validate_event("WPStatusChanged", payload, strict=True)
+            validate_event(payload, "WPStatusChanged", strict=True)
 
 
 def test_validate_event_nonstrict_skips_schema() -> None:
     """Test that strict=False skips schema validation when jsonschema unavailable."""
     payload = _make_valid_status_transition()
 
-    # Create a mock that simulates jsonschema not being available
-    import spec_kitty_events.conformance.validators as validators_module
+    # Patch builtins.__import__ to block jsonschema import
+    real_import = builtins.__import__
 
-    def mock_validate_with_schema(payload: Any, schema_name: str, strict: bool) -> Any:
-        # Simulate jsonschema not being available, gracefully degrade
-        return ((), True)
+    def mock_import(name: str, *args: Any, **kwargs: Any) -> Any:
+        if name == "jsonschema":
+            raise ImportError("No module named 'jsonschema'")
+        return real_import(name, *args, **kwargs)
 
-    with patch.object(validators_module, "_validate_with_schema", mock_validate_with_schema):
-        result = validate_event("WPStatusChanged", payload, strict=False)
+    with patch.object(builtins, "__import__", side_effect=mock_import):
+        result = validate_event(payload, "WPStatusChanged", strict=False)
 
-        # Should succeed with model validation only
-        assert result.valid is True
-        assert result.schema_check_skipped is True
-        assert len(result.model_violations) == 0
+    # Should succeed with model validation only
+    assert result.valid is True
+    assert result.schema_check_skipped is True
+    assert len(result.model_violations) == 0
 
 
 @pytest.mark.parametrize(
@@ -245,11 +241,35 @@ def test_validate_event_all_event_types(
 ) -> None:
     """Test validation succeeds for all supported event types."""
     payload = payload_factory()
-    result = validate_event(event_type, payload)
+    result = validate_event(payload, event_type)
 
     assert result.valid is True, f"Validation failed for {event_type}: {result.model_violations}"
     assert result.event_type == event_type
     assert len(result.model_violations) == 0
+
+
+def test_validate_event_schema_violations_populated() -> None:
+    """Test that schema violations are populated when payload fails JSON Schema.
+
+    Constructs a payload that passes Pydantic validation (via extra="allow")
+    but fails JSON Schema due to an unexpected additional property.
+    """
+    payload = _make_valid_status_transition()
+    # Add an extra field that Pydantic allows (extra="allow" or ignored)
+    # but JSON Schema with additionalProperties=false would reject.
+    # Instead, use a type mismatch that Pydantic coerces but schema catches.
+    payload["actor"] = 42  # Pydantic coerces int to str, JSON Schema type check fails
+
+    result = validate_event(payload, "WPStatusChanged")
+
+    # If jsonschema is installed, schema violations should be populated
+    if not result.schema_check_skipped:
+        # Schema should catch the type mismatch (int where string expected)
+        assert len(result.schema_violations) > 0
+        violation = result.schema_violations[0]
+        assert isinstance(violation, SchemaViolation)
+        assert violation.json_path  # Should have a path
+        assert violation.message  # Should have a message
 
 
 def test_model_violation_structure() -> None:
@@ -257,7 +277,7 @@ def test_model_violation_structure() -> None:
     payload = _make_valid_status_transition()
     del payload["actor"]
 
-    result = validate_event("WPStatusChanged", payload)
+    result = validate_event(payload, "WPStatusChanged")
 
     assert len(result.model_violations) > 0
     violation = result.model_violations[0]
@@ -271,7 +291,7 @@ def test_model_violation_structure() -> None:
 def test_conformance_result_structure() -> None:
     """Test that ConformanceResult has correct structure."""
     payload = _make_valid_status_transition()
-    result = validate_event("WPStatusChanged", payload)
+    result = validate_event(payload, "WPStatusChanged")
 
     assert isinstance(result, ConformanceResult)
     assert hasattr(result, "valid")
