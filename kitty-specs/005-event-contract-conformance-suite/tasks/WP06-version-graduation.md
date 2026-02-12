@@ -8,6 +8,7 @@ base_commit: 7cf19ad7b4184c546e82d1f17e92ce82f9be7211
 created_at: '2026-02-12T11:20:40.207106+00:00'
 subtasks: [T034, T035, T036, T037, T038, T039]
 shell_pid: "14070"
+agent: "claude-opus"
 history:
 - date: '2026-02-12'
   action: created
@@ -155,3 +156,7 @@ This is the "lock it down" step. After WP01–WP05, all code is implemented. Thi
 - Verify `SCHEMA_VERSION` is `"2.0.0"` not `"2.0.0rc1"`.
 - Verify no regressions in existing 427+ tests.
 - Verify conformance suite runs independently via `--pyargs`.
+
+## Activity Log
+
+- 2026-02-12T11:20:40Z – claude-opus – shell_pid=14070 – lane=doing – Assigned agent via workflow command
