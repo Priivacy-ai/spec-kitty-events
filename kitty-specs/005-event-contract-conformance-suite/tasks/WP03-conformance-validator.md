@@ -1,7 +1,7 @@
 ---
 work_package_id: WP03
 title: Conformance Validator API
-lane: "doing"
+lane: "done"
 dependencies: [WP02]
 base_branch: 005-event-contract-conformance-suite-WP02
 base_commit: 1382e91bdfa19cefd94d3943317aa2591f2a9351
@@ -360,3 +360,4 @@ class ConformanceResult:
 - 2026-02-12T10:46:37Z – claude-opus – shell_pid=87457 – lane=doing – Started implementation via workflow command
 - 2026-02-12T10:51:30Z – claude-opus – shell_pid=87457 – lane=for_review – Re-review: fixed validate_event(payload, event_type, *, strict) signature, uses load_schema(), added schema violations test, realistic import-failure testing. 469 tests pass, mypy clean.
 - 2026-02-12T10:51:34Z – codex – shell_pid=91425 – lane=doing – Started review via workflow command
+- 2026-02-12T10:52:35Z – codex – shell_pid=91425 – lane=done – Review passed: conformance API meets contract, tests+full suite pass, mypy strict clean
