@@ -60,7 +60,7 @@ disallow_untyped_defs = true
 
 [tool.coverage.run]
 source = ["src/spec_kitty_events"]
-omit = ["*/tests/*", "*/__pycache__/*", "*/conformance/test_*", "*/conformance/conftest.py"]
+omit = ["*/tests/*", "*/__pycache__/*", "*/conformance/test_*", "*/conformance/conftest.py", "*/conformance/pytest_helpers.py", "*/schemas/generate.py"]
 
 [tool.coverage.report]
 exclude_lines = [
