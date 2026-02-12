@@ -1,7 +1,7 @@
 ---
 work_package_id: WP06
 title: Version Graduation and Package Finalization
-lane: "planned"
+lane: "for_review"
 dependencies: [WP05]
 base_branch: 005-event-contract-conformance-suite-WP05
 base_commit: 7cf19ad7b4184c546e82d1f17e92ce82f9be7211
@@ -172,3 +172,4 @@ This is the "lock it down" step. After WP01–WP05, all code is implemented. Thi
 - 2026-02-12T11:24:16Z – claude-opus – shell_pid=14070 – lane=for_review – Ready for review: version graduation to 2.0.0rc1, SCHEMA_VERSION to 2.0.0, exports verified, 545 tests pass, mypy strict clean.
 - 2026-02-12T11:24:21Z – codex – shell_pid=16619 – lane=doing – Started review via workflow command
 - 2026-02-12T11:25:56Z – codex – shell_pid=16619 – lane=planned – Moved to planned
+- 2026-02-12T11:28:44Z – codex – shell_pid=16619 – lane=for_review – Review feedback addressed: exports count 68, coverage 98%, conformance symbols in subpackage only.
