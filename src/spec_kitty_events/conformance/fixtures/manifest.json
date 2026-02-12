@@ -1,0 +1,173 @@
+{
+  "version": "2.0.0",
+  "fixtures": [
+    {
+      "id": "event-valid",
+      "path": "events/valid/event.json",
+      "expected_result": "valid",
+      "event_type": "Event",
+      "notes": "Complete Event with all required fields",
+      "min_version": "2.0.0"
+    },
+    {
+      "id": "wp-status-changed-valid",
+      "path": "events/valid/wp_status_changed.json",
+      "expected_result": "valid",
+      "event_type": "WPStatusChanged",
+      "notes": "Valid StatusTransitionPayload with planned->claimed transition",
+      "min_version": "2.0.0"
+    },
+    {
+      "id": "gate-passed-valid",
+      "path": "events/valid/gate_passed.json",
+      "expected_result": "valid",
+      "event_type": "GatePassed",
+      "notes": "Valid GatePassedPayload with conclusion=success",
+      "min_version": "2.0.0"
+    },
+    {
+      "id": "gate-failed-valid",
+      "path": "events/valid/gate_failed.json",
+      "expected_result": "valid",
+      "event_type": "GateFailed",
+      "notes": "Valid GateFailedPayload with conclusion=failure",
+      "min_version": "2.0.0"
+    },
+    {
+      "id": "mission-started-valid",
+      "path": "events/valid/mission_started.json",
+      "expected_result": "valid",
+      "event_type": "MissionStarted",
+      "notes": "Valid MissionStartedPayload with all required fields",
+      "min_version": "2.0.0"
+    },
+    {
+      "id": "mission-completed-valid",
+      "path": "events/valid/mission_completed.json",
+      "expected_result": "valid",
+      "event_type": "MissionCompleted",
+      "notes": "Valid MissionCompletedPayload with all required fields",
+      "min_version": "2.0.0"
+    },
+    {
+      "id": "mission-cancelled-valid",
+      "path": "events/valid/mission_cancelled.json",
+      "expected_result": "valid",
+      "event_type": "MissionCancelled",
+      "notes": "Valid MissionCancelledPayload with reason",
+      "min_version": "2.0.0"
+    },
+    {
+      "id": "phase-entered-valid",
+      "path": "events/valid/phase_entered.json",
+      "expected_result": "valid",
+      "event_type": "PhaseEntered",
+      "notes": "Valid PhaseEnteredPayload with required fields",
+      "min_version": "2.0.0"
+    },
+    {
+      "id": "review-rollback-valid",
+      "path": "events/valid/review_rollback.json",
+      "expected_result": "valid",
+      "event_type": "ReviewRollback",
+      "notes": "Valid ReviewRollbackPayload with review reference",
+      "min_version": "2.0.0"
+    },
+    {
+      "id": "event-missing-correlation-id",
+      "path": "events/invalid/event_missing_correlation_id.json",
+      "expected_result": "invalid",
+      "event_type": "Event",
+      "notes": "Event missing required correlation_id field",
+      "min_version": "2.0.0"
+    },
+    {
+      "id": "event-invalid-lamport-clock",
+      "path": "events/invalid/event_invalid_lamport_clock.json",
+      "expected_result": "invalid",
+      "event_type": "Event",
+      "notes": "Event with negative lamport_clock value (-1)",
+      "min_version": "2.0.0"
+    },
+    {
+      "id": "wp-status-changed-invalid-lane",
+      "path": "events/invalid/wp_status_changed_invalid_lane.json",
+      "expected_result": "invalid",
+      "event_type": "WPStatusChanged",
+      "notes": "StatusTransitionPayload with invalid to_lane value 'in_review'",
+      "min_version": "2.0.0"
+    },
+    {
+      "id": "wp-status-changed-force-no-reason",
+      "path": "events/invalid/wp_status_changed_force_no_reason.json",
+      "expected_result": "invalid",
+      "event_type": "WPStatusChanged",
+      "notes": "StatusTransitionPayload with force=true but no reason",
+      "min_version": "2.0.0"
+    },
+    {
+      "id": "gate-failed-invalid-conclusion",
+      "path": "events/invalid/gate_failed_invalid_conclusion.json",
+      "expected_result": "invalid",
+      "event_type": "GateFailed",
+      "notes": "GateFailedPayload with conclusion='success' (invalid for GateFailed)",
+      "min_version": "2.0.0"
+    },
+    {
+      "id": "lane-mapping-all-canonical",
+      "path": "lane_mapping/valid/all_canonical_to_sync_v1.json",
+      "expected_result": "valid",
+      "event_type": "LaneMapping",
+      "notes": "All 7 canonical lanes mapped to SyncLaneV1",
+      "min_version": "2.0.0"
+    },
+    {
+      "id": "lane-mapping-unknown-lanes",
+      "path": "lane_mapping/invalid/unknown_lanes.json",
+      "expected_result": "invalid",
+      "event_type": "LaneMapping",
+      "notes": "Unknown lane values that should fail Lane enum construction",
+      "min_version": "2.0.0"
+    },
+    {
+      "id": "edge-alias-doing-normalized",
+      "path": "edge_cases/valid/alias_doing_normalized.json",
+      "expected_result": "valid",
+      "event_type": "WPStatusChanged",
+      "notes": "StatusTransitionPayload with to_lane='doing' alias (normalizes to in_progress)",
+      "min_version": "2.0.0"
+    },
+    {
+      "id": "edge-optional-fields-omitted",
+      "path": "edge_cases/valid/optional_fields_omitted.json",
+      "expected_result": "valid",
+      "event_type": "WPStatusChanged",
+      "notes": "StatusTransitionPayload with only required fields",
+      "min_version": "2.0.0"
+    },
+    {
+      "id": "edge-event-all-optional-fields",
+      "path": "edge_cases/valid/event_with_all_optional_fields.json",
+      "expected_result": "valid",
+      "event_type": "Event",
+      "notes": "Event with all optional fields populated",
+      "min_version": "2.0.0"
+    },
+    {
+      "id": "edge-unsupported-schema-version",
+      "path": "edge_cases/invalid/unsupported_schema_version.json",
+      "expected_result": "invalid",
+      "event_type": "Event",
+      "notes": "Event with non-semver schema_version 'v99'",
+      "min_version": "2.0.0"
+    },
+    {
+      "id": "edge-empty-event-type",
+      "path": "edge_cases/invalid/empty_event_type.json",
+      "expected_result": "invalid",
+      "event_type": "Event",
+      "notes": "Event with empty event_type string",
+      "min_version": "2.0.0"
+    }
+  ]
+}

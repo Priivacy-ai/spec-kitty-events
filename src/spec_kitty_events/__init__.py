@@ -90,6 +90,12 @@ from spec_kitty_events.lifecycle import (
     reduce_lifecycle_events,
 )
 
+# Conformance fixtures
+from spec_kitty_events.conformance.loader import (
+    FixtureCase,
+    load_fixtures,
+)
+
 # Status state model contracts
 from spec_kitty_events.status import (
     Lane,
@@ -174,6 +180,9 @@ __all__ = [
     "LifecycleAnomaly",
     "ReducedMissionState",
     "reduce_lifecycle_events",
+    # Conformance fixtures
+    "FixtureCase",
+    "load_fixtures",
     # Status state model
     "Lane",
     "SyncLaneV1",
