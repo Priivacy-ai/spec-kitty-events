@@ -7,5 +7,5 @@
   "lamport_clock": 1,
   "project_uuid": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
   "correlation_id": "01JMYYYYYYYYYYYYYYYYYYYYYY",
-  "schema_version": "v99"
+  "schema_version": "not-a-semver"
 }

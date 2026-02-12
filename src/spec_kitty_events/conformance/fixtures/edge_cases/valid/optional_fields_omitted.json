@@ -1,12 +1,7 @@
 {
   "feature_slug": "my-feature",
   "wp_id": "WP01",
-  "from_lane": null,
   "to_lane": "planned",
   "actor": "test-agent",
-  "force": false,
-  "reason": null,
-  "execution_mode": "worktree",
-  "review_ref": null,
-  "evidence": null
+  "execution_mode": "worktree"
 }

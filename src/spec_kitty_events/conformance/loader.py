@@ -22,7 +22,7 @@ class FixtureCase:
     """A single fixture test case loaded from the manifest."""
 
     id: str
-    payload: Dict[str, Any]
+    payload: Any
     expected_valid: bool
     event_type: str
     notes: str

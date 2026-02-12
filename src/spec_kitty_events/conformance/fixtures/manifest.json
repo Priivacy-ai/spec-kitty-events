@@ -158,7 +158,7 @@
       "path": "edge_cases/invalid/unsupported_schema_version.json",
       "expected_result": "invalid",
       "event_type": "Event",
-      "notes": "Event with non-semver schema_version 'v99'",
+      "notes": "Event with invalid non-semver schema_version format",
       "min_version": "2.0.0"
     },
     {
