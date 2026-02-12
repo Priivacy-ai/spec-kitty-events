@@ -1,0 +1,7 @@
+{
+  "feature_slug": "my-feature",
+  "wp_id": "WP01",
+  "to_lane": "planned",
+  "actor": "test-agent",
+  "execution_mode": "worktree"
+}

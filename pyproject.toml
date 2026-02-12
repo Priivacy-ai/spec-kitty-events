@@ -32,7 +32,17 @@ build-backend = "setuptools.build_meta"
 where = ["src"]
 
 [tool.setuptools.package-data]
-spec_kitty_events = ["py.typed", "schemas/*.json", "conformance/fixtures/**/*.json"]
+spec_kitty_events = [
+    "py.typed",
+    "schemas/*.json",
+    "conformance/fixtures/*.json",
+    "conformance/fixtures/events/valid/*.json",
+    "conformance/fixtures/events/invalid/*.json",
+    "conformance/fixtures/lane_mapping/valid/*.json",
+    "conformance/fixtures/lane_mapping/invalid/*.json",
+    "conformance/fixtures/edge_cases/valid/*.json",
+    "conformance/fixtures/edge_cases/invalid/*.json",
+]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
