@@ -1,14 +1,14 @@
 ---
 work_package_id: WP02
 title: Schema Subpackage and Generation Script
-lane: "for_review"
+lane: "doing"
 dependencies: [WP01]
 base_branch: 005-event-contract-conformance-suite-WP01
 base_commit: 1c16bd2a704cc44184e768fda496a645fe9356b1
 created_at: '2026-02-12T10:25:26.669407+00:00'
 subtasks: [T007, T008, T009, T010, T011, T012, T013]
-shell_pid: "73719"
-agent: "claude-opus"
+shell_pid: "76117"
+agent: "codex"
 review_status: "has_feedback"
 reviewed_by: "Robert Douglass"
 history:
@@ -284,3 +284,4 @@ def list_schemas() -> list[str]:
 - 2026-02-12T10:33:24Z – codex – shell_pid=71572 – lane=planned – Moved to planned
 - 2026-02-12T10:33:51Z – claude-opus – shell_pid=73719 – lane=doing – Started implementation via workflow command
 - 2026-02-12T10:35:02Z – claude-opus – shell_pid=73719 – lane=for_review – Fixed orphan detection per Codex review. 450 tests pass, mypy clean. --check now detects orphaned schema files.
+- 2026-02-12T10:35:08Z – codex – shell_pid=76117 – lane=doing – Started review via workflow command
