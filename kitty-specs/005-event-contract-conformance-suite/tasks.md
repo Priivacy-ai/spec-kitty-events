@@ -135,11 +135,11 @@
 **Estimated size**: ~350 lines
 
 **Subtasks**:
-- [ ] T040: Create `CHANGELOG.md` with `2.0.0-rc1` section and migration notes
-- [ ] T041: Create `COMPATIBILITY.md` with lane mapping table and field requirements per event type
-- [ ] T042: Document versioning policy (SemVer rules for 2.x)
-- [ ] T043: Document consumer CI integration steps
-- [ ] T044: Final review: ensure all FR-001 through FR-023 are addressed
+- [x] T040: Create `CHANGELOG.md` with `2.0.0-rc1` section and migration notes
+- [x] T041: Create `COMPATIBILITY.md` with lane mapping table and field requirements per event type
+- [x] T042: Document versioning policy (SemVer rules for 2.x)
+- [x] T043: Document consumer CI integration steps
+- [x] T044: Final review: ensure all FR-001 through FR-023 are addressed
 
 ---
 
