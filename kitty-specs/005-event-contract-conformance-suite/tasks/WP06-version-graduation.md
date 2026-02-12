@@ -1,7 +1,7 @@
 ---
 work_package_id: WP06
 title: Version Graduation and Package Finalization
-lane: "doing"
+lane: "planned"
 dependencies: [WP05]
 base_branch: 005-event-contract-conformance-suite-WP05
 base_commit: 7cf19ad7b4184c546e82d1f17e92ce82f9be7211
@@ -9,6 +9,8 @@ created_at: '2026-02-12T11:20:40.207106+00:00'
 subtasks: [T034, T035, T036, T037, T038, T039]
 shell_pid: "16619"
 agent: "codex"
+review_status: "has_feedback"
+reviewed_by: "Robert Douglass"
 history:
 - date: '2026-02-12'
   action: created
@@ -157,8 +159,16 @@ This is the "lock it down" step. After WP01–WP05, all code is implemented. Thi
 - Verify no regressions in existing 427+ tests.
 - Verify conformance suite runs independently via `--pyargs`.
 
+## Review Feedback
+
+- **Issue 1 (T037 export audit failed)**: `spec_kitty_events.__all__` currently has 70 symbols, but WP06 requires 68. `src/spec_kitty_events/__init__.py` still exports conformance loader symbols (`FixtureCase`, `load_fixtures`) at top level, which conflicts with the WP guidance to keep conformance APIs in the conformance namespace.
+  - **Fix**: Remove top-level imports/`__all__` entries for `FixtureCase` and `load_fixtures`, and verify `len(spec_kitty_events.__all__) == 68`.
+- **Issue 2 (T038 quality gate failed)**: `python3.11 -m pytest -v` passes (545 tests) but reports total coverage of 95%, below the required 98% threshold.
+  - **Fix**: Add missing tests or adjust approved coverage configuration per spec intent, then rerun full pytest and confirm coverage >= 98%.
+
 ## Activity Log
 
 - 2026-02-12T11:20:40Z – claude-opus – shell_pid=14070 – lane=doing – Assigned agent via workflow command
 - 2026-02-12T11:24:16Z – claude-opus – shell_pid=14070 – lane=for_review – Ready for review: version graduation to 2.0.0rc1, SCHEMA_VERSION to 2.0.0, exports verified, 545 tests pass, mypy strict clean.
 - 2026-02-12T11:24:21Z – codex – shell_pid=16619 – lane=doing – Started review via workflow command
+- 2026-02-12T11:25:56Z – codex – shell_pid=16619 – lane=planned – Moved to planned
