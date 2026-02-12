@@ -102,7 +102,7 @@
 - [x] T030: Create `conformance/conftest.py` with shared pytest fixtures
 - [x] T031: Create `conformance/test_pyargs_entrypoint.py` with manifest-driven conformance tests
 - [x] T032: Add coverage omit for `conformance/` directory in `pyproject.toml`
-- [ ] T033: Verify `pytest --pyargs spec_kitty_events.conformance` works after editable install
+- [x] T033: Verify `pytest --pyargs spec_kitty_events.conformance` works after editable install
 
 ---
 
