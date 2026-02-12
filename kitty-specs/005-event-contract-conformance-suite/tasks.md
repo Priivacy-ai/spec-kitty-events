@@ -82,7 +82,7 @@
 - [x] T024: Create lane mapping fixtures (all 7 canonical→sync cases + invalid lane values)
 - [x] T025: Create edge case fixtures (alias normalization, optional field omission, schema version mismatch)
 - [x] T026: Create `manifest.json` with id, path, expected_result, event_type, notes, min_version
-- [ ] T027: Implement `load_fixtures()` and `FixtureCase` in `conformance/__init__.py`
+- [x] T027: Implement `load_fixtures()` and `FixtureCase` in `conformance/__init__.py`
 - [ ] T028: Update `pyproject.toml` package-data for `conformance/fixtures/**/*.json`
 
 ---
