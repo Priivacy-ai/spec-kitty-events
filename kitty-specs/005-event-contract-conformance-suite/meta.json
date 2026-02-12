@@ -1,0 +1,10 @@
+{
+  "feature_number": "005",
+  "slug": "005-event-contract-conformance-suite",
+  "friendly_name": "Event Contract Conformance Suite",
+  "mission": "software-dev",
+  "source_description": "Finalize and enforce the event contract needed by CLI and SaaS for a complete 2.x target state. Mission: Provide a stable, versioned event schema package and conformance suite that closes ambiguity around status lanes, payloads, and compatibility. Current confirmed gaps: (1) Canonical status model is 7-lane while sync payload contract currently uses 4-lane status values, (2) Cross-repo alignment needs explicit contract documentation and machine-checkable fixtures, (3) Consumers need deterministic validation and upgrade guidance. Required output: Canonical event taxonomy and JSON schema definitions, explicit lane semantics (canonical 7-lane model, compatibility mapping rules for 4-lane consumers, required/optional fields and invariants), versioning and compatibility policy (breaking vs non-breaking), required conformance artifacts for both CLI and SaaS.",
+  "created_at": "2026-02-12T00:00:00Z",
+  "target_branch": "main",
+  "vcs": "git"
+}
