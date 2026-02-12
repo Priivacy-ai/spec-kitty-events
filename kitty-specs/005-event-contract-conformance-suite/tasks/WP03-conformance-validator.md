@@ -8,6 +8,7 @@ base_commit: 1382e91bdfa19cefd94d3943317aa2591f2a9351
 created_at: '2026-02-12T10:39:25.027797+00:00'
 subtasks: [T014, T015, T016, T017, T018, T019, T020]
 shell_pid: "80468"
+agent: "claude-opus"
 history:
 - date: '2026-02-12'
   action: created
@@ -347,3 +348,7 @@ class ConformanceResult:
 - Verify `valid` field logic: must be `False` if model_violations is non-empty, regardless of schema result.
 - Verify graceful degradation: `schema_check_skipped=True` when jsonschema absent and `strict=False`.
 - Spot-check test payloads against the model definitions in `status.py`, `gates.py`, `lifecycle.py`.
+
+## Activity Log
+
+- 2026-02-12T10:39:25Z – claude-opus – shell_pid=80468 – lane=doing – Assigned agent via workflow command
