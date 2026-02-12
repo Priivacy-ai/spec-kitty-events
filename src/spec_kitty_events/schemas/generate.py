@@ -168,6 +168,14 @@ def check_drift() -> int:
             print(actual_content, file=sys.stderr)
             drift_detected = True
 
+    # Check for orphaned schema files not in the registry
+    expected_files = {f"{name}.schema.json" for name in schemas}
+    actual_files = {p.name for p in SCHEMA_DIR.glob("*.schema.json")}
+    orphaned = actual_files - expected_files
+    for orphan in sorted(orphaned):
+        print(f"Orphaned schema {orphan}", file=sys.stderr)
+        drift_detected = True
+
     if drift_detected:
         print("\nSchema drift detected. Run without --check to regenerate.", file=sys.stderr)
         return 1

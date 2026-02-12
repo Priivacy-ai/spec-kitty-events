@@ -61,3 +61,29 @@ def test_schema_drift_check_detects_modification() -> None:
     assert (
         verify_result.returncode == 0
     ), f"Schema restoration failed: {verify_result.stderr}"
+
+
+def test_schema_drift_check_detects_orphaned_file() -> None:
+    """Test that --check mode detects orphaned schema files not in the registry."""
+    import spec_kitty_events.schemas
+
+    schema_dir = Path(spec_kitty_events.schemas.__file__).parent
+    orphan_file = schema_dir / "orphan_test.schema.json"
+
+    try:
+        orphan_file.write_text(
+            '{"$schema": "https://json-schema.org/draft/2020-12/schema"}\n',
+            encoding="utf-8",
+        )
+
+        result = subprocess.run(
+            [sys.executable, "-m", "spec_kitty_events.schemas.generate", "--check"],
+            capture_output=True,
+            text=True,
+        )
+
+        assert result.returncode == 1, "Should detect orphaned schema file"
+        assert "orphaned schema" in result.stderr.lower()
+
+    finally:
+        orphan_file.unlink(missing_ok=True)
