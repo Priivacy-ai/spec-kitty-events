@@ -1,7 +1,7 @@
 ---
 work_package_id: WP03
 title: Conformance Validator API
-lane: "doing"
+lane: "for_review"
 dependencies: [WP02]
 base_branch: 005-event-contract-conformance-suite-WP02
 base_commit: 1382e91bdfa19cefd94d3943317aa2591f2a9351
@@ -352,3 +352,4 @@ class ConformanceResult:
 ## Activity Log
 
 - 2026-02-12T10:39:25Z – claude-opus – shell_pid=80468 – lane=doing – Assigned agent via workflow command
+- 2026-02-12T10:44:17Z – claude-opus – shell_pid=80468 – lane=for_review – Ready for review: conformance/ subpackage with dual-layer validator, 9 event types, 18 new tests, 468 total pass, mypy clean
