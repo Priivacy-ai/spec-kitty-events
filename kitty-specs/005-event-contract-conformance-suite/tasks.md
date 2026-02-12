@@ -80,7 +80,7 @@
 - [x] T022: Create valid event fixtures for all 9 conformance payload types
 - [x] T023: Create invalid event fixtures (missing fields, wrong types, invalid enums)
 - [x] T024: Create lane mapping fixtures (all 7 canonical→sync cases + invalid lane values)
-- [ ] T025: Create edge case fixtures (alias normalization, optional field omission, schema version mismatch)
+- [x] T025: Create edge case fixtures (alias normalization, optional field omission, schema version mismatch)
 - [ ] T026: Create `manifest.json` with id, path, expected_result, event_type, notes, min_version
 - [ ] T027: Implement `load_fixtures()` and `FixtureCase` in `conformance/__init__.py`
 - [ ] T028: Update `pyproject.toml` package-data for `conformance/fixtures/**/*.json`
