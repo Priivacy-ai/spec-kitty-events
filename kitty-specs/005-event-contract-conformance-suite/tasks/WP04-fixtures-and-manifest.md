@@ -1,7 +1,7 @@
 ---
 work_package_id: WP04
 title: Canonical Fixtures and Manifest
-lane: "doing"
+lane: "for_review"
 dependencies: [WP03]
 base_branch: 005-event-contract-conformance-suite-WP03
 base_commit: 57c9ad089e6fb61d491586822a2e55354179f1e7
@@ -276,3 +276,4 @@ Each fixture category has `valid/` and `invalid/` subdirectories. The `manifest.
 ## Activity Log
 
 - 2026-02-12T10:54:01Z – claude-opus – shell_pid=93397 – lane=doing – Assigned agent via workflow command
+- 2026-02-12T11:02:25Z – claude-opus – shell_pid=93397 – lane=for_review – Ready for review: 21 fixture files, manifest.json, FixtureCase + load_fixtures API, 76 new tests, 545 total pass, mypy clean
