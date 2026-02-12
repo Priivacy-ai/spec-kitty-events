@@ -1,13 +1,13 @@
 ---
 work_package_id: WP07
 title: Compatibility Table, Changelog, and Migration Notes
-lane: "for_review"
+lane: "doing"
 dependencies: [WP06]
 base_branch: 005-event-contract-conformance-suite-WP06
 base_commit: 65a647b9980d95fd0de21cefef3a99b43b9e520a
 created_at: '2026-02-12T11:35:12.699714+00:00'
 subtasks: [T040, T041, T042, T043, T044]
-shell_pid: "25817"
+shell_pid: "29143"
 agent: "codex"
 review_status: "has_feedback"
 reviewed_by: "Robert Douglass"
@@ -233,3 +233,4 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 - 2026-02-12T11:42:58Z – codex – shell_pid=25817 – lane=doing – Started review via workflow command
 - 2026-02-12T11:44:58Z – codex – shell_pid=25817 – lane=planned – Moved to planned
 - 2026-02-12T11:46:26Z – codex – shell_pid=25817 – lane=for_review – Fixed: force field type corrected to bool in COMPATIBILITY.md per Codex feedback
+- 2026-02-12T11:46:32Z – codex – shell_pid=29143 – lane=doing – Started review via workflow command
