@@ -1,7 +1,7 @@
 ---
 work_package_id: WP01
 title: Lane Mapping Contract
-lane: "doing"
+lane: "for_review"
 dependencies: []
 base_branch: main
 base_commit: 1c16bd2a704cc44184e768fda496a645fe9356b1
@@ -196,3 +196,4 @@ The mapping is currently hardcoded in each consumer. This WP formalizes it as a 
 ## Activity Log
 
 - 2026-02-12T10:21:10Z – claude-opus – shell_pid=54078 – lane=doing – Assigned agent via workflow command
+- 2026-02-12T10:22:09Z – claude-opus – shell_pid=54078 – lane=for_review – Ready for review: SyncLaneV1 enum, CANONICAL_TO_SYNC_V1 mapping, canonical_to_sync_v1() function, unit + property tests. All 13 tests pass, mypy clean.
