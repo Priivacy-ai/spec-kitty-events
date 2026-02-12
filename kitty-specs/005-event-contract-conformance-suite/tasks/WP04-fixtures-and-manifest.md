@@ -1,7 +1,7 @@
 ---
 work_package_id: WP04
 title: Canonical Fixtures and Manifest
-lane: "doing"
+lane: "done"
 dependencies: [WP03]
 base_branch: 005-event-contract-conformance-suite-WP03
 base_commit: 57c9ad089e6fb61d491586822a2e55354179f1e7
@@ -284,3 +284,4 @@ Each fixture category has `valid/` and `invalid/` subdirectories. The `manifest.
 - 2026-02-12T11:06:27Z – claude-opus – shell_pid=3104 – lane=doing – Started implementation via workflow command
 - 2026-02-12T11:07:31Z – claude-opus – shell_pid=3104 – lane=for_review – Re-review: fixed optional_fields_omitted (only required fields), FixtureCase.payload widened to Any, schema_version renamed to non-semver format case. 545 tests, mypy clean.
 - 2026-02-12T11:07:36Z – codex – shell_pid=4562 – lane=doing – Started review via workflow command
+- 2026-02-12T11:08:42Z – codex – shell_pid=4562 – lane=done – Review passed: fixtures, manifest, loader API, tests, and packaging verified
