@@ -1,9 +1,13 @@
 ---
 work_package_id: WP06
 title: Version Graduation and Package Finalization
-lane: planned
+lane: "doing"
 dependencies: [WP05]
+base_branch: 005-event-contract-conformance-suite-WP05
+base_commit: 7cf19ad7b4184c546e82d1f17e92ce82f9be7211
+created_at: '2026-02-12T11:20:40.207106+00:00'
 subtasks: [T034, T035, T036, T037, T038, T039]
+shell_pid: "14070"
 history:
 - date: '2026-02-12'
   action: created
