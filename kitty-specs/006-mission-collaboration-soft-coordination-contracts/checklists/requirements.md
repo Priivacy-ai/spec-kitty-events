@@ -2,6 +2,7 @@
 
 **Purpose**: Validate specification completeness and quality before proceeding to planning
 **Created**: 2026-02-15
+**Updated**: 2026-02-15 (post-clarification: SaaS-authoritative participation, strict/permissive modes)
 **Feature**: [spec.md](../spec.md)
 
 ## Content Quality
@@ -29,11 +30,21 @@
 - [x] Feature meets measurable outcomes defined in Success Criteria
 - [x] No implementation details leak into specification
 
+## Contradiction Resolution Log
+
+The following spec contradictions were identified and resolved:
+
+1. **FR-003 vs warning payload actor fields**: Warning payloads (`ConcurrentDriverWarningPayload`, `PotentialStepCollisionDetectedPayload`) are multi-actor and use `participant_ids: list[str]`, not a single `participant_id`. FR-003 now distinguishes single-actor payloads from multi-actor warning payloads.
+
+2. **Duplicate leave anomaly inconsistency**: Edge case previously said "no anomaly for duplicate leave" but FR-026 said "produce anomalies for duplicate join/leave". Resolved: duplicate leave is recorded as an anomaly in both modes (FR-027) — it is a protocol error worth logging.
+
+3. **Warning acknowledgement enum alignment**: Changed from informal `"noted"`, `"will_coordinate"`, `"proceeding"` to structured `Literal["continue", "hold", "reassign", "defer"]` (FR-015).
+
 ## Notes
 
-- All 31 functional requirements are testable and specific
-- 6 user stories cover: participant lifecycle (P1), concurrent intent (P1), LLM execution tracking (P1), decision/comment audit (P2), session linking (P2), conformance fixtures (P2)
-- 8 edge cases documented with expected reducer behavior
-- 6 measurable success criteria defined
-- No clarification markers remain — all decisions resolved during discovery (participant identity model, drive intent scope, reducer output shape)
+- 35 functional requirements (expanded from 31 after adding envelope mapping, auth binding, strict/permissive mode)
+- 6 user stories: SaaS-authoritative participant lifecycle (P1), concurrent intent (P1), LLM execution tracking (P1), decision/comment audit (P2), session linking (P2), conformance fixtures (P2)
+- 9 edge cases documented with strict/permissive mode behavior
+- 7 measurable success criteria (expanded from 6 after adding strict-mode rejection verification)
+- Key clarification: SaaS-authoritative participation model with strict/permissive reducer modes
 - Spec is ready for `/spec-kitty.plan` or `/spec-kitty.clarify`

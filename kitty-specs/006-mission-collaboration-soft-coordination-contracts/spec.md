@@ -7,19 +7,20 @@
 
 ## User Scenarios & Testing
 
-### User Story 1 — CLI Emits Participant Lifecycle Events (Priority: P1)
+### User Story 1 — SaaS-Authoritative Participant Lifecycle (Priority: P1)
 
-A developer opens a CLI session and joins a running mission. The CLI emits `ParticipantJoined` with a structured identity (`participant_id`, `participant_type: "human"`, `display_name`, `session_id`). A second developer joins the same mission from their own CLI session. Both participants are visible in the collaboration state. When the first developer disconnects, a `ParticipantLeft` event is emitted, and the collaboration snapshot updates to show one active participant.
+A developer completes the SaaS join flow for a running mission. SaaS mints a mission-scoped `participant_id`, binds it to the developer's auth principal, and emits `ParticipantJoined` with a structured identity (`participant_id`, `participant_type: "human"`, `display_name`, `session_id`). The CLI receives the SaaS-issued identity and uses it for all subsequent collaboration events — it never invents its own participant identity. A second developer joins via SaaS. Both participants are visible in the collaboration state. When the first developer disconnects, a `ParticipantLeft` event is emitted, and the collaboration snapshot updates to show one active participant.
 
-**Why this priority**: Participant lifecycle is the foundation — every other collaboration event depends on knowing who is present. Without typed participant events, there is no collaboration model.
+**Why this priority**: Participant lifecycle is the foundation — every other collaboration event depends on knowing who is present. SaaS-authoritative identity minting ensures a single source of truth for participation and prevents rogue or forged participant entries.
 
-**Independent Test**: Can be tested by constructing `ParticipantJoined` and `ParticipantLeft` payloads, feeding them through the collaboration reducer, and verifying the materialized participant roster.
+**Independent Test**: Can be tested by constructing `ParticipantJoined` and `ParticipantLeft` payloads with SaaS-minted identities, feeding them through the collaboration reducer in strict mode, and verifying the materialized participant roster.
 
 **Acceptance Scenarios**:
 
-1. **Given** an empty mission with no participants, **When** a `ParticipantJoined` event is processed with `participant_type: "human"`, **Then** the collaboration snapshot shows exactly one active participant with the correct identity fields.
+1. **Given** an empty mission with no participants, **When** a `ParticipantJoined` event is processed with a SaaS-minted `participant_id` and `participant_type: "human"`, **Then** the collaboration snapshot shows exactly one active participant with the correct identity fields.
 2. **Given** a mission with 2 active participants, **When** one emits `ParticipantLeft`, **Then** the collaboration snapshot shows 1 active participant and the departed participant is recorded in history.
 3. **Given** a participant has already joined, **When** a duplicate `ParticipantJoined` with the same `participant_id` arrives, **Then** the reducer records an anomaly and does not create a second participant entry.
+4. **Given** the reducer is in strict mode, **When** an event arrives with a `participant_id` not in the mission roster (no prior `ParticipantJoined`), **Then** the reducer raises a hard error and rejects the event.
 
 ---
 
@@ -105,14 +106,15 @@ A consumer repo (`spec-kitty` CLI or `spec-kitty-saas`) runs `pytest --pyargs sp
 
 ### Edge Cases
 
-- What happens when a participant emits events before `ParticipantJoined`? The reducer records an anomaly ("event from unknown participant") but still processes the event — soft coordination does not reject.
+- What happens when an event arrives from a `participant_id` not in the mission roster? **Strict mode (live)**: the reducer raises `UnknownParticipantError` — this is a hard rejection, not an advisory anomaly. Live event ingest MUST reject events from non-rostered participants. **Permissive mode (replay/import)**: the reducer records an anomaly ("event from unknown participant") and continues processing, accommodating incomplete historical streams.
 - What happens when `DriveIntentSet(intent: "active")` is emitted twice by the same participant without an intervening `"inactive"`? The reducer is idempotent — the participant remains active, no state change, no anomaly.
-- What happens when `WarningAcknowledged` references a warning that doesn't exist in the event stream? The reducer records an anomaly ("acknowledgement for unknown warning") and stores the acknowledgement anyway.
-- What happens when `PromptStepExecutionCompleted` arrives without a matching `PromptStepExecutionStarted`? The reducer records an anomaly ("completion without start") and processes the event.
-- What happens when a `ParticipantLeft` event arrives for a participant that already left? The reducer is idempotent — no state change, no anomaly for the duplicate leave.
-- What happens when a `PresenceHeartbeat` arrives for a participant that has left? The reducer records an anomaly ("heartbeat from departed participant") but updates the timestamp — the participant may have reconnected.
+- What happens when `WarningAcknowledged` references a warning that doesn't exist in the event stream? **Strict mode**: the reducer raises an error. **Permissive mode**: the reducer records an anomaly ("acknowledgement for unknown warning") and stores the acknowledgement.
+- What happens when `PromptStepExecutionCompleted` arrives without a matching `PromptStepExecutionStarted`? **Strict mode**: the reducer raises an error. **Permissive mode**: the reducer records an anomaly ("completion without start") and processes the event.
+- What happens when a `ParticipantLeft` event arrives for a participant that already left? The reducer records an anomaly ("duplicate leave") — this is a protocol error worth logging in both modes, but not a hard rejection.
+- What happens when a `PresenceHeartbeat` arrives for a participant that has left? **Strict mode**: the reducer raises an error — the participant is no longer rostered as active. **Permissive mode**: the reducer records an anomaly ("heartbeat from departed participant") and updates the timestamp.
 - What happens with 100+ concurrent participants? The reducer has no cardinality limit — it processes all participant events and produces indexed state. Performance is a consumer concern.
 - What happens when events arrive with identical Lamport clocks from different nodes? The deterministic sort tiebreaker (`lamport_clock`, `timestamp.isoformat()`, `event_id`) ensures total ordering, consistent with the existing sort semantics.
+- What happens when CLI tries to emit collaboration events without completing SaaS join? The CLI MUST NOT emit collaboration events until it has received a SaaS-issued `participant_id` and `session_id`. This is enforced at the CLI layer (spec-kitty 040), not in this package.
 
 ## Requirements
 
@@ -120,9 +122,9 @@ A consumer repo (`spec-kitty` CLI or `spec-kitty-saas`) runs `pytest --pyargs sp
 
 #### Participant Identity Model
 
-- **FR-001**: Package MUST define a `ParticipantIdentity` structured type with required fields `participant_id: str` and `participant_type: str` (constrained to known values: `"human"`, `"llm_context"`), and optional fields `display_name: str` and `session_id: str`.
-- **FR-002**: The `participant_type` field MUST be extensible — new values MAY be added in minor versions without breaking the contract. The initial set is `"human"` and `"llm_context"`.
-- **FR-003**: All 14 collaboration event payloads MUST include a `participant_id: str` field identifying the acting participant. Payloads that introduce a participant (`ParticipantInvited`, `ParticipantJoined`) MUST include the full `ParticipantIdentity` structure.
+- **FR-001**: Package MUST define a `ParticipantIdentity` structured type with required fields `participant_id: str` (SaaS-minted, mission-scoped) and `participant_type: str` (constrained to known values: `"human"`, `"llm_context"`), and optional fields `display_name: str` and `session_id: str`. The `participant_id` is opaque to this package but is contractually guaranteed to be assigned by SaaS at join time — this package does not mint or validate provenance, but defines the shape.
+- **FR-002**: The `participant_type` field MUST be extensible — new values MAY be added in minor versions without breaking the contract. The initial set is `"human"` and `"llm_context"`. For LLM contexts, each distinct agent session is a separate participant entry with `participant_type: "llm_context"`.
+- **FR-003**: All collaboration event payloads that represent a single actor's action MUST include a `participant_id: str` field identifying the acting participant. Warning payloads (`ConcurrentDriverWarningPayload`, `PotentialStepCollisionDetectedPayload`) are multi-actor — they MUST include a `participant_ids: list[str]` field instead, since they reference multiple participants involved in the risk condition. Payloads that introduce a participant (`ParticipantInvited`, `ParticipantJoined`) MUST include the full `ParticipantIdentity` structure.
 
 #### Participant Lifecycle Events
 
@@ -146,7 +148,7 @@ A consumer repo (`spec-kitty` CLI or `spec-kitty-saas`) runs `pytest --pyargs sp
 
 - **FR-013**: Package MUST export `ConcurrentDriverWarningPayload` with fields: `warning_id`, `mission_id`, `participant_ids` (list of all concurrent active drivers on the overlapping focus target), `focus_target` (the shared target), `severity` (e.g., `"info"`, `"warning"`).
 - **FR-014**: Package MUST export `PotentialStepCollisionDetectedPayload` with fields: `warning_id`, `mission_id`, `participant_ids` (list of colliding participants), `step_id`, `wp_id` (optional), `severity`.
-- **FR-015**: Package MUST export `WarningAcknowledgedPayload` with fields: `participant_id`, `mission_id`, `warning_id` (reference to the acknowledged warning), `acknowledgement` (optional, e.g., `"noted"`, `"will_coordinate"`, `"proceeding"`).
+- **FR-015**: Package MUST export `WarningAcknowledgedPayload` with fields: `participant_id`, `mission_id`, `warning_id` (reference to the acknowledged warning), `acknowledgement` constrained to `Literal["continue", "hold", "reassign", "defer"]`.
 - **FR-016**: Warnings MUST be advisory only — no hard rejection, no locking, no blocking. The default coordination mode is soft.
 
 #### Communication and Decision Events
@@ -169,47 +171,65 @@ A consumer repo (`spec-kitty` CLI or `spec-kitty-saas`) runs `pytest --pyargs sp
 - **FR-023**: The reducer MUST be deterministic — given any causal-order-preserving permutation of the same events, the output MUST be identical.
 - **FR-024**: The reducer MUST handle N participants (no hardcoded cardinality limit).
 - **FR-025**: The reducer MUST follow the existing pipeline pattern: sort → dedup → process → collect anomalies.
-- **FR-026**: The reducer MUST produce anomalies (not raise exceptions) for: events from unknown participants, acknowledgements for unknown warnings, completions without starts, duplicate join/leave, heartbeats from departed participants.
+- **FR-026**: The reducer MUST support two membership enforcement modes, selectable via a `mode` parameter:
+  - **`strict` (default, for live traffic)**: Events referencing a `participant_id` not in the current mission roster (no prior `ParticipantJoined`) MUST cause the reducer to raise `UnknownParticipantError`. Acknowledgements for unknown warnings and completions without starts MUST also raise errors. This is the enforcement profile for live ingest.
+  - **`permissive` (for replay/import)**: Events from unknown participants, acknowledgements for unknown warnings, and completions without starts are recorded as anomalies (not exceptions), allowing processing of incomplete historical streams.
+- **FR-027**: In both modes, duplicate `ParticipantLeft` for an already-departed participant MUST be recorded as an anomaly — this is a protocol error worth logging but not a hard rejection.
+
+#### Envelope Mapping
+
+- **FR-028**: All collaboration events MUST use canonical envelope mapping: `Event.aggregate_id` = `mission_id`, `Event.correlation_id` = `mission_run_id` (the identifier for the specific run/session of the mission). This is a contract rule — consumers constructing collaboration events MUST follow this mapping.
+
+#### Auth Principal Binding
+
+- **FR-029**: Package MUST define an `AuthPrincipalBinding` structured type with fields: `auth_principal_id: str`, `participant_id: str`, `bound_at: datetime`. This type represents the SaaS-side binding between an authenticated identity and a mission-scoped participant. The binding is created by SaaS at join time and is included in conformance fixtures as context, but is NOT embedded in every event payload — it is a roster-level association.
+- **FR-030**: The `ParticipantJoinedPayload` MUST include an optional `auth_principal_id: str` field. When present (live traffic), it records the auth principal that was bound to this participant at join time. When absent (replay/import), the binding is assumed to exist externally.
 
 #### Conformance Artifacts
 
-- **FR-027**: Package MUST ship JSON Schema files for all 14 payload models and the `ParticipantIdentity` model, generated from Pydantic v2 models via the existing schema generation infrastructure.
-- **FR-028**: Package MUST ship conformance fixtures including: (a) a 3-participant overlap scenario (join → drive intent → shared focus → concurrent driver warning → acknowledgement), (b) a step collision scenario (2 LLM contexts, same WP), (c) a decision capture scenario with comments.
-- **FR-029**: Conformance fixtures MUST be registered in the existing `manifest.json` with appropriate `event_type` values and `min_version: "2.1.0"` (or the version where this feature ships).
+- **FR-031**: Package MUST ship JSON Schema files for all 14 payload models, the `ParticipantIdentity` model, the `FocusTarget` model, and the `AuthPrincipalBinding` model, generated from Pydantic v2 models via the existing schema generation infrastructure.
+- **FR-032**: Package MUST ship conformance fixtures including: (a) a 3-participant overlap scenario (join with auth_principal_id → drive intent → shared focus → concurrent driver warning → acknowledgement with `"continue"`/`"hold"`), (b) a step collision scenario (2 LLM contexts, same WP), (c) a decision capture scenario with comments, (d) a strict-mode rejection scenario (event from non-rostered participant).
+- **FR-033**: Conformance fixtures MUST be registered in the existing `manifest.json` with appropriate `event_type` values and `min_version: "2.1.0"` (or the version where this feature ships).
 
 #### Exports and Compatibility
 
-- **FR-030**: All new public symbols (14 payload models, `ParticipantIdentity`, 14 event type constants, `COLLABORATION_EVENT_TYPES`, `ReducedCollaborationState`, `CollaborationAnomaly`, `reduce_collaboration_events`, `FocusTarget`) MUST be exported from `spec_kitty_events.__init__`.
-- **FR-031**: Package MUST include updated README, COMPATIBILITY.md, and CHANGELOG documenting: all 14 event types with payload field references, reducer input/output contract, advisory warning semantics, and consumer integration guidance for CLI and SaaS.
+- **FR-034**: All new public symbols (14 payload models, `ParticipantIdentity`, `FocusTarget`, `AuthPrincipalBinding`, 14 event type constants, `COLLABORATION_EVENT_TYPES`, `ReducedCollaborationState`, `CollaborationAnomaly`, `UnknownParticipantError`, `reduce_collaboration_events`) MUST be exported from `spec_kitty_events.__init__`.
+- **FR-035**: Package MUST include updated README, COMPATIBILITY.md, and CHANGELOG documenting: all 14 event types with payload field references, reducer input/output contract, strict vs permissive mode semantics, canonical envelope mapping (`aggregate_id = mission_id`, `correlation_id = mission_run_id`), advisory warning semantics, SaaS-authoritative participation model, and consumer integration guidance for CLI and SaaS.
 
 ### Key Entities
 
-- **ParticipantIdentity**: Structured identity for mission participants. Required: `participant_id` (unique string), `participant_type` (`"human"` | `"llm_context"`). Optional: `display_name`, `session_id`. Frozen Pydantic model.
+- **ParticipantIdentity**: Structured identity for mission participants. Required: `participant_id` (SaaS-minted, mission-scoped unique string), `participant_type` (`"human"` | `"llm_context"`). Optional: `display_name`, `session_id`. Frozen Pydantic model. Each LLM agent session is a separate participant entry.
+- **AuthPrincipalBinding**: Roster-level association between an authenticated identity (`auth_principal_id`) and a mission-scoped `participant_id`. Created by SaaS at join time. Recorded in `ParticipantJoinedPayload` (optional for replay). Used in conformance fixtures as context for strict-mode validation scenarios.
 - **FocusTarget**: Structured focus reference. Required: `target_type` (`"wp"` | `"step"` | `"file"`), `target_id` (string identifier). Frozen Pydantic model.
-- **ReducedCollaborationState**: Materialized view from collaboration event reduction. Contains mission-level snapshot, per-participant focus, reverse indexes, warning timeline, decision state, execution state, and anomalies. Frozen Pydantic model.
+- **ReducedCollaborationState**: Materialized view from collaboration event reduction. Contains mission-level snapshot (roster, presence, active drivers), per-participant focus, reverse index (participants by focus), warning timeline with acknowledgement state, decision state, active executions, anomalies, `event_count`, `last_processed_event_id`. Frozen Pydantic model.
 - **CollaborationAnomaly**: Records non-fatal issues during reduction (event_id, event_type, reason). Follows existing `LifecycleAnomaly` / `TransitionAnomaly` pattern.
+- **UnknownParticipantError**: Exception raised in strict mode when an event references a `participant_id` not in the mission roster. Not raised in permissive mode.
 
 ## Success Criteria
 
 ### Measurable Outcomes
 
-- **SC-001**: The collaboration reducer produces identical output for any causal-order-preserving permutation of the same event sequence, verified by property-based tests with 200+ orderings.
+- **SC-001**: The collaboration reducer produces identical output for any causal-order-preserving permutation of the same event sequence, verified by property-based tests with 200+ orderings, in both strict and permissive modes.
 - **SC-002**: All 14 collaboration event payloads pass dual-layer validation (Pydantic model + JSON Schema) in the conformance suite with zero failures.
-- **SC-003**: Conformance fixtures include at least one scenario with 3+ participants, overlapping drive intent on the same focus target, and a warning-acknowledgement sequence — all passing validation.
+- **SC-003**: Conformance fixtures include at least one scenario with 3+ participants, overlapping drive intent on the same focus target, and a warning-acknowledgement sequence — all passing validation. At least one fixture exercises strict-mode rejection of a non-rostered participant.
 - **SC-004**: Consumer developers can construct, validate, and reduce collaboration events using only the public API exported from `spec_kitty_events`, with no private imports required.
-- **SC-005**: README and COMPATIBILITY.md document all 14 event types, reducer contract, and consumer integration guidance — enabling a CLI or SaaS developer to integrate without reading source code.
-- **SC-006**: Warning and decision events are fully replayable — a consumer can replay the event log and reconstruct the complete warning timeline and decision history with actor attribution.
+- **SC-005**: README and COMPATIBILITY.md document all 14 event types, reducer contract (including strict/permissive modes), canonical envelope mapping, SaaS-authoritative participation model, and consumer integration guidance — enabling a CLI or SaaS developer to integrate without reading source code.
+- **SC-006**: Warning and decision events are fully replayable — a consumer can replay the event log in permissive mode and reconstruct the complete warning timeline and decision history with actor attribution.
+- **SC-007**: In strict mode, the reducer raises `UnknownParticipantError` for any event from a `participant_id` not in the mission roster, verified by unit tests and conformance fixtures.
 
 ## Assumptions
 
-- The existing `Event` envelope model (from Feature 001/004) is stable and sufficient for collaboration events — no envelope changes needed.
+- **SaaS-authoritative participation**: Mission participation is SaaS-authoritative. A participant can only join a mission via the SaaS join flow. `participant_id` is minted by SaaS and is mission-scoped. CLI and other consumers MUST NOT invent participant identities — they use SaaS-issued identity.
+- **Auth principal binding is SaaS-side**: The binding between `auth_principal_id` and `participant_id` is created and enforced by SaaS. This package defines the contract shape (`AuthPrincipalBinding`, optional `auth_principal_id` on `ParticipantJoinedPayload`) but does not implement auth verification.
+- The existing `Event` envelope model (from Feature 001/004) is stable and sufficient for collaboration events — no envelope changes needed. Canonical envelope mapping (`aggregate_id = mission_id`, `correlation_id = mission_run_id`) is a usage convention, not an envelope model change.
 - The existing conformance infrastructure (Feature 005) — schema generation, fixture manifest, dual-layer validation — is stable and extensible for new event types.
-- `participant_type` starts with `"human"` and `"llm_context"` but is designed for extension. New types in minor versions are additive and non-breaking.
+- `participant_type` starts with `"human"` and `"llm_context"` but is designed for extension. New types in minor versions are additive and non-breaking. Each LLM agent session gets its own `participant_id` as a separate participant entry.
 - The collaboration reducer is additive to the existing codebase — it does not modify `reduce_lifecycle_events()` or `reduce_status_events()`. Higher-level consumers may compose all three reducers.
 - Lamport clock ordering and the existing deterministic sort key (`lamport_clock`, `timestamp.isoformat()`, `event_id`) apply to collaboration events without modification.
 - Presence staleness thresholds are consumer-defined — this package provides the heartbeat data, not the staleness policy.
 - The `[conformance]` extra already provides `jsonschema` — no new optional dependencies are needed for this feature.
 - This feature targets the `2.x` line. The version will be `2.1.0` or the next minor version after `2.0.0`.
+- **Strict mode is default**: The reducer defaults to strict membership enforcement (live traffic profile). Permissive mode is opt-in for replay/import tooling only.
 
 ## Dependencies
 
@@ -221,10 +241,11 @@ A consumer repo (`spec-kitty` CLI or `spec-kitty-saas`) runs `pytest --pyargs sp
 
 ## Out of Scope
 
-- CLI command implementation for collaboration features — CLI consumes these contracts but is built separately.
-- SaaS projection UI implementation — SaaS consumes these contracts but is built separately.
+- CLI command implementation for collaboration features — CLI consumes these contracts but is built separately (spec-kitty 040).
+- SaaS projection UI and join flow implementation — SaaS consumes these contracts but is built separately (spec-kitty-saas 010).
 - Hard locking or pessimistic concurrency control — this feature is advisory-only by design.
 - Presence staleness detection logic — this package provides heartbeat data; consumers define staleness thresholds.
 - Real-time transport (WebSockets, SSE) — events are data contracts, not transport mechanisms.
-- Participant authentication or authorization — `participant_id` is opaque; auth is a consumer concern.
+- Auth principal verification logic — this package defines the `AuthPrincipalBinding` shape and records `auth_principal_id` in `ParticipantJoinedPayload`, but actual auth verification and `auth_principal_id → participant_id` enforcement is a SaaS concern.
+- `participant_id` minting — this package defines the identity shape; SaaS mints the actual IDs at join time.
 - Conflict resolution automation — warnings are informational; resolution is human/consumer-driven.
