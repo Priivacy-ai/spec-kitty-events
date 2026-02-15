@@ -276,11 +276,11 @@
 **Estimated prompt size**: ~350 lines
 
 ### Included Subtasks
-- [ ] T048 Update README.md: add Collaboration section listing all 14 event types and key exports
-- [ ] T049 Update COMPATIBILITY.md: add collaboration event field reference table, reducer strict/permissive mode contract, canonical envelope mapping (aggregate_id = "mission/{id}", correlation_id = ULID-26), SaaS-authoritative participation model
-- [ ] T050 Update CHANGELOG.md: add 2.1.0 entry documenting all collaboration additions
-- [ ] T051 Verify quickstart.md examples compile (construct events, reduce, read state)
-- [ ] T052 Run full test suite (`python3.11 -m pytest -x -m "not benchmark"`) plus benchmark (`python3.11 -m pytest -m benchmark`) and mypy (`mypy --strict`) to verify package integrity
+- [x] T048 Update README.md: add Collaboration section listing all 14 event types and key exports
+- [x] T049 Update COMPATIBILITY.md: add collaboration event field reference table, reducer strict/permissive mode contract, canonical envelope mapping (aggregate_id = "mission/{id}", correlation_id = ULID-26), SaaS-authoritative participation model
+- [x] T050 Update CHANGELOG.md: add 2.1.0 entry documenting all collaboration additions
+- [x] T051 Verify quickstart.md examples compile (construct events, reduce, read state)
+- [x] T052 Run full test suite (`python3.11 -m pytest -x -m "not benchmark"`) plus benchmark (`python3.11 -m pytest -m benchmark`) and mypy (`mypy --strict`) to verify package integrity
 
 ### Implementation Notes
 - Follow existing README/COMPATIBILITY patterns from Feature 005
