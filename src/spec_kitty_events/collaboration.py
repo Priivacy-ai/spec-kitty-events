@@ -116,6 +116,76 @@ class UnknownParticipantError(SpecKittyEventsError):
 
 # ── Section 3: Payload Models ──  (populated by WP02-WP04)
 
+
+class ParticipantInvitedPayload(BaseModel):
+    """Typed payload for ParticipantInvited events."""
+
+    model_config = ConfigDict(frozen=True)
+
+    participant_id: str = Field(
+        ..., min_length=1, description="Invited participant"
+    )
+    participant_identity: ParticipantIdentity = Field(
+        ..., description="Full structured identity"
+    )
+    invited_by: str = Field(
+        ..., min_length=1, description="participant_id of inviter"
+    )
+    mission_id: str = Field(
+        ..., min_length=1, description="Target mission"
+    )
+
+
+class ParticipantJoinedPayload(BaseModel):
+    """Typed payload for ParticipantJoined events."""
+
+    model_config = ConfigDict(frozen=True)
+
+    participant_id: str = Field(
+        ..., min_length=1, description="Joining participant"
+    )
+    participant_identity: ParticipantIdentity = Field(
+        ..., description="Full structured identity"
+    )
+    mission_id: str = Field(
+        ..., min_length=1, description="Target mission"
+    )
+    auth_principal_id: Optional[str] = Field(
+        None, description="Auth principal bound at join time (present in live traffic)"
+    )
+
+
+class ParticipantLeftPayload(BaseModel):
+    """Typed payload for ParticipantLeft events."""
+
+    model_config = ConfigDict(frozen=True)
+
+    participant_id: str = Field(
+        ..., min_length=1, description="Departing participant"
+    )
+    mission_id: str = Field(
+        ..., min_length=1, description="Mission being left"
+    )
+    reason: Optional[str] = Field(
+        None, description="Departure reason (e.g., 'disconnect', 'explicit')"
+    )
+
+
+class PresenceHeartbeatPayload(BaseModel):
+    """Typed payload for PresenceHeartbeat events."""
+
+    model_config = ConfigDict(frozen=True)
+
+    participant_id: str = Field(
+        ..., min_length=1, description="Heartbeat source"
+    )
+    mission_id: str = Field(
+        ..., min_length=1, description="Mission context"
+    )
+    session_id: Optional[str] = Field(
+        None, description="Specific session sending heartbeat"
+    )
+
 # ── Section 4: Reducer Output Models ──  (populated by WP05)
 
 # ── Section 5: Collaboration Reducer ──  (populated by WP06)
