@@ -14,7 +14,7 @@ subtasks:
 - T047
 phase: Phase 3 - Integration
 assignee: ''
-agent: ''
+agent: "claude-coordinator"
 shell_pid: "88847"
 review_status: ''
 reviewed_by: ''
@@ -251,3 +251,4 @@ spec-kitty agent tasks move-task WP08 --to for_review --note "Ready for review: 
 ## Activity Log
 
 - 2026-02-15T10:35:14Z – system – lane=planned – Prompt created.
+- 2026-02-15T11:23:00Z – claude-coordinator – shell_pid=88847 – lane=doing – Assigned agent via workflow command
