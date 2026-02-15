@@ -111,13 +111,13 @@
 **Estimated prompt size**: ~450 lines
 
 ### Included Subtasks
-- [ ] T018 [P] Implement `ConcurrentDriverWarningPayload` (warning_id, mission_id, participant_ids list, focus_target, severity)
-- [ ] T019 [P] Implement `PotentialStepCollisionDetectedPayload` (warning_id, mission_id, participant_ids list, step_id, optional wp_id, severity)
-- [ ] T020 [P] Implement `WarningAcknowledgedPayload` (participant_id, mission_id, warning_id, acknowledgement as Literal["continue", "hold", "reassign", "defer"])
-- [ ] T021 [P] Implement `CommentPostedPayload` (participant_id, mission_id, comment_id, content, optional reply_to)
-- [ ] T022 [P] Implement `DecisionCapturedPayload` (participant_id, mission_id, decision_id, topic, chosen_option, optional rationale, optional referenced_warning_id)
-- [ ] T023 [P] Implement `SessionLinkedPayload` (participant_id, mission_id, primary_session_id, linked_session_id, link_type as Literal)
-- [ ] T024 Write unit tests for all 6 payloads (valid, invalid, min_length constraints on participant_ids, enum validation)
+- [x] T018 [P] Implement `ConcurrentDriverWarningPayload` (warning_id, mission_id, participant_ids list, focus_target, severity)
+- [x] T019 [P] Implement `PotentialStepCollisionDetectedPayload` (warning_id, mission_id, participant_ids list, step_id, optional wp_id, severity)
+- [x] T020 [P] Implement `WarningAcknowledgedPayload` (participant_id, mission_id, warning_id, acknowledgement as Literal["continue", "hold", "reassign", "defer"])
+- [x] T021 [P] Implement `CommentPostedPayload` (participant_id, mission_id, comment_id, content, optional reply_to)
+- [x] T022 [P] Implement `DecisionCapturedPayload` (participant_id, mission_id, decision_id, topic, chosen_option, optional rationale, optional referenced_warning_id)
+- [x] T023 [P] Implement `SessionLinkedPayload` (participant_id, mission_id, primary_session_id, linked_session_id, link_type as Literal)
+- [x] T024 Write unit tests for all 6 payloads (valid, invalid, min_length constraints on participant_ids, enum validation)
 
 ### Implementation Notes
 - Warning payloads use `participant_ids: list[str]` (NOT `participant_id`) — this is the multi-actor distinction from FR-003
