@@ -42,6 +42,8 @@ spec_kitty_events = [
     "conformance/fixtures/lane_mapping/invalid/*.json",
     "conformance/fixtures/edge_cases/valid/*.json",
     "conformance/fixtures/edge_cases/invalid/*.json",
+    "conformance/fixtures/collaboration/valid/*.json",
+    "conformance/fixtures/collaboration/invalid/*.json",
 ]
 
 [tool.pytest.ini_options]

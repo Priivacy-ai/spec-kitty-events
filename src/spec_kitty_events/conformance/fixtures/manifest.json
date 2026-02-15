@@ -168,6 +168,62 @@
       "event_type": "Event",
       "notes": "Event with empty event_type string",
       "min_version": "2.0.0"
+    },
+    {
+      "id": "collab-participant-joined-valid",
+      "path": "collaboration/valid/participant_joined_valid.json",
+      "expected_result": "valid",
+      "event_type": "ParticipantJoined",
+      "notes": "Valid ParticipantJoinedPayload with full identity and auth binding",
+      "min_version": "2.1.0"
+    },
+    {
+      "id": "collab-drive-intent-set-valid",
+      "path": "collaboration/valid/drive_intent_set_valid.json",
+      "expected_result": "valid",
+      "event_type": "DriveIntentSet",
+      "notes": "Valid DriveIntentSetPayload with active intent",
+      "min_version": "2.1.0"
+    },
+    {
+      "id": "collab-focus-changed-valid",
+      "path": "collaboration/valid/focus_changed_valid.json",
+      "expected_result": "valid",
+      "event_type": "FocusChanged",
+      "notes": "Valid FocusChangedPayload with wp target and no previous focus",
+      "min_version": "2.1.0"
+    },
+    {
+      "id": "collab-concurrent-driver-warning-valid",
+      "path": "collaboration/valid/concurrent_driver_warning_valid.json",
+      "expected_result": "valid",
+      "event_type": "ConcurrentDriverWarning",
+      "notes": "Valid ConcurrentDriverWarningPayload with two concurrent drivers",
+      "min_version": "2.1.0"
+    },
+    {
+      "id": "collab-warning-acknowledged-valid",
+      "path": "collaboration/valid/warning_acknowledged_valid.json",
+      "expected_result": "valid",
+      "event_type": "WarningAcknowledged",
+      "notes": "Valid WarningAcknowledgedPayload with continue action",
+      "min_version": "2.1.0"
+    },
+    {
+      "id": "collab-participant-joined-missing-participant-id",
+      "path": "collaboration/invalid/participant_joined_missing_participant_id.json",
+      "expected_result": "invalid",
+      "event_type": "ParticipantJoined",
+      "notes": "ParticipantJoinedPayload missing required participant_id field",
+      "min_version": "2.1.0"
+    },
+    {
+      "id": "collab-focus-changed-missing-focus-target",
+      "path": "collaboration/invalid/focus_changed_missing_focus_target.json",
+      "expected_result": "invalid",
+      "event_type": "FocusChanged",
+      "notes": "FocusChangedPayload missing required focus_target field",
+      "min_version": "2.1.0"
     }
   ]
 }

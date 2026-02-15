@@ -8,21 +8,38 @@ from spec_kitty_events.schemas import list_schemas, load_schema, schema_path
 
 
 def test_list_schemas_returns_all_names() -> None:
-    """Test that list_schemas returns all 11 schema names."""
+    """Test that list_schemas returns all 28 schema names."""
     names = list_schemas()
-    assert len(names) == 11
+    assert len(names) == 28
     expected = [
+        "auth_principal_binding",
+        "comment_posted_payload",
+        "concurrent_driver_warning_payload",
+        "decision_captured_payload",
+        "drive_intent_set_payload",
         "event",
+        "focus_changed_payload",
+        "focus_target",
         "gate_failed_payload",
         "gate_passed_payload",
         "lane",
         "mission_cancelled_payload",
         "mission_completed_payload",
         "mission_started_payload",
+        "participant_identity",
+        "participant_invited_payload",
+        "participant_joined_payload",
+        "participant_left_payload",
         "phase_entered_payload",
+        "potential_step_collision_detected_payload",
+        "presence_heartbeat_payload",
+        "prompt_step_execution_completed_payload",
+        "prompt_step_execution_started_payload",
         "review_rollback_payload",
+        "session_linked_payload",
         "status_transition_payload",
         "sync_lane_v1",
+        "warning_acknowledged_payload",
     ]
     assert names == expected
 
