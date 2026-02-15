@@ -1,7 +1,7 @@
 ---
 work_package_id: WP05
 title: Reducer Output Models
-lane: "doing"
+lane: "for_review"
 dependencies: [WP01]
 base_branch: 006-mission-collaboration-soft-coordination-contracts-WP01
 base_commit: f058d167abbbbbd8460757676b7e12ee4fb0ed3b
@@ -244,3 +244,4 @@ spec-kitty agent tasks move-task WP05 --to for_review --note "Ready for review: 
 
 - 2026-02-15T10:35:14Z – system – lane=planned – Prompt created.
 - 2026-02-15T11:08:15Z – claude-coordinator – shell_pid=80547 – lane=doing – Assigned agent via workflow command
+- 2026-02-15T11:11:32Z – claude-coordinator – shell_pid=80547 – lane=for_review – Ready for review: 5 output models including ReducedCollaborationState with 15 fields
