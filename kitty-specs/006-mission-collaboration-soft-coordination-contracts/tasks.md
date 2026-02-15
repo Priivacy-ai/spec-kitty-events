@@ -81,11 +81,11 @@
 **Estimated prompt size**: ~350 lines
 
 ### Included Subtasks
-- [ ] T013 [P] Implement `DriveIntentSetPayload` (participant_id, mission_id, intent as Literal["active", "inactive"])
-- [ ] T014 [P] Implement `FocusChangedPayload` (participant_id, mission_id, focus_target as FocusTarget, optional previous_focus_target)
-- [ ] T015 [P] Implement `PromptStepExecutionStartedPayload` (participant_id, mission_id, step_id, optional wp_id, optional step_description)
-- [ ] T016 [P] Implement `PromptStepExecutionCompletedPayload` (participant_id, mission_id, step_id, optional wp_id, outcome as Literal)
-- [ ] T017 Write unit tests for all 4 payloads (valid, invalid, Literal constraints, FocusTarget embedding)
+- [x] T013 [P] Implement `DriveIntentSetPayload` (participant_id, mission_id, intent as Literal["active", "inactive"])
+- [x] T014 [P] Implement `FocusChangedPayload` (participant_id, mission_id, focus_target as FocusTarget, optional previous_focus_target)
+- [x] T015 [P] Implement `PromptStepExecutionStartedPayload` (participant_id, mission_id, step_id, optional wp_id, optional step_description)
+- [x] T016 [P] Implement `PromptStepExecutionCompletedPayload` (participant_id, mission_id, step_id, optional wp_id, outcome as Literal)
+- [x] T017 Write unit tests for all 4 payloads (valid, invalid, Literal constraints, FocusTarget embedding)
 
 ### Implementation Notes
 - `FocusChangedPayload.focus_target` embeds `FocusTarget` model (nested Pydantic)
