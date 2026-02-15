@@ -15,7 +15,7 @@ subtasks:
 - T030
 phase: Phase 1 - Payload Models
 assignee: ''
-agent: ''
+agent: "claude-coordinator"
 shell_pid: "80547"
 review_status: ''
 reviewed_by: ''
@@ -243,3 +243,4 @@ spec-kitty agent tasks move-task WP05 --to for_review --note "Ready for review: 
 ## Activity Log
 
 - 2026-02-15T10:35:14Z – system – lane=planned – Prompt created.
+- 2026-02-15T11:08:15Z – claude-coordinator – shell_pid=80547 – lane=doing – Assigned agent via workflow command
