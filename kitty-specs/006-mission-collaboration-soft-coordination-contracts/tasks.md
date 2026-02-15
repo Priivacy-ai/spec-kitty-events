@@ -243,11 +243,11 @@
 **Estimated prompt size**: ~500 lines
 
 ### Included Subtasks
-- [ ] T043 Create `conformance/fixtures/collaboration/valid/` directory and 5 valid **payload** fixture JSON files
-- [ ] T044 Create `conformance/fixtures/collaboration/invalid/` directory and 2 invalid **payload** fixture JSON files
-- [ ] T045 Register all 7 fixtures in `conformance/fixtures/manifest.json` using current manifest fields (`event_type`, `expected_result`, `min_version`) and include `conformance/fixtures/collaboration/*` in package data
-- [ ] T046 Write `tests/property/test_collaboration_determinism.py` — Hypothesis property tests proving reducer determinism across 200+ event orderings (strict and permissive modes)
-- [ ] T047 Write `tests/benchmark/test_collaboration_perf.py` — 10K-event synthetic benchmark (50 participants, mixed types), assert <1s, @pytest.mark.benchmark
+- [x] T043 Create `conformance/fixtures/collaboration/valid/` directory and 5 valid **payload** fixture JSON files
+- [x] T044 Create `conformance/fixtures/collaboration/invalid/` directory and 2 invalid **payload** fixture JSON files
+- [x] T045 Register all 7 fixtures in `conformance/fixtures/manifest.json` using current manifest fields (`event_type`, `expected_result`, `min_version`) and include `conformance/fixtures/collaboration/*` in package data
+- [x] T046 Write `tests/property/test_collaboration_determinism.py` — Hypothesis property tests proving reducer determinism across 200+ event orderings (strict and permissive modes)
+- [x] T047 Write `tests/benchmark/test_collaboration_perf.py` — 10K-event synthetic benchmark (50 participants, mixed types), assert <1s, @pytest.mark.benchmark
 
 ### Implementation Notes
 - Conformance fixture format must match existing harness: one payload object per fixture + manifest `event_type`
