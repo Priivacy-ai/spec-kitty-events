@@ -1,7 +1,7 @@
 ---
 work_package_id: WP02
 title: Participant Lifecycle Payloads
-lane: "for_review"
+lane: "doing"
 dependencies: [WP01]
 base_branch: 006-mission-collaboration-soft-coordination-contracts-WP01
 base_commit: f058d167abbbbbd8460757676b7e12ee4fb0ed3b
@@ -14,8 +14,8 @@ subtasks:
 - T012
 phase: Phase 1 - Payload Models
 assignee: ''
-agent: "claude-coordinator"
-shell_pid: "53449"
+agent: "codex"
+shell_pid: "58785"
 review_status: ''
 reviewed_by: ''
 history:
@@ -184,3 +184,4 @@ spec-kitty agent tasks move-task WP02 --to for_review --note "Ready for review: 
 - 2026-02-15T10:35:14Z – system – lane=planned – Prompt created.
 - 2026-02-15T10:54:55Z – claude-coordinator – shell_pid=53449 – lane=doing – Assigned agent via workflow command
 - 2026-02-15T10:57:57Z – claude-coordinator – shell_pid=53449 – lane=for_review – Ready for review: 4 lifecycle payloads with 39 tests, mypy clean
+- 2026-02-15T10:58:02Z – codex – shell_pid=58785 – lane=doing – Started review via workflow command
