@@ -1,28 +1,31 @@
 ---
-work_package_id: "WP04"
+work_package_id: WP04
+title: Warning, Communication, and Session Payloads
+lane: "doing"
+dependencies: [WP01]
+base_branch: 006-mission-collaboration-soft-coordination-contracts-WP01
+base_commit: f058d167abbbbbd8460757676b7e12ee4fb0ed3b
+created_at: '2026-02-15T11:02:25.052265+00:00'
 subtasks:
-  - "T018"
-  - "T019"
-  - "T020"
-  - "T021"
-  - "T022"
-  - "T023"
-  - "T024"
-title: "Warning, Communication, and Session Payloads"
-phase: "Phase 1 - Payload Models"
-lane: "planned"  # DO NOT EDIT - use: spec-kitty agent tasks move-task <WPID> --to <lane>
-assignee: ""
-agent: ""
-shell_pid: ""
-review_status: ""
-reviewed_by: ""
-dependencies: ["WP01"]
+- T018
+- T019
+- T020
+- T021
+- T022
+- T023
+- T024
+phase: Phase 1 - Payload Models
+assignee: ''
+agent: ''
+shell_pid: "67115"
+review_status: ''
+reviewed_by: ''
 history:
-  - timestamp: "2026-02-15T10:35:14Z"
-    lane: "planned"
-    agent: "system"
-    shell_pid: ""
-    action: "Prompt generated via /spec-kitty.tasks"
+- timestamp: '2026-02-15T10:35:14Z'
+  lane: planned
+  agent: system
+  shell_pid: ''
+  action: Prompt generated via /spec-kitty.tasks
 ---
 
 # Work Package Prompt: WP04 – Warning, Communication, and Session Payloads
