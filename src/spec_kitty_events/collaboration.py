@@ -186,6 +186,86 @@ class PresenceHeartbeatPayload(BaseModel):
         None, description="Specific session sending heartbeat"
     )
 
+
+class DriveIntentSetPayload(BaseModel):
+    """Typed payload for DriveIntentSet events."""
+
+    model_config = ConfigDict(frozen=True)
+
+    participant_id: str = Field(
+        ..., min_length=1, description="Participant declaring intent"
+    )
+    mission_id: str = Field(
+        ..., min_length=1, description="Mission context"
+    )
+    intent: Literal["active", "inactive"] = Field(
+        ..., description="Drive intent state"
+    )
+
+
+class FocusChangedPayload(BaseModel):
+    """Typed payload for FocusChanged events."""
+
+    model_config = ConfigDict(frozen=True)
+
+    participant_id: str = Field(
+        ..., min_length=1, description="Participant changing focus"
+    )
+    mission_id: str = Field(
+        ..., min_length=1, description="Mission context"
+    )
+    focus_target: FocusTarget = Field(
+        ..., description="New focus target"
+    )
+    previous_focus_target: Optional[FocusTarget] = Field(
+        None, description="Previous focus (if any)"
+    )
+
+
+class PromptStepExecutionStartedPayload(BaseModel):
+    """Typed payload for PromptStepExecutionStarted events."""
+
+    model_config = ConfigDict(frozen=True)
+
+    participant_id: str = Field(
+        ..., min_length=1, description="Executing participant"
+    )
+    mission_id: str = Field(
+        ..., min_length=1, description="Mission context"
+    )
+    step_id: str = Field(
+        ..., min_length=1, description="Step identifier"
+    )
+    wp_id: Optional[str] = Field(
+        None, description="Work package being targeted"
+    )
+    step_description: Optional[str] = Field(
+        None, description="Human-readable step description"
+    )
+
+
+class PromptStepExecutionCompletedPayload(BaseModel):
+    """Typed payload for PromptStepExecutionCompleted events."""
+
+    model_config = ConfigDict(frozen=True)
+
+    participant_id: str = Field(
+        ..., min_length=1, description="Completing participant"
+    )
+    mission_id: str = Field(
+        ..., min_length=1, description="Mission context"
+    )
+    step_id: str = Field(
+        ..., min_length=1, description="Step identifier"
+    )
+    wp_id: Optional[str] = Field(
+        None, description="Work package targeted"
+    )
+    outcome: Literal["success", "failure", "skipped"] = Field(
+        ..., description="Step outcome"
+    )
+
+
 # ── Section 4: Reducer Output Models ──  (populated by WP05)
 
 # ── Section 5: Collaboration Reducer ──  (populated by WP06)
