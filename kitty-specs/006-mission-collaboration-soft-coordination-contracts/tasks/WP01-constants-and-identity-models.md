@@ -1,28 +1,31 @@
 ---
-work_package_id: "WP01"
-subtasks:
-  - "T001"
-  - "T002"
-  - "T003"
-  - "T004"
-  - "T005"
-  - "T006"
-  - "T007"
-title: "Constants and Identity Models"
-phase: "Phase 0 - Foundation"
-lane: "planned"  # DO NOT EDIT - use: spec-kitty agent tasks move-task <WPID> --to <lane>
-assignee: ""
-agent: ""
-shell_pid: ""
-review_status: ""
-reviewed_by: ""
+work_package_id: WP01
+title: Constants and Identity Models
+lane: "doing"
 dependencies: []
+base_branch: main
+base_commit: 0697f26d3beaaf8cadb3eb68e938f31c4d05e71d
+created_at: '2026-02-15T10:46:29.964505+00:00'
+subtasks:
+- T001
+- T002
+- T003
+- T004
+- T005
+- T006
+- T007
+phase: Phase 0 - Foundation
+assignee: ''
+agent: ''
+shell_pid: "44934"
+review_status: ''
+reviewed_by: ''
 history:
-  - timestamp: "2026-02-15T10:35:14Z"
-    lane: "planned"
-    agent: "system"
-    shell_pid: ""
-    action: "Prompt generated via /spec-kitty.tasks"
+- timestamp: '2026-02-15T10:35:14Z'
+  lane: planned
+  agent: system
+  shell_pid: ''
+  action: Prompt generated via /spec-kitty.tasks
 ---
 
 # Work Package Prompt: WP01 – Constants and Identity Models
