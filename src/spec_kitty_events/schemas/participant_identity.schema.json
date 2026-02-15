@@ -1,0 +1,54 @@
+{
+  "$id": "spec-kitty-events/participant_identity",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "SaaS-minted, mission-scoped participant identity.",
+  "properties": {
+    "display_name": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Human-readable name for display",
+      "title": "Display Name"
+    },
+    "participant_id": {
+      "description": "SaaS-minted, mission-scoped unique identifier",
+      "minLength": 1,
+      "title": "Participant Id",
+      "type": "string"
+    },
+    "participant_type": {
+      "description": "Participant category",
+      "enum": [
+        "human",
+        "llm_context"
+      ],
+      "title": "Participant Type",
+      "type": "string"
+    },
+    "session_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "SaaS-issued session identifier",
+      "title": "Session Id"
+    }
+  },
+  "required": [
+    "participant_id",
+    "participant_type"
+  ],
+  "title": "ParticipantIdentity",
+  "type": "object"
+}

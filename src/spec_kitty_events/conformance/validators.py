@@ -25,6 +25,22 @@ from spec_kitty_events.lifecycle import (
 )
 from spec_kitty_events.models import Event
 from spec_kitty_events.status import StatusTransitionPayload
+from spec_kitty_events.collaboration import (
+    ParticipantInvitedPayload,
+    ParticipantJoinedPayload,
+    ParticipantLeftPayload,
+    PresenceHeartbeatPayload,
+    DriveIntentSetPayload,
+    FocusChangedPayload,
+    PromptStepExecutionStartedPayload,
+    PromptStepExecutionCompletedPayload,
+    ConcurrentDriverWarningPayload,
+    PotentialStepCollisionDetectedPayload,
+    WarningAcknowledgedPayload,
+    CommentPostedPayload,
+    DecisionCapturedPayload,
+    SessionLinkedPayload,
+)
 
 
 @dataclass(frozen=True)
@@ -70,6 +86,21 @@ _EVENT_TYPE_TO_MODEL: Dict[str, Type[Any]] = {
     "MissionCancelled": MissionCancelledPayload,
     "PhaseEntered": PhaseEnteredPayload,
     "ReviewRollback": ReviewRollbackPayload,
+    # Collaboration event contracts
+    "ParticipantInvited": ParticipantInvitedPayload,
+    "ParticipantJoined": ParticipantJoinedPayload,
+    "ParticipantLeft": ParticipantLeftPayload,
+    "PresenceHeartbeat": PresenceHeartbeatPayload,
+    "DriveIntentSet": DriveIntentSetPayload,
+    "FocusChanged": FocusChangedPayload,
+    "PromptStepExecutionStarted": PromptStepExecutionStartedPayload,
+    "PromptStepExecutionCompleted": PromptStepExecutionCompletedPayload,
+    "ConcurrentDriverWarning": ConcurrentDriverWarningPayload,
+    "PotentialStepCollisionDetected": PotentialStepCollisionDetectedPayload,
+    "WarningAcknowledged": WarningAcknowledgedPayload,
+    "CommentPosted": CommentPostedPayload,
+    "DecisionCaptured": DecisionCapturedPayload,
+    "SessionLinked": SessionLinkedPayload,
 }
 
 # Event type to JSON Schema name mapping (used with load_schema())
@@ -83,6 +114,21 @@ _EVENT_TYPE_TO_SCHEMA: Dict[str, str] = {
     "MissionCancelled": "mission_cancelled_payload",
     "PhaseEntered": "phase_entered_payload",
     "ReviewRollback": "review_rollback_payload",
+    # Collaboration event contracts
+    "ParticipantInvited": "participant_invited_payload",
+    "ParticipantJoined": "participant_joined_payload",
+    "ParticipantLeft": "participant_left_payload",
+    "PresenceHeartbeat": "presence_heartbeat_payload",
+    "DriveIntentSet": "drive_intent_set_payload",
+    "FocusChanged": "focus_changed_payload",
+    "PromptStepExecutionStarted": "prompt_step_execution_started_payload",
+    "PromptStepExecutionCompleted": "prompt_step_execution_completed_payload",
+    "ConcurrentDriverWarning": "concurrent_driver_warning_payload",
+    "PotentialStepCollisionDetected": "potential_step_collision_detected_payload",
+    "WarningAcknowledged": "warning_acknowledged_payload",
+    "CommentPosted": "comment_posted_payload",
+    "DecisionCaptured": "decision_captured_payload",
+    "SessionLinked": "session_linked_payload",
 }
 
 
