@@ -8,7 +8,7 @@ multi-participant mission coordination.
 from __future__ import annotations
 
 from datetime import datetime
-from typing import FrozenSet, Literal, Optional
+from typing import FrozenSet, List, Literal, Optional
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -115,6 +115,145 @@ class UnknownParticipantError(SpecKittyEventsError):
 
 
 # ── Section 3: Payload Models ──  (populated by WP02-WP04)
+
+
+class ConcurrentDriverWarningPayload(BaseModel):
+    """Typed payload for ConcurrentDriverWarning events."""
+
+    model_config = ConfigDict(frozen=True)
+
+    warning_id: str = Field(
+        ..., min_length=1, description="Unique warning identifier"
+    )
+    mission_id: str = Field(
+        ..., min_length=1, description="Mission context"
+    )
+    participant_ids: List[str] = Field(
+        ..., min_length=2, description="All concurrent active drivers on overlapping target"
+    )
+    focus_target: FocusTarget = Field(
+        ..., description="Shared focus target triggering warning"
+    )
+    severity: Literal["info", "warning"] = Field(
+        ..., description="Warning severity level"
+    )
+
+
+class PotentialStepCollisionDetectedPayload(BaseModel):
+    """Typed payload for PotentialStepCollisionDetected events."""
+
+    model_config = ConfigDict(frozen=True)
+
+    warning_id: str = Field(
+        ..., min_length=1, description="Unique warning identifier"
+    )
+    mission_id: str = Field(
+        ..., min_length=1, description="Mission context"
+    )
+    participant_ids: List[str] = Field(
+        ..., min_length=2, description="Colliding participants"
+    )
+    step_id: str = Field(
+        ..., min_length=1, description="Colliding step"
+    )
+    wp_id: Optional[str] = Field(
+        None, description="Work package context"
+    )
+    severity: Literal["info", "warning"] = Field(
+        ..., description="Warning severity level"
+    )
+
+
+class WarningAcknowledgedPayload(BaseModel):
+    """Typed payload for WarningAcknowledged events."""
+
+    model_config = ConfigDict(frozen=True)
+
+    participant_id: str = Field(
+        ..., min_length=1, description="Acknowledging participant"
+    )
+    mission_id: str = Field(
+        ..., min_length=1, description="Mission context"
+    )
+    warning_id: str = Field(
+        ..., min_length=1, description="Warning being acknowledged"
+    )
+    acknowledgement: Literal["continue", "hold", "reassign", "defer"] = Field(
+        ..., description="Response action"
+    )
+
+
+class CommentPostedPayload(BaseModel):
+    """Typed payload for CommentPosted events."""
+
+    model_config = ConfigDict(frozen=True)
+
+    participant_id: str = Field(
+        ..., min_length=1, description="Comment author"
+    )
+    mission_id: str = Field(
+        ..., min_length=1, description="Mission context"
+    )
+    comment_id: str = Field(
+        ..., min_length=1, description="Unique comment identifier"
+    )
+    content: str = Field(
+        ..., min_length=1, description="Comment text"
+    )
+    reply_to: Optional[str] = Field(
+        None, description="Parent comment_id for threading"
+    )
+
+
+class DecisionCapturedPayload(BaseModel):
+    """Typed payload for DecisionCaptured events."""
+
+    model_config = ConfigDict(frozen=True)
+
+    participant_id: str = Field(
+        ..., min_length=1, description="Decision author"
+    )
+    mission_id: str = Field(
+        ..., min_length=1, description="Mission context"
+    )
+    decision_id: str = Field(
+        ..., min_length=1, description="Unique decision identifier"
+    )
+    topic: str = Field(
+        ..., min_length=1, description="Decision topic/question"
+    )
+    chosen_option: str = Field(
+        ..., min_length=1, description="Selected option"
+    )
+    rationale: Optional[str] = Field(
+        None, description="Reasoning for the decision"
+    )
+    referenced_warning_id: Optional[str] = Field(
+        None, description="Warning that prompted this decision"
+    )
+
+
+class SessionLinkedPayload(BaseModel):
+    """Typed payload for SessionLinked events."""
+
+    model_config = ConfigDict(frozen=True)
+
+    participant_id: str = Field(
+        ..., min_length=1, description="Participant linking sessions"
+    )
+    mission_id: str = Field(
+        ..., min_length=1, description="Mission context"
+    )
+    primary_session_id: str = Field(
+        ..., min_length=1, description="Primary session"
+    )
+    linked_session_id: str = Field(
+        ..., min_length=1, description="Session being linked"
+    )
+    link_type: Literal["cli_to_saas", "saas_to_cli"] = Field(
+        ..., description="Direction of link"
+    )
+
 
 # ── Section 4: Reducer Output Models ──  (populated by WP05)
 
