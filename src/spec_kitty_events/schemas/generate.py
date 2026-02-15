@@ -28,6 +28,25 @@ from spec_kitty_events.gates import (
     GatePassedPayload,
     GateFailedPayload,
 )
+from spec_kitty_events.collaboration import (
+    ParticipantIdentity,
+    AuthPrincipalBinding,
+    FocusTarget,
+    ParticipantInvitedPayload,
+    ParticipantJoinedPayload,
+    ParticipantLeftPayload,
+    PresenceHeartbeatPayload,
+    DriveIntentSetPayload,
+    FocusChangedPayload,
+    PromptStepExecutionStartedPayload,
+    PromptStepExecutionCompletedPayload,
+    ConcurrentDriverWarningPayload,
+    PotentialStepCollisionDetectedPayload,
+    WarningAcknowledgedPayload,
+    CommentPostedPayload,
+    DecisionCapturedPayload,
+    SessionLinkedPayload,
+)
 
 
 # Schema directory (same directory as this script)
@@ -44,6 +63,25 @@ PYDANTIC_MODELS: List[tuple[str, Type[BaseModel]]] = [
     ("mission_cancelled_payload", MissionCancelledPayload),
     ("phase_entered_payload", PhaseEnteredPayload),
     ("review_rollback_payload", ReviewRollbackPayload),
+    # Collaboration identity models
+    ("participant_identity", ParticipantIdentity),
+    ("auth_principal_binding", AuthPrincipalBinding),
+    ("focus_target", FocusTarget),
+    # Collaboration payload models
+    ("participant_invited_payload", ParticipantInvitedPayload),
+    ("participant_joined_payload", ParticipantJoinedPayload),
+    ("participant_left_payload", ParticipantLeftPayload),
+    ("presence_heartbeat_payload", PresenceHeartbeatPayload),
+    ("drive_intent_set_payload", DriveIntentSetPayload),
+    ("focus_changed_payload", FocusChangedPayload),
+    ("prompt_step_execution_started_payload", PromptStepExecutionStartedPayload),
+    ("prompt_step_execution_completed_payload", PromptStepExecutionCompletedPayload),
+    ("concurrent_driver_warning_payload", ConcurrentDriverWarningPayload),
+    ("potential_step_collision_detected_payload", PotentialStepCollisionDetectedPayload),
+    ("warning_acknowledged_payload", WarningAcknowledgedPayload),
+    ("comment_posted_payload", CommentPostedPayload),
+    ("decision_captured_payload", DecisionCapturedPayload),
+    ("session_linked_payload", SessionLinkedPayload),
 ]
 
 # Enums (use TypeAdapter)
