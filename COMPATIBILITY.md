@@ -8,6 +8,7 @@ per event type, versioning policy, and CI integration steps.
 
 - [Lane Mapping Contract](#lane-mapping-contract)
 - [Event Type Field Reference](#event-type-field-reference)
+- [Collaboration Event Contracts](#collaboration-event-contracts)
 - [Versioning Policy](#versioning-policy)
 - [Migration Guide (0.x to 2.0.0)](#migration-guide-0x-to-200)
 - [Consumer CI Integration](#consumer-ci-integration)
@@ -166,6 +167,120 @@ The `Event` model is the top-level envelope for all events. All payload-specific
 | `target_phase` | `str` | Yes | — | Phase to roll back to |
 | `affected_wp_ids` | `list[str]` | No | `[]` | WP IDs affected by rollback |
 | `actor` | `str` | Yes | — | Actor triggering rollback |
+
+---
+
+## Collaboration Event Contracts
+
+Added in **2.1.0** (Feature 006). N-participant mission collaboration with advisory coordination
+(soft locks, not hard locks).
+
+### Event Type Reference Table
+
+All 14 collaboration event types with their key fields and categories:
+
+| Category | Event Type | Payload Model | Key Fields |
+|---|---|---|---|
+| Participant Lifecycle | `ParticipantInvited` | `ParticipantInvitedPayload` | `participant_id`, `participant_identity`, `invited_by`, `mission_id` |
+| Participant Lifecycle | `ParticipantJoined` | `ParticipantJoinedPayload` | `participant_id`, `participant_identity`, `mission_id`, `auth_principal_id` (optional) |
+| Participant Lifecycle | `ParticipantLeft` | `ParticipantLeftPayload` | `participant_id`, `mission_id`, `reason` (optional) |
+| Participant Lifecycle | `PresenceHeartbeat` | `PresenceHeartbeatPayload` | `participant_id`, `mission_id`, `session_id` (optional) |
+| Drive Intent & Focus | `DriveIntentSet` | `DriveIntentSetPayload` | `participant_id`, `mission_id`, `intent` (`"active"` / `"inactive"`) |
+| Drive Intent & Focus | `FocusChanged` | `FocusChangedPayload` | `participant_id`, `mission_id`, `focus_target`, `previous_focus_target` (optional) |
+| Step Execution | `PromptStepExecutionStarted` | `PromptStepExecutionStartedPayload` | `participant_id`, `mission_id`, `step_id`, `wp_id` (optional) |
+| Step Execution | `PromptStepExecutionCompleted` | `PromptStepExecutionCompletedPayload` | `participant_id`, `mission_id`, `step_id`, `outcome` (`"success"` / `"failure"` / `"skipped"`) |
+| Advisory Warnings | `ConcurrentDriverWarning` | `ConcurrentDriverWarningPayload` | `warning_id`, `mission_id`, `participant_ids`, `focus_target`, `severity` |
+| Advisory Warnings | `PotentialStepCollisionDetected` | `PotentialStepCollisionDetectedPayload` | `warning_id`, `mission_id`, `participant_ids`, `step_id`, `severity` |
+| Advisory Warnings | `WarningAcknowledged` | `WarningAcknowledgedPayload` | `participant_id`, `mission_id`, `warning_id`, `acknowledgement` |
+| Communication | `CommentPosted` | `CommentPostedPayload` | `participant_id`, `mission_id`, `comment_id`, `content`, `reply_to` (optional) |
+| Communication | `DecisionCaptured` | `DecisionCapturedPayload` | `participant_id`, `mission_id`, `decision_id`, `topic`, `chosen_option` |
+| Session | `SessionLinked` | `SessionLinkedPayload` | `participant_id`, `mission_id`, `primary_session_id`, `linked_session_id`, `link_type` |
+
+### Identity and Target Models
+
+| Model | Purpose | Key Fields |
+|---|---|---|
+| `ParticipantIdentity` | SaaS-minted, mission-scoped participant identity | `participant_id`, `participant_type` (`"human"` / `"llm_context"`), `display_name`, `session_id` |
+| `AuthPrincipalBinding` | Auth principal to participant binding | `auth_principal_id`, `participant_id`, `bound_at` |
+| `FocusTarget` | Structured focus reference (hashable) | `target_type` (`"wp"` / `"step"` / `"file"`), `target_id` |
+
+### Reducer Contract
+
+```python
+reduce_collaboration_events(
+    events: Sequence[Event],
+    *,
+    mode: Literal["strict", "permissive"] = "strict",
+    roster: Optional[Dict[str, ParticipantIdentity]] = None,
+) -> ReducedCollaborationState
+```
+
+**Modes**:
+
+- **Strict** (default): Raises `UnknownParticipantError` when an event references a participant
+  not in the roster. Appropriate for production event replay where the roster is complete.
+- **Permissive**: Records a `CollaborationAnomaly` for each violation instead of raising. Useful
+  for debugging, partial replays, and log analysis.
+
+**Seeded roster**: When `roster` is provided (`Dict[str, ParticipantIdentity]`), participants are
+pre-populated before event processing begins. Events can reference these participants without a
+prior `ParticipantJoined` event. This supports partial-window reduction where a consumer replays
+only a subset of events.
+
+**Pipeline**:
+
+1. **Filter**: Keep only events with `event_type in COLLABORATION_EVENT_TYPES`
+2. **Sort**: Order by `(lamport_clock, timestamp, event_id)` for deterministic processing
+3. **Dedup**: Remove duplicate `event_id` values (reuses `dedup_events()` from status module)
+4. **Process**: Fold each event into mutable intermediate state
+5. **Assemble**: Build frozen `ReducedCollaborationState`
+
+**Output**: `ReducedCollaborationState` with 15 fields including `participants`, `active_drivers`,
+`focus_by_participant`, `participants_by_focus` (reverse index), `warnings`, `decisions`,
+`comments`, `active_executions`, `linked_sessions`, `anomalies`, and `event_count`.
+
+### Envelope Mapping Convention
+
+Collaboration events follow the same `Event` envelope as lifecycle events:
+
+- **`aggregate_id`**: `"mission/{mission_id}"` format (matches lifecycle events)
+- **`correlation_id`**: ULID-26 format (exactly 26 characters)
+- **`event_type`**: One of the 14 collaboration event type constants
+- **`payload`**: Dictionary matching the corresponding typed payload model
+
+### SaaS-Authoritative Participation Model
+
+The collaboration contract uses a **SaaS-authoritative** participation model:
+
+- **`participant_id`** is SaaS-minted and mission-scoped. The SaaS backend assigns participant
+  identifiers when participants are invited or join a mission.
+- **CLI must not invent identities**. CLI agents receive their `participant_id` from the SaaS
+  backend during session establishment.
+- **Auth principal binding**: The `auth_principal_id` field on `ParticipantJoinedPayload` records
+  the authenticated identity of the joining participant. This is populated by the SaaS backend
+  at join time and binds the auth principal to the mission-scoped participant.
+- **Strict mode enforces roster membership**: In strict mode, every event that references a
+  `participant_id` must have that participant already in the roster (via `ParticipantInvited`,
+  `ParticipantJoined`, or seeded `roster` parameter). Events from unknown participants raise
+  `UnknownParticipantError`.
+
+### Advisory Warning Semantics
+
+The collaboration model uses **advisory warnings**, not hard locks:
+
+- **No hard locks**: `ConcurrentDriverWarning` and `PotentialStepCollisionDetected` are
+  informational signals. They do not block or prevent any action.
+- **Acknowledgement actions**: When a participant acknowledges a warning via
+  `WarningAcknowledged`, they select one of four actions:
+  - `"continue"` -- proceed despite the warning
+  - `"hold"` -- pause current work voluntarily
+  - `"reassign"` -- hand off the conflicting work to another participant
+  - `"defer"` -- postpone the conflicting work
+- **Warning emitters**: Warning events may be emitted by:
+  - CLI observers that detect concurrent focus or step execution locally
+  - SaaS backend fallback inference that detects conflicts from the event stream
+- **Soft coordination**: The system provides visibility into potential conflicts but does not
+  enforce resolution. Participants retain full autonomy over their actions.
 
 ---
 

@@ -3,7 +3,7 @@
 Event log library with Lamport clocks, CRDT merge, and canonical event contracts for distributed
 systems.
 
-**Version**: 2.0.0rc1 | **SCHEMA_VERSION**: 2.0.0 | **Python**: >= 3.10
+**Version**: 2.1.0 | **SCHEMA_VERSION**: 2.0.0 | **Python**: >= 3.10
 
 ## Features
 
@@ -16,9 +16,11 @@ systems.
 - **Lane Mapping Contract**: `SyncLaneV1` maps 7 canonical lanes to 4 consumer-facing sync lanes
 - **Gate Observability**: Typed payloads for GitHub `check_run` gate events
 - **Lifecycle Events**: Mission lifecycle contracts with typed payloads and reducer
+- **Collaboration Events**: N-participant mission collaboration with advisory coordination (soft
+  locks, not hard locks), 14 event types, dual-mode reducer
 - **Conformance Suite**: Dual-layer validation (Pydantic + JSON Schema), manifest-driven fixtures,
   pytest-runnable conformance tests
-- **JSON Schemas**: 11 committed schema artifacts generated from Pydantic models
+- **JSON Schemas**: 28 committed schema artifacts generated from Pydantic models
 - **Error Logging**: Systematic error tracking with retention policies
 - **Storage Adapters**: Abstract storage interfaces (bring your own database)
 - **Type Safety**: Full `mypy --strict` compliance with `py.typed` marker
@@ -28,7 +30,7 @@ systems.
 ### From PyPI
 
 ```bash
-pip install "spec-kitty-events>=2.0.0rc1,<3.0.0"
+pip install "spec-kitty-events>=2.1.0,<3.0.0"
 ```
 
 With conformance testing support (adds `jsonschema`):
@@ -40,7 +42,7 @@ pip install "spec-kitty-events[conformance]>=2.0.0rc1,<3.0.0"
 ### From Git
 
 ```bash
-pip install "git+https://github.com/Priivacy-ai/spec-kitty-events.git@v2.0.0rc1"
+pip install "git+https://github.com/Priivacy-ai/spec-kitty-events.git@v2.1.0"
 ```
 
 ### Development Installation
@@ -113,6 +115,57 @@ result = validate_event(payload, "WPStatusChanged")
 assert result.valid
 ```
 
+### Collaboration Events (New in 2.1.0)
+
+N-participant mission collaboration with advisory coordination. Soft locks, not hard locks --
+warnings are informational and participants decide how to respond.
+
+**14 event types** grouped by category:
+
+| Category | Event Types |
+|---|---|
+| Participant Lifecycle | `ParticipantInvited`, `ParticipantJoined`, `ParticipantLeft`, `PresenceHeartbeat` |
+| Drive Intent & Focus | `DriveIntentSet`, `FocusChanged` |
+| Step Execution | `PromptStepExecutionStarted`, `PromptStepExecutionCompleted` |
+| Advisory Warnings | `ConcurrentDriverWarning`, `PotentialStepCollisionDetected`, `WarningAcknowledged` |
+| Communication | `CommentPosted`, `DecisionCaptured` |
+| Session | `SessionLinked` |
+
+**Key exports**: `ParticipantIdentity`, `FocusTarget`, `reduce_collaboration_events`,
+`ReducedCollaborationState`, `UnknownParticipantError`, `CollaborationAnomaly`
+
+```python
+from spec_kitty_events import (
+    Event,
+    ParticipantIdentity,
+    ParticipantJoinedPayload,
+    PARTICIPANT_JOINED,
+    reduce_collaboration_events,
+    FocusTarget,
+)
+
+# Construct a participant identity
+identity = ParticipantIdentity(
+    participant_id="p-abc123",
+    participant_type="human",
+    display_name="Alice",
+)
+
+# Construct a typed payload
+payload = ParticipantJoinedPayload(
+    participant_id="p-abc123",
+    participant_identity=identity,
+    mission_id="mission/M042",
+)
+
+# Reduce collaboration events into materialized state
+state = reduce_collaboration_events([])
+assert state.event_count == 0
+```
+
+See [COMPATIBILITY.md](COMPATIBILITY.md) for the full collaboration event contracts, reducer
+pipeline details, and SaaS-authoritative participation model.
+
 ### Conflict Detection and Resolution
 
 ```python
@@ -133,9 +186,9 @@ if is_concurrent(event1, event2):
 - **Type hints**: Full mypy --strict compliance (source is the documentation)
 - **Conformance suite**: `pytest --pyargs spec_kitty_events.conformance -v`
 
-## Public API (68 Exports)
+## Public API (104 Exports)
 
-The `spec_kitty_events` package exports 68 symbols covering:
+The `spec_kitty_events` package exports 104 symbols covering:
 
 | Category | Count | Key Exports |
 |---|---|---|
@@ -149,11 +202,12 @@ The `spec_kitty_events` package exports 68 symbols covering:
 | Gate observability | 5 | `GatePayloadBase`, `GatePassedPayload`, `GateFailedPayload`, `map_check_run_conclusion`, `UnknownConclusionError` |
 | Lifecycle events | 15 | `SCHEMA_VERSION`, `MissionStatus`, payload models, reducer, constants |
 | Status model | 25 | `Lane`, `SyncLaneV1`, `canonical_to_sync_v1`, `StatusTransitionPayload`, reducer, validators |
+| Collaboration events | 36 | `ParticipantIdentity`, `FocusTarget`, payload models, reducer, constants, warnings |
 | Version | 1 | `__version__` |
 
 ## Testing
 
-Run the full test suite (552 tests, 98% coverage):
+Run the full test suite (790 tests, 98% coverage):
 
 ```bash
 pytest --cov --cov-report=html
@@ -195,7 +249,7 @@ Release flow:
 
 1. Update `project.version` in `pyproject.toml`.
 2. Commit to `main`.
-3. Create and push matching tag (e.g., `v2.0.0rc1` for `version = "2.0.0rc1"`).
+3. Create and push matching tag (e.g., `v2.1.0` for `version = "2.1.0"`).
 4. Approve the `pypi` GitHub environment (if required).
 5. Verify package on PyPI and install in a clean environment.
 

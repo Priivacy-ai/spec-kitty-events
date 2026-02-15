@@ -5,6 +5,35 @@ All notable changes to spec-kitty-events will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.0] - 2026-02-15
+
+### Added
+
+- **Collaboration event contracts** (Feature 006):
+  - 14 new event type constants and `COLLABORATION_EVENT_TYPES` frozenset
+  - 3 identity/target models: `ParticipantIdentity`, `AuthPrincipalBinding`, `FocusTarget`
+  - 14 typed payload models for participant lifecycle, drive intent, focus, step execution,
+    advisory warnings, communication, and session linking
+  - `ReducedCollaborationState` materialized view with 15 fields
+  - `reduce_collaboration_events()` -- dual-mode reducer (strict/permissive) with seeded roster
+    support
+  - `UnknownParticipantError` for strict mode enforcement
+  - `CollaborationAnomaly` for non-fatal issue recording
+  - 17 new JSON Schema files for collaboration models (28 total)
+  - 7 conformance payload fixtures (5 valid, 2 invalid)
+  - Hypothesis property tests for reducer determinism
+  - Performance benchmark (10K events in <1s)
+- 36 new exports (total package exports: 104)
+- SaaS-authoritative participation model documentation
+- Canonical envelope mapping convention
+
+### Changed
+
+- **Version**: Graduated from `2.0.0rc1` to `2.1.0`.
+- **Public API**: 104 exports in `__init__.py` (up from 68 in 2.0.0rc1). Added 14 event type
+  constants, 3 identity/target models, 14 payload models, 3 reducer/error models, and
+  `COLLABORATION_EVENT_TYPES` frozenset and `reduce_collaboration_events` function.
+
 ## [2.0.0rc1] - 2026-02-12
 
 ### Added
@@ -151,6 +180,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+[2.1.0]: https://github.com/Priivacy-ai/spec-kitty-events/compare/v2.0.0rc1...v2.1.0
 [2.0.0rc1]: https://github.com/Priivacy-ai/spec-kitty-events/compare/v0.4.0-alpha...v2.0.0rc1
 [0.4.0-alpha]: https://github.com/Priivacy-ai/spec-kitty-events/compare/v0.3.0-alpha...v0.4.0-alpha
 [0.3.0-alpha]: https://github.com/Priivacy-ai/spec-kitty-events/compare/v0.2.0-alpha...v0.3.0-alpha
