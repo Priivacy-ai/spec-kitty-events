@@ -51,11 +51,11 @@
 **Estimated prompt size**: ~350 lines
 
 ### Included Subtasks
-- [ ] T008 [P] Implement `ParticipantInvitedPayload` (participant_id, participant_identity, invited_by, mission_id)
-- [ ] T009 [P] Implement `ParticipantJoinedPayload` (participant_id, participant_identity, mission_id, optional auth_principal_id)
-- [ ] T010 [P] Implement `ParticipantLeftPayload` (participant_id, mission_id, optional reason)
-- [ ] T011 [P] Implement `PresenceHeartbeatPayload` (participant_id, mission_id, optional session_id)
-- [ ] T012 Write unit tests for all 4 lifecycle payloads (valid, invalid, round-trip)
+- [x] T008 [P] Implement `ParticipantInvitedPayload` (participant_id, participant_identity, invited_by, mission_id)
+- [x] T009 [P] Implement `ParticipantJoinedPayload` (participant_id, participant_identity, mission_id, optional auth_principal_id)
+- [x] T010 [P] Implement `ParticipantLeftPayload` (participant_id, mission_id, optional reason)
+- [x] T011 [P] Implement `PresenceHeartbeatPayload` (participant_id, mission_id, optional session_id)
+- [x] T012 Write unit tests for all 4 lifecycle payloads (valid, invalid, round-trip)
 
 ### Implementation Notes
 - `ParticipantJoinedPayload.auth_principal_id` is optional (absent for replay/import)
