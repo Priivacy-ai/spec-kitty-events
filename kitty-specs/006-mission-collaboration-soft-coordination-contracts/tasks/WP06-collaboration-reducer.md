@@ -1,7 +1,7 @@
 ---
 work_package_id: WP06
 title: Collaboration Reducer
-lane: "doing"
+lane: "for_review"
 dependencies:
 - WP01
 - WP02
@@ -423,3 +423,4 @@ spec-kitty agent tasks move-task WP06 --to for_review --note "Ready for review: 
 
 - 2026-02-15T10:35:14Z – system – lane=planned – Prompt created.
 - 2026-02-15T11:13:09Z – claude-coordinator – shell_pid=83786 – lane=doing – Assigned agent via workflow command
+- 2026-02-15T11:18:50Z – claude-coordinator – shell_pid=83786 – lane=for_review – Ready for review: reducer with all 14 event handlers, strict/permissive modes, seeded roster, 36 tests
