@@ -19,13 +19,13 @@
 **Estimated prompt size**: ~350 lines
 
 ### Included Subtasks
-- [ ] T001 Create `src/spec_kitty_events/collaboration.py` with module docstring and section headers
-- [ ] T002 Define 14 event type string constants and `COLLABORATION_EVENT_TYPES` frozenset
-- [ ] T003 Implement `ParticipantIdentity` frozen Pydantic model
-- [ ] T004 Implement `AuthPrincipalBinding` frozen Pydantic model
-- [ ] T005 Implement `FocusTarget` frozen Pydantic model
-- [ ] T006 Implement `UnknownParticipantError` exception (inherits `SpecKittyEventsError`)
-- [ ] T007 Write unit tests for all identity models, constants, and exception
+- [x] T001 Create `src/spec_kitty_events/collaboration.py` with module docstring and section headers
+- [x] T002 Define 14 event type string constants and `COLLABORATION_EVENT_TYPES` frozenset
+- [x] T003 Implement `ParticipantIdentity` frozen Pydantic model
+- [x] T004 Implement `AuthPrincipalBinding` frozen Pydantic model
+- [x] T005 Implement `FocusTarget` frozen Pydantic model
+- [x] T006 Implement `UnknownParticipantError` exception (inherits `SpecKittyEventsError`)
+- [x] T007 Write unit tests for all identity models, constants, and exception
 
 ### Implementation Notes
 - Follow `lifecycle.py` section structure: constants at top, then models, then exception
