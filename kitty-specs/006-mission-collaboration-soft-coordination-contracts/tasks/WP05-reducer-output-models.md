@@ -1,27 +1,30 @@
 ---
-work_package_id: "WP05"
+work_package_id: WP05
+title: Reducer Output Models
+lane: "doing"
+dependencies: [WP01]
+base_branch: 006-mission-collaboration-soft-coordination-contracts-WP01
+base_commit: f058d167abbbbbd8460757676b7e12ee4fb0ed3b
+created_at: '2026-02-15T11:08:14.255816+00:00'
 subtasks:
-  - "T025"
-  - "T026"
-  - "T027"
-  - "T028"
-  - "T029"
-  - "T030"
-title: "Reducer Output Models"
-phase: "Phase 1 - Payload Models"
-lane: "planned"  # DO NOT EDIT - use: spec-kitty agent tasks move-task <WPID> --to <lane>
-assignee: ""
-agent: ""
-shell_pid: ""
-review_status: ""
-reviewed_by: ""
-dependencies: ["WP01"]
+- T025
+- T026
+- T027
+- T028
+- T029
+- T030
+phase: Phase 1 - Payload Models
+assignee: ''
+agent: ''
+shell_pid: "80547"
+review_status: ''
+reviewed_by: ''
 history:
-  - timestamp: "2026-02-15T10:35:14Z"
-    lane: "planned"
-    agent: "system"
-    shell_pid: ""
-    action: "Prompt generated via /spec-kitty.tasks"
+- timestamp: '2026-02-15T10:35:14Z'
+  lane: planned
+  agent: system
+  shell_pid: ''
+  action: Prompt generated via /spec-kitty.tasks
 ---
 
 # Work Package Prompt: WP05 – Reducer Output Models
