@@ -1,26 +1,29 @@
 ---
-work_package_id: "WP07"
+work_package_id: WP07
+title: Exports and Schema Generation
+lane: "doing"
+dependencies: [WP06]
+base_branch: 006-mission-collaboration-soft-coordination-contracts-WP06
+base_commit: dc1e5a5c78a3af8ec033970101289c108f0989ab
+created_at: '2026-02-15T11:19:09.008361+00:00'
 subtasks:
-  - "T038"
-  - "T039"
-  - "T040"
-  - "T041"
-  - "T042"
-title: "Exports and Schema Generation"
-phase: "Phase 3 - Integration"
-lane: "planned"  # DO NOT EDIT - use: spec-kitty agent tasks move-task <WPID> --to <lane>
-assignee: ""
-agent: ""
-shell_pid: ""
-review_status: ""
-reviewed_by: ""
-dependencies: ["WP06"]
+- T038
+- T039
+- T040
+- T041
+- T042
+phase: Phase 3 - Integration
+assignee: ''
+agent: ''
+shell_pid: "86895"
+review_status: ''
+reviewed_by: ''
 history:
-  - timestamp: "2026-02-15T10:35:14Z"
-    lane: "planned"
-    agent: "system"
-    shell_pid: ""
-    action: "Prompt generated via /spec-kitty.tasks"
+- timestamp: '2026-02-15T10:35:14Z'
+  lane: planned
+  agent: system
+  shell_pid: ''
+  action: Prompt generated via /spec-kitty.tasks
 ---
 
 # Work Package Prompt: WP07 – Exports and Schema Generation
