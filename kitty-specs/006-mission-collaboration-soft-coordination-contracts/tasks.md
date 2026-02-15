@@ -144,12 +144,12 @@
 **Estimated prompt size**: ~350 lines
 
 ### Included Subtasks
-- [ ] T025 Implement `CollaborationAnomaly` frozen model (event_id, event_type, reason)
-- [ ] T026 [P] Implement `WarningEntry` frozen model (warning_id, event_id, warning_type, participant_ids, acknowledgements dict)
-- [ ] T027 [P] Implement `DecisionEntry` frozen model (decision_id, event_id, participant_id, topic, chosen_option, optional referenced_warning_id)
-- [ ] T028 [P] Implement `CommentEntry` frozen model (comment_id, event_id, participant_id, content, optional reply_to)
-- [ ] T029 Implement `ReducedCollaborationState` frozen model with all fields from data-model.md
-- [ ] T030 Write unit tests for all output models (construction, freezing, field access)
+- [x] T025 Implement `CollaborationAnomaly` frozen model (event_id, event_type, reason)
+- [x] T026 [P] Implement `WarningEntry` frozen model (warning_id, event_id, warning_type, participant_ids, acknowledgements dict)
+- [x] T027 [P] Implement `DecisionEntry` frozen model (decision_id, event_id, participant_id, topic, chosen_option, optional referenced_warning_id)
+- [x] T028 [P] Implement `CommentEntry` frozen model (comment_id, event_id, participant_id, content, optional reply_to)
+- [x] T029 Implement `ReducedCollaborationState` frozen model with all fields from data-model.md
+- [x] T030 Write unit tests for all output models (construction, freezing, field access)
 
 ### Implementation Notes
 - `ReducedCollaborationState` is the largest model — 14 fields. Use tuple for ordered collections (warnings, decisions, comments, anomalies) and dict/frozenset for indexed state
