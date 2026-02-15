@@ -1,7 +1,7 @@
 ---
 work_package_id: WP04
 title: Warning, Communication, and Session Payloads
-lane: "doing"
+lane: "for_review"
 dependencies: [WP01]
 base_branch: 006-mission-collaboration-soft-coordination-contracts-WP01
 base_commit: f058d167abbbbbd8460757676b7e12ee4fb0ed3b
@@ -242,3 +242,4 @@ spec-kitty agent tasks move-task WP04 --to for_review --note "Ready for review: 
 
 - 2026-02-15T10:35:14Z – system – lane=planned – Prompt created.
 - 2026-02-15T11:02:25Z – claude-coordinator – shell_pid=67115 – lane=doing – Assigned agent via workflow command
+- 2026-02-15T11:06:05Z – claude-coordinator – shell_pid=67115 – lane=for_review – Ready for review: 6 warning/comm/session payloads with 54 tests, mypy clean
