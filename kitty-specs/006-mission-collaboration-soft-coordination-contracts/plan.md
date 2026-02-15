@@ -1,108 +1,176 @@
-# Implementation Plan: [FEATURE]
-*Path: [templates/plan-template.md](templates/plan-template.md)*
+# Implementation Plan: Mission Collaboration Soft Coordination Contracts
 
-
-**Branch**: `[###-feature-name]` | **Date**: [DATE] | **Spec**: [link]
-**Input**: Feature specification from `/kitty-specs/[###-feature-name]/spec.md`
-
-**Note**: This template is filled in by the `/spec-kitty.plan` command. See `src/specify_cli/missions/software-dev/command-templates/plan.md` for the execution workflow.
-
-The planner will not begin until all planning questions have been answered—capture those answers in this document before progressing to later phases.
+**Branch**: `006-mission-collaboration-soft-coordination-contracts` | **Date**: 2026-02-15 | **Spec**: [spec.md](spec.md)
+**Input**: Feature specification from `kitty-specs/006-mission-collaboration-soft-coordination-contracts/spec.md`
 
 ## Summary
 
-[Extract from feature spec: primary requirement + technical approach from research]
+Add 14 typed event payloads, 3 identity/target models, a dual-mode collaboration reducer, and conformance artifacts to `spec-kitty-events`. This is the contract authority for N-participant mission collaboration with advisory (soft) coordination semantics. The reducer operates in strict mode (default, for live traffic — rejects unknown participants) or permissive mode (for replay/import — records anomalies). All artifacts follow existing patterns from Features 001–005.
 
 ## Technical Context
 
-<!--
-  ACTION REQUIRED: Replace the content in this section with the technical details
-  for the project. The structure here is presented in advisory capacity to guide
-  the iteration process.
--->
-
-**Language/Version**: [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION]  
-**Primary Dependencies**: [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION]  
-**Storage**: [if applicable, e.g., PostgreSQL, CoreData, files or N/A]  
-**Testing**: [e.g., pytest, XCTest, cargo test or NEEDS CLARIFICATION]  
-**Target Platform**: [e.g., Linux server, iOS 15+, WASM or NEEDS CLARIFICATION]
-**Project Type**: [single/web/mobile - determines source structure]  
-**Performance Goals**: [domain-specific, e.g., 1000 req/s, 10k lines/sec, 60 fps or NEEDS CLARIFICATION]  
-**Constraints**: [domain-specific, e.g., <200ms p95, <100MB memory, offline-capable or NEEDS CLARIFICATION]  
-**Scale/Scope**: [domain-specific, e.g., 10k users, 1M LOC, 50 screens or NEEDS CLARIFICATION]
+**Language/Version**: Python >=3.10 (mypy target 3.10, dev on 3.11)
+**Primary Dependencies**: Pydantic >=2.0.0,<3.0.0, python-ulid >=1.1.0
+**Storage**: N/A (pure data contracts, no persistence)
+**Testing**: pytest >=7.0.0, pytest-cov >=4.0.0, hypothesis >=6.0.0, mypy --strict
+**Target Platform**: Library (pip-installable, cross-platform)
+**Project Type**: Single Python package
+**Performance Goals**: Reducer processes 10K events in <1s (pure CPU, no I/O)
+**Constraints**: mypy --strict, 98%+ coverage, frozen Pydantic v2 models, no new external dependencies
+**Scale/Scope**: 14 new event types, ~35 new exports, ~550-630 LOC in collaboration.py
 
 ## Constitution Check
 
-*GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
-
-[Gates determined based on constitution file]
+*No constitution file found at `.kittify/memory/constitution.md`. Gate skipped.*
 
 ## Project Structure
 
 ### Documentation (this feature)
 
 ```
-kitty-specs/[###-feature]/
-├── plan.md              # This file (/spec-kitty.plan command output)
-├── research.md          # Phase 0 output (/spec-kitty.plan command)
-├── data-model.md        # Phase 1 output (/spec-kitty.plan command)
-├── quickstart.md        # Phase 1 output (/spec-kitty.plan command)
-├── contracts/           # Phase 1 output (/spec-kitty.plan command)
-└── tasks.md             # Phase 2 output (/spec-kitty.tasks command - NOT created by /spec-kitty.plan)
+kitty-specs/006-mission-collaboration-soft-coordination-contracts/
+├── plan.md              # This file
+├── research.md          # Phase 0 output — design decisions and rationale
+├── data-model.md        # Phase 1 output — entity definitions
+├── quickstart.md        # Phase 1 output — developer integration guide
+├── contracts/           # Phase 1 output — API contracts
+│   └── collaboration-api.md    # Collaboration module public API contract
+└── tasks.md             # Phase 2 output (NOT created by /spec-kitty.plan)
 ```
 
 ### Source Code (repository root)
-<!--
-  ACTION REQUIRED: Replace the placeholder tree below with the concrete layout
-  for this feature. Delete unused options and expand the chosen structure with
-  real paths (e.g., apps/admin, packages/something). The delivered plan must
-  not include Option labels.
--->
 
 ```
-# [REMOVE IF UNUSED] Option 1: Single project (DEFAULT)
-src/
-├── models/
-├── services/
-├── cli/
-└── lib/
+src/spec_kitty_events/
+├── collaboration.py          # NEW — 14 payloads, 3 identity models, reducer, constants
+├── models.py                 # UNCHANGED — Event envelope (reused)
+├── lifecycle.py              # UNCHANGED — Mission lifecycle (composed by consumers)
+├── status.py                 # UNCHANGED — Status reducer (sort/dedup reused)
+├── gates.py                  # UNCHANGED
+├── __init__.py               # MODIFIED — Add ~35 new exports
+├── schemas/
+│   ├── generate.py           # MODIFIED — Register 17 new models for schema gen
+│   ├── participant_identity.schema.json      # NEW
+│   ├── auth_principal_binding.schema.json    # NEW
+│   ├── focus_target.schema.json              # NEW
+│   ├── participant_invited_payload.schema.json        # NEW (14 payload schemas)
+│   ├── participant_joined_payload.schema.json         # NEW
+│   ├── participant_left_payload.schema.json           # NEW
+│   ├── presence_heartbeat_payload.schema.json         # NEW
+│   ├── drive_intent_set_payload.schema.json           # NEW
+│   ├── focus_changed_payload.schema.json              # NEW
+│   ├── prompt_step_execution_started_payload.schema.json   # NEW
+│   ├── prompt_step_execution_completed_payload.schema.json # NEW
+│   ├── concurrent_driver_warning_payload.schema.json       # NEW
+│   ├── potential_step_collision_detected_payload.schema.json # NEW
+│   ├── warning_acknowledged_payload.schema.json       # NEW
+│   ├── comment_posted_payload.schema.json             # NEW
+│   ├── decision_captured_payload.schema.json          # NEW
+│   └── session_linked_payload.schema.json             # NEW
+└── conformance/
+    ├── validators.py         # MODIFIED — Register collaboration payloads
+    └── fixtures/
+        ├── manifest.json     # MODIFIED — Add collaboration fixture entries
+        └── collaboration/    # NEW — Collaboration fixture directory
+            ├── valid/
+            │   ├── 3-participant-overlap.json         # NEW
+            │   ├── step-collision-llm.json            # NEW
+            │   ├── decision-with-comments.json        # NEW
+            │   ├── participant-lifecycle.json          # NEW
+            │   └── session-linking.json               # NEW
+            └── invalid/
+                ├── unknown-participant-strict.json     # NEW
+                └── missing-required-fields.json        # NEW
 
 tests/
-├── contract/
-├── integration/
-└── unit/
-
-# [REMOVE IF UNUSED] Option 2: Web application (when "frontend" + "backend" detected)
-backend/
-├── src/
-│   ├── models/
-│   ├── services/
-│   └── api/
-└── tests/
-
-frontend/
-├── src/
-│   ├── components/
-│   ├── pages/
-│   └── services/
-└── tests/
-
-# [REMOVE IF UNUSED] Option 3: Mobile + API (when "iOS/Android" detected)
-api/
-└── [same as backend above]
-
-ios/ or android/
-└── [platform-specific structure: feature modules, UI flows, platform tests]
+├── unit/
+│   └── test_collaboration.py    # NEW — Unit tests for all payloads + reducer
+└── property/
+    └── test_collaboration_determinism.py  # NEW — Hypothesis property tests
 ```
 
-**Structure Decision**: [Document the selected structure and reference the real
-directories captured above]
+**Structure Decision**: Single `collaboration.py` module following the same one-module-per-domain pattern as `lifecycle.py` (459 LOC) and `status.py` (540 LOC). Internal sections:
+1. Constants / event-type strings
+2. Identity models (ParticipantIdentity, AuthPrincipalBinding, FocusTarget)
+3. Payload models (14)
+4. Reducer output models (ReducedCollaborationState, CollaborationAnomaly, UnknownParticipantError)
+5. Reducer + helper functions
+
+**Split trigger**: If collaboration.py exceeds ~700 LOC or reducer/helpers dominate and hurt testability, split into `collaboration/` package with `payloads.py`, `reducer.py`, `models.py`.
+
+## Key Design Decisions
+
+### D1: Single collaboration.py (not a sub-package)
+
+**Decision**: All collaboration Python API surface lives in one file.
+**Rationale**: Consistent with lifecycle.py / status.py pattern. Estimated ~550-630 LOC — well under the 700 LOC split trigger. Cross-team discoverability: developers find all collaboration contracts in one place.
+**Alternative rejected**: `collaboration/` sub-package — premature for initial delivery, adds import complexity.
+
+### D2: Strict mode as default
+
+**Decision**: `reduce_collaboration_events(events, mode="strict")` — strict is the default.
+**Rationale**: Live traffic is the primary use case. Unknown participant = hard error prevents silent data corruption. Permissive mode is opt-in for replay/import tooling.
+**Implementation**: `mode` parameter as `Literal["strict", "permissive"]` with default `"strict"`. Type narrowing in reducer body.
+
+### D3: Reuse existing sort/dedup utilities
+
+**Decision**: Import `status_event_sort_key()` and `dedup_events()` from `status.py`.
+**Rationale**: Same ordering semantics (lamport_clock, timestamp, event_id). No reason to duplicate. Already tested and proven deterministic.
+
+### D4: Warning payloads are multi-actor
+
+**Decision**: `ConcurrentDriverWarningPayload` and `PotentialStepCollisionDetectedPayload` use `participant_ids: list[str]` (not `participant_id: str`).
+**Rationale**: These events describe a risk condition involving multiple participants. Single-actor payloads use `participant_id`. This distinction is explicit in FR-003.
+
+### D5: Acknowledgement enum is `continue|hold|reassign|defer`
+
+**Decision**: `WarningAcknowledgedPayload.acknowledgement` is `Literal["continue", "hold", "reassign", "defer"]`.
+**Rationale**: Actionable responses that consumers can switch on. Maps to real coordination decisions: proceed as-is, pause, hand off, postpone.
+
+### D6: Canonical envelope mapping convention
+
+**Decision**: `Event.aggregate_id = mission_id`, `Event.correlation_id = mission_run_id`.
+**Rationale**: Consistent with how lifecycle events use `aggregate_id = "mission/M001"`. The `correlation_id` carries the run-specific identifier so replays can be scoped.
+
+### D7: AuthPrincipalBinding as roster-level, not per-event
+
+**Decision**: `auth_principal_id` appears on `ParticipantJoinedPayload` (optional), not on every event.
+**Rationale**: Auth binding is established once at join time. Repeating it on every event is wasteful and creates a consistency risk. The binding is a roster-level association.
+
+## Deliverables
+
+### Deliverable 1: Collaboration Module (`collaboration.py`)
+
+**Scope**: 14 payload models, 3 identity/target models, event constants, reducer with strict/permissive modes, output state model, anomaly model, exception.
+**Estimated LOC**: 550-630
+**Files**: `src/spec_kitty_events/collaboration.py`
+**Dependencies**: `models.py` (Event), `status.py` (sort/dedup utilities)
+
+### Deliverable 2: Exports and Package Integration
+
+**Scope**: ~35 new symbols in `__init__.py`, schema generation registration, conformance validator updates.
+**Files**: `src/spec_kitty_events/__init__.py`, `src/spec_kitty_events/schemas/generate.py`, `src/spec_kitty_events/conformance/validators.py`
+
+### Deliverable 3: JSON Schemas
+
+**Scope**: 17 new `.schema.json` files (14 payloads + 3 identity/target models), generated from Pydantic models.
+**Files**: `src/spec_kitty_events/schemas/*.schema.json`
+
+### Deliverable 4: Conformance Fixtures
+
+**Scope**: 7 fixture files (5 valid, 2 invalid), manifest.json updates.
+**Files**: `src/spec_kitty_events/conformance/fixtures/collaboration/`
+
+### Deliverable 5: Tests
+
+**Scope**: Unit tests for all 14 payloads, reducer strict/permissive modes, all edge cases. Property tests for reducer determinism with Hypothesis.
+**Files**: `tests/unit/test_collaboration.py`, `tests/property/test_collaboration_determinism.py`
+
+### Deliverable 6: Documentation
+
+**Scope**: README, COMPATIBILITY.md, CHANGELOG updates with collaboration event reference, reducer contract, envelope mapping, SaaS-authoritative participation model.
+**Files**: `README.md`, `COMPATIBILITY.md`, `CHANGELOG.md`
 
 ## Complexity Tracking
 
-*Fill ONLY if Constitution Check has violations that must be justified*
-
-| Violation | Why Needed | Simpler Alternative Rejected Because |
-|-----------|------------|-------------------------------------|
-| [e.g., 4th project] | [current need] | [why 3 projects insufficient] |
-| [e.g., Repository pattern] | [specific problem] | [why direct DB access insufficient] |
+*No constitution violations to justify.*
