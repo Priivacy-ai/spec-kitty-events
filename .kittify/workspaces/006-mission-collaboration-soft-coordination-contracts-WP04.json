@@ -1,0 +1,14 @@
+{
+  "wp_id": "WP04",
+  "feature_slug": "006-mission-collaboration-soft-coordination-contracts",
+  "worktree_path": ".worktrees/006-mission-collaboration-soft-coordination-contracts-WP04",
+  "branch_name": "006-mission-collaboration-soft-coordination-contracts-WP04",
+  "base_branch": "006-mission-collaboration-soft-coordination-contracts-WP01",
+  "base_commit": "f058d167abbbbbd8460757676b7e12ee4fb0ed3b",
+  "dependencies": [
+    "WP01"
+  ],
+  "created_at": "2026-02-15T11:02:25.052265+00:00",
+  "created_by": "implement-command",
+  "vcs_backend": "git"
+}
