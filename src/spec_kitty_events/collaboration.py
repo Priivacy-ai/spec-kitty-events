@@ -567,7 +567,10 @@ def reduce_collaboration_events(
 
     Raises:
         UnknownParticipantError: In strict mode, when an event references a
-            participant not in the roster.
+            participant not in the active roster.
+        SpecKittyEventsError: In strict mode, for reducer integrity violations
+            such as acknowledgement of unknown warning IDs or completion
+            without a matching started execution.
     """
     from spec_kitty_events.status import dedup_events, status_event_sort_key
 
@@ -588,6 +591,7 @@ def reduce_collaboration_events(
 
     # -- Mutable intermediate state --
     participants: Dict[str, ParticipantIdentity] = {}
+    invited_participants: Dict[str, ParticipantIdentity] = {}
     departed_participants: Dict[str, ParticipantIdentity] = {}
     presence: Dict[str, datetime] = {}
     active_drivers: Set[str] = set()
@@ -615,12 +619,26 @@ def reduce_collaboration_events(
 
     # -- Helper functions --
 
-    def _check_participant(
+    def _check_active_participant(
         participant_id: str, event_id: str, event_type: str
     ) -> bool:
-        """Check participant is in roster. Returns True if valid."""
+        """Check participant is in active roster. Returns True if valid."""
         if participant_id in participants:
             return True
+        if participant_id in departed_participants:
+            if mode == "strict":
+                raise SpecKittyEventsError(
+                    f"Participant {participant_id!r} has departed "
+                    f"(event_id={event_id}, event_type={event_type})"
+                )
+            anomalies.append(
+                CollaborationAnomaly(
+                    event_id=event_id,
+                    event_type=event_type,
+                    reason=f"Participant {participant_id!r} has departed",
+                )
+            )
+            return False
         if mode == "strict":
             raise UnknownParticipantError(participant_id, event_id, event_type)
         anomalies.append(
@@ -632,30 +650,15 @@ def reduce_collaboration_events(
         )
         return False
 
-    def _check_participants(
+    def _check_active_participants(
         participant_ids: List[str], event_id: str, event_type: str
     ) -> bool:
         """Check all participant_ids are in roster. Returns True if all valid."""
         all_valid = True
         for pid in participant_ids:
-            if not _check_participant(pid, event_id, event_type):
+            if not _check_active_participant(pid, event_id, event_type):
                 all_valid = False
         return all_valid
-
-    def _check_not_departed(
-        participant_id: str, event_id: str, event_type: str
-    ) -> bool:
-        """Check participant is active (not departed). Returns True if active."""
-        if participant_id in departed_participants and participant_id not in participants:
-            anomalies.append(
-                CollaborationAnomaly(
-                    event_id=event_id,
-                    event_type=event_type,
-                    reason=f"Participant {participant_id!r} has departed",
-                )
-            )
-            return False
-        return True
 
     def _remove_from_focus_index(pid: str) -> None:
         """Remove participant from the focus reverse index."""
@@ -674,7 +677,7 @@ def reduce_collaboration_events(
         payload = event.payload if isinstance(event.payload, dict) else {}
 
         if et == PARTICIPANT_INVITED:
-            # Invited adds to roster with the provided identity
+            # Invitation is pre-activation metadata; it does not activate roster membership.
             pid = payload.get("participant_id", "")
             if not isinstance(pid, str) or not pid:
                 anomalies.append(
@@ -697,16 +700,16 @@ def reduce_collaboration_events(
                     )
                 )
                 continue
-            if pid in participants:
+            if pid in participants or pid in invited_participants:
                 anomalies.append(
                     CollaborationAnomaly(
                         event_id=event.event_id,
                         event_type=et,
-                        reason=f"Participant {pid!r} already in roster (duplicate invite)",
+                        reason=f"Participant {pid!r} already invited or active (duplicate invite)",
                     )
                 )
                 continue
-            participants[pid] = identity
+            invited_participants[pid] = identity
 
         elif et == PARTICIPANT_JOINED:
             pid = payload.get("participant_id", "")
@@ -744,6 +747,8 @@ def reduce_collaboration_events(
             # Re-join after leave: remove from departed
             if pid in departed_participants:
                 del departed_participants[pid]
+            if pid in invited_participants:
+                del invited_participants[pid]
             participants[pid] = identity
 
         elif et == PARTICIPANT_LEFT:
@@ -780,9 +785,23 @@ def reduce_collaboration_events(
             pid = payload.get("participant_id", "")
             if not isinstance(pid, str) or not pid:
                 continue
-            if not _check_participant(pid, event.event_id, et):
+            if pid in departed_participants and pid not in participants:
+                if mode == "strict":
+                    raise SpecKittyEventsError(
+                        f"Participant {pid!r} has departed "
+                        f"(event_id={event.event_id}, event_type={et})"
+                    )
+                anomalies.append(
+                    CollaborationAnomaly(
+                        event_id=event.event_id,
+                        event_type=et,
+                        reason=f"Participant {pid!r} has departed",
+                    )
+                )
+                # Permissive mode keeps the timestamp for replay/import forensics.
+                presence[pid] = event.timestamp
                 continue
-            if not _check_not_departed(pid, event.event_id, et):
+            if not _check_active_participant(pid, event.event_id, et):
                 continue
             presence[pid] = event.timestamp
 
@@ -790,9 +809,7 @@ def reduce_collaboration_events(
             pid = payload.get("participant_id", "")
             if not isinstance(pid, str) or not pid:
                 continue
-            if not _check_participant(pid, event.event_id, et):
-                continue
-            if not _check_not_departed(pid, event.event_id, et):
+            if not _check_active_participant(pid, event.event_id, et):
                 continue
             intent = payload.get("intent")
             if intent == "active":
@@ -804,9 +821,7 @@ def reduce_collaboration_events(
             pid = payload.get("participant_id", "")
             if not isinstance(pid, str) or not pid:
                 continue
-            if not _check_participant(pid, event.event_id, et):
-                continue
-            if not _check_not_departed(pid, event.event_id, et):
+            if not _check_active_participant(pid, event.event_id, et):
                 continue
             try:
                 focus_data = payload.get("focus_target", {})
@@ -834,7 +849,7 @@ def reduce_collaboration_events(
             step_id = payload.get("step_id", "")
             if not isinstance(pid, str) or not pid:
                 continue
-            if not _check_participant(pid, event.event_id, et):
+            if not _check_active_participant(pid, event.event_id, et):
                 continue
             if pid not in active_executions:
                 active_executions[pid] = []
@@ -845,33 +860,27 @@ def reduce_collaboration_events(
             step_id = payload.get("step_id", "")
             if not isinstance(pid, str) or not pid:
                 continue
-            if not _check_participant(pid, event.event_id, et):
+            if not _check_active_participant(pid, event.event_id, et):
                 continue
             # Check matching started exists
             pid_execs = active_executions.get(pid, [])
             if step_id not in pid_execs:
                 if mode == "strict":
-                    anomalies.append(
-                        CollaborationAnomaly(
-                            event_id=event.event_id,
-                            event_type=et,
-                            reason=(
-                                f"No matching PromptStepExecutionStarted for "
-                                f"step {step_id!r} by participant {pid!r}"
-                            ),
-                        )
+                    raise SpecKittyEventsError(
+                        f"No matching PromptStepExecutionStarted for step {step_id!r} "
+                        f"by participant {pid!r} "
+                        f"(event_id={event.event_id}, event_type={et})"
                     )
-                else:
-                    anomalies.append(
-                        CollaborationAnomaly(
-                            event_id=event.event_id,
-                            event_type=et,
-                            reason=(
-                                f"No matching PromptStepExecutionStarted for "
-                                f"step {step_id!r} by participant {pid!r}"
-                            ),
-                        )
+                anomalies.append(
+                    CollaborationAnomaly(
+                        event_id=event.event_id,
+                        event_type=et,
+                        reason=(
+                            f"No matching PromptStepExecutionStarted for "
+                            f"step {step_id!r} by participant {pid!r}"
+                        ),
                     )
+                )
                 continue
             pid_execs.remove(step_id)
 
@@ -882,7 +891,7 @@ def reduce_collaboration_events(
                 continue
             if not isinstance(pids, list):
                 continue
-            _check_participants(pids, event.event_id, et)
+            _check_active_participants(pids, event.event_id, et)
             warning_map[warning_id] = _MutableWarningEntry(
                 warning_id=warning_id,
                 event_id=event.event_id,
@@ -898,7 +907,7 @@ def reduce_collaboration_events(
                 continue
             if not isinstance(pids, list):
                 continue
-            _check_participants(pids, event.event_id, et)
+            _check_active_participants(pids, event.event_id, et)
             warning_map[warning_id] = _MutableWarningEntry(
                 warning_id=warning_id,
                 event_id=event.event_id,
@@ -913,9 +922,14 @@ def reduce_collaboration_events(
             ack_action = payload.get("acknowledgement", "")
             if not isinstance(pid, str) or not pid:
                 continue
-            if not _check_participant(pid, event.event_id, et):
+            if not _check_active_participant(pid, event.event_id, et):
                 continue
             if warning_id not in warning_map:
+                if mode == "strict":
+                    raise SpecKittyEventsError(
+                        f"Warning {warning_id!r} not found "
+                        f"(event_id={event.event_id}, event_type={et})"
+                    )
                 anomalies.append(
                     CollaborationAnomaly(
                         event_id=event.event_id,
@@ -930,7 +944,7 @@ def reduce_collaboration_events(
             pid = payload.get("participant_id", "")
             if not isinstance(pid, str) or not pid:
                 continue
-            if not _check_participant(pid, event.event_id, et):
+            if not _check_active_participant(pid, event.event_id, et):
                 continue
             comments.append(
                 CommentEntry(
@@ -946,7 +960,7 @@ def reduce_collaboration_events(
             pid = payload.get("participant_id", "")
             if not isinstance(pid, str) or not pid:
                 continue
-            if not _check_participant(pid, event.event_id, et):
+            if not _check_active_participant(pid, event.event_id, et):
                 continue
             decisions.append(
                 DecisionEntry(
@@ -964,7 +978,7 @@ def reduce_collaboration_events(
             linked_sid = payload.get("linked_session_id", "")
             if not isinstance(pid, str) or not pid:
                 continue
-            if not _check_participant(pid, event.event_id, et):
+            if not _check_active_participant(pid, event.event_id, et):
                 continue
             if pid not in linked_sessions:
                 linked_sessions[pid] = []

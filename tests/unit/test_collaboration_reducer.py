@@ -32,7 +32,7 @@ from spec_kitty_events.collaboration import (
     WarningEntry,
     reduce_collaboration_events,
 )
-from spec_kitty_events.models import Event
+from spec_kitty_events.models import Event, SpecKittyEventsError
 
 _PROJECT_UUID = uuid.UUID("12345678-1234-5678-1234-567812345678")
 _CORRELATION_ID = str(ULID())
@@ -169,7 +169,7 @@ class TestParticipantLifecycle:
         assert len(result.anomalies) == 1
         assert "not in roster" in result.anomalies[0].reason
 
-    def test_invited_adds_to_roster(self) -> None:
+    def test_invited_does_not_activate_roster(self) -> None:
         evt = _make_event(
             PARTICIPANT_INVITED,
             {
@@ -180,7 +180,26 @@ class TestParticipantLifecycle:
             },
         )
         result = reduce_collaboration_events([evt])
+        assert "p1" not in result.participants
+        assert len(result.anomalies) == 0
+
+    def test_invited_then_join_has_no_duplicate_join_anomaly(self) -> None:
+        events = [
+            _make_event(
+                PARTICIPANT_INVITED,
+                {
+                    "participant_id": "p1",
+                    "participant_identity": _identity("p1"),
+                    "invited_by": "admin",
+                    "mission_id": "M001",
+                },
+                clock=0,
+            ),
+            _join_event("p1", clock=1),
+        ]
+        result = reduce_collaboration_events(events, mode="strict")
         assert "p1" in result.participants
+        assert len(result.anomalies) == 0
 
 
 # ── Strict mode ──────────────────────────────────────────────────────────────
@@ -217,6 +236,27 @@ class TestStrictMode:
         assert "p1" in result.participants
         assert "p1" in result.presence
 
+    def test_invited_only_is_not_active_roster_in_strict_mode(self) -> None:
+        events = [
+            _make_event(
+                PARTICIPANT_INVITED,
+                {
+                    "participant_id": "p1",
+                    "participant_identity": _identity("p1"),
+                    "invited_by": "admin",
+                    "mission_id": "M001",
+                },
+                clock=0,
+            ),
+            _make_event(
+                PRESENCE_HEARTBEAT,
+                {"participant_id": "p1", "mission_id": "M001"},
+                clock=1,
+            ),
+        ]
+        with pytest.raises(UnknownParticipantError):
+            reduce_collaboration_events(events, mode="strict")
+
 
 # ── Permissive mode ──────────────────────────────────────────────────────────
 
@@ -239,6 +279,21 @@ class TestPermissiveMode:
         result = reduce_collaboration_events(events, mode="permissive")
         assert len(result.anomalies) == 1
         assert "Duplicate join" in result.anomalies[0].reason
+
+    def test_departed_heartbeat_records_anomaly_and_keeps_timestamp(self) -> None:
+        events = [
+            _join_event("p1", clock=0),
+            _leave_event("p1", clock=1),
+            _make_event(
+                PRESENCE_HEARTBEAT,
+                {"participant_id": "p1", "mission_id": "M001"},
+                clock=2,
+            ),
+        ]
+        result = reduce_collaboration_events(events, mode="permissive")
+        assert len(result.anomalies) == 1
+        assert "has departed" in result.anomalies[0].reason
+        assert "p1" in result.presence
 
 
 # ── Drive intent ─────────────────────────────────────────────────────────────
@@ -276,7 +331,7 @@ class TestDriveIntent:
         result = reduce_collaboration_events(events)
         assert "p1" not in result.active_drivers
 
-    def test_departed_participant_drive_intent_anomaly(self) -> None:
+    def test_departed_participant_drive_intent_strict_raises(self) -> None:
         events = [
             _join_event("p1", clock=0),
             _leave_event("p1", clock=1),
@@ -286,9 +341,8 @@ class TestDriveIntent:
                 clock=2,
             ),
         ]
-        # p1 is departed, so should produce anomaly (not in participants anymore)
-        # Strict mode: p1 is not in participants after leaving -> UnknownParticipantError
-        with pytest.raises(UnknownParticipantError):
+        # Departed participants are hard errors in strict mode.
+        with pytest.raises(SpecKittyEventsError):
             reduce_collaboration_events(events, mode="strict")
 
 
@@ -421,7 +475,7 @@ class TestWarnings:
         result = reduce_collaboration_events(events)
         assert result.warnings[0].acknowledgements == {"p1": "continue"}
 
-    def test_ack_nonexistent_warning_anomaly(self) -> None:
+    def test_ack_nonexistent_warning_strict_raises(self) -> None:
         events = [
             _join_event("p1", clock=0),
             _make_event(
@@ -435,7 +489,24 @@ class TestWarnings:
                 clock=1,
             ),
         ]
-        result = reduce_collaboration_events(events)
+        with pytest.raises(SpecKittyEventsError):
+            reduce_collaboration_events(events, mode="strict")
+
+    def test_ack_nonexistent_warning_permissive_anomaly(self) -> None:
+        events = [
+            _join_event("p1", clock=0),
+            _make_event(
+                WARNING_ACKNOWLEDGED,
+                {
+                    "participant_id": "p1",
+                    "mission_id": "M001",
+                    "warning_id": "nonexistent",
+                    "acknowledgement": "continue",
+                },
+                clock=1,
+            ),
+        ]
+        result = reduce_collaboration_events(events, mode="permissive")
         assert len(result.anomalies) == 1
         assert "not found" in result.anomalies[0].reason
 
@@ -489,7 +560,7 @@ class TestExecutionTracking:
         result = reduce_collaboration_events(events)
         assert result.active_executions.get("p1", []) == []
 
-    def test_complete_without_start_anomaly(self) -> None:
+    def test_complete_without_start_strict_raises(self) -> None:
         events = [
             _join_event("p1", clock=0),
             _make_event(
@@ -503,7 +574,24 @@ class TestExecutionTracking:
                 clock=1,
             ),
         ]
-        result = reduce_collaboration_events(events)
+        with pytest.raises(SpecKittyEventsError):
+            reduce_collaboration_events(events, mode="strict")
+
+    def test_complete_without_start_permissive_anomaly(self) -> None:
+        events = [
+            _join_event("p1", clock=0),
+            _make_event(
+                PROMPT_STEP_EXECUTION_COMPLETED,
+                {
+                    "participant_id": "p1",
+                    "mission_id": "M001",
+                    "step_id": "step1",
+                    "outcome": "success",
+                },
+                clock=1,
+            ),
+        ]
+        result = reduce_collaboration_events(events, mode="permissive")
         assert len(result.anomalies) == 1
         assert "No matching PromptStepExecutionStarted" in result.anomalies[0].reason
 
@@ -797,6 +885,8 @@ class TestAll14EventTypes:
             ),
             # 2. ParticipantJoined
             _join_event("p1", clock=1),
+            # (extra join so warning payload uses active participants only)
+            _join_event("p2", clock=1),
             # 3. PresenceHeartbeat
             _make_event(
                 PRESENCE_HEARTBEAT,
@@ -842,7 +932,7 @@ class TestAll14EventTypes:
                 {
                     "warning_id": "w1",
                     "mission_id": "M001",
-                    "participant_ids": ["p0", "p1"],
+                    "participant_ids": ["p1", "p2"],
                     "focus_target": {"target_type": "wp", "target_id": "WP01"},
                     "severity": "warning",
                 },
@@ -854,7 +944,7 @@ class TestAll14EventTypes:
                 {
                     "warning_id": "w2",
                     "mission_id": "M001",
-                    "participant_ids": ["p0", "p1"],
+                    "participant_ids": ["p1", "p2"],
                     "step_id": "s1",
                     "severity": "info",
                 },
@@ -907,13 +997,13 @@ class TestAll14EventTypes:
                 clock=12,
             ),
             # 14. ParticipantLeft
-            _leave_event("p0", clock=13),
+            _leave_event("p2", clock=13),
         ]
         result = reduce_collaboration_events(events, mode="strict")
-        assert result.event_count == 14
+        assert result.event_count == 15
         assert len(result.anomalies) == 0
         assert "p1" in result.participants
-        assert "p0" in result.departed_participants
+        assert "p2" in result.departed_participants
         assert len(result.warnings) == 2
         assert len(result.comments) == 1
         assert len(result.decisions) == 1
