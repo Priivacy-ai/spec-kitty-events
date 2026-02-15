@@ -892,12 +892,16 @@ def reduce_collaboration_events(
             if not isinstance(pids, list):
                 continue
             _check_active_participants(pids, event.event_id, et)
+            existing = warning_map.get(warning_id)
+            existing_acks = (
+                dict(existing.acknowledgements) if existing is not None else {}
+            )
             warning_map[warning_id] = _MutableWarningEntry(
                 warning_id=warning_id,
                 event_id=event.event_id,
                 warning_type=CONCURRENT_DRIVER_WARNING,
                 participant_ids=tuple(pids),
-                acknowledgements={},
+                acknowledgements=existing_acks,
             )
 
         elif et == POTENTIAL_STEP_COLLISION_DETECTED:
@@ -908,12 +912,16 @@ def reduce_collaboration_events(
             if not isinstance(pids, list):
                 continue
             _check_active_participants(pids, event.event_id, et)
+            existing = warning_map.get(warning_id)
+            existing_acks = (
+                dict(existing.acknowledgements) if existing is not None else {}
+            )
             warning_map[warning_id] = _MutableWarningEntry(
                 warning_id=warning_id,
                 event_id=event.event_id,
                 warning_type=POTENTIAL_STEP_COLLISION_DETECTED,
                 participant_ids=tuple(pids),
-                acknowledgements={},
+                acknowledgements=existing_acks,
             )
 
         elif et == WARNING_ACKNOWLEDGED:
@@ -936,6 +944,16 @@ def reduce_collaboration_events(
                         event_type=et,
                         reason=f"Warning {warning_id!r} not found",
                     )
+                )
+                # Permissive mode keeps acknowledgement state even if the warning
+                # event is missing from the window; if the warning arrives later,
+                # the acknowledgement map is preserved by the warning handlers.
+                warning_map[warning_id] = _MutableWarningEntry(
+                    warning_id=warning_id,
+                    event_id=event.event_id,
+                    warning_type="UnknownWarning",
+                    participant_ids=(pid,),
+                    acknowledgements={pid: ack_action},
                 )
                 continue
             warning_map[warning_id].acknowledgements[pid] = ack_action

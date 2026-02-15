@@ -509,6 +509,43 @@ class TestWarnings:
         result = reduce_collaboration_events(events, mode="permissive")
         assert len(result.anomalies) == 1
         assert "not found" in result.anomalies[0].reason
+        assert len(result.warnings) == 1
+        assert result.warnings[0].warning_id == "nonexistent"
+        assert result.warnings[0].acknowledgements == {"p1": "continue"}
+
+    def test_ack_before_warning_preserves_ack_when_warning_arrives(self) -> None:
+        events = [
+            _join_event("p1", clock=0),
+            _join_event("p2", clock=0),
+            _make_event(
+                WARNING_ACKNOWLEDGED,
+                {
+                    "participant_id": "p1",
+                    "mission_id": "M001",
+                    "warning_id": "w-late",
+                    "acknowledgement": "hold",
+                },
+                clock=1,
+            ),
+            _make_event(
+                CONCURRENT_DRIVER_WARNING,
+                {
+                    "warning_id": "w-late",
+                    "mission_id": "M001",
+                    "participant_ids": ["p1", "p2"],
+                    "focus_target": {"target_type": "wp", "target_id": "WP03"},
+                    "severity": "warning",
+                },
+                clock=2,
+            ),
+        ]
+        result = reduce_collaboration_events(events, mode="permissive")
+        assert len(result.anomalies) == 1
+        assert "not found" in result.anomalies[0].reason
+        assert len(result.warnings) == 1
+        assert result.warnings[0].warning_id == "w-late"
+        assert result.warnings[0].warning_type == CONCURRENT_DRIVER_WARNING
+        assert result.warnings[0].acknowledgements == {"p1": "hold"}
 
 
 # ── Execution tracking ───────────────────────────────────────────────────────
