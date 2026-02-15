@@ -1,7 +1,7 @@
 ---
 work_package_id: WP03
 title: Intent, Focus, and Execution Payloads
-lane: "doing"
+lane: "for_review"
 dependencies: [WP01]
 base_branch: 006-mission-collaboration-soft-coordination-contracts-WP01
 base_commit: f058d167abbbbbd8460757676b7e12ee4fb0ed3b
@@ -185,3 +185,4 @@ spec-kitty agent tasks move-task WP03 --to for_review --note "Ready for review: 
 
 - 2026-02-15T10:35:14Z – system – lane=planned – Prompt created.
 - 2026-02-15T10:58:21Z – claude-coordinator – shell_pid=59807 – lane=doing – Assigned agent via workflow command
+- 2026-02-15T11:02:03Z – claude-coordinator – shell_pid=59807 – lane=for_review – Ready for review: 4 intent/focus/execution payloads with 38 tests, mypy clean
