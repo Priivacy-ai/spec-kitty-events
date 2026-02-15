@@ -1,7 +1,7 @@
 ---
 work_package_id: WP07
 title: Exports and Schema Generation
-lane: "doing"
+lane: "for_review"
 dependencies: [WP06]
 base_branch: 006-mission-collaboration-soft-coordination-contracts-WP06
 base_commit: dc1e5a5c78a3af8ec033970101289c108f0989ab
@@ -240,3 +240,4 @@ spec-kitty agent tasks move-task WP07 --to for_review --note "Ready for review: 
 
 - 2026-02-15T10:35:14Z – system – lane=planned – Prompt created.
 - 2026-02-15T11:19:09Z – claude-coordinator – shell_pid=86895 – lane=doing – Assigned agent via workflow command
+- 2026-02-15T11:22:48Z – claude-coordinator – shell_pid=86895 – lane=for_review – Ready for review: 36 exports, 17 schemas, conformance validators
