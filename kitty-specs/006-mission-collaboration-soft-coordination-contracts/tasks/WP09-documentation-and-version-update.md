@@ -1,26 +1,29 @@
 ---
-work_package_id: "WP09"
+work_package_id: WP09
+title: Documentation and Version Update
+lane: "doing"
+dependencies: [WP08]
+base_branch: 006-mission-collaboration-soft-coordination-contracts-WP08
+base_commit: dee0a8d815da6da9407f58baf20e276410f9638b
+created_at: '2026-02-15T11:32:26.380650+00:00'
 subtasks:
-  - "T048"
-  - "T049"
-  - "T050"
-  - "T051"
-  - "T052"
-title: "Documentation and Version Update"
-phase: "Phase 4 - Polish"
-lane: "planned"  # DO NOT EDIT - use: spec-kitty agent tasks move-task <WPID> --to <lane>
-assignee: ""
-agent: ""
-shell_pid: ""
-review_status: ""
-reviewed_by: ""
-dependencies: ["WP08"]
+- T048
+- T049
+- T050
+- T051
+- T052
+phase: Phase 4 - Polish
+assignee: ''
+agent: ''
+shell_pid: "92983"
+review_status: ''
+reviewed_by: ''
 history:
-  - timestamp: "2026-02-15T10:35:14Z"
-    lane: "planned"
-    agent: "system"
-    shell_pid: ""
-    action: "Prompt generated via /spec-kitty.tasks"
+- timestamp: '2026-02-15T10:35:14Z'
+  lane: planned
+  agent: system
+  shell_pid: ''
+  action: Prompt generated via /spec-kitty.tasks
 ---
 
 # Work Package Prompt: WP09 – Documentation and Version Update
