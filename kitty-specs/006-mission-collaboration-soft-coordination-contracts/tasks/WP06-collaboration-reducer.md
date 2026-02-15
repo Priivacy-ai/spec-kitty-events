@@ -1,13 +1,16 @@
 ---
 work_package_id: WP06
 title: Collaboration Reducer
-lane: planned
+lane: "doing"
 dependencies:
 - WP01
 - WP02
 - WP03
 - WP04
 - WP05
+base_branch: 006-mission-collaboration-soft-coordination-contracts-WP05
+base_commit: 47f57de833e4715cbf0d1494a165794b01b4f1b9
+created_at: '2026-02-15T11:13:08.927233+00:00'
 subtasks:
 - T031
 - T032
@@ -19,7 +22,7 @@ subtasks:
 phase: Phase 2 - Reducer
 assignee: ''
 agent: ''
-shell_pid: ''
+shell_pid: "83786"
 review_status: ''
 reviewed_by: ''
 history:
