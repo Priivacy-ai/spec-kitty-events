@@ -8,7 +8,7 @@ multi-participant mission coordination.
 from __future__ import annotations
 
 from datetime import datetime
-from typing import FrozenSet, Literal, Optional
+from typing import Dict, FrozenSet, List, Literal, Optional, Tuple
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -116,6 +116,128 @@ class UnknownParticipantError(SpecKittyEventsError):
 
 # ── Section 3: Payload Models ──  (populated by WP02-WP04)
 
-# ── Section 4: Reducer Output Models ──  (populated by WP05)
+# ── Section 4: Reducer Output Models ──────────────────────────────────────
+
+
+class CollaborationAnomaly(BaseModel):
+    """Non-fatal issue encountered during collaboration event reduction."""
+
+    model_config = ConfigDict(frozen=True)
+
+    event_id: str = Field(..., description="Event that caused the anomaly")
+    event_type: str = Field(..., description="Type of the problematic event")
+    reason: str = Field(..., description="Human-readable anomaly description")
+
+
+class WarningEntry(BaseModel):
+    """Warning timeline entry in reduced collaboration state."""
+
+    model_config = ConfigDict(frozen=True)
+
+    warning_id: str = Field(..., description="Warning identifier")
+    event_id: str = Field(..., description="Event that created this warning")
+    warning_type: str = Field(
+        ...,
+        description="'ConcurrentDriverWarning' or 'PotentialStepCollisionDetected'",
+    )
+    participant_ids: Tuple[str, ...] = Field(
+        ..., description="Affected participants"
+    )
+    acknowledgements: Dict[str, str] = Field(
+        default_factory=dict,
+        description="participant_id -> acknowledgement action",
+    )
+
+
+class DecisionEntry(BaseModel):
+    """Decision history entry in reduced collaboration state."""
+
+    model_config = ConfigDict(frozen=True)
+
+    decision_id: str = Field(..., description="Decision identifier")
+    event_id: str = Field(..., description="Event that captured this decision")
+    participant_id: str = Field(..., description="Decision author")
+    topic: str = Field(..., description="Decision topic")
+    chosen_option: str = Field(..., description="Selected option")
+    referenced_warning_id: Optional[str] = Field(
+        None, description="Related warning"
+    )
+
+
+class CommentEntry(BaseModel):
+    """Comment history entry in reduced collaboration state."""
+
+    model_config = ConfigDict(frozen=True)
+
+    comment_id: str = Field(..., description="Comment identifier")
+    event_id: str = Field(..., description="Event that posted this comment")
+    participant_id: str = Field(..., description="Comment author")
+    content: str = Field(..., description="Comment text")
+    reply_to: Optional[str] = Field(None, description="Parent comment_id")
+
+
+class ReducedCollaborationState(BaseModel):
+    """Materialized collaboration state from event reduction."""
+
+    model_config = ConfigDict(frozen=True)
+
+    mission_id: str = Field(
+        ..., description="Mission this state represents"
+    )
+    participants: Dict[str, ParticipantIdentity] = Field(
+        default_factory=dict,
+        description="Active participant roster (participant_id -> identity)",
+    )
+    departed_participants: Dict[str, ParticipantIdentity] = Field(
+        default_factory=dict,
+        description="Historical departed participants",
+    )
+    presence: Dict[str, datetime] = Field(
+        default_factory=dict,
+        description="Last heartbeat timestamp per participant_id",
+    )
+    active_drivers: FrozenSet[str] = Field(
+        default_factory=frozenset,
+        description="participant_ids with active drive intent",
+    )
+    focus_by_participant: Dict[str, FocusTarget] = Field(
+        default_factory=dict,
+        description="Current focus per participant",
+    )
+    participants_by_focus: Dict[str, FrozenSet[str]] = Field(
+        default_factory=dict,
+        description="Reverse index: focus_key -> participant set",
+    )
+    warnings: Tuple[WarningEntry, ...] = Field(
+        default_factory=tuple,
+        description="Ordered warning timeline",
+    )
+    decisions: Tuple[DecisionEntry, ...] = Field(
+        default_factory=tuple,
+        description="Ordered decision history",
+    )
+    comments: Tuple[CommentEntry, ...] = Field(
+        default_factory=tuple,
+        description="Ordered comment history",
+    )
+    active_executions: Dict[str, List[str]] = Field(
+        default_factory=dict,
+        description="In-flight step_ids per participant_id",
+    )
+    linked_sessions: Dict[str, List[str]] = Field(
+        default_factory=dict,
+        description="Linked session_ids per participant_id",
+    )
+    anomalies: Tuple[CollaborationAnomaly, ...] = Field(
+        default_factory=tuple,
+        description="Non-fatal issues encountered",
+    )
+    event_count: int = Field(
+        default=0, description="Total events processed"
+    )
+    last_processed_event_id: Optional[str] = Field(
+        None, description="Last event_id in processed sequence"
+    )
+
 
 # ── Section 5: Collaboration Reducer ──  (populated by WP06)
