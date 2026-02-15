@@ -176,13 +176,13 @@
 **Estimated prompt size**: ~550 lines
 
 ### Included Subtasks
-- [ ] T031 Implement reducer pipeline skeleton: filter collaboration events → sort (reuse `status_event_sort_key`) → dedup (reuse `dedup_events`) → process loop
-- [ ] T032 Implement roster management: process ParticipantJoined/Left, seeded roster pre-loading, membership check helper
-- [ ] T033 Implement strict/permissive mode branching: membership validation, UnknownParticipantError raising, anomaly recording
-- [ ] T034 Implement event handlers: drive intent, focus tracking, focus reverse index, presence heartbeats, session linking
-- [ ] T035 Implement event handlers: warning timeline, acknowledgement tracking, execution start/complete, comments, decisions
-- [ ] T036 Implement state assembly: build and return ReducedCollaborationState from accumulated state
-- [ ] T037 Write comprehensive unit tests: strict mode (full history + seeded roster + partial window rejection), permissive mode, all 14 event types, edge cases from spec
+- [x] T031 Implement reducer pipeline skeleton: filter collaboration events → sort (reuse `status_event_sort_key`) → dedup (reuse `dedup_events`) → process loop
+- [x] T032 Implement roster management: process ParticipantJoined/Left, seeded roster pre-loading, membership check helper
+- [x] T033 Implement strict/permissive mode branching: membership validation, UnknownParticipantError raising, anomaly recording
+- [x] T034 Implement event handlers: drive intent, focus tracking, focus reverse index, presence heartbeats, session linking
+- [x] T035 Implement event handlers: warning timeline, acknowledgement tracking, execution start/complete, comments, decisions
+- [x] T036 Implement state assembly: build and return ReducedCollaborationState from accumulated state
+- [x] T037 Write comprehensive unit tests: strict mode (full history + seeded roster + partial window rejection), permissive mode, all 14 event types, edge cases from spec
 
 ### Implementation Notes
 - Reuse `status_event_sort_key()` and `dedup_events()` from `status.py` — import, don't duplicate
