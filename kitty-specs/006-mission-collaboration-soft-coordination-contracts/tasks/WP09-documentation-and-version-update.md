@@ -1,7 +1,7 @@
 ---
 work_package_id: WP09
 title: Documentation and Version Update
-lane: "doing"
+lane: "for_review"
 dependencies: [WP08]
 base_branch: 006-mission-collaboration-soft-coordination-contracts-WP08
 base_commit: dee0a8d815da6da9407f58baf20e276410f9638b
@@ -260,3 +260,4 @@ spec-kitty agent tasks move-task WP09 --to for_review --note "Ready for review: 
 
 - 2026-02-15T10:35:14Z – system – lane=planned – Prompt created.
 - 2026-02-15T11:32:26Z – claude-coordinator – shell_pid=92983 – lane=doing – Assigned agent via workflow command
+- 2026-02-15T11:38:34Z – claude-coordinator – shell_pid=92983 – lane=for_review – Ready for review: README, COMPATIBILITY, CHANGELOG updated, version bumped to 2.1.0, quickstart verified, 789 tests passing, mypy clean
