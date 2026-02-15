@@ -16,7 +16,7 @@ subtasks:
 - T007
 phase: Phase 0 - Foundation
 assignee: ''
-agent: ''
+agent: "claude-coordinator"
 shell_pid: "44934"
 review_status: ''
 reviewed_by: ''
@@ -278,3 +278,4 @@ spec-kitty agent tasks move-task WP01 --to for_review --note "Ready for review: 
 ## Activity Log
 
 - 2026-02-15T10:35:14Z – system – lane=planned – Prompt created.
+- 2026-02-15T10:46:30Z – claude-coordinator – shell_pid=44934 – lane=doing – Assigned agent via workflow command
