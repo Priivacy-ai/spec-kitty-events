@@ -1,26 +1,29 @@
 ---
-work_package_id: "WP08"
+work_package_id: WP08
+title: Conformance Fixtures and Tests
+lane: "doing"
+dependencies: [WP07]
+base_branch: 006-mission-collaboration-soft-coordination-contracts-WP07
+base_commit: 3a4f5aea7b57215afe836762312c639af5903d81
+created_at: '2026-02-15T11:23:00.134060+00:00'
 subtasks:
-  - "T043"
-  - "T044"
-  - "T045"
-  - "T046"
-  - "T047"
-title: "Conformance Fixtures and Tests"
-phase: "Phase 3 - Integration"
-lane: "planned"  # DO NOT EDIT - use: spec-kitty agent tasks move-task <WPID> --to <lane>
-assignee: ""
-agent: ""
-shell_pid: ""
-review_status: ""
-reviewed_by: ""
-dependencies: ["WP07"]
+- T043
+- T044
+- T045
+- T046
+- T047
+phase: Phase 3 - Integration
+assignee: ''
+agent: ''
+shell_pid: "88847"
+review_status: ''
+reviewed_by: ''
 history:
-  - timestamp: "2026-02-15T10:35:14Z"
-    lane: "planned"
-    agent: "system"
-    shell_pid: ""
-    action: "Prompt generated via /spec-kitty.tasks"
+- timestamp: '2026-02-15T10:35:14Z'
+  lane: planned
+  agent: system
+  shell_pid: ''
+  action: Prompt generated via /spec-kitty.tasks
 ---
 
 # Work Package Prompt: WP08 – Conformance Fixtures and Tests
