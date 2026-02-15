@@ -37,13 +37,13 @@ payload = ParticipantJoinedPayload(
 event = Event(
     event_id=str(ULID()),
     event_type=PARTICIPANT_JOINED,
-    aggregate_id="mission/M042",          # Canonical: aggregate_id = mission_id
+    aggregate_id="mission/M042",          # Canonical: "mission/" + mission_id (type-prefixed)
     payload=payload.model_dump(),
     timestamp=datetime.now(timezone.utc),
     node_id="saas-node-1",
     lamport_clock=1,
     project_uuid=project_uuid,
-    correlation_id="run-001",             # Canonical: correlation_id = mission_run_id
+    correlation_id=str(ULID()),           # Canonical: ULID-26 mission_run_id (must be exactly 26 chars)
 )
 ```
 
@@ -92,11 +92,33 @@ ack_payload = WarningAcknowledgedPayload(
 ```python
 from spec_kitty_events import reduce_collaboration_events, UnknownParticipantError
 
+# Option 1: Full event history (includes ParticipantJoined events)
 try:
     state = reduce_collaboration_events(events)  # mode="strict" is default
 except UnknownParticipantError as e:
     # Event from participant not in mission roster — reject
     print(f"Rejected: participant {e.participant_id} not rostered (event {e.event_id})")
+```
+
+### Strict Mode with Seeded Roster (for partial-window reduction)
+
+```python
+from spec_kitty_events import (
+    reduce_collaboration_events, ParticipantIdentity, UnknownParticipantError,
+)
+
+# Option 2: Partial event window — seed known participants from external state
+known_roster = {
+    "p-abc123": ParticipantIdentity(
+        participant_id="p-abc123", participant_type="human", display_name="Alice",
+    ),
+    "p-def456": ParticipantIdentity(
+        participant_id="p-def456", participant_type="llm_context",
+    ),
+}
+
+# Strict mode still enforced, but seeded participants are pre-rostered
+state = reduce_collaboration_events(partial_events, roster=known_roster)
 ```
 
 ### Permissive Mode (for replay/import)
@@ -146,12 +168,14 @@ pytest --pyargs spec_kitty_events.conformance
 
 All collaboration events follow this canonical mapping:
 
-| Event field | Maps to |
-|---|---|
-| `aggregate_id` | `mission_id` (e.g., `"mission/M042"`) |
-| `correlation_id` | `mission_run_id` (run-specific identifier) |
-| `event_type` | One of the 14 `COLLABORATION_EVENT_TYPES` constants |
-| `node_id` | Emitting process/node (not participant identity) |
+| Event field | Wire format | Example |
+|---|---|---|
+| `aggregate_id` | `"mission/{mission_id}"` (type-prefixed) | `"mission/M042"` |
+| `correlation_id` | ULID-26 (`mission_run_id`) | `str(ULID())` (exactly 26 chars) |
+| `event_type` | One of 14 `COLLABORATION_EVENT_TYPES` | `"ParticipantJoined"` |
+| `node_id` | Emitting process/node (not participant identity) | `"saas-node-1"` |
+
+**Do not** use raw `mission_id` as `aggregate_id` — always prefix with `"mission/"`. **Do not** use freeform strings as `correlation_id` — must be ULID-26 (envelope enforces 26-char length).
 
 ## Key Constraints
 

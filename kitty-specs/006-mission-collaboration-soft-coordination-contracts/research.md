@@ -70,3 +70,28 @@
 7. **missing-required-fields** (invalid): Payload missing participant_id — validates schema rejection
 
 **Rationale**: Covers all 6 user stories, all 3 required acceptance criteria (3+ participants, overlapping intent, strict rejection). Balanced valid/invalid ratio.
+
+## R9: Canonical aggregate_id Wire Format (P1 review fix)
+
+**Decision**: `Event.aggregate_id` MUST be `"mission/{mission_id}"` (type-prefixed). Not raw `mission_id`.
+**Rationale**: Existing lifecycle tests consistently use `aggregate_id="mission/M001"`. If different producers use different encodings (raw vs prefixed), reducers and projections will fragment one mission into two aggregates. One canonical wire format prevents stream fragmentation.
+**Alternatives considered**:
+- Raw `mission_id` without prefix — rejected; ambiguous with other aggregate types, inconsistent with lifecycle convention.
+
+## R10: mission_run_id Must Be ULID-26 (P1 review fix)
+
+**Decision**: `Event.correlation_id` (mapped to `mission_run_id`) MUST be a ULID-26 string. Not a freeform string.
+**Rationale**: The `Event` envelope model enforces `min_length=26, max_length=26` on `correlation_id` (models.py lines 63-66). Any non-ULID value will fail Pydantic validation at event construction time. Plan and docs must state this explicitly to prevent consumer confusion.
+
+## R11: Seeded Roster for Partial-Window Strict Mode (P2 review fix)
+
+**Decision**: `reduce_collaboration_events()` accepts an optional `roster: dict[str, ParticipantIdentity] | None` parameter to seed known participants.
+**Rationale**: Consumers reducing partial event windows (e.g., SaaS projections starting from a checkpoint) would otherwise need to replay the full event history including all `ParticipantJoined` events. The seeded roster enables strict-mode enforcement without full replay. Contract rule: strict mode requires either (a) full history, or (b) seeded roster.
+**Alternatives considered**:
+- Force full replay always — rejected; impractical for projections processing recent windows.
+- Separate `reduce_collaboration_events_partial()` function — rejected; unnecessary API surface; a single optional parameter is cleaner.
+
+## R12: Performance Benchmark Deliverable (P2 review fix)
+
+**Decision**: Add `tests/benchmark/test_collaboration_perf.py` with a 10K-event synthetic benchmark.
+**Rationale**: The plan states "10K events in <1s" as a performance goal but had no test backing it. The benchmark generates a realistic 10K-event stream (50 participants, mixed types), reduces in strict mode with seeded roster, and asserts wall-clock < 1s. Marked `@pytest.mark.benchmark` (non-blocking in CI by default).

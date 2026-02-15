@@ -60,6 +60,7 @@ def reduce_collaboration_events(
     events: Sequence[Event],
     *,
     mode: Literal["strict", "permissive"] = "strict",
+    roster: dict[str, ParticipantIdentity] | None = None,
 ) -> ReducedCollaborationState:
     """
     Reduce a sequence of collaboration events into materialized state.
@@ -72,15 +73,22 @@ def reduce_collaboration_events(
         mode: Enforcement mode.
             - "strict" (default): Raises UnknownParticipantError for events
               from non-rostered participants. Hard errors for integrity violations.
+              Requires either full event history (including ParticipantJoined) or
+              a seeded roster parameter.
             - "permissive": Records anomalies for integrity violations. For
               replay/import of incomplete historical streams.
+        roster: Optional pre-seeded participant roster (participant_id →
+                ParticipantIdentity). Enables strict-mode reduction of partial
+                event windows without requiring full ParticipantJoined history.
+                Seeded participants are treated as already-joined before event
+                processing begins.
 
     Returns:
         ReducedCollaborationState with mission snapshot, indexes, and anomalies.
 
     Raises:
         UnknownParticipantError: In strict mode, when an event references a
-            participant_id not in the mission roster.
+            participant_id not in the mission roster (and not in seeded roster).
     """
 ```
 
@@ -98,13 +106,15 @@ class UnknownParticipantError(SpecKittyEventsError):
 
 All collaboration events MUST follow this envelope mapping:
 
-| Event.field | Value | Source |
-|-------------|-------|--------|
-| `aggregate_id` | `mission_id` | Payload field |
-| `correlation_id` | `mission_run_id` | Consumer-provided run identifier |
-| `event_type` | One of `COLLABORATION_EVENT_TYPES` | Constant |
-| `node_id` | Emitting process identity | Consumer-provided |
-| `lamport_clock` | Monotonically increasing per node | Consumer-provided |
+| Event.field | Wire format | Example | Constraint |
+|-------------|------------|---------|------------|
+| `aggregate_id` | `"mission/{mission_id}"` | `"mission/M042"` | Type-prefixed string (matches lifecycle convention) |
+| `correlation_id` | ULID-26 (`mission_run_id`) | `"01HXYZ..."` (26 chars) | Exactly 26 characters (ULID format, enforced by envelope model) |
+| `event_type` | One of `COLLABORATION_EVENT_TYPES` | `"ParticipantJoined"` | Must be one of 14 constants |
+| `node_id` | Emitting process identity | `"saas-node-1"` | min_length=1 |
+| `lamport_clock` | Monotonically increasing per node | `42` | int >= 0 |
+
+**Critical**: `aggregate_id` MUST use the `"mission/"` prefix. Raw `mission_id` without prefix will fragment aggregates if other producers use the prefixed form. The `correlation_id` MUST be a ULID — freeform strings will fail envelope validation.
 
 ## Payload Actor Field Contract
 

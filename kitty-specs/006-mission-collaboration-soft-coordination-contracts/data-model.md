@@ -294,12 +294,12 @@ Inherits from `SpecKittyEventsError` (existing base exception).
 
 All collaboration events follow canonical envelope mapping:
 
-| Event Field | Collaboration Mapping |
-|-------------|----------------------|
-| `aggregate_id` | `mission_id` |
-| `correlation_id` | `mission_run_id` |
-| `event_type` | One of 14 `COLLABORATION_EVENT_TYPES` |
-| `node_id` | Emitting process/node (not participant identity) |
+| Event Field | Wire Format | Constraint |
+|-------------|------------|------------|
+| `aggregate_id` | `"mission/{mission_id}"` (type-prefixed) | Must use `"mission/"` prefix (e.g., `"mission/M042"`) |
+| `correlation_id` | ULID-26 (`mission_run_id`) | Exactly 26 characters (ULID format, enforced by envelope) |
+| `event_type` | One of 14 `COLLABORATION_EVENT_TYPES` | String constant |
+| `node_id` | Emitting process/node (not participant identity) | min_length=1 |
 
 ## State Transitions
 

@@ -85,8 +85,10 @@ src/spec_kitty_events/
 tests/
 ├── unit/
 │   └── test_collaboration.py    # NEW — Unit tests for all payloads + reducer
-└── property/
-    └── test_collaboration_determinism.py  # NEW — Hypothesis property tests
+├── property/
+│   └── test_collaboration_determinism.py  # NEW — Hypothesis property tests
+└── benchmark/
+    └── test_collaboration_perf.py  # NEW — 10K-event reducer benchmark (@pytest.mark.benchmark)
 ```
 
 **Structure Decision**: Single `collaboration.py` module following the same one-module-per-domain pattern as `lifecycle.py` (459 LOC) and `status.py` (540 LOC). Internal sections:
@@ -106,11 +108,12 @@ tests/
 **Rationale**: Consistent with lifecycle.py / status.py pattern. Estimated ~550-630 LOC — well under the 700 LOC split trigger. Cross-team discoverability: developers find all collaboration contracts in one place.
 **Alternative rejected**: `collaboration/` sub-package — premature for initial delivery, adds import complexity.
 
-### D2: Strict mode as default
+### D2: Strict mode as default, with seeded roster support
 
-**Decision**: `reduce_collaboration_events(events, mode="strict")` — strict is the default.
-**Rationale**: Live traffic is the primary use case. Unknown participant = hard error prevents silent data corruption. Permissive mode is opt-in for replay/import tooling.
-**Implementation**: `mode` parameter as `Literal["strict", "permissive"]` with default `"strict"`. Type narrowing in reducer body.
+**Decision**: `reduce_collaboration_events(events, *, mode="strict", roster=None)` — strict is the default. An optional `roster` parameter accepts a `dict[str, ParticipantIdentity]` of pre-known participants, enabling strict-mode reduction of partial event windows without requiring the full `ParticipantJoined` history.
+**Rationale**: Live traffic is the primary use case. Unknown participant = hard error prevents silent data corruption. Permissive mode is opt-in for replay/import tooling. However, consumers reducing partial windows (e.g., SaaS projections starting from a checkpoint, not from mission start) need a way to seed known participants without replaying the full roster history. The `roster` parameter solves this without weakening strict enforcement.
+**Implementation**: `mode` parameter as `Literal["strict", "permissive"]` with default `"strict"`. `roster` parameter as `dict[str, ParticipantIdentity] | None` with default `None`. When provided, seeded participants are pre-loaded into the reducer's internal roster before event processing begins. Type narrowing in reducer body for mode-dependent error handling.
+**Contract rule**: Strict mode requires either (a) full event history including all `ParticipantJoined` events, or (b) a seeded `roster` covering all participants referenced in the event window. Failing both results in `UnknownParticipantError`. Tests MUST cover: full-history strict, seeded-roster strict, and partial-window-without-roster strict (expected failure).
 
 ### D3: Reuse existing sort/dedup utilities
 
@@ -129,8 +132,9 @@ tests/
 
 ### D6: Canonical envelope mapping convention
 
-**Decision**: `Event.aggregate_id = mission_id`, `Event.correlation_id = mission_run_id`.
-**Rationale**: Consistent with how lifecycle events use `aggregate_id = "mission/M001"`. The `correlation_id` carries the run-specific identifier so replays can be scoped.
+**Decision**: `Event.aggregate_id` MUST be `"mission/{mission_id}"` (type-prefixed, e.g., `"mission/M042"`). `Event.correlation_id` MUST be a ULID-26 string representing the `mission_run_id`.
+**Rationale**: The type-prefixed form `"mission/{mission_id}"` is the established convention in all lifecycle tests (e.g., `aggregate_id="mission/M001"`). Raw `mission_id` without prefix would be ambiguous with other aggregate types (WP, project). The `correlation_id` field has an envelope constraint of exactly 26 characters (ULID format, enforced by `models.py` line 63–66), so `mission_run_id` MUST be a ULID — not a freeform string.
+**Wire format**: `aggregate_id = "mission/" + mission_id` (literal prefix). `correlation_id = ulid()` (ULID-26 representing the run).
 
 ### D7: AuthPrincipalBinding as roster-level, not per-event
 
@@ -163,8 +167,9 @@ tests/
 
 ### Deliverable 5: Tests
 
-**Scope**: Unit tests for all 14 payloads, reducer strict/permissive modes, all edge cases. Property tests for reducer determinism with Hypothesis.
-**Files**: `tests/unit/test_collaboration.py`, `tests/property/test_collaboration_determinism.py`
+**Scope**: Unit tests for all 14 payloads, reducer strict/permissive modes, seeded roster, all edge cases. Property tests for reducer determinism with Hypothesis. Performance benchmark validating the 10K-events-in-<1s target.
+**Files**: `tests/unit/test_collaboration.py`, `tests/property/test_collaboration_determinism.py`, `tests/benchmark/test_collaboration_perf.py`
+**Performance benchmark**: `test_collaboration_perf.py` generates a synthetic 10K-event collaboration stream (N=50 participants, mixed event types), reduces it in strict mode with seeded roster, and asserts wall-clock < 1s. Marked `@pytest.mark.benchmark` (non-blocking in CI by default, opt-in via `pytest -m benchmark`).
 
 ### Deliverable 6: Documentation
 

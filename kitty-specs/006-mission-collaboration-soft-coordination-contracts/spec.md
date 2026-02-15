@@ -166,19 +166,19 @@ A consumer repo (`spec-kitty` CLI or `spec-kitty-saas`) runs `pytest --pyargs sp
 
 #### Collaboration Reducer
 
-- **FR-021**: Package MUST export a `reduce_collaboration_events()` pure function that accepts a sequence of `Event` objects and returns a `ReducedCollaborationState`.
+- **FR-021**: Package MUST export a `reduce_collaboration_events()` pure function that accepts a sequence of `Event` objects and returns a `ReducedCollaborationState`. The function MUST accept an optional `roster` parameter (`dict[str, ParticipantIdentity] | None`) to seed known participants for partial-window reduction without requiring the full `ParticipantJoined` history.
 - **FR-022**: `ReducedCollaborationState` MUST include: active participants (roster with identity), presence state (last heartbeat per participant), active drivers (participants with `intent: "active"`), `focus_by_participant` (current focus target per participant), `participants_by_focus` (reverse index: focus target → participant set), warning timeline (ordered warnings with acknowledgement state), decision state (decisions with authorship), active executions (in-flight prompt steps), anomalies, `event_count`, `last_processed_event_id`.
 - **FR-023**: The reducer MUST be deterministic — given any causal-order-preserving permutation of the same events, the output MUST be identical.
 - **FR-024**: The reducer MUST handle N participants (no hardcoded cardinality limit).
 - **FR-025**: The reducer MUST follow the existing pipeline pattern: sort → dedup → process → collect anomalies.
 - **FR-026**: The reducer MUST support two membership enforcement modes, selectable via a `mode` parameter:
-  - **`strict` (default, for live traffic)**: Events referencing a `participant_id` not in the current mission roster (no prior `ParticipantJoined`) MUST cause the reducer to raise `UnknownParticipantError`. Acknowledgements for unknown warnings and completions without starts MUST also raise errors. This is the enforcement profile for live ingest.
+  - **`strict` (default, for live traffic)**: Events referencing a `participant_id` not in the current mission roster (no prior `ParticipantJoined` and not in seeded `roster`) MUST cause the reducer to raise `UnknownParticipantError`. Acknowledgements for unknown warnings and completions without starts MUST also raise errors. This is the enforcement profile for live ingest. Strict mode requires either (a) full event history including all `ParticipantJoined` events, or (b) a seeded `roster` parameter covering all participants referenced in the event window.
   - **`permissive` (for replay/import)**: Events from unknown participants, acknowledgements for unknown warnings, and completions without starts are recorded as anomalies (not exceptions), allowing processing of incomplete historical streams.
 - **FR-027**: In both modes, duplicate `ParticipantLeft` for an already-departed participant MUST be recorded as an anomaly — this is a protocol error worth logging but not a hard rejection.
 
 #### Envelope Mapping
 
-- **FR-028**: All collaboration events MUST use canonical envelope mapping: `Event.aggregate_id` = `mission_id`, `Event.correlation_id` = `mission_run_id` (the identifier for the specific run/session of the mission). This is a contract rule — consumers constructing collaboration events MUST follow this mapping.
+- **FR-028**: All collaboration events MUST use canonical envelope mapping: `Event.aggregate_id` MUST be `"mission/{mission_id}"` (type-prefixed string, e.g., `"mission/M042"` — matching existing lifecycle event convention). `Event.correlation_id` MUST be a ULID-26 string representing the `mission_run_id` (the envelope enforces exactly 26 characters). This is a contract rule — consumers constructing collaboration events MUST follow this wire format.
 
 #### Auth Principal Binding
 
