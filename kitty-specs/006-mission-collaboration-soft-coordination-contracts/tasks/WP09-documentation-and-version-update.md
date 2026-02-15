@@ -128,7 +128,7 @@ Update all documentation and version metadata for the collaboration feature:
   **e) Advisory Warning Semantics**:
   - No hard locks — warnings are informational
   - Acknowledgement actions: continue, hold, reassign, defer
-  - Warning events emitted by SaaS/observer (node_id identifies emitter)
+  - Warning events may be emitted by CLI observers and/or SaaS fallback inference (node_id identifies emitter and source)
 
 - **Files**: `COMPATIBILITY.md`
 - **Parallel?**: Yes (with T048, T050)
@@ -152,7 +152,8 @@ Update all documentation and version metadata for the collaboration feature:
        - `UnknownParticipantError` for strict mode enforcement
        - `CollaborationAnomaly` for non-fatal issue recording
        - 17 new JSON Schema files for collaboration models
-       - 7 conformance fixtures (5 valid scenarios, 2 invalid)
+      - 7 conformance payload fixtures (5 valid payloads, 2 invalid payloads)
+      - Reducer scenario fixtures for multi-event collaboration timelines
        - Hypothesis property tests for reducer determinism
        - Performance benchmark (10K events in <1s)
      - 36 new exports (total package exports: 104)
@@ -200,9 +201,9 @@ Update all documentation and version metadata for the collaboration feature:
 
 - **Purpose**: Final integrity check before feature completion.
 - **Steps**:
-  1. Run full test suite:
+  1. Run default regression suite (exclude benchmark marker):
      ```bash
-     python3.11 -m pytest -x --tb=short
+     python3.11 -m pytest -x -m "not benchmark" --tb=short
      ```
   2. Run mypy strict:
      ```bash
@@ -212,15 +213,20 @@ Update all documentation and version metadata for the collaboration feature:
      ```bash
      python3.11 -m pytest --cov=src/spec_kitty_events --cov-report=term-missing
      ```
-  4. Expected: all tests pass, no mypy errors, coverage >= 98%
-  5. If any failures: fix before marking WP09 complete
+  4. Run benchmark marker separately:
+     ```bash
+     python3.11 -m pytest -m benchmark --tb=short
+     ```
+  5. Expected: default regression suite passes, benchmark suite passes, no mypy errors, coverage >= 98%
+  6. If any failures: fix before marking WP09 complete
 - **Files**: N/A (verification only)
 - **Parallel?**: No — final step
 
 ## Test Strategy
 
 - **Quickstart verification**: Manual Python execution of code examples
-- **Full suite**: `python3.11 -m pytest -x`
+- **Full suite (default gate)**: `python3.11 -m pytest -x -m "not benchmark"`
+- **Benchmark suite (separate gate/manual)**: `python3.11 -m pytest -m benchmark`
 - **mypy**: `mypy --strict src/spec_kitty_events/`
 - **Coverage**: `python3.11 -m pytest --cov=src/spec_kitty_events`
 

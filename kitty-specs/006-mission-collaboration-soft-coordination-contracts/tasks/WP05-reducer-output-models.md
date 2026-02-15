@@ -48,12 +48,12 @@ Add the reducer output models to `collaboration.py` Section 4:
 2. `WarningEntry` — warning timeline entry
 3. `DecisionEntry` — decision history entry
 4. `CommentEntry` — comment history entry
-5. `ReducedCollaborationState` — the main reducer output (14 fields)
+5. `ReducedCollaborationState` — the main reducer output (full state snapshot)
 
 **Success criteria**:
 - All models frozen Pydantic v2
-- `ReducedCollaborationState` has all 14 fields matching `data-model.md`
-- `ReducedCollaborationState.participants_by_focus` uses `FocusTarget` as dict key
+- `ReducedCollaborationState` has all required fields from `data-model.md` (including `last_processed_event_id`)
+- `ReducedCollaborationState.participants_by_focus` uses a deterministic string key (`"{target_type}:{target_id}"`)
 - All tuple fields use `Tuple[X, ...]` for immutability
 - `mypy --strict` passes
 
@@ -147,7 +147,7 @@ Add the reducer output models to `collaboration.py` Section 4:
 
 ### Subtask T029 – Implement ReducedCollaborationState model
 
-- **Purpose**: The main output of the collaboration reducer. 14-field frozen model containing the full mission collaboration snapshot.
+- **Purpose**: The main output of the collaboration reducer. Frozen model containing the full mission collaboration snapshot.
 - **Steps**:
   1. Add to Section 4:
      ```python
@@ -166,8 +166,8 @@ Add the reducer output models to `collaboration.py` Section 4:
              default_factory=frozenset, description="participant_ids with active drive intent")
          focus_by_participant: Dict[str, FocusTarget] = Field(
              default_factory=dict, description="Current focus per participant")
-         participants_by_focus: Dict[FocusTarget, FrozenSet[str]] = Field(
-             default_factory=dict, description="Reverse index: focus -> participant set")
+         participants_by_focus: Dict[str, FrozenSet[str]] = Field(
+             default_factory=dict, description="Reverse index: focus_key -> participant set (focus_key = '{target_type}:{target_id}')")
          warnings: Tuple[WarningEntry, ...] = Field(
              default_factory=tuple, description="Ordered warning timeline")
          decisions: Tuple[DecisionEntry, ...] = Field(
@@ -184,7 +184,7 @@ Add the reducer output models to `collaboration.py` Section 4:
          last_processed_event_id: Optional[str] = Field(
              None, description="Last event_id in processed sequence")
      ```
-  2. **Critical**: `participants_by_focus` uses `FocusTarget` as dict key — requires FocusTarget to be hashable (verified in WP01)
+  2. **Critical**: `participants_by_focus` uses normalized string keys to guarantee JSON/Pydantic serialization safety
   3. Note: `active_drivers` uses `FrozenSet[str]`, `warnings`/`decisions`/`comments`/`anomalies` use `Tuple[X, ...]` for immutability
 - **Files**: `src/spec_kitty_events/collaboration.py`
 - **Parallel?**: No — depends on T025-T028 (uses all entry models)
@@ -201,7 +201,7 @@ Add the reducer output models to `collaboration.py` Section 4:
      - **CommentEntry**: construction with/without reply_to, frozen
      - **ReducedCollaborationState**: construction with representative data including:
        - Non-empty participants dict
-       - FocusTarget as dict key in participants_by_focus
+       - String focus keys in participants_by_focus (for example `wp:WP03`)
        - Frozen assertion (attribute assignment raises)
        - Default factory values (empty collections when not provided)
   2. Run: `python3.11 -m pytest tests/unit/ -k collaboration -v`
@@ -210,24 +210,24 @@ Add the reducer output models to `collaboration.py` Section 4:
 
 ## Test Strategy
 
-- **Unit tests**: Focus on frozen model construction and FocusTarget as dict key
+- **Unit tests**: Focus on frozen model construction and deterministic focus-key indexing
 - **Run command**: `python3.11 -m pytest tests/unit/ -k collaboration -v`
 - **mypy check**: `mypy --strict src/spec_kitty_events/collaboration.py`
-- **Key validation**: `ReducedCollaborationState` can be constructed with `participants_by_focus={FocusTarget(...): frozenset({"p-001"})}`
+- **Key validation**: `ReducedCollaborationState` can be constructed with `participants_by_focus={"wp:WP03": frozenset({"p-001"})}`
 
 ## Risks & Mitigations
 
 | Risk | Impact | Mitigation |
 |------|--------|------------|
 | Frozen model with dict fields | Pydantic may reject dict in frozen model | `ConfigDict(frozen=True)` prevents reassignment but allows dict values — verify |
-| FocusTarget as dict key in JSON serialization | JSON keys must be strings | `model_dump()` serializes FocusTarget keys correctly — verify round-trip |
+| Non-string map keys in JSON serialization | Pydantic/json serialization can fail | Store `participants_by_focus` keys as normalized strings (`"{target_type}:{target_id}"`) |
 | `Tuple[WarningEntry, ...]` Pydantic support | Type annotation complexity | Pydantic v2 supports tuple of BaseModel — verify |
 
 ## Review Guidance
 
 - Verify all 15 fields of `ReducedCollaborationState` match `data-model.md`
 - Verify tuple types for ordered collections, dict for indexed, frozenset for sets
-- Verify FocusTarget dict key test exists and passes
+- Verify normalized focus-key test exists and passes
 - Verify all models use `ConfigDict(frozen=True)`
 
 ## Completion

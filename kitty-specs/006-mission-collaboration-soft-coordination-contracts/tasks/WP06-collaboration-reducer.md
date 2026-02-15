@@ -4,6 +4,10 @@ title: Collaboration Reducer
 lane: planned
 dependencies:
 - WP01
+- WP02
+- WP03
+- WP04
+- WP05
 subtasks:
 - T031
 - T032
@@ -286,15 +290,16 @@ Implement `reduce_collaboration_events()` — the core pure function in Section 
 
 - **Purpose**: Build the final `ReducedCollaborationState` from accumulated mutable state.
 - **Steps**:
-  1. After the process loop, build the reverse focus index:
+  1. After the process loop, build the reverse focus index using normalized string keys:
      ```python
      # Build participants_by_focus reverse index
-     participants_by_focus: Dict[FocusTarget, FrozenSet[str]] = {}
+     participants_by_focus: Dict[str, FrozenSet[str]] = {}
      for pid, target in focus_by_participant.items():
-         if target in participants_by_focus:
-             participants_by_focus[target] = participants_by_focus[target] | frozenset({pid})
+         focus_key = f"{target.target_type}:{target.target_id}"
+         if focus_key in participants_by_focus:
+             participants_by_focus[focus_key] = participants_by_focus[focus_key] | frozenset({pid})
          else:
-             participants_by_focus[target] = frozenset({pid})
+             participants_by_focus[focus_key] = frozenset({pid})
      ```
   2. Convert mutable warnings to frozen WarningEntry objects (if using mutable intermediates)
   3. Return:
@@ -346,7 +351,7 @@ Implement `reduce_collaboration_events()` — the core pure function in Section 
   - `ParticipantLeft` → moves to departed
   - `DriveIntentSet(active)` → adds to active_drivers
   - `DriveIntentSet(inactive)` → removes from active_drivers
-  - `FocusChanged` → updates focus_by_participant and participants_by_focus
+  - `FocusChanged` → updates focus_by_participant and normalized `participants_by_focus` keys
   - `PresenceHeartbeat` → updates presence timestamp
   - `ConcurrentDriverWarning` → adds to warnings
   - `WarningAcknowledged` → updates warning acknowledgements
