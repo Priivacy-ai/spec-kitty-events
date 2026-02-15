@@ -212,11 +212,11 @@
 **Estimated prompt size**: ~400 lines
 
 ### Included Subtasks
-- [ ] T038 Add 36 new exports to `src/spec_kitty_events/__init__.py` (organized by category following existing pattern)
-- [ ] T039 Register 17 new models in `src/spec_kitty_events/schemas/generate.py` PYDANTIC_MODELS list
-- [ ] T040 Run schema generation and commit 17 new `.schema.json` files
-- [ ] T041 Update `src/spec_kitty_events/conformance/validators.py` to recognize collaboration payloads
-- [ ] T042 Run schema drift check (`python -m spec_kitty_events.schemas.generate --check`) and verify pass
+- [x] T038 Add 36 new exports to `src/spec_kitty_events/__init__.py` (organized by category following existing pattern)
+- [x] T039 Register 17 new models in `src/spec_kitty_events/schemas/generate.py` PYDANTIC_MODELS list
+- [x] T040 Run schema generation and commit 17 new `.schema.json` files
+- [x] T041 Update `src/spec_kitty_events/conformance/validators.py` to recognize collaboration payloads
+- [x] T042 Run schema drift check (`python -m spec_kitty_events.schemas.generate --check`) and verify pass
 
 ### Implementation Notes
 - Export order: constants (15) → identity models (3) → payload models (14) → reducer outputs (3) → reducer function (1) — add as a `# Collaboration` section in `__init__.py`
