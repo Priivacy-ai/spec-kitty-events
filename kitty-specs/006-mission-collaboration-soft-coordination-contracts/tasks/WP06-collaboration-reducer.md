@@ -21,7 +21,7 @@ subtasks:
 - T037
 phase: Phase 2 - Reducer
 assignee: ''
-agent: ''
+agent: "claude-coordinator"
 shell_pid: "83786"
 review_status: ''
 reviewed_by: ''
@@ -422,3 +422,4 @@ spec-kitty agent tasks move-task WP06 --to for_review --note "Ready for review: 
 ## Activity Log
 
 - 2026-02-15T10:35:14Z – system – lane=planned – Prompt created.
+- 2026-02-15T11:13:09Z – claude-coordinator – shell_pid=83786 – lane=doing – Assigned agent via workflow command
