@@ -1,26 +1,29 @@
 ---
-work_package_id: "WP02"
+work_package_id: WP02
+title: Core Payload Models — Scope, Term, Sense, Strictness
+lane: "doing"
+dependencies: [WP01]
+base_branch: 007-glossary-semantic-integrity-contracts-WP01
+base_commit: b784a988a468e02443875607213646fa89a9a4bc
+created_at: '2026-02-16T13:16:38.576849+00:00'
 subtasks:
-  - "T005"
-  - "T006"
-  - "T007"
-  - "T008"
-  - "T009"
-title: "Core Payload Models — Scope, Term, Sense, Strictness"
-phase: "Phase 1 - Payload Models"
-lane: "planned"
-assignee: ""
-agent: ""
-shell_pid: ""
-review_status: ""
-reviewed_by: ""
-dependencies: ["WP01"]
+- T005
+- T006
+- T007
+- T008
+- T009
+phase: Phase 1 - Payload Models
+assignee: ''
+agent: ''
+shell_pid: "19899"
+review_status: ''
+reviewed_by: ''
 history:
-  - timestamp: "2026-02-16T12:00:00Z"
-    lane: "planned"
-    agent: "system"
-    shell_pid: ""
-    action: "Prompt generated via /spec-kitty.tasks"
+- timestamp: '2026-02-16T12:00:00Z'
+  lane: planned
+  agent: system
+  shell_pid: ''
+  action: Prompt generated via /spec-kitty.tasks
 ---
 
 # Work Package Prompt: WP02 – Core Payload Models — Scope, Term, Sense, Strictness
