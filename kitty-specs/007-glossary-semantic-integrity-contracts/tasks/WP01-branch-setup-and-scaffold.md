@@ -1,7 +1,7 @@
 ---
 work_package_id: WP01
 title: Branch Setup & Module Scaffold
-lane: "doing"
+lane: "for_review"
 dependencies: []
 base_branch: 2.x
 base_commit: 1ffeb090612a59c7864871c8bfb0aad41b9db81c
@@ -171,3 +171,4 @@ history:
 
 - 2026-02-16T12:00:00Z – system – lane=planned – Prompt created.
 - 2026-02-16T13:14:17Z – claude-opus – shell_pid=18339 – lane=doing – Assigned agent via workflow command
+- 2026-02-16T13:16:12Z – claude-opus – shell_pid=18339 – lane=for_review – Ready for review: glossary.py scaffold with 8 event constants, pyproject.toml updated, mypy strict passes
