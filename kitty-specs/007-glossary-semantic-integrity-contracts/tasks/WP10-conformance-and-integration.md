@@ -1,9 +1,12 @@
 ---
 work_package_id: WP10
 title: Conformance Fixtures & Integration Verification
-lane: planned
+lane: "doing"
 dependencies:
 - WP06
+base_branch: 007-glossary-semantic-integrity-contracts-WP06
+base_commit: 36b0cdc3f4066d989ad8ab413208b3854c24a655
+created_at: '2026-02-16T13:32:08.193177+00:00'
 subtasks:
 - T049
 - T050
@@ -14,7 +17,7 @@ subtasks:
 phase: Phase 4 - Conformance & Polish
 assignee: ''
 agent: ''
-shell_pid: ''
+shell_pid: "29932"
 review_status: ''
 reviewed_by: ''
 history:
