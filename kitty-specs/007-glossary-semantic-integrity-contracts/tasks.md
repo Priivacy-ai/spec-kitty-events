@@ -266,12 +266,12 @@
 **Estimated Size**: ~450 lines
 
 ### Included Subtasks
-- [ ] T043 Test strict mode — raises on event for unactivated scope
-- [ ] T044 Test strict mode — raises on `GlossarySenseUpdated` for unobserved term
-- [ ] T045 Test permissive mode — records anomaly for unactivated scope, continues processing remaining events
-- [ ] T046 Test permissive mode — records anomaly for unobserved term sense update, continues
-- [ ] T047 Test concurrent clarification resolution — last-write-wins by causal ordering
-- [ ] T048 Test strictness change from `max` to `off` mid-mission — existing block events remain in state
+- [x] T043 Test strict mode — raises on event for unactivated scope
+- [x] T044 Test strict mode — raises on `GlossarySenseUpdated` for unobserved term
+- [x] T045 Test permissive mode — records anomaly for unactivated scope, continues processing remaining events
+- [x] T046 Test permissive mode — records anomaly for unobserved term sense update, continues
+- [x] T047 Test concurrent clarification resolution — last-write-wins by causal ordering
+- [x] T048 Test strictness change from `max` to `off` mid-mission — existing block events remain in state
 
 ### Implementation Notes
 - Test file: `tests/test_glossary_reducer.py` (same file as WP08, or separate class).
