@@ -298,12 +298,12 @@
 **Estimated Size**: ~500 lines
 
 ### Included Subtasks
-- [ ] T049 Create valid glossary fixture JSON files (9 files: one per event type + semantic_check_evaluated_warn variant)
-- [ ] T050 Create invalid glossary fixture JSON files (3 files: missing step_id, invalid scope_type, missing semantic_check_event_id)
-- [ ] T051 Register all 12 fixtures in `conformance/fixtures/manifest.json`
-- [ ] T052 Write conformance test — high-severity block scenario (fixture sequence → reduce → assert block)
-- [ ] T053 Write conformance test — medium-severity warn scenario + clarification burst cap scenario
-- [ ] T054 Run full integration verification: `mypy --strict`, full test suite, coverage check, export verification
+- [x] T049 Create valid glossary fixture JSON files (9 files: one per event type + semantic_check_evaluated_warn variant)
+- [x] T050 Create invalid glossary fixture JSON files (3 files: missing step_id, invalid scope_type, missing semantic_check_event_id)
+- [x] T051 Register all 12 fixtures in `conformance/fixtures/manifest.json`
+- [x] T052 Write conformance test — high-severity block scenario (fixture sequence → reduce → assert block)
+- [x] T053 Write conformance test — medium-severity warn scenario + clarification burst cap scenario
+- [x] T054 Run full integration verification: `mypy --strict`, full test suite, coverage check, export verification
 
 ### Implementation Notes
 - Fixture JSONs follow existing structure (see `conformance/fixtures/collaboration/valid/` for reference).
