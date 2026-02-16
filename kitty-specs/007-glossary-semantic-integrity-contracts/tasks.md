@@ -202,12 +202,12 @@
 **Estimated Size**: ~450 lines
 
 ### Included Subtasks
-- [ ] T031 [P] Tests for `GlossaryScopeActivatedPayload` and `GlossaryStrictnessSetPayload` — valid construction, round-trip, invalid scope_type/strictness rejection
-- [ ] T032 [P] Tests for `TermCandidateObservedPayload` — valid, confidence bounds (reject <0.0, >1.0), empty term_surface rejection
-- [ ] T033 [P] Tests for `SemanticCheckEvaluatedPayload` + `SemanticConflictEntry` — valid with conflict list, recommended_action values, confidence bounds
-- [ ] T034 [P] Tests for `GlossaryClarificationRequestedPayload` and `GlossaryClarificationResolvedPayload` — valid, semantic_check_event_id presence
-- [ ] T035 [P] Tests for `GenerationBlockedBySemanticConflictPayload` — blocking_strictness cannot be "off", conflict_event_ids must be non-empty
-- [ ] T036 [P] Tests for `GlossarySenseUpdatedPayload` — valid, optional before_sense=None for initial definition
+- [x] T031 [P] Tests for `GlossaryScopeActivatedPayload` and `GlossaryStrictnessSetPayload` — valid construction, round-trip, invalid scope_type/strictness rejection
+- [x] T032 [P] Tests for `TermCandidateObservedPayload` — valid, confidence bounds (reject <0.0, >1.0), empty term_surface rejection
+- [x] T033 [P] Tests for `SemanticCheckEvaluatedPayload` + `SemanticConflictEntry` — valid with conflict list, recommended_action values, confidence bounds
+- [x] T034 [P] Tests for `GlossaryClarificationRequestedPayload` and `GlossaryClarificationResolvedPayload` — valid, semantic_check_event_id presence
+- [x] T035 [P] Tests for `GenerationBlockedBySemanticConflictPayload` — blocking_strictness cannot be "off", conflict_event_ids must be non-empty
+- [x] T036 [P] Tests for `GlossarySenseUpdatedPayload` — valid, optional before_sense=None for initial definition
 
 ### Implementation Notes
 - Test file: `tests/test_glossary.py` (payload models only).
