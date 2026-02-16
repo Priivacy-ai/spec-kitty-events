@@ -14,7 +14,7 @@ subtasks:
 - T009
 phase: Phase 1 - Payload Models
 assignee: ''
-agent: ''
+agent: "claude-opus"
 shell_pid: "19899"
 review_status: ''
 reviewed_by: ''
@@ -204,3 +204,4 @@ history:
 ## Activity Log
 
 - 2026-02-16T12:00:00Z – system – lane=planned – Prompt created.
+- 2026-02-16T13:16:38Z – claude-opus – shell_pid=19899 – lane=doing – Assigned agent via workflow command
