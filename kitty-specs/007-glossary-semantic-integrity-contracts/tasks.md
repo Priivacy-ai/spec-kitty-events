@@ -170,12 +170,12 @@
 **Estimated Size**: ~500 lines
 
 ### Included Subtasks
-- [ ] T025 Implement `SemanticCheckEvaluated` processing (append to semantic_checks list)
-- [ ] T026 Implement `GlossaryClarificationRequested` processing (create `ClarificationRecord`, enforce burst cap per `semantic_check_event_id`)
-- [ ] T027 Implement `GlossaryClarificationResolved` processing (mark record resolved, handle concurrent resolution with last-write-wins)
-- [ ] T028 Implement `GenerationBlockedBySemanticConflict` processing (append to generation_blocks)
-- [ ] T029 Implement final state assembly — freeze all mutable intermediates into `ReducedGlossaryState`
-- [ ] T030 Run `mypy --strict` on completed `glossary.py`
+- [x] T025 Implement `SemanticCheckEvaluated` processing (append to semantic_checks list)
+- [x] T026 Implement `GlossaryClarificationRequested` processing (create `ClarificationRecord`, enforce burst cap per `semantic_check_event_id`)
+- [x] T027 Implement `GlossaryClarificationResolved` processing (mark record resolved, handle concurrent resolution with last-write-wins)
+- [x] T028 Implement `GenerationBlockedBySemanticConflict` processing (append to generation_blocks)
+- [x] T029 Implement final state assembly — freeze all mutable intermediates into `ReducedGlossaryState`
+- [x] T030 Run `mypy --strict` on completed `glossary.py`
 
 ### Implementation Notes
 - Burst cap enforcement: count unresolved `ClarificationRecord` entries grouped by `semantic_check_event_id`. If count >3, strict mode raises, permissive mode records anomaly and caps at 3.
