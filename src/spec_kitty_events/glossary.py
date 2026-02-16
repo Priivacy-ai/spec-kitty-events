@@ -122,6 +122,95 @@ class GlossaryStrictnessSetPayload(BaseModel):
     )
     actor: str = Field(..., min_length=1, description="Actor who changed the setting")
 
+
+class SemanticCheckEvaluatedPayload(BaseModel):
+    """Payload for SemanticCheckEvaluated event (step-level semantic check)."""
+
+    model_config = ConfigDict(frozen=True)
+
+    mission_id: str = Field(..., min_length=1, description="Mission context")
+    scope_id: str = Field(..., min_length=1, description="Scope checked against")
+    step_id: str = Field(..., min_length=1, description="Step being evaluated")
+    conflicts: Tuple[SemanticConflictEntry, ...] = Field(
+        ..., description="List of detected conflicts"
+    )
+    severity: Literal["low", "medium", "high"] = Field(
+        ..., description="Overall check severity (max of conflicts)"
+    )
+    confidence: float = Field(
+        ..., ge=0.0, le=1.0, description="Overall confidence score"
+    )
+    recommended_action: Literal["block", "warn", "pass"] = Field(
+        ..., description="Action recommendation based on severity and strictness"
+    )
+    effective_strictness: Literal["off", "medium", "max"] = Field(
+        ..., description="Strictness mode used for this evaluation"
+    )
+    step_metadata: Dict[str, str] = Field(
+        default_factory=dict,
+        description="Mission primitive metadata (no hardcoded step names)",
+    )
+
+
+class GlossaryClarificationRequestedPayload(BaseModel):
+    """Payload for GlossaryClarificationRequested event."""
+
+    model_config = ConfigDict(frozen=True)
+
+    mission_id: str = Field(..., min_length=1, description="Mission context")
+    scope_id: str = Field(..., min_length=1, description="Scope context")
+    step_id: str = Field(..., min_length=1, description="Step that triggered clarification")
+    semantic_check_event_id: str = Field(
+        ...,
+        min_length=1,
+        description="Event ID of triggering SemanticCheckEvaluated (burst-window key)",
+    )
+    term: str = Field(..., min_length=1, description="The ambiguous term")
+    question: str = Field(..., description="Clarification question text")
+    options: Tuple[str, ...] = Field(..., description="Available answer options")
+    urgency: Literal["low", "medium", "high"] = Field(
+        ..., description="Urgency level"
+    )
+    actor: str = Field(..., min_length=1, description="Actor who triggered the request")
+
+
+class GlossaryClarificationResolvedPayload(BaseModel):
+    """Payload for GlossaryClarificationResolved event."""
+
+    model_config = ConfigDict(frozen=True)
+
+    mission_id: str = Field(..., min_length=1, description="Mission context")
+    clarification_event_id: str = Field(
+        ...,
+        min_length=1,
+        description="Event ID of the originating clarification request",
+    )
+    selected_meaning: str = Field(
+        ..., min_length=1, description="The chosen or entered meaning"
+    )
+    actor: str = Field(..., min_length=1, description="Identity of the resolving actor")
+
+
+class GenerationBlockedBySemanticConflictPayload(BaseModel):
+    """Payload for GenerationBlockedBySemanticConflict event."""
+
+    model_config = ConfigDict(frozen=True)
+
+    mission_id: str = Field(..., min_length=1, description="Mission context")
+    step_id: str = Field(..., min_length=1, description="Step that was blocked")
+    conflict_event_ids: Tuple[str, ...] = Field(
+        ...,
+        min_length=1,
+        description="Event IDs of unresolved SemanticCheckEvaluated events",
+    )
+    blocking_strictness: Literal["medium", "max"] = Field(
+        ..., description="Policy mode that triggered the block (never 'off')"
+    )
+    step_metadata: Dict[str, str] = Field(
+        default_factory=dict,
+        description="Mission primitive metadata",
+    )
+
 # ── Section 4: Reducer Output Models ─────────────────────────────────────────
 
 # ── Section 5: Glossary Reducer ──────────────────────────────────────────────
