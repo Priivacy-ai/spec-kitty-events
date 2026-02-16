@@ -1,27 +1,30 @@
 ---
-work_package_id: "WP06"
+work_package_id: WP06
+title: Reducer — Checks, Clarifications, Blocks & Assembly
+lane: "doing"
+dependencies: [WP05]
+base_branch: 007-glossary-semantic-integrity-contracts-WP05
+base_commit: 7126c08de30c59ad7421e93d1b514aabd77cd2ab
+created_at: '2026-02-16T13:24:09.961343+00:00'
 subtasks:
-  - "T025"
-  - "T026"
-  - "T027"
-  - "T028"
-  - "T029"
-  - "T030"
-title: "Reducer — Checks, Clarifications, Blocks & Assembly"
-phase: "Phase 2 - Reducer Implementation"
-lane: "planned"
-assignee: ""
-agent: ""
-shell_pid: ""
-review_status: ""
-reviewed_by: ""
-dependencies: ["WP05"]
+- T025
+- T026
+- T027
+- T028
+- T029
+- T030
+phase: Phase 2 - Reducer Implementation
+assignee: ''
+agent: ''
+shell_pid: "24697"
+review_status: ''
+reviewed_by: ''
 history:
-  - timestamp: "2026-02-16T12:00:00Z"
-    lane: "planned"
-    agent: "system"
-    shell_pid: ""
-    action: "Prompt generated via /spec-kitty.tasks"
+- timestamp: '2026-02-16T12:00:00Z'
+  lane: planned
+  agent: system
+  shell_pid: ''
+  action: Prompt generated via /spec-kitty.tasks
 ---
 
 # Work Package Prompt: WP06 – Reducer — Checks, Clarifications, Blocks & Assembly
