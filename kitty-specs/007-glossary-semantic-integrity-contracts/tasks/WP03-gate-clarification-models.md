@@ -1,25 +1,28 @@
 ---
-work_package_id: "WP03"
+work_package_id: WP03
+title: Gate & Clarification Payload Models
+lane: "doing"
+dependencies: [WP02]
+base_branch: 007-glossary-semantic-integrity-contracts-WP02
+base_commit: 421824f411e5452ce78bc91a713e6960e4a0a4ab
+created_at: '2026-02-16T13:18:21.106217+00:00'
 subtasks:
-  - "T010"
-  - "T011"
-  - "T012"
-  - "T013"
-title: "Gate & Clarification Payload Models"
-phase: "Phase 1 - Payload Models"
-lane: "planned"
-assignee: ""
-agent: ""
-shell_pid: ""
-review_status: ""
-reviewed_by: ""
-dependencies: ["WP02"]
+- T010
+- T011
+- T012
+- T013
+phase: Phase 1 - Payload Models
+assignee: ''
+agent: ''
+shell_pid: "21232"
+review_status: ''
+reviewed_by: ''
 history:
-  - timestamp: "2026-02-16T12:00:00Z"
-    lane: "planned"
-    agent: "system"
-    shell_pid: ""
-    action: "Prompt generated via /spec-kitty.tasks"
+- timestamp: '2026-02-16T12:00:00Z'
+  lane: planned
+  agent: system
+  shell_pid: ''
+  action: Prompt generated via /spec-kitty.tasks
 ---
 
 # Work Package Prompt: WP03 – Gate & Clarification Payload Models
