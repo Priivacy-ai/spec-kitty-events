@@ -37,7 +37,7 @@ As a system that replays event streams, I can reduce a sequence of glossary even
 
 1. **Given** a sequence of glossary events in any causal-order-preserving permutation, **When** reduced, **Then** the resulting glossary state is identical regardless of input ordering.
 2. **Given** a `GlossaryScopeActivated` event followed by `TermCandidateObserved` and `GlossarySenseUpdated` events, **When** reduced, **Then** the state contains the activated scope, observed candidates, and current sense values.
-3. **Given** a `GlossaryStrictnessSet` event changing policy from `medium` to `max`, **When** reduced, **Then** the state reflects the latest strictness mode and records the policy transition in history.
+3. **Given** a `GlossaryStrictnessSet` event changing mission-wide policy from `medium` to `max`, **When** reduced, **Then** the state reflects the latest mission-wide strictness mode and records the policy transition in history.
 4. **Given** duplicate events (same event_id), **When** reduced, **Then** duplicates are discarded and the result is the same as reducing the deduplicated set.
 5. **Given** an event referencing a scope that was never activated, **When** reduced in strict mode, **Then** the reducer raises an error. **When** reduced in permissive mode, **Then** the reducer records an anomaly and continues.
 
@@ -72,7 +72,7 @@ As a mission participant (human or LLM), I can observe clarification request and
 
 1. **Given** a `GlossaryClarificationRequested` event, **When** constructed, **Then** the payload includes the question text, the ambiguous term, option choices, urgency level, and the step id that triggered the request.
 2. **Given** a `GlossaryClarificationResolved` event, **When** constructed, **Then** the payload includes the selected or entered meaning, the resolving actor's identity, and a reference to the originating request event.
-3. **Given** 5 pending clarifications ranked by severity, **When** reduced, **Then** the state shows at most 3 active clarification prompts per burst window (the burst cap is observable in reduced state).
+3. **Given** 5 pending clarifications from a single semantic check evaluation (same `semantic_check_event_id`), **When** reduced, **Then** the state shows at most 3 active clarification prompts for that evaluation (the burst cap is observable in reduced state).
 
 ---
 
@@ -128,7 +128,7 @@ As a test author in a downstream repo (CLI or SaaS), I can import pre-built conf
 
 **Payload Contract — Clarification**
 
-- **FR-011**: `GlossaryClarificationRequestedPayload` MUST include the question text, the ambiguous term, available options, urgency level, step id, and scope id.
+- **FR-011**: `GlossaryClarificationRequestedPayload` MUST include the question text, the ambiguous term, available options, urgency level, step id, scope id, and a `semantic_check_event_id` linking the request to the specific `SemanticCheckEvaluated` event that triggered it (this field serves as the deterministic burst-window grouping key).
 - **FR-012**: `GlossaryClarificationResolvedPayload` MUST include the selected or entered meaning, the resolving actor's identity, and a reference to the originating clarification request.
 
 **Payload Contract — Strictness Configuration**
@@ -147,10 +147,10 @@ As a test author in a downstream repo (CLI or SaaS), I can import pre-built conf
 
 - **FR-016**: System MUST provide a `reduce_glossary_events()` function in a standalone `glossary.py` module that produces a deterministic glossary state from an event sequence.
 - **FR-017**: The reducer MUST support both strict mode (raises on integrity violations) and permissive mode (records anomalies and continues), matching the dual-mode pattern in the collaboration reducer.
-- **FR-018**: The reducer MUST reconstruct: active scopes, current strictness per scope, observed term candidates, current term senses, pending and resolved clarifications, semantic check history, and generation block records.
-- **FR-019**: The reducer MUST enforce the clarification burst cap — the reduced state exposes at most 3 active (unresolved) clarification prompts per burst window.
+- **FR-018**: The reducer MUST reconstruct: active scopes, current mission-wide strictness mode, observed term candidates, current term senses, pending and resolved clarifications, semantic check history, and generation block records.
+- **FR-019**: The reducer MUST enforce the clarification burst cap — the reduced state exposes at most 3 active (unresolved) clarification prompts per semantic check evaluation (grouped by `semantic_check_event_id`).
 - **FR-020**: The reducer MUST produce identical output for any causal-order-preserving permutation of the same event set (determinism invariant).
-- **FR-021**: The reducer MUST reuse `dedup_events()` from the existing codebase for event deduplication.
+- **FR-021**: The reducer MUST deduplicate events by `event_id` before processing, discarding exact duplicates so that the same event delivered multiple times produces the same result as a single delivery.
 
 **Conformance Fixtures**
 
@@ -170,14 +170,14 @@ As a test author in a downstream repo (CLI or SaaS), I can import pre-built conf
 
 ### Key Entities
 
-- **GlossaryScope**: A bounded semantic context (e.g., `spec_kitty_core`, `mission_local`) within which terms have authoritative meanings. Identified by scope id and type. Has an associated glossary version and strictness mode.
+- **GlossaryScope**: A bounded semantic context (e.g., `spec_kitty_core`, `mission_local`) within which terms have authoritative meanings. Identified by scope id and type. Has an associated glossary version.
 - **TermCandidate**: A raw term surface observed in mission input, linked to a scope, step, and actor. Carries a confidence score indicating certainty of relevance.
 - **TermSense**: The context-specific meaning of a term within a scope. Tracks before/after values when updated, with reason and actor attribution.
 - **SemanticConflict**: A mismatch or ambiguity detected during a semantic check. Classified by conflict nature (overloaded, drift, ambiguous), severity, and the specific term involved.
-- **ClarificationPrompt**: A targeted question emitted when conflict severity and confidence policy require human input. Linked to a specific term, scope, and step. Subject to a burst cap of 3 per evaluation window.
-- **GlossaryStrictness**: Policy mode (`off`, `medium`, `max`) controlling the warning/block behavior threshold for a scope within a mission.
+- **ClarificationPrompt**: A targeted question emitted when conflict severity and confidence policy require human input. Linked to a specific term, scope, step, and the originating `SemanticCheckEvaluated` event (which defines the burst window). Subject to a burst cap of 3 per semantic check evaluation.
+- **GlossaryStrictness**: Mission-wide policy mode (`off`, `medium`, `max`) controlling the warning/block behavior threshold. Applies to the entire mission, not per scope.
 - **GlossaryAnomalyRecord**: A non-fatal integrity issue recorded by the reducer in permissive mode (e.g., sense update for unobserved term, event for unactivated scope).
-- **ReducedGlossaryState**: The projected glossary state produced by the reducer — containing active scopes, strictness settings, term senses, pending clarifications, check history, and block records.
+- **ReducedGlossaryState**: The projected glossary state produced by the reducer — containing active scopes, current mission-wide strictness mode, term senses, pending clarifications, check history, and block records.
 
 ## Success Criteria *(mandatory)*
 
@@ -194,14 +194,14 @@ As a test author in a downstream repo (CLI or SaaS), I can import pre-built conf
 
 - Mission primitives in 2.x carry configurable metadata that step-level events can reference without hardcoding step names.
 - The `2.x` branch will be cut from the current `main` baseline before feature work begins.
-- The existing `dedup_events()` function from `status.py` is reusable for glossary event deduplication without modification.
+- Event deduplication by `event_id` is a well-established pattern in the codebase; the glossary reducer applies the same semantic (discard exact duplicates by id).
 - Actor identity fields in glossary payloads follow the same `str` pattern used in lifecycle and collaboration payloads (not the full `ParticipantIdentity` model, which belongs to the collaboration domain).
 - Confidence scores are numeric (float, 0.0–1.0 range) and severity levels use a constrained string or enum (`low`, `medium`, `high`).
-- The clarification burst cap of 3 is a per-evaluation-window limit, not a global lifetime cap.
+- The clarification burst cap of 3 is per semantic check evaluation (grouped by `semantic_check_event_id`), not a global lifetime cap.
 
 ## Dependencies
 
-- Existing `spec-kitty-events` infrastructure: `Event` model, `dedup_events()`, causal ordering utilities, storage abstractions.
+- Existing `spec-kitty-events` infrastructure: `Event` model, causal ordering utilities, storage abstractions.
 - Branch `2.x` must be established before implementation begins.
 - No external package dependencies beyond what `spec-kitty-events` already declares.
 
