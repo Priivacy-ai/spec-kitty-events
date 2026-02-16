@@ -1,26 +1,29 @@
 ---
-work_package_id: "WP04"
+work_package_id: WP04
+title: Reducer Output Models & Exports
+lane: "doing"
+dependencies: [WP03]
+base_branch: 007-glossary-semantic-integrity-contracts-WP03
+base_commit: b16d591b8f032989376528aa0ed974102c513e36
+created_at: '2026-02-16T13:19:45.919745+00:00'
 subtasks:
-  - "T014"
-  - "T015"
-  - "T016"
-  - "T017"
-  - "T018"
-title: "Reducer Output Models & Exports"
-phase: "Phase 1 - Payload Models"
-lane: "planned"
-assignee: ""
-agent: ""
-shell_pid: ""
-review_status: ""
-reviewed_by: ""
-dependencies: ["WP03"]
+- T014
+- T015
+- T016
+- T017
+- T018
+phase: Phase 1 - Payload Models
+assignee: ''
+agent: ''
+shell_pid: "22012"
+review_status: ''
+reviewed_by: ''
 history:
-  - timestamp: "2026-02-16T12:00:00Z"
-    lane: "planned"
-    agent: "system"
-    shell_pid: ""
-    action: "Prompt generated via /spec-kitty.tasks"
+- timestamp: '2026-02-16T12:00:00Z'
+  lane: planned
+  agent: system
+  shell_pid: ''
+  action: Prompt generated via /spec-kitty.tasks
 ---
 
 # Work Package Prompt: WP04 – Reducer Output Models & Exports
