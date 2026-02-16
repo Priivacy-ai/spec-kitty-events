@@ -234,12 +234,12 @@
 **Estimated Size**: ~500 lines
 
 ### Included Subtasks
-- [ ] T037 Test reducer with empty input — returns empty `ReducedGlossaryState` with defaults
-- [ ] T038 Test full happy path — scope activation → term observation → sense update → semantic check → generation block
-- [ ] T039 Test strictness tracking — initial default (`medium`), transitions, history preservation
-- [ ] T040 Test dedup — duplicate `event_id` entries discarded, same result as unique set
-- [ ] T041 Test determinism — Hypothesis property test with `@given(st.permutations(...))`, 200 examples
-- [ ] T042 Test clarification lifecycle — request/resolve pairs, burst cap at exactly 3
+- [x] T037 Test reducer with empty input — returns empty `ReducedGlossaryState` with defaults
+- [x] T038 Test full happy path — scope activation → term observation → sense update → semantic check → generation block
+- [x] T039 Test strictness tracking — initial default (`medium`), transitions, history preservation
+- [x] T040 Test dedup — duplicate `event_id` entries discarded, same result as unique set
+- [x] T041 Test determinism — Hypothesis property test with `@given(st.permutations(...))`, 200 examples
+- [x] T042 Test clarification lifecycle — request/resolve pairs, burst cap at exactly 3
 
 ### Implementation Notes
 - Test file: `tests/test_glossary_reducer.py`.
