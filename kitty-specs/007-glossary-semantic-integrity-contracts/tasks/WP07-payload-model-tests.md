@@ -1,27 +1,30 @@
 ---
-work_package_id: "WP07"
+work_package_id: WP07
+title: Payload Model Tests
+lane: "doing"
+dependencies: [WP04]
+base_branch: 007-glossary-semantic-integrity-contracts-WP04
+base_commit: 1cc294fbe6cea88e0fcd6f32bc53645a7db5cb4d
+created_at: '2026-02-16T13:26:22.789008+00:00'
 subtasks:
-  - "T031"
-  - "T032"
-  - "T033"
-  - "T034"
-  - "T035"
-  - "T036"
-title: "Payload Model Tests"
-phase: "Phase 3 - Testing"
-lane: "planned"
-assignee: ""
-agent: ""
-shell_pid: ""
-review_status: ""
-reviewed_by: ""
-dependencies: ["WP04"]
+- T031
+- T032
+- T033
+- T034
+- T035
+- T036
+phase: Phase 3 - Testing
+assignee: ''
+agent: ''
+shell_pid: "25971"
+review_status: ''
+reviewed_by: ''
 history:
-  - timestamp: "2026-02-16T12:00:00Z"
-    lane: "planned"
-    agent: "system"
-    shell_pid: ""
-    action: "Prompt generated via /spec-kitty.tasks"
+- timestamp: '2026-02-16T12:00:00Z'
+  lane: planned
+  agent: system
+  shell_pid: ''
+  action: Prompt generated via /spec-kitty.tasks
 ---
 
 # Work Package Prompt: WP07 – Payload Model Tests
