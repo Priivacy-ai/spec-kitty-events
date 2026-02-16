@@ -107,11 +107,11 @@
 **Estimated Size**: ~400 lines
 
 ### Included Subtasks
-- [ ] T014 Define `GlossaryAnomaly` model (event_id, event_type, reason)
-- [ ] T015 Define `ClarificationRecord` model (request_event_id, semantic_check_event_id, term, resolved, resolution_event_id)
-- [ ] T016 Define `ReducedGlossaryState` model (all ~12 fields with defaults)
-- [ ] T017 Add all glossary imports and `__all__` entries to `__init__.py` (~21 new exports)
-- [ ] T018 Run `mypy --strict` on `glossary.py` to catch type issues early
+- [x] T014 Define `GlossaryAnomaly` model (event_id, event_type, reason)
+- [x] T015 Define `ClarificationRecord` model (request_event_id, semantic_check_event_id, term, resolved, resolution_event_id)
+- [x] T016 Define `ReducedGlossaryState` model (all ~12 fields with defaults)
+- [x] T017 Add all glossary imports and `__all__` entries to `__init__.py` (~21 new exports)
+- [x] T018 Run `mypy --strict` on `glossary.py` to catch type issues early
 
 ### Implementation Notes
 - `ReducedGlossaryState` follows `ReducedCollaborationState` pattern: frozen Pydantic model with Field defaults.
