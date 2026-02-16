@@ -1,7 +1,7 @@
 ---
 work_package_id: WP06
 title: Reducer — Checks, Clarifications, Blocks & Assembly
-lane: "doing"
+lane: "for_review"
 dependencies: [WP05]
 base_branch: 007-glossary-semantic-integrity-contracts-WP05
 base_commit: 7126c08de30c59ad7421e93d1b514aabd77cd2ab
@@ -252,3 +252,4 @@ history:
 
 - 2026-02-16T12:00:00Z – system – lane=planned – Prompt created.
 - 2026-02-16T13:24:10Z – claude-opus – shell_pid=24697 – lane=doing – Assigned agent via workflow command
+- 2026-02-16T13:26:01Z – claude-opus – shell_pid=24697 – lane=for_review – Complete reducer: 8 handlers, burst cap, dual-mode, assembly, mypy passes
