@@ -1,27 +1,30 @@
 ---
-work_package_id: "WP09"
+work_package_id: WP09
+title: Reducer Tests — Edge Cases & Dual-Mode
+lane: "doing"
+dependencies: [WP06]
+base_branch: 007-glossary-semantic-integrity-contracts-WP06
+base_commit: 36b0cdc3f4066d989ad8ab413208b3854c24a655
+created_at: '2026-02-16T13:30:30.220933+00:00'
 subtasks:
-  - "T043"
-  - "T044"
-  - "T045"
-  - "T046"
-  - "T047"
-  - "T048"
-title: "Reducer Tests — Edge Cases & Dual-Mode"
-phase: "Phase 3 - Testing"
-lane: "planned"
-assignee: ""
-agent: ""
-shell_pid: ""
-review_status: ""
-reviewed_by: ""
-dependencies: ["WP06"]
+- T043
+- T044
+- T045
+- T046
+- T047
+- T048
+phase: Phase 3 - Testing
+assignee: ''
+agent: ''
+shell_pid: "28797"
+review_status: ''
+reviewed_by: ''
 history:
-  - timestamp: "2026-02-16T12:00:00Z"
-    lane: "planned"
-    agent: "system"
-    shell_pid: ""
-    action: "Prompt generated via /spec-kitty.tasks"
+- timestamp: '2026-02-16T12:00:00Z'
+  lane: planned
+  agent: system
+  shell_pid: ''
+  action: Prompt generated via /spec-kitty.tasks
 ---
 
 # Work Package Prompt: WP09 – Reducer Tests — Edge Cases & Dual-Mode
