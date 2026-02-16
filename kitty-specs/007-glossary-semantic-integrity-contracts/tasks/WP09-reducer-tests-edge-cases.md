@@ -1,7 +1,7 @@
 ---
 work_package_id: WP09
 title: Reducer Tests — Edge Cases & Dual-Mode
-lane: "doing"
+lane: "for_review"
 dependencies: [WP06]
 base_branch: 007-glossary-semantic-integrity-contracts-WP06
 base_commit: 36b0cdc3f4066d989ad8ab413208b3854c24a655
@@ -159,3 +159,4 @@ history:
 
 - 2026-02-16T12:00:00Z – system – lane=planned – Prompt created.
 - 2026-02-16T13:30:30Z – claude-opus – shell_pid=28797 – lane=doing – Assigned agent via workflow command
+- 2026-02-16T13:31:49Z – claude-opus – shell_pid=28797 – lane=for_review – 6 edge case tests: strict/permissive modes, concurrent resolution, strictness changes
