@@ -45,11 +45,11 @@
 **Estimated Size**: ~450 lines
 
 ### Included Subtasks
-- [ ] T005 [P] Define `SemanticConflictEntry` value object (term, nature, severity, description)
-- [ ] T006 [P] Define `GlossaryScopeActivatedPayload` (mission_id, scope_id, scope_type, glossary_version_id)
-- [ ] T007 [P] Define `TermCandidateObservedPayload` (mission_id, scope_id, step_id, term_surface, confidence, actor, step_metadata)
-- [ ] T008 [P] Define `GlossarySenseUpdatedPayload` (mission_id, scope_id, term_surface, before_sense, after_sense, reason, actor)
-- [ ] T009 [P] Define `GlossaryStrictnessSetPayload` (mission_id, new_strictness, previous_strictness, actor)
+- [x] T005 [P] Define `SemanticConflictEntry` value object (term, nature, severity, description)
+- [x] T006 [P] Define `GlossaryScopeActivatedPayload` (mission_id, scope_id, scope_type, glossary_version_id)
+- [x] T007 [P] Define `TermCandidateObservedPayload` (mission_id, scope_id, step_id, term_surface, confidence, actor, step_metadata)
+- [x] T008 [P] Define `GlossarySenseUpdatedPayload` (mission_id, scope_id, term_surface, before_sense, after_sense, reason, actor)
+- [x] T009 [P] Define `GlossaryStrictnessSetPayload` (mission_id, new_strictness, previous_strictness, actor)
 
 ### Implementation Notes
 - All models: `ConfigDict(frozen=True)`, `from __future__ import annotations`.
