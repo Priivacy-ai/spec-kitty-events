@@ -1,0 +1,14 @@
+{
+  "wp_id": "WP10",
+  "feature_slug": "007-glossary-semantic-integrity-contracts",
+  "worktree_path": ".worktrees/007-glossary-semantic-integrity-contracts-WP10",
+  "branch_name": "007-glossary-semantic-integrity-contracts-WP10",
+  "base_branch": "007-glossary-semantic-integrity-contracts-WP06",
+  "base_commit": "36b0cdc3f4066d989ad8ab413208b3854c24a655",
+  "dependencies": [
+    "WP06"
+  ],
+  "created_at": "2026-02-16T13:32:08.193177+00:00",
+  "created_by": "implement-command",
+  "vcs_backend": "git"
+}
