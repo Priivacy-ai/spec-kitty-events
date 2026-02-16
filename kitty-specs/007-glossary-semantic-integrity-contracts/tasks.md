@@ -138,12 +138,12 @@
 **Estimated Size**: ~500 lines
 
 ### Included Subtasks
-- [ ] T019 Implement `reduce_glossary_events()` skeleton (filter → sort → dedup → empty-input short-circuit, mode parameter)
-- [ ] T020 Implement `GlossaryScopeActivated` processing (add to active_scopes mutable dict)
-- [ ] T021 Implement `GlossaryStrictnessSet` processing (update current_strictness, append to strictness_history)
-- [ ] T022 Implement `TermCandidateObserved` processing (append to term_candidates by term_surface)
-- [ ] T023 Implement `GlossarySenseUpdated` processing (update term_senses, integrity check for unobserved term)
-- [ ] T024 Extract `mission_id` from first processed event's payload
+- [x] T019 Implement `reduce_glossary_events()` skeleton (filter → sort → dedup → empty-input short-circuit, mode parameter)
+- [x] T020 Implement `GlossaryScopeActivated` processing (add to active_scopes mutable dict)
+- [x] T021 Implement `GlossaryStrictnessSet` processing (update current_strictness, append to strictness_history)
+- [x] T022 Implement `TermCandidateObserved` processing (append to term_candidates by term_surface)
+- [x] T023 Implement `GlossarySenseUpdated` processing (update term_senses, integrity check for unobserved term)
+- [x] T024 Extract `mission_id` from first processed event's payload
 
 ### Implementation Notes
 - Late import of `dedup_events` and `status_event_sort_key` from `status.py` (inside function body, matching collaboration.py line 575).
