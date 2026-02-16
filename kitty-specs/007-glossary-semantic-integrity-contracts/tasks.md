@@ -77,10 +77,10 @@
 **Estimated Size**: ~400 lines
 
 ### Included Subtasks
-- [ ] T010 Define `SemanticCheckEvaluatedPayload` (mission_id, scope_id, step_id, conflicts, severity, confidence, recommended_action, effective_strictness, step_metadata)
-- [ ] T011 [P] Define `GlossaryClarificationRequestedPayload` (mission_id, scope_id, step_id, semantic_check_event_id, term, question, options, urgency, actor)
-- [ ] T012 [P] Define `GlossaryClarificationResolvedPayload` (mission_id, clarification_event_id, selected_meaning, actor)
-- [ ] T013 Define `GenerationBlockedBySemanticConflictPayload` (mission_id, step_id, conflict_event_ids, blocking_strictness, step_metadata)
+- [x] T010 Define `SemanticCheckEvaluatedPayload` (mission_id, scope_id, step_id, conflicts, severity, confidence, recommended_action, effective_strictness, step_metadata)
+- [x] T011 [P] Define `GlossaryClarificationRequestedPayload` (mission_id, scope_id, step_id, semantic_check_event_id, term, question, options, urgency, actor)
+- [x] T012 [P] Define `GlossaryClarificationResolvedPayload` (mission_id, clarification_event_id, selected_meaning, actor)
+- [x] T013 Define `GenerationBlockedBySemanticConflictPayload` (mission_id, step_id, conflict_event_ids, blocking_strictness, step_metadata)
 
 ### Implementation Notes
 - `SemanticCheckEvaluatedPayload.conflicts` is `Tuple[SemanticConflictEntry, ...]` — uses the value object from WP02.
