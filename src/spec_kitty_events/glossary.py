@@ -238,7 +238,7 @@ class ClarificationRecord(BaseModel):
     term: str = Field(..., description="The ambiguous term")
     resolved: bool = Field(default=False, description="Whether resolution received")
     resolution_event_id: Optional[str] = Field(
-        None, description="Event ID of the resolution (if resolved)"
+        default=None, description="Event ID of the resolution (if resolved)"
     )
 
 
@@ -388,7 +388,93 @@ def reduce_glossary_events(
                 ))
             term_senses[p_sense.term_surface] = p_sense
 
-        # WP06 event handlers: SemanticCheckEvaluated, Clarification*, GenerationBlocked
+        elif etype == SEMANTIC_CHECK_EVALUATED:
+            p_check = SemanticCheckEvaluatedPayload(**payload_data)
+            _check_scope_activated(p_check.scope_id, active_scopes, event, mode, anomalies)
+            semantic_checks.append(p_check)
 
-    # 5. Assemble — WP06 will complete this
-    raise NotImplementedError("Assembly not yet implemented (WP06)")
+        elif etype == GLOSSARY_CLARIFICATION_REQUESTED:
+            p_clar = GlossaryClarificationRequestedPayload(**payload_data)
+
+            active_for_check = sum(
+                1 for c in clarifications
+                if c.semantic_check_event_id == p_clar.semantic_check_event_id
+                and not c.resolved
+            )
+
+            if active_for_check >= 3:
+                if mode == "strict":
+                    raise SpecKittyEventsError(
+                        f"Clarification burst cap exceeded for semantic check "
+                        f"'{p_clar.semantic_check_event_id}' in event {event.event_id}"
+                    )
+                anomalies.append(GlossaryAnomaly(
+                    event_id=event.event_id,
+                    event_type=event.event_type,
+                    reason=(
+                        f"Burst cap exceeded: >3 active clarifications for "
+                        f"semantic check '{p_clar.semantic_check_event_id}'"
+                    ),
+                ))
+            else:
+                clarifications.append(ClarificationRecord(
+                    request_event_id=event.event_id,
+                    semantic_check_event_id=p_clar.semantic_check_event_id,
+                    term=p_clar.term,
+                ))
+
+        elif etype == GLOSSARY_CLARIFICATION_RESOLVED:
+            p_res = GlossaryClarificationResolvedPayload(**payload_data)
+
+            found = False
+            for i, record in enumerate(clarifications):
+                if record.request_event_id == p_res.clarification_event_id:
+                    clarifications[i] = ClarificationRecord(
+                        request_event_id=record.request_event_id,
+                        semantic_check_event_id=record.semantic_check_event_id,
+                        term=record.term,
+                        resolved=True,
+                        resolution_event_id=event.event_id,
+                    )
+                    found = True
+                    break
+
+            if not found:
+                if mode == "strict":
+                    raise SpecKittyEventsError(
+                        f"GlossaryClarificationResolved references unknown "
+                        f"clarification '{p_res.clarification_event_id}' "
+                        f"in event {event.event_id}"
+                    )
+                anomalies.append(GlossaryAnomaly(
+                    event_id=event.event_id,
+                    event_type=event.event_type,
+                    reason=(
+                        f"Resolution for unknown clarification "
+                        f"'{p_res.clarification_event_id}'"
+                    ),
+                ))
+
+        elif etype == GENERATION_BLOCKED_BY_SEMANTIC_CONFLICT:
+            p_block = GenerationBlockedBySemanticConflictPayload(**payload_data)
+            generation_blocks.append(p_block)
+
+    # 5. Assemble frozen state
+    last_event = unique_events[-1]
+
+    return ReducedGlossaryState(
+        mission_id=mission_id,
+        active_scopes=active_scopes,
+        current_strictness=current_strictness,  # type: ignore[arg-type]
+        strictness_history=tuple(strictness_history),
+        term_candidates={
+            k: tuple(v) for k, v in term_candidates.items()
+        },
+        term_senses=term_senses,
+        clarifications=tuple(clarifications),
+        semantic_checks=tuple(semantic_checks),
+        generation_blocks=tuple(generation_blocks),
+        anomalies=tuple(anomalies),
+        event_count=len(unique_events),
+        last_processed_event_id=last_event.event_id,
+    )
