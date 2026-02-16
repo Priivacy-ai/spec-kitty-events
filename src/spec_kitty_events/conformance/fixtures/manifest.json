@@ -224,6 +224,102 @@
       "event_type": "FocusChanged",
       "notes": "FocusChangedPayload missing required focus_target field",
       "min_version": "2.1.0"
+    },
+    {
+      "id": "glossary-scope-activated-valid",
+      "path": "glossary/valid/glossary_scope_activated.json",
+      "expected_result": "valid",
+      "event_type": "GlossaryScopeActivated",
+      "notes": "Valid GlossaryScopeActivatedPayload with team_domain scope",
+      "min_version": "2.0.0"
+    },
+    {
+      "id": "glossary-term-candidate-observed-valid",
+      "path": "glossary/valid/term_candidate_observed.json",
+      "expected_result": "valid",
+      "event_type": "TermCandidateObserved",
+      "notes": "Valid TermCandidateObservedPayload with confidence 0.7",
+      "min_version": "2.0.0"
+    },
+    {
+      "id": "glossary-semantic-check-block-valid",
+      "path": "glossary/valid/semantic_check_evaluated_block.json",
+      "expected_result": "valid",
+      "event_type": "SemanticCheckEvaluated",
+      "notes": "Valid SemanticCheckEvaluatedPayload with high severity and block action",
+      "min_version": "2.0.0"
+    },
+    {
+      "id": "glossary-semantic-check-warn-valid",
+      "path": "glossary/valid/semantic_check_evaluated_warn.json",
+      "expected_result": "valid",
+      "event_type": "SemanticCheckEvaluated",
+      "notes": "Valid SemanticCheckEvaluatedPayload with medium severity and warn action",
+      "min_version": "2.0.0"
+    },
+    {
+      "id": "glossary-generation-blocked-valid",
+      "path": "glossary/valid/generation_blocked.json",
+      "expected_result": "valid",
+      "event_type": "GenerationBlockedBySemanticConflict",
+      "notes": "Valid GenerationBlockedBySemanticConflictPayload with max strictness",
+      "min_version": "2.0.0"
+    },
+    {
+      "id": "glossary-clarification-requested-valid",
+      "path": "glossary/valid/glossary_clarification_requested.json",
+      "expected_result": "valid",
+      "event_type": "GlossaryClarificationRequested",
+      "notes": "Valid GlossaryClarificationRequestedPayload with high urgency",
+      "min_version": "2.0.0"
+    },
+    {
+      "id": "glossary-clarification-resolved-valid",
+      "path": "glossary/valid/glossary_clarification_resolved.json",
+      "expected_result": "valid",
+      "event_type": "GlossaryClarificationResolved",
+      "notes": "Valid GlossaryClarificationResolvedPayload referencing clarification event",
+      "min_version": "2.0.0"
+    },
+    {
+      "id": "glossary-sense-updated-valid",
+      "path": "glossary/valid/glossary_sense_updated.json",
+      "expected_result": "valid",
+      "event_type": "GlossarySenseUpdated",
+      "notes": "Valid GlossarySenseUpdatedPayload with before and after sense",
+      "min_version": "2.0.0"
+    },
+    {
+      "id": "glossary-strictness-set-valid",
+      "path": "glossary/valid/glossary_strictness_set.json",
+      "expected_result": "valid",
+      "event_type": "GlossaryStrictnessSet",
+      "notes": "Valid GlossaryStrictnessSetPayload changing from medium to max",
+      "min_version": "2.0.0"
+    },
+    {
+      "id": "glossary-semantic-check-missing-step-id",
+      "path": "glossary/invalid/semantic_check_missing_step_id.json",
+      "expected_result": "invalid",
+      "event_type": "SemanticCheckEvaluated",
+      "notes": "SemanticCheckEvaluatedPayload missing required step_id field",
+      "min_version": "2.0.0"
+    },
+    {
+      "id": "glossary-scope-invalid-type",
+      "path": "glossary/invalid/glossary_scope_invalid_type.json",
+      "expected_result": "invalid",
+      "event_type": "GlossaryScopeActivated",
+      "notes": "GlossaryScopeActivatedPayload with invalid scope_type value",
+      "min_version": "2.0.0"
+    },
+    {
+      "id": "glossary-clarification-missing-check-ref",
+      "path": "glossary/invalid/clarification_missing_check_ref.json",
+      "expected_result": "invalid",
+      "event_type": "GlossaryClarificationRequested",
+      "notes": "GlossaryClarificationRequestedPayload missing semantic_check_event_id",
+      "min_version": "2.0.0"
     }
   ]
 }
