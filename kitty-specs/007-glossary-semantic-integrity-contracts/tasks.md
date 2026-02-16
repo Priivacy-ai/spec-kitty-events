@@ -16,10 +16,10 @@
 **Estimated Size**: ~300 lines
 
 ### Included Subtasks
-- [ ] T001 Cut `2.x` branch from `main` HEAD (`f4692ea` at planning time), tag as `2.x-baseline`
-- [ ] T002 Create `src/spec_kitty_events/glossary.py` scaffold (docstring, `from __future__ import annotations`, imports)
-- [ ] T003 Define 8 event type constants and `GLOSSARY_EVENT_TYPES` frozenset
-- [ ] T004 Add `pyproject.toml` package-data entries for `conformance/fixtures/glossary/valid/*.json` and `conformance/fixtures/glossary/invalid/*.json`
+- [x] T001 Cut `2.x` branch from `main` HEAD (`f4692ea` at planning time), tag as `2.x-baseline`
+- [x] T002 Create `src/spec_kitty_events/glossary.py` scaffold (docstring, `from __future__ import annotations`, imports)
+- [x] T003 Define 8 event type constants and `GLOSSARY_EVENT_TYPES` frozenset
+- [x] T004 Add `pyproject.toml` package-data entries for `conformance/fixtures/glossary/valid/*.json` and `conformance/fixtures/glossary/invalid/*.json`
 
 ### Implementation Notes
 - Branch cut is the very first step — all subsequent WPs work on `2.x`.
