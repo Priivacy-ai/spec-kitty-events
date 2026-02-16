@@ -39,7 +39,7 @@ history:
 
 ## Objectives & Success Criteria
 
-- Cut `2.x` branch from `main` HEAD (`4aa95a6`) and tag as `2.x-baseline`.
+- Cut `2.x` branch from `main` HEAD at branch-cut time (`f4692ea` at planning time) and tag as `2.x-baseline`.
 - Create the `glossary.py` module in `src/spec_kitty_events/` with the correct scaffold structure.
 - Define all 8 event type constants and the `GLOSSARY_EVENT_TYPES` frozenset.
 - Update `pyproject.toml` to include glossary conformance fixture paths.
@@ -62,9 +62,9 @@ history:
 
 - **Purpose**: Establish the `2.x` branch as the target for all glossary feature work. Main stays maintenance-only.
 - **Steps**:
-  1. Verify current HEAD is `4aa95a6`: `git rev-parse HEAD`
-  2. Create the branch: `git branch 2.x`
-  3. Tag the cut point: `git tag 2.x-baseline`
+  1. Capture current `main` HEAD: `BASE_SHA=$(git rev-parse HEAD)`
+  2. Create the branch: `git branch 2.x "$BASE_SHA"`
+  3. Tag the cut point: `git tag 2.x-baseline "$BASE_SHA"`
   4. Switch to the new branch: `git checkout 2.x`
   5. Verify: `git branch --show-current` should output `2.x`
 - **Files**: None (git operations only).
@@ -158,7 +158,7 @@ history:
 
 ## Review Guidance
 
-- Verify `2.x` branch points to `4aa95a6`.
+- Verify `2.x` branch points to the captured `BASE_SHA` (`f4692ea` at planning time).
 - Verify `2.x-baseline` tag points to the same commit.
 - Verify `glossary.py` has correct section structure matching `collaboration.py`.
 - Verify all 8 constant values are PascalCase and `GLOSSARY_EVENT_TYPES` has exactly 8 members.
