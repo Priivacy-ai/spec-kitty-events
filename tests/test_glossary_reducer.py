@@ -1,4 +1,4 @@
-"""Tests for glossary reducer — happy path and determinism (WP08)."""
+"""Tests for glossary reducer — happy path, determinism, and edge cases (WP08/WP09)."""
 
 from __future__ import annotations
 
@@ -390,3 +390,176 @@ class TestReducerClarificationLifecycle:
         state = reduce_glossary_events(events)
         assert len(state.clarifications) == 6
         assert len(state.anomalies) == 0
+
+
+# ── T043: Strict Mode — Unactivated Scope ────────────────────────────────────
+
+
+class TestStrictModeUnactivatedScope:
+    """Test strict mode raises on unactivated scope reference."""
+
+    def test_term_in_unactivated_scope_raises(self) -> None:
+        event = make_glossary_event("TermCandidateObserved", {
+            "mission_id": "m1", "scope_id": "nonexistent", "step_id": "st1",
+            "term_surface": "api", "confidence": 0.5, "actor": "a1",
+        }, lamport_clock=1)
+        with pytest.raises(SpecKittyEventsError, match="unactivated scope"):
+            reduce_glossary_events([event], mode="strict")
+
+
+# ── T044: Strict Mode — Unobserved Term ──────────────────────────────────────
+
+
+class TestStrictModeUnobservedTerm:
+    """Test strict mode raises on sense update for unobserved term."""
+
+    def test_sense_update_unobserved_term_raises(self) -> None:
+        events = [
+            make_glossary_event("GlossaryScopeActivated", {
+                "mission_id": "m1", "scope_id": "s1",
+                "scope_type": "team_domain", "glossary_version_id": "v1",
+            }, lamport_clock=1),
+            make_glossary_event("GlossarySenseUpdated", {
+                "mission_id": "m1", "scope_id": "s1",
+                "term_surface": "unknown_term", "after_sense": "meaning",
+                "reason": "initial", "actor": "a1",
+            }, lamport_clock=2),
+        ]
+        with pytest.raises(SpecKittyEventsError, match="unobserved term"):
+            reduce_glossary_events(events, mode="strict")
+
+
+# ── T045: Permissive Mode — Scope Anomaly ────────────────────────────────────
+
+
+class TestPermissiveModeScope:
+    """Test permissive mode records anomaly and continues on scope errors."""
+
+    def test_unactivated_scope_records_anomaly_and_continues(self) -> None:
+        events = [
+            make_glossary_event("TermCandidateObserved", {
+                "mission_id": "m1", "scope_id": "bad_scope", "step_id": "st1",
+                "term_surface": "early_term", "confidence": 0.5, "actor": "a1",
+            }, lamport_clock=1),
+            make_glossary_event("GlossaryScopeActivated", {
+                "mission_id": "m1", "scope_id": "s1",
+                "scope_type": "team_domain", "glossary_version_id": "v1",
+            }, lamport_clock=2),
+            make_glossary_event("TermCandidateObserved", {
+                "mission_id": "m1", "scope_id": "s1", "step_id": "st2",
+                "term_surface": "valid_term", "confidence": 0.8, "actor": "a1",
+            }, lamport_clock=3),
+        ]
+        state = reduce_glossary_events(events, mode="permissive")
+        assert len(state.anomalies) == 1
+        assert "unactivated scope" in state.anomalies[0].reason
+        assert "valid_term" in state.term_candidates
+        assert state.event_count == 3
+
+
+# ── T046: Permissive Mode — Unobserved Term Anomaly ──────────────────────────
+
+
+class TestPermissiveModeUnobservedTerm:
+    """Test permissive mode records anomaly for unobserved term and continues."""
+
+    def test_sense_update_unobserved_term_records_anomaly(self) -> None:
+        events = [
+            make_glossary_event("GlossaryScopeActivated", {
+                "mission_id": "m1", "scope_id": "s1",
+                "scope_type": "team_domain", "glossary_version_id": "v1",
+            }, lamport_clock=1),
+            make_glossary_event("GlossarySenseUpdated", {
+                "mission_id": "m1", "scope_id": "s1",
+                "term_surface": "unknown_term", "after_sense": "meaning",
+                "reason": "initial", "actor": "a1",
+            }, lamport_clock=2),
+            make_glossary_event("TermCandidateObserved", {
+                "mission_id": "m1", "scope_id": "s1", "step_id": "st1",
+                "term_surface": "known_term", "confidence": 0.7, "actor": "a1",
+            }, lamport_clock=3),
+        ]
+        state = reduce_glossary_events(events, mode="permissive")
+        assert len(state.anomalies) == 1
+        assert "unobserved term" in state.anomalies[0].reason
+        assert "unknown_term" in state.term_senses
+        assert "known_term" in state.term_candidates
+
+
+# ── T047: Concurrent Clarification Resolution ────────────────────────────────
+
+
+class TestConcurrentClarificationResolution:
+    """Test last-write-wins for concurrent resolutions."""
+
+    def test_last_resolution_wins(self) -> None:
+        req_eid = "01HX0000000000000000000203"
+        check_eid = "01HX0000000000000000000202"
+        events = [
+            make_glossary_event("GlossaryScopeActivated", {
+                "mission_id": "m1", "scope_id": "s1",
+                "scope_type": "team_domain", "glossary_version_id": "v1",
+            }, event_id="01HX0000000000000000000201", lamport_clock=201),
+            make_glossary_event("SemanticCheckEvaluated", {
+                "mission_id": "m1", "scope_id": "s1", "step_id": "st1",
+                "conflicts": [], "severity": "low", "confidence": 0.5,
+                "recommended_action": "pass", "effective_strictness": "medium",
+            }, event_id=check_eid, lamport_clock=202),
+            make_glossary_event("GlossaryClarificationRequested", {
+                "mission_id": "m1", "scope_id": "s1", "step_id": "st1",
+                "semantic_check_event_id": check_eid,
+                "term": "api", "question": "Which?",
+                "options": ["A", "B"], "urgency": "low", "actor": "a1",
+            }, event_id=req_eid, lamport_clock=203),
+            make_glossary_event("GlossaryClarificationResolved", {
+                "mission_id": "m1", "clarification_event_id": req_eid,
+                "selected_meaning": "A", "actor": "actor-A",
+            }, event_id="01HX0000000000000000000204", lamport_clock=204),
+            make_glossary_event("GlossaryClarificationResolved", {
+                "mission_id": "m1", "clarification_event_id": req_eid,
+                "selected_meaning": "B", "actor": "actor-B",
+            }, event_id="01HX0000000000000000000205", lamport_clock=205),
+        ]
+        state = reduce_glossary_events(events)
+        assert len(state.clarifications) == 1
+        record = state.clarifications[0]
+        assert record.resolved is True
+        assert record.resolution_event_id == "01HX0000000000000000000205"
+
+
+# ── T048: Mid-Mission Strictness Change ──────────────────────────────────────
+
+
+class TestMidMissionStrictnessChange:
+    """Test that block events are preserved when strictness changes."""
+
+    def test_blocks_preserved_after_strictness_off(self) -> None:
+        events = [
+            make_glossary_event("GlossaryScopeActivated", {
+                "mission_id": "m1", "scope_id": "s1",
+                "scope_type": "team_domain", "glossary_version_id": "v1",
+            }, lamport_clock=1),
+            make_glossary_event("GlossaryStrictnessSet", {
+                "mission_id": "m1", "new_strictness": "max", "actor": "admin",
+            }, lamport_clock=2),
+            make_glossary_event("SemanticCheckEvaluated", {
+                "mission_id": "m1", "scope_id": "s1", "step_id": "st1",
+                "conflicts": [{"term": "api", "nature": "overloaded",
+                               "severity": "high", "description": "ambig"}],
+                "severity": "high", "confidence": 0.9,
+                "recommended_action": "block", "effective_strictness": "max",
+            }, lamport_clock=3),
+            make_glossary_event("GenerationBlockedBySemanticConflict", {
+                "mission_id": "m1", "step_id": "st1",
+                "conflict_event_ids": ["e3"], "blocking_strictness": "max",
+            }, lamport_clock=4),
+            make_glossary_event("GlossaryStrictnessSet", {
+                "mission_id": "m1", "new_strictness": "off",
+                "previous_strictness": "max", "actor": "admin",
+            }, lamport_clock=5),
+        ]
+        state = reduce_glossary_events(events)
+        assert state.current_strictness == "off"
+        assert len(state.generation_blocks) == 1
+        assert len(state.strictness_history) == 2
+        assert state.generation_blocks[0].blocking_strictness == "max"
