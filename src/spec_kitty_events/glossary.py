@@ -7,9 +7,9 @@ mission-level semantic integrity enforcement.
 
 from __future__ import annotations
 
-from typing import Dict, FrozenSet, List, Literal, Optional, Sequence, Tuple
+from typing import Any, Dict, FrozenSet, List, Literal, Optional, Sequence, Set, Tuple
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_serializer
 
 from spec_kitty_events.models import Event, SpecKittyEventsError
 
@@ -257,12 +257,13 @@ class ReducedGlossaryState(BaseModel):
     strictness_history: Tuple[GlossaryStrictnessSetPayload, ...] = Field(
         default_factory=tuple, description="Ordered history of strictness changes"
     )
-    term_candidates: Dict[str, Tuple[TermCandidateObservedPayload, ...]] = Field(
+    term_candidates: Dict[Tuple[str, str], Tuple[TermCandidateObservedPayload, ...]] = Field(
         default_factory=dict,
-        description="term_surface → observed candidate payloads",
+        description="(scope_id, term_surface) → observed candidate payloads",
     )
-    term_senses: Dict[str, GlossarySenseUpdatedPayload] = Field(
-        default_factory=dict, description="term_surface → latest sense update"
+    term_senses: Dict[Tuple[str, str], GlossarySenseUpdatedPayload] = Field(
+        default_factory=dict,
+        description="(scope_id, term_surface) → latest sense update",
     )
     clarifications: Tuple[ClarificationRecord, ...] = Field(
         default_factory=tuple, description="Ordered clarification timeline"
@@ -280,6 +281,32 @@ class ReducedGlossaryState(BaseModel):
     last_processed_event_id: Optional[str] = Field(
         default=None, description="Last event_id in processed sequence"
     )
+
+    @field_serializer("term_candidates", when_used="json")
+    def _serialize_term_candidates_json(
+        self,
+        value: Dict[Tuple[str, str], Tuple[TermCandidateObservedPayload, ...]],
+    ) -> Dict[str, Dict[str, List[Dict[str, Any]]]]:
+        """Serialize composite keys as nested maps to avoid JSON key collisions."""
+        nested: Dict[str, Dict[str, List[Dict[str, Any]]]] = {}
+        for (scope_id, term_surface), candidates in sorted(value.items()):
+            scope_bucket = nested.setdefault(scope_id, {})
+            scope_bucket[term_surface] = [
+                candidate.model_dump(mode="json") for candidate in candidates
+            ]
+        return nested
+
+    @field_serializer("term_senses", when_used="json")
+    def _serialize_term_senses_json(
+        self,
+        value: Dict[Tuple[str, str], GlossarySenseUpdatedPayload],
+    ) -> Dict[str, Dict[str, Dict[str, Any]]]:
+        """Serialize composite keys as nested maps to avoid JSON key collisions."""
+        nested: Dict[str, Dict[str, Dict[str, Any]]] = {}
+        for (scope_id, term_surface), sense in sorted(value.items()):
+            scope_bucket = nested.setdefault(scope_id, {})
+            scope_bucket[term_surface] = sense.model_dump(mode="json")
+        return nested
 
 
 # ── Section 5: Glossary Reducer ──────────────────────────────────────────────
@@ -347,9 +374,10 @@ def reduce_glossary_events(
     active_scopes: Dict[str, GlossaryScopeActivatedPayload] = {}
     current_strictness: str = "medium"
     strictness_history: List[GlossaryStrictnessSetPayload] = []
-    term_candidates: Dict[str, List[TermCandidateObservedPayload]] = {}
-    term_senses: Dict[str, GlossarySenseUpdatedPayload] = {}
+    term_candidates: Dict[Tuple[str, str], List[TermCandidateObservedPayload]] = {}
+    term_senses: Dict[Tuple[str, str], GlossarySenseUpdatedPayload] = {}
     semantic_checks: List[SemanticCheckEvaluatedPayload] = []
+    semantic_check_event_ids: Set[str] = set()
     clarifications: List[ClarificationRecord] = []
     generation_blocks: List[GenerationBlockedBySemanticConflictPayload] = []
     anomalies: List[GlossaryAnomaly] = []
@@ -370,12 +398,13 @@ def reduce_glossary_events(
         elif etype == TERM_CANDIDATE_OBSERVED:
             p_term = TermCandidateObservedPayload(**payload_data)
             _check_scope_activated(p_term.scope_id, active_scopes, event, mode, anomalies)
-            term_candidates.setdefault(p_term.term_surface, []).append(p_term)
+            term_candidates.setdefault((p_term.scope_id, p_term.term_surface), []).append(p_term)
 
         elif etype == GLOSSARY_SENSE_UPDATED:
             p_sense = GlossarySenseUpdatedPayload(**payload_data)
             _check_scope_activated(p_sense.scope_id, active_scopes, event, mode, anomalies)
-            if p_sense.term_surface not in term_candidates:
+            sense_key = (p_sense.scope_id, p_sense.term_surface)
+            if sense_key not in term_candidates:
                 if mode == "strict":
                     raise SpecKittyEventsError(
                         f"GlossarySenseUpdated for unobserved term '{p_sense.term_surface}' "
@@ -386,15 +415,34 @@ def reduce_glossary_events(
                     event_type=event.event_type,
                     reason=f"Sense update for unobserved term '{p_sense.term_surface}'",
                 ))
-            term_senses[p_sense.term_surface] = p_sense
+            term_senses[sense_key] = p_sense
 
         elif etype == SEMANTIC_CHECK_EVALUATED:
             p_check = SemanticCheckEvaluatedPayload(**payload_data)
             _check_scope_activated(p_check.scope_id, active_scopes, event, mode, anomalies)
             semantic_checks.append(p_check)
+            semantic_check_event_ids.add(event.event_id)
 
         elif etype == GLOSSARY_CLARIFICATION_REQUESTED:
             p_clar = GlossaryClarificationRequestedPayload(**payload_data)
+            _check_scope_activated(p_clar.scope_id, active_scopes, event, mode, anomalies)
+
+            if p_clar.semantic_check_event_id not in semantic_check_event_ids:
+                if mode == "strict":
+                    raise SpecKittyEventsError(
+                        f"GlossaryClarificationRequested references unknown "
+                        f"semantic check '{p_clar.semantic_check_event_id}' "
+                        f"in event {event.event_id}"
+                    )
+                anomalies.append(GlossaryAnomaly(
+                    event_id=event.event_id,
+                    event_type=event.event_type,
+                    reason=(
+                        f"References unknown semantic check "
+                        f"'{p_clar.semantic_check_event_id}'"
+                    ),
+                ))
+                continue
 
             active_for_check = sum(
                 1 for c in clarifications

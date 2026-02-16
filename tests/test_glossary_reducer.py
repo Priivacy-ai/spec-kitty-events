@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import uuid
 from datetime import datetime, timezone
 
@@ -117,10 +118,10 @@ class TestReducerHappyPath:
         assert len(state.active_scopes) == 1
         assert state.current_strictness == "max"
         assert len(state.strictness_history) == 1
-        assert "dashboard" in state.term_candidates
-        assert len(state.term_candidates["dashboard"]) == 1
-        assert "dashboard" in state.term_senses
-        assert state.term_senses["dashboard"].after_sense == "UI panel"
+        assert ("s1", "dashboard") in state.term_candidates
+        assert len(state.term_candidates[("s1", "dashboard")]) == 1
+        assert ("s1", "dashboard") in state.term_senses
+        assert state.term_senses[("s1", "dashboard")].after_sense == "UI panel"
         assert len(state.semantic_checks) == 1
         assert len(state.generation_blocks) == 1
         assert state.event_count == 6
@@ -453,7 +454,7 @@ class TestPermissiveModeScope:
         state = reduce_glossary_events(events, mode="permissive")
         assert len(state.anomalies) == 1
         assert "unactivated scope" in state.anomalies[0].reason
-        assert "valid_term" in state.term_candidates
+        assert ("s1", "valid_term") in state.term_candidates
         assert state.event_count == 3
 
 
@@ -482,8 +483,8 @@ class TestPermissiveModeUnobservedTerm:
         state = reduce_glossary_events(events, mode="permissive")
         assert len(state.anomalies) == 1
         assert "unobserved term" in state.anomalies[0].reason
-        assert "unknown_term" in state.term_senses
-        assert "known_term" in state.term_candidates
+        assert ("s1", "unknown_term") in state.term_senses
+        assert ("s1", "known_term") in state.term_candidates
 
 
 # ── T047: Concurrent Clarification Resolution ────────────────────────────────
@@ -563,3 +564,198 @@ class TestMidMissionStrictnessChange:
         assert len(state.generation_blocks) == 1
         assert len(state.strictness_history) == 2
         assert state.generation_blocks[0].blocking_strictness == "max"
+
+
+# ── T049+: Cross-Scope Same Term ─────────────────────────────────────────────
+
+
+class TestCrossScopeSameTerm:
+    """Same term_surface in different scopes produces separate entries."""
+
+    def test_same_term_different_scopes(self) -> None:
+        events = [
+            make_glossary_event("GlossaryScopeActivated", {
+                "mission_id": "m1", "scope_id": "scope-a",
+                "scope_type": "team_domain", "glossary_version_id": "v1",
+            }, lamport_clock=1),
+            make_glossary_event("GlossaryScopeActivated", {
+                "mission_id": "m1", "scope_id": "scope-b",
+                "scope_type": "audience_domain", "glossary_version_id": "v1",
+            }, lamport_clock=2),
+            make_glossary_event("TermCandidateObserved", {
+                "mission_id": "m1", "scope_id": "scope-a", "step_id": "st1",
+                "term_surface": "node", "confidence": 0.9, "actor": "a1",
+            }, lamport_clock=3),
+            make_glossary_event("TermCandidateObserved", {
+                "mission_id": "m1", "scope_id": "scope-b", "step_id": "st2",
+                "term_surface": "node", "confidence": 0.8, "actor": "a1",
+            }, lamport_clock=4),
+            make_glossary_event("GlossarySenseUpdated", {
+                "mission_id": "m1", "scope_id": "scope-a",
+                "term_surface": "node", "after_sense": "server instance",
+                "reason": "infra context", "actor": "a1",
+            }, lamport_clock=5),
+            make_glossary_event("GlossarySenseUpdated", {
+                "mission_id": "m1", "scope_id": "scope-b",
+                "term_surface": "node", "after_sense": "graph vertex",
+                "reason": "data context", "actor": "a1",
+            }, lamport_clock=6),
+        ]
+        state = reduce_glossary_events(events)
+
+        # Both scopes have separate term_candidates entries
+        assert ("scope-a", "node") in state.term_candidates
+        assert ("scope-b", "node") in state.term_candidates
+        assert len(state.term_candidates) == 2
+
+        # Both scopes have separate term_senses entries
+        assert ("scope-a", "node") in state.term_senses
+        assert ("scope-b", "node") in state.term_senses
+        assert state.term_senses[("scope-a", "node")].after_sense == "server instance"
+        assert state.term_senses[("scope-b", "node")].after_sense == "graph vertex"
+
+        assert len(state.anomalies) == 0
+
+
+# ── Clarification Scope Check ────────────────────────────────────────────────
+
+
+class TestClarificationScopeCheck:
+    """GlossaryClarificationRequested with unactivated scope_id."""
+
+    def test_strict_raises_on_unactivated_scope(self) -> None:
+        check_eid = "01HX0000000000000000000502"
+        events = [
+            make_glossary_event("GlossaryScopeActivated", {
+                "mission_id": "m1", "scope_id": "s1",
+                "scope_type": "team_domain", "glossary_version_id": "v1",
+            }, lamport_clock=501),
+            make_glossary_event("SemanticCheckEvaluated", {
+                "mission_id": "m1", "scope_id": "s1", "step_id": "st1",
+                "conflicts": [], "severity": "low", "confidence": 0.5,
+                "recommended_action": "pass", "effective_strictness": "medium",
+            }, event_id=check_eid, lamport_clock=502),
+            make_glossary_event("GlossaryClarificationRequested", {
+                "mission_id": "m1", "scope_id": "nonexistent", "step_id": "st1",
+                "semantic_check_event_id": check_eid,
+                "term": "api", "question": "Which?",
+                "options": ["A", "B"], "urgency": "low", "actor": "a1",
+            }, lamport_clock=503),
+        ]
+        with pytest.raises(SpecKittyEventsError, match="unactivated scope"):
+            reduce_glossary_events(events, mode="strict")
+
+    def test_permissive_records_anomaly(self) -> None:
+        check_eid = "01HX0000000000000000000602"
+        events = [
+            make_glossary_event("GlossaryScopeActivated", {
+                "mission_id": "m1", "scope_id": "s1",
+                "scope_type": "team_domain", "glossary_version_id": "v1",
+            }, lamport_clock=601),
+            make_glossary_event("SemanticCheckEvaluated", {
+                "mission_id": "m1", "scope_id": "s1", "step_id": "st1",
+                "conflicts": [], "severity": "low", "confidence": 0.5,
+                "recommended_action": "pass", "effective_strictness": "medium",
+            }, event_id=check_eid, lamport_clock=602),
+            make_glossary_event("GlossaryClarificationRequested", {
+                "mission_id": "m1", "scope_id": "bad_scope", "step_id": "st1",
+                "semantic_check_event_id": check_eid,
+                "term": "api", "question": "Which?",
+                "options": ["A", "B"], "urgency": "low", "actor": "a1",
+            }, lamport_clock=603),
+        ]
+        state = reduce_glossary_events(events, mode="permissive")
+        scope_anomalies = [a for a in state.anomalies if "unactivated scope" in a.reason]
+        assert len(scope_anomalies) == 1
+
+
+# ── Clarification Unknown Check Reference ────────────────────────────────────
+
+
+class TestClarificationUnknownCheckRef:
+    """GlossaryClarificationRequested referencing non-existent semantic check."""
+
+    def test_strict_raises_on_unknown_check_ref(self) -> None:
+        events = [
+            make_glossary_event("GlossaryScopeActivated", {
+                "mission_id": "m1", "scope_id": "s1",
+                "scope_type": "team_domain", "glossary_version_id": "v1",
+            }, lamport_clock=701),
+            make_glossary_event("GlossaryClarificationRequested", {
+                "mission_id": "m1", "scope_id": "s1", "step_id": "st1",
+                "semantic_check_event_id": "fabricated-check-id-00000001",
+                "term": "api", "question": "Which?",
+                "options": ["A", "B"], "urgency": "low", "actor": "a1",
+            }, lamport_clock=702),
+        ]
+        with pytest.raises(SpecKittyEventsError, match="unknown semantic check"):
+            reduce_glossary_events(events, mode="strict")
+
+    def test_permissive_records_anomaly(self) -> None:
+        events = [
+            make_glossary_event("GlossaryScopeActivated", {
+                "mission_id": "m1", "scope_id": "s1",
+                "scope_type": "team_domain", "glossary_version_id": "v1",
+            }, lamport_clock=801),
+            make_glossary_event("GlossaryClarificationRequested", {
+                "mission_id": "m1", "scope_id": "s1", "step_id": "st1",
+                "semantic_check_event_id": "fabricated-check-id-00000002",
+                "term": "api", "question": "Which?",
+                "options": ["A", "B"], "urgency": "low", "actor": "a1",
+            }, lamport_clock=802),
+        ]
+        state = reduce_glossary_events(events, mode="permissive")
+        ref_anomalies = [a for a in state.anomalies if "unknown semantic check" in a.reason]
+        assert len(ref_anomalies) == 1
+        # Clarification should NOT be added when reference is invalid
+        assert len(state.clarifications) == 0
+
+
+# ── JSON Serialization Safety ─────────────────────────────────────────────────
+
+
+class TestGlossaryJsonSerialization:
+    """JSON output must preserve distinct composite keys without collisions."""
+
+    def test_tuple_key_collision_is_prevented_in_json_output(self) -> None:
+        events = [
+            make_glossary_event("GlossaryScopeActivated", {
+                "mission_id": "m1", "scope_id": "a,b",
+                "scope_type": "team_domain", "glossary_version_id": "v1",
+            }, lamport_clock=901),
+            make_glossary_event("GlossaryScopeActivated", {
+                "mission_id": "m1", "scope_id": "a",
+                "scope_type": "team_domain", "glossary_version_id": "v1",
+            }, lamport_clock=902),
+            make_glossary_event("TermCandidateObserved", {
+                "mission_id": "m1", "scope_id": "a,b", "step_id": "st1",
+                "term_surface": "c", "confidence": 0.9, "actor": "a1",
+            }, lamport_clock=903),
+            make_glossary_event("TermCandidateObserved", {
+                "mission_id": "m1", "scope_id": "a", "step_id": "st2",
+                "term_surface": "b,c", "confidence": 0.8, "actor": "a1",
+            }, lamport_clock=904),
+            make_glossary_event("GlossarySenseUpdated", {
+                "mission_id": "m1", "scope_id": "a,b",
+                "term_surface": "c", "after_sense": "sense-1",
+                "reason": "collision test", "actor": "a1",
+            }, lamport_clock=905),
+            make_glossary_event("GlossarySenseUpdated", {
+                "mission_id": "m1", "scope_id": "a",
+                "term_surface": "b,c", "after_sense": "sense-2",
+                "reason": "collision test", "actor": "a1",
+            }, lamport_clock=906),
+        ]
+        state = reduce_glossary_events(events)
+
+        payload = json.loads(state.model_dump_json())
+
+        term_candidates = payload["term_candidates"]
+        assert set(term_candidates.keys()) == {"a,b", "a"}
+        assert "c" in term_candidates["a,b"]
+        assert "b,c" in term_candidates["a"]
+
+        term_senses = payload["term_senses"]
+        assert set(term_senses.keys()) == {"a,b", "a"}
+        assert term_senses["a,b"]["c"]["after_sense"] == "sense-1"
+        assert term_senses["a"]["b,c"]["after_sense"] == "sense-2"
