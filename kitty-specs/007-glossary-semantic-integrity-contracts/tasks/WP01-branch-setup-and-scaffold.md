@@ -1,25 +1,28 @@
 ---
-work_package_id: "WP01"
-subtasks:
-  - "T001"
-  - "T002"
-  - "T003"
-  - "T004"
-title: "Branch Setup & Module Scaffold"
-phase: "Phase 0 - Setup"
-lane: "planned"
-assignee: ""
-agent: ""
-shell_pid: ""
-review_status: ""
-reviewed_by: ""
+work_package_id: WP01
+title: Branch Setup & Module Scaffold
+lane: "doing"
 dependencies: []
+base_branch: 2.x
+base_commit: 1ffeb090612a59c7864871c8bfb0aad41b9db81c
+created_at: '2026-02-16T13:14:17.708514+00:00'
+subtasks:
+- T001
+- T002
+- T003
+- T004
+phase: Phase 0 - Setup
+assignee: ''
+agent: ''
+shell_pid: "18339"
+review_status: ''
+reviewed_by: ''
 history:
-  - timestamp: "2026-02-16T12:00:00Z"
-    lane: "planned"
-    agent: "system"
-    shell_pid: ""
-    action: "Prompt generated via /spec-kitty.tasks"
+- timestamp: '2026-02-16T12:00:00Z'
+  lane: planned
+  agent: system
+  shell_pid: ''
+  action: Prompt generated via /spec-kitty.tasks
 ---
 
 # Work Package Prompt: WP01 – Branch Setup & Module Scaffold
