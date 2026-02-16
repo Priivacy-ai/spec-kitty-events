@@ -1,7 +1,7 @@
 ---
 work_package_id: WP04
 title: Reducer Output Models & Exports
-lane: "doing"
+lane: "for_review"
 dependencies: [WP03]
 base_branch: 007-glossary-semantic-integrity-contracts-WP03
 base_commit: b16d591b8f032989376528aa0ed974102c513e36
@@ -236,3 +236,4 @@ history:
 
 - 2026-02-16T12:00:00Z – system – lane=planned – Prompt created.
 - 2026-02-16T13:19:46Z – claude-opus – shell_pid=22012 – lane=doing – Assigned agent via workflow command
+- 2026-02-16T13:21:16Z – claude-opus – shell_pid=22012 – lane=for_review – 3 output models + 22 exports + reducer stub, mypy passes
