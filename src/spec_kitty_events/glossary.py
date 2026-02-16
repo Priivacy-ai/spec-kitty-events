@@ -7,14 +7,11 @@ mission-level semantic integrity enforcement.
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Dict, FrozenSet, List, Literal, Optional, Sequence, Tuple
+from typing import Dict, FrozenSet, List, Literal, Optional, Sequence, Tuple
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from spec_kitty_events.models import SpecKittyEventsError
-
-if TYPE_CHECKING:
-    from spec_kitty_events.models import Event
+from spec_kitty_events.models import Event, SpecKittyEventsError
 
 # ── Section 1: Constants ─────────────────────────────────────────────────────
 
@@ -281,11 +278,31 @@ class ReducedGlossaryState(BaseModel):
     )
     event_count: int = Field(default=0, description="Total glossary events processed")
     last_processed_event_id: Optional[str] = Field(
-        None, description="Last event_id in processed sequence"
+        default=None, description="Last event_id in processed sequence"
     )
 
 
 # ── Section 5: Glossary Reducer ──────────────────────────────────────────────
+
+
+def _check_scope_activated(
+    scope_id: str,
+    active_scopes: Dict[str, GlossaryScopeActivatedPayload],
+    event: Event,
+    mode: str,
+    anomalies: List[GlossaryAnomaly],
+) -> None:
+    """Validate that a scope has been activated before use."""
+    if scope_id not in active_scopes:
+        if mode == "strict":
+            raise SpecKittyEventsError(
+                f"Event {event.event_id} references unactivated scope '{scope_id}'"
+            )
+        anomalies.append(GlossaryAnomaly(
+            event_id=event.event_id,
+            event_type=event.event_type,
+            reason=f"References unactivated scope '{scope_id}'",
+        ))
 
 
 def reduce_glossary_events(
@@ -293,5 +310,85 @@ def reduce_glossary_events(
     *,
     mode: Literal["strict", "permissive"] = "strict",
 ) -> ReducedGlossaryState:
-    """Reduce glossary events into projected state. Implemented in WP05/WP06."""
-    raise NotImplementedError("Reducer not yet implemented")
+    """Fold glossary events into projected glossary state.
+
+    Pipeline:
+    1. Filter to glossary event types only
+    2. Sort by (lamport_clock, timestamp, event_id)
+    3. Deduplicate by event_id
+    4. Process each event, mutating intermediate state
+    5. Assemble frozen ReducedGlossaryState
+
+    Pure function. No I/O. Deterministic for any causal-order-preserving
+    permutation.
+    """
+    from spec_kitty_events.status import dedup_events, status_event_sort_key
+
+    if not events:
+        return ReducedGlossaryState()
+
+    # 1. Filter
+    glossary_events = [e for e in events if e.event_type in GLOSSARY_EVENT_TYPES]
+
+    if not glossary_events:
+        return ReducedGlossaryState()
+
+    # 2. Sort
+    sorted_events = sorted(glossary_events, key=status_event_sort_key)
+
+    # 3. Dedup
+    unique_events = dedup_events(sorted_events)
+
+    # Extract mission_id from first event
+    first_payload = unique_events[0].payload
+    mission_id = str(first_payload.get("mission_id", ""))
+
+    # 4. Process (mutable intermediates)
+    active_scopes: Dict[str, GlossaryScopeActivatedPayload] = {}
+    current_strictness: str = "medium"
+    strictness_history: List[GlossaryStrictnessSetPayload] = []
+    term_candidates: Dict[str, List[TermCandidateObservedPayload]] = {}
+    term_senses: Dict[str, GlossarySenseUpdatedPayload] = {}
+    semantic_checks: List[SemanticCheckEvaluatedPayload] = []
+    clarifications: List[ClarificationRecord] = []
+    generation_blocks: List[GenerationBlockedBySemanticConflictPayload] = []
+    anomalies: List[GlossaryAnomaly] = []
+
+    for event in unique_events:
+        payload_data = event.payload
+        etype = event.event_type
+
+        if etype == GLOSSARY_SCOPE_ACTIVATED:
+            p_scope = GlossaryScopeActivatedPayload(**payload_data)
+            active_scopes[p_scope.scope_id] = p_scope
+
+        elif etype == GLOSSARY_STRICTNESS_SET:
+            p_strict = GlossaryStrictnessSetPayload(**payload_data)
+            current_strictness = p_strict.new_strictness
+            strictness_history.append(p_strict)
+
+        elif etype == TERM_CANDIDATE_OBSERVED:
+            p_term = TermCandidateObservedPayload(**payload_data)
+            _check_scope_activated(p_term.scope_id, active_scopes, event, mode, anomalies)
+            term_candidates.setdefault(p_term.term_surface, []).append(p_term)
+
+        elif etype == GLOSSARY_SENSE_UPDATED:
+            p_sense = GlossarySenseUpdatedPayload(**payload_data)
+            _check_scope_activated(p_sense.scope_id, active_scopes, event, mode, anomalies)
+            if p_sense.term_surface not in term_candidates:
+                if mode == "strict":
+                    raise SpecKittyEventsError(
+                        f"GlossarySenseUpdated for unobserved term '{p_sense.term_surface}' "
+                        f"in event {event.event_id}"
+                    )
+                anomalies.append(GlossaryAnomaly(
+                    event_id=event.event_id,
+                    event_type=event.event_type,
+                    reason=f"Sense update for unobserved term '{p_sense.term_surface}'",
+                ))
+            term_senses[p_sense.term_surface] = p_sense
+
+        # WP06 event handlers: SemanticCheckEvaluated, Clarification*, GenerationBlocked
+
+    # 5. Assemble — WP06 will complete this
+    raise NotImplementedError("Assembly not yet implemented (WP06)")
