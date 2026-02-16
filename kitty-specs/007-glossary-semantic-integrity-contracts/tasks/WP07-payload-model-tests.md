@@ -1,7 +1,7 @@
 ---
 work_package_id: WP07
 title: Payload Model Tests
-lane: "doing"
+lane: "for_review"
 dependencies: [WP04]
 base_branch: 007-glossary-semantic-integrity-contracts-WP04
 base_commit: 1cc294fbe6cea88e0fcd6f32bc53645a7db5cb4d
@@ -160,3 +160,4 @@ history:
 
 - 2026-02-16T12:00:00Z – system – lane=planned – Prompt created.
 - 2026-02-16T13:26:23Z – claude-opus – shell_pid=25971 – lane=doing – Assigned agent via workflow command
+- 2026-02-16T13:28:23Z – claude-opus – shell_pid=25971 – lane=for_review – 70 payload model tests, all passing
