@@ -1,27 +1,30 @@
 ---
-work_package_id: "WP05"
+work_package_id: WP05
+title: Reducer — Scope, Strictness & Term Processing
+lane: "doing"
+dependencies: [WP04]
+base_branch: 007-glossary-semantic-integrity-contracts-WP04
+base_commit: 1cc294fbe6cea88e0fcd6f32bc53645a7db5cb4d
+created_at: '2026-02-16T13:21:34.558635+00:00'
 subtasks:
-  - "T019"
-  - "T020"
-  - "T021"
-  - "T022"
-  - "T023"
-  - "T024"
-title: "Reducer — Scope, Strictness & Term Processing"
-phase: "Phase 2 - Reducer Implementation"
-lane: "planned"
-assignee: ""
-agent: ""
-shell_pid: ""
-review_status: ""
-reviewed_by: ""
-dependencies: ["WP04"]
+- T019
+- T020
+- T021
+- T022
+- T023
+- T024
+phase: Phase 2 - Reducer Implementation
+assignee: ''
+agent: ''
+shell_pid: "22994"
+review_status: ''
+reviewed_by: ''
 history:
-  - timestamp: "2026-02-16T12:00:00Z"
-    lane: "planned"
-    agent: "system"
-    shell_pid: ""
-    action: "Prompt generated via /spec-kitty.tasks"
+- timestamp: '2026-02-16T12:00:00Z'
+  lane: planned
+  agent: system
+  shell_pid: ''
+  action: Prompt generated via /spec-kitty.tasks
 ---
 
 # Work Package Prompt: WP05 – Reducer — Scope, Strictness & Term Processing
