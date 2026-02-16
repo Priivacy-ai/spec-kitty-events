@@ -7,11 +7,14 @@ mission-level semantic integrity enforcement.
 
 from __future__ import annotations
 
-from typing import Dict, FrozenSet, List, Literal, Optional, Sequence, Tuple
+from typing import TYPE_CHECKING, Dict, FrozenSet, List, Literal, Optional, Sequence, Tuple
 
 from pydantic import BaseModel, ConfigDict, Field
 
 from spec_kitty_events.models import SpecKittyEventsError
+
+if TYPE_CHECKING:
+    from spec_kitty_events.models import Event
 
 # ── Section 1: Constants ─────────────────────────────────────────────────────
 
@@ -213,4 +216,82 @@ class GenerationBlockedBySemanticConflictPayload(BaseModel):
 
 # ── Section 4: Reducer Output Models ─────────────────────────────────────────
 
+
+class GlossaryAnomaly(BaseModel):
+    """Non-fatal issue encountered during glossary event reduction."""
+
+    model_config = ConfigDict(frozen=True)
+
+    event_id: str = Field(..., description="ID of the event that caused the anomaly")
+    event_type: str = Field(..., description="Type of the problematic event")
+    reason: str = Field(..., description="Human-readable explanation")
+
+
+class ClarificationRecord(BaseModel):
+    """Tracks clarification lifecycle for burst-cap enforcement."""
+
+    model_config = ConfigDict(frozen=True)
+
+    request_event_id: str = Field(
+        ..., description="Event ID of the clarification request"
+    )
+    semantic_check_event_id: str = Field(
+        ..., description="Burst-window grouping key"
+    )
+    term: str = Field(..., description="The ambiguous term")
+    resolved: bool = Field(default=False, description="Whether resolution received")
+    resolution_event_id: Optional[str] = Field(
+        None, description="Event ID of the resolution (if resolved)"
+    )
+
+
+class ReducedGlossaryState(BaseModel):
+    """Projected glossary state from reduce_glossary_events()."""
+
+    model_config = ConfigDict(frozen=True)
+
+    mission_id: str = Field(default="", description="Mission context (from first event)")
+    active_scopes: Dict[str, GlossaryScopeActivatedPayload] = Field(
+        default_factory=dict, description="scope_id → activation payload"
+    )
+    current_strictness: Literal["off", "medium", "max"] = Field(
+        default="medium", description="Latest mission-wide strictness mode"
+    )
+    strictness_history: Tuple[GlossaryStrictnessSetPayload, ...] = Field(
+        default_factory=tuple, description="Ordered history of strictness changes"
+    )
+    term_candidates: Dict[str, Tuple[TermCandidateObservedPayload, ...]] = Field(
+        default_factory=dict,
+        description="term_surface → observed candidate payloads",
+    )
+    term_senses: Dict[str, GlossarySenseUpdatedPayload] = Field(
+        default_factory=dict, description="term_surface → latest sense update"
+    )
+    clarifications: Tuple[ClarificationRecord, ...] = Field(
+        default_factory=tuple, description="Ordered clarification timeline"
+    )
+    semantic_checks: Tuple[SemanticCheckEvaluatedPayload, ...] = Field(
+        default_factory=tuple, description="Ordered check history"
+    )
+    generation_blocks: Tuple[GenerationBlockedBySemanticConflictPayload, ...] = Field(
+        default_factory=tuple, description="Ordered block history"
+    )
+    anomalies: Tuple[GlossaryAnomaly, ...] = Field(
+        default_factory=tuple, description="Non-fatal issues encountered"
+    )
+    event_count: int = Field(default=0, description="Total glossary events processed")
+    last_processed_event_id: Optional[str] = Field(
+        None, description="Last event_id in processed sequence"
+    )
+
+
 # ── Section 5: Glossary Reducer ──────────────────────────────────────────────
+
+
+def reduce_glossary_events(
+    events: Sequence[Event],
+    *,
+    mode: Literal["strict", "permissive"] = "strict",
+) -> ReducedGlossaryState:
+    """Reduce glossary events into projected state. Implemented in WP05/WP06."""
+    raise NotImplementedError("Reducer not yet implemented")

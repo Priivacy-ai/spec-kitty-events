@@ -158,6 +158,32 @@ from spec_kitty_events.collaboration import (
     reduce_collaboration_events,
 )
 
+# Glossary semantic integrity contracts
+from spec_kitty_events.glossary import (
+    GLOSSARY_SCOPE_ACTIVATED,
+    TERM_CANDIDATE_OBSERVED,
+    SEMANTIC_CHECK_EVALUATED,
+    GLOSSARY_CLARIFICATION_REQUESTED,
+    GLOSSARY_CLARIFICATION_RESOLVED,
+    GLOSSARY_SENSE_UPDATED,
+    GENERATION_BLOCKED_BY_SEMANTIC_CONFLICT,
+    GLOSSARY_STRICTNESS_SET,
+    GLOSSARY_EVENT_TYPES,
+    SemanticConflictEntry,
+    GlossaryScopeActivatedPayload,
+    TermCandidateObservedPayload,
+    SemanticCheckEvaluatedPayload,
+    GlossaryClarificationRequestedPayload,
+    GlossaryClarificationResolvedPayload,
+    GlossarySenseUpdatedPayload,
+    GenerationBlockedBySemanticConflictPayload,
+    GlossaryStrictnessSetPayload,
+    GlossaryAnomaly,
+    ClarificationRecord,
+    ReducedGlossaryState,
+    reduce_glossary_events,
+)
+
 # Public API (controls what's exported with "from spec_kitty_events import *")
 __all__ = [
     # Version
@@ -276,4 +302,27 @@ __all__ = [
     "CollaborationAnomaly",
     "UnknownParticipantError",
     "reduce_collaboration_events",
+    # Glossary semantic integrity contracts
+    "GLOSSARY_SCOPE_ACTIVATED",
+    "TERM_CANDIDATE_OBSERVED",
+    "SEMANTIC_CHECK_EVALUATED",
+    "GLOSSARY_CLARIFICATION_REQUESTED",
+    "GLOSSARY_CLARIFICATION_RESOLVED",
+    "GLOSSARY_SENSE_UPDATED",
+    "GENERATION_BLOCKED_BY_SEMANTIC_CONFLICT",
+    "GLOSSARY_STRICTNESS_SET",
+    "GLOSSARY_EVENT_TYPES",
+    "SemanticConflictEntry",
+    "GlossaryScopeActivatedPayload",
+    "TermCandidateObservedPayload",
+    "SemanticCheckEvaluatedPayload",
+    "GlossaryClarificationRequestedPayload",
+    "GlossaryClarificationResolvedPayload",
+    "GlossarySenseUpdatedPayload",
+    "GenerationBlockedBySemanticConflictPayload",
+    "GlossaryStrictnessSetPayload",
+    "GlossaryAnomaly",
+    "ClarificationRecord",
+    "ReducedGlossaryState",
+    "reduce_glossary_events",
 ]
