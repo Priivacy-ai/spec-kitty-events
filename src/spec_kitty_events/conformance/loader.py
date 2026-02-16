@@ -14,7 +14,7 @@ from typing import Any, Dict, List
 _FIXTURES_DIR = Path(__file__).parent / "fixtures"
 _MANIFEST_PATH = _FIXTURES_DIR / "manifest.json"
 
-_VALID_CATEGORIES = frozenset({"events", "lane_mapping", "edge_cases"})
+_VALID_CATEGORIES = frozenset({"events", "lane_mapping", "edge_cases", "collaboration", "glossary"})
 
 
 @dataclass(frozen=True)

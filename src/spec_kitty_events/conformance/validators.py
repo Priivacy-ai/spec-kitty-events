@@ -41,6 +41,16 @@ from spec_kitty_events.collaboration import (
     DecisionCapturedPayload,
     SessionLinkedPayload,
 )
+from spec_kitty_events.glossary import (
+    GlossaryScopeActivatedPayload,
+    TermCandidateObservedPayload,
+    SemanticCheckEvaluatedPayload,
+    GlossaryClarificationRequestedPayload,
+    GlossaryClarificationResolvedPayload,
+    GlossarySenseUpdatedPayload,
+    GenerationBlockedBySemanticConflictPayload,
+    GlossaryStrictnessSetPayload,
+)
 
 
 @dataclass(frozen=True)
@@ -101,6 +111,15 @@ _EVENT_TYPE_TO_MODEL: Dict[str, Type[Any]] = {
     "CommentPosted": CommentPostedPayload,
     "DecisionCaptured": DecisionCapturedPayload,
     "SessionLinked": SessionLinkedPayload,
+    # Glossary semantic integrity contracts
+    "GlossaryScopeActivated": GlossaryScopeActivatedPayload,
+    "TermCandidateObserved": TermCandidateObservedPayload,
+    "SemanticCheckEvaluated": SemanticCheckEvaluatedPayload,
+    "GlossaryClarificationRequested": GlossaryClarificationRequestedPayload,
+    "GlossaryClarificationResolved": GlossaryClarificationResolvedPayload,
+    "GlossarySenseUpdated": GlossarySenseUpdatedPayload,
+    "GenerationBlockedBySemanticConflict": GenerationBlockedBySemanticConflictPayload,
+    "GlossaryStrictnessSet": GlossaryStrictnessSetPayload,
 }
 
 # Event type to JSON Schema name mapping (used with load_schema())
@@ -257,15 +276,19 @@ def validate_event(
         )
 
     model_class = _EVENT_TYPE_TO_MODEL[event_type]
-    schema_name = _EVENT_TYPE_TO_SCHEMA[event_type]
+    schema_name = _EVENT_TYPE_TO_SCHEMA.get(event_type)
 
     # Layer 1: Pydantic validation
     model_violations = _validate_with_model(payload, model_class)
 
-    # Layer 2: JSON Schema validation
-    schema_violations, schema_skipped = _validate_with_schema(
-        payload, schema_name, strict=strict
-    )
+    # Layer 2: JSON Schema validation (skip if no schema mapping exists)
+    if schema_name is not None:
+        schema_violations, schema_skipped = _validate_with_schema(
+            payload, schema_name, strict=strict
+        )
+    else:
+        schema_violations = ()
+        schema_skipped = True
 
     # Determine overall validity
     valid = len(model_violations) == 0 and (
