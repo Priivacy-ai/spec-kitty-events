@@ -15,7 +15,7 @@ subtasks:
 - T024
 phase: Phase 2 - Reducer Implementation
 assignee: ''
-agent: ''
+agent: "claude-opus"
 shell_pid: "22994"
 review_status: ''
 reviewed_by: ''
@@ -263,3 +263,4 @@ history:
 ## Activity Log
 
 - 2026-02-16T12:00:00Z – system – lane=planned – Prompt created.
+- 2026-02-16T13:21:34Z – claude-opus – shell_pid=22994 – lane=doing – Assigned agent via workflow command
