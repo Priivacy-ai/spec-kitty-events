@@ -1,7 +1,7 @@
 ---
 work_package_id: WP02
 title: Core Payload Models — Scope, Term, Sense, Strictness
-lane: "doing"
+lane: "for_review"
 dependencies: [WP01]
 base_branch: 007-glossary-semantic-integrity-contracts-WP01
 base_commit: b784a988a468e02443875607213646fa89a9a4bc
@@ -205,3 +205,4 @@ history:
 
 - 2026-02-16T12:00:00Z – system – lane=planned – Prompt created.
 - 2026-02-16T13:16:38Z – claude-opus – shell_pid=19899 – lane=doing – Assigned agent via workflow command
+- 2026-02-16T13:18:02Z – claude-opus – shell_pid=19899 – lane=for_review – 5 frozen Pydantic models with round-trip verification and mypy --strict pass
