@@ -1,108 +1,120 @@
-# Implementation Plan: [FEATURE]
-*Path: [templates/plan-template.md](templates/plan-template.md)*
+# Implementation Plan: Glossary Semantic Integrity Contracts
 
-
-**Branch**: `[###-feature-name]` | **Date**: [DATE] | **Spec**: [link]
-**Input**: Feature specification from `/kitty-specs/[###-feature-name]/spec.md`
-
-**Note**: This template is filled in by the `/spec-kitty.plan` command. See `src/specify_cli/missions/software-dev/command-templates/plan.md` for the execution workflow.
-
-The planner will not begin until all planning questions have been answered—capture those answers in this document before progressing to later phases.
+**Branch**: `007-glossary-semantic-integrity-contracts` (on `2.x`) | **Date**: 2026-02-16 | **Spec**: [spec.md](spec.md)
+**Input**: Feature specification from `kitty-specs/007-glossary-semantic-integrity-contracts/spec.md`
 
 ## Summary
 
-[Extract from feature spec: primary requirement + technical approach from research]
+Add 8 typed glossary semantic integrity event contracts, a standalone glossary reducer with strict/permissive dual-mode, and 3 conformance fixtures to `spec-kitty-events`. All work targets the `2.x` branch (cut from current `main` HEAD). The module (`glossary.py`) mirrors the `collaboration.py` structural pattern: same reducer pipeline shape (filter → sort → dedup → process → assemble frozen state), same anomaly-recording pattern, and same frozen Pydantic output models.
 
 ## Technical Context
 
-<!--
-  ACTION REQUIRED: Replace the content in this section with the technical details
-  for the project. The structure here is presented in advisory capacity to guide
-  the iteration process.
--->
-
-**Language/Version**: [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION]  
-**Primary Dependencies**: [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION]  
-**Storage**: [if applicable, e.g., PostgreSQL, CoreData, files or N/A]  
-**Testing**: [e.g., pytest, XCTest, cargo test or NEEDS CLARIFICATION]  
-**Target Platform**: [e.g., Linux server, iOS 15+, WASM or NEEDS CLARIFICATION]
-**Project Type**: [single/web/mobile - determines source structure]  
-**Performance Goals**: [domain-specific, e.g., 1000 req/s, 10k lines/sec, 60 fps or NEEDS CLARIFICATION]  
-**Constraints**: [domain-specific, e.g., <200ms p95, <100MB memory, offline-capable or NEEDS CLARIFICATION]  
-**Scale/Scope**: [domain-specific, e.g., 10k users, 1M LOC, 50 screens or NEEDS CLARIFICATION]
+**Language/Version**: Python 3.10+ (target), 3.11 for dev tooling (pip/pytest)
+**Primary Dependencies**: pydantic>=2.0.0,<3.0.0, python-ulid>=1.1.0 (no new deps)
+**Storage**: N/A — pure event contracts and reducer, no I/O
+**Testing**: pytest + pytest-cov + hypothesis + mypy --strict
+**Target Platform**: Library package (pip-installable), local-first with SaaS projection
+**Project Type**: Single Python package (`src/spec_kitty_events/`)
+**Performance Goals**: N/A — contract library, not a service
+**Constraints**: mypy --strict, Python 3.10 minimum, frozen Pydantic models, 98%+ coverage target
+**Scale/Scope**: 8 event types, ~8 payload models, ~5 supporting value models, 1 reducer, 1 reduced state model, 3 conformance fixture sets, ~20 new exports
 
 ## Constitution Check
 
-*GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
-
-[Gates determined based on constitution file]
+*No constitution file exists at `.kittify/memory/constitution.md`. Skipped.*
 
 ## Project Structure
 
 ### Documentation (this feature)
 
 ```
-kitty-specs/[###-feature]/
-├── plan.md              # This file (/spec-kitty.plan command output)
-├── research.md          # Phase 0 output (/spec-kitty.plan command)
-├── data-model.md        # Phase 1 output (/spec-kitty.plan command)
-├── quickstart.md        # Phase 1 output (/spec-kitty.plan command)
-├── contracts/           # Phase 1 output (/spec-kitty.plan command)
-└── tasks.md             # Phase 2 output (/spec-kitty.tasks command - NOT created by /spec-kitty.plan)
+kitty-specs/007-glossary-semantic-integrity-contracts/
+├── plan.md              # This file
+├── spec.md              # Feature specification
+├── meta.json            # Feature metadata (target_branch: 2.x)
+├── research.md          # Phase 0 output
+├── data-model.md        # Phase 1 output
+├── quickstart.md        # Phase 1 output
+├── contracts/           # Phase 1 output
+│   └── glossary-events.md
+├── checklists/
+│   └── requirements.md  # Spec quality checklist
+└── tasks.md             # Phase 2 output (NOT created by /spec-kitty.plan)
 ```
 
 ### Source Code (repository root)
-<!--
-  ACTION REQUIRED: Replace the placeholder tree below with the concrete layout
-  for this feature. Delete unused options and expand the chosen structure with
-  real paths (e.g., apps/admin, packages/something). The delivered plan must
-  not include Option labels.
--->
 
 ```
-# [REMOVE IF UNUSED] Option 1: Single project (DEFAULT)
-src/
-├── models/
-├── services/
-├── cli/
-└── lib/
+src/spec_kitty_events/
+├── __init__.py                          # Add ~20 new glossary exports
+├── glossary.py                          # NEW: Event types, payloads, reducer
+├── conformance/
+│   └── fixtures/
+│       ├── manifest.json                # MODIFIED: Add glossary fixture entries
+│       └── glossary/                    # NEW: Glossary conformance fixtures
+│           ├── valid/
+│           │   ├── glossary_scope_activated.json
+│           │   ├── term_candidate_observed.json
+│           │   ├── semantic_check_evaluated_warn.json
+│           │   ├── semantic_check_evaluated_block.json
+│           │   ├── generation_blocked.json
+│           │   ├── glossary_clarification_requested.json
+│           │   ├── glossary_clarification_resolved.json
+│           │   ├── glossary_sense_updated.json
+│           │   └── glossary_strictness_set.json
+│           └── invalid/
+│               ├── semantic_check_missing_step_id.json
+│               ├── glossary_scope_invalid_type.json
+│               └── clarification_missing_check_ref.json
 
 tests/
-├── contract/
-├── integration/
-└── unit/
-
-# [REMOVE IF UNUSED] Option 2: Web application (when "frontend" + "backend" detected)
-backend/
-├── src/
-│   ├── models/
-│   ├── services/
-│   └── api/
-└── tests/
-
-frontend/
-├── src/
-│   ├── components/
-│   ├── pages/
-│   └── services/
-└── tests/
-
-# [REMOVE IF UNUSED] Option 3: Mobile + API (when "iOS/Android" detected)
-api/
-└── [same as backend above]
-
-ios/ or android/
-└── [platform-specific structure: feature modules, UI flows, platform tests]
+├── test_glossary.py                     # NEW: Unit tests for glossary module
+├── test_glossary_reducer.py             # NEW: Reducer tests (determinism, edge cases)
+└── test_glossary_conformance.py         # NEW: Conformance fixture validation
 ```
 
-**Structure Decision**: [Document the selected structure and reference the real
-directories captured above]
+**Structure Decision**: Single module (`glossary.py`) in the existing package, matching the established pattern where each domain has one module file (lifecycle.py, status.py, collaboration.py). Conformance fixtures in a namespaced `glossary/` subdirectory under existing `conformance/fixtures/`.
+
+## Design Decisions
+
+### D1: Single module vs. multi-file package
+
+**Decision**: Single `glossary.py` file.
+**Rationale**: `collaboration.py` is ~1070 lines and works well as a single file. Glossary will be simpler (~600-800 lines estimated) since it has no roster/presence/reverse-index machinery. One file keeps imports clean and matches the pattern.
+**Alternative rejected**: `glossary/` package with `__init__.py`, `models.py`, `reducer.py` — unnecessary complexity for the expected size.
+
+### D2: Reducer pipeline reuse
+
+**Decision**: Import and reuse `status_event_sort_key` and `dedup_events` from `status.py` at function call time (late import), matching `collaboration.py`'s approach.
+**Rationale**: These are well-tested utilities. Late import avoids circular dependency issues. The spec requires dedup-by-event_id semantics; `dedup_events()` implements exactly that.
+**Note**: If `dedup_events` moves in a future refactor, the import path changes but the semantic stays the same — this is implementation reuse, not a contract coupling.
+
+### D3: Enum vs. Literal for constrained fields
+
+**Decision**: Use `Literal` types for fields with small fixed value sets (scope_type, strictness, severity, conflict_nature, recommended_action). Use `Enum` only if the set needs to be iterated or referenced programmatically.
+**Rationale**: Matches the existing pattern in `collaboration.py` (e.g., `Literal["human", "llm_context"]` for participant_type). Keeps models simple and avoids enum serialization overhead.
+**Exception**: `GlossaryStrictness` as an enum if needed for programmatic iteration in the reducer's strictness-tracking logic. Decision to be made during implementation.
+
+### D4: Conflict entry as embedded value object
+
+**Decision**: Define a `SemanticConflictEntry` frozen Pydantic model used as a list element within `SemanticCheckEvaluatedPayload.conflicts`.
+**Rationale**: Conflict entries have 3+ fields (term, nature, severity) — a typed model is clearer than a nested dict and enables validation.
+
+### D5: Clarification burst grouping
+
+**Decision**: Group clarifications by `semantic_check_event_id` field on `GlossaryClarificationRequestedPayload`. The reducer counts active (unresolved) requests per group and caps at 3.
+**Rationale**: This was the P2 review finding fix — gives every consumer the same deterministic grouping key.
+
+### D6: Actor identity representation
+
+**Decision**: Use `str` for actor fields in glossary payloads.
+**Rationale**: Matches lifecycle (`MissionStartedPayload.actor: str`) and collaboration payload patterns where actor is a simple identifier. The full `ParticipantIdentity` model belongs to the collaboration domain and would be cross-domain coupling.
+
+### D7: Branch `2.x` setup
+
+**Decision**: Cut `2.x` from current `main` HEAD (`4aa95a6`). Tag the cut point as `2.x-baseline`.
+**Rationale**: Includes spec artifacts (planning metadata, not runtime code). Avoids cherry-pick divergence. Downstream repos can align to the tagged commit.
 
 ## Complexity Tracking
 
-*Fill ONLY if Constitution Check has violations that must be justified*
-
-| Violation | Why Needed | Simpler Alternative Rejected Because |
-|-----------|------------|-------------------------------------|
-| [e.g., 4th project] | [current need] | [why 3 projects insufficient] |
-| [e.g., Repository pattern] | [specific problem] | [why direct DB access insufficient] |
+No constitution violations to justify — no constitution exists.
