@@ -1,12 +1,14 @@
 """Unit tests for core data models."""
 import uuid
+from typing import Any, Dict
 import pytest
 from datetime import datetime
 from pydantic import ValidationError as PydanticValidationError
 from ulid import ULID
 from spec_kitty_events.models import (
     Event, ErrorEntry, ConflictResolution,
-    SpecKittyEventsError, StorageError, ValidationError, CyclicDependencyError
+    SpecKittyEventsError, StorageError, ValidationError, CyclicDependencyError,
+    normalize_event_id,
 )
 
 TEST_PROJECT_UUID = uuid.UUID("12345678-1234-5678-1234-567812345678")
@@ -279,7 +281,7 @@ class TestCorrelationId:
             )
 
     def test_correlation_id_too_long_rejected(self) -> None:
-        """String longer than 26 chars rejected."""
+        """String longer than 36 chars rejected."""
         with pytest.raises(PydanticValidationError):
             Event(
                 event_id="01ARZ3NDEKTSV4RRFFQ69G5FAV",
@@ -289,7 +291,7 @@ class TestCorrelationId:
                 node_id="test-node",
                 lamport_clock=0,
                 project_uuid=TEST_PROJECT_UUID,
-                correlation_id="A" * 27,
+                correlation_id="A" * 37,
             )
 
     def test_correlation_id_required(self) -> None:
@@ -580,3 +582,109 @@ class TestExceptions:
         """Test raising custom exceptions."""
         with pytest.raises(SpecKittyEventsError):
             raise StorageError("Storage failed")
+
+
+class TestEventIdFormats:
+    """Tests for ULID + UUID event ID acceptance."""
+
+    def _make_event(self, **overrides: Any) -> Event:
+        defaults: Dict[str, Any] = {
+            "event_id": "01ARZ3NDEKTSV4RRFFQ69G5FAV",
+            "event_type": "TestEvent",
+            "aggregate_id": "AGG001",
+            "timestamp": datetime.now(),
+            "node_id": "test-node",
+            "lamport_clock": 0,
+            "project_uuid": TEST_PROJECT_UUID,
+            "correlation_id": str(ULID()),
+        }
+        defaults.update(overrides)
+        return Event(**defaults)
+
+    def test_ulid_format_accepted(self) -> None:
+        """26-char ULID passes unchanged."""
+        event = self._make_event(event_id="01ARZ3NDEKTSV4RRFFQ69G5FAV")
+        assert event.event_id == "01ARZ3NDEKTSV4RRFFQ69G5FAV"
+
+    def test_26char_non_crockford_accepted(self) -> None:
+        """26-char string with lowercase/non-Base32 chars passes (backward compat)."""
+        event = self._make_event(event_id="abcdefghijklmnopqrstuvwxyz")
+        assert event.event_id == "abcdefghijklmnopqrstuvwxyz"
+
+    def test_uuid_hyphenated_accepted(self) -> None:
+        """36-char hyphenated UUID accepted, lowercased."""
+        event = self._make_event(
+            event_id="550E8400-E29B-41D4-A716-446655440000"
+        )
+        assert event.event_id == "550e8400-e29b-41d4-a716-446655440000"
+
+    def test_uuid_bare_normalized(self) -> None:
+        """32-char bare hex → 36-char hyphenated lowercase."""
+        event = self._make_event(event_id="550e8400e29b41d4a716446655440000")
+        assert event.event_id == "550e8400-e29b-41d4-a716-446655440000"
+
+    def test_uuid_uppercase_normalized(self) -> None:
+        """Mixed-case UUID → lowercase."""
+        event = self._make_event(
+            event_id="550E8400-e29b-41D4-A716-446655440000"
+        )
+        assert event.event_id == "550e8400-e29b-41d4-a716-446655440000"
+
+    @pytest.mark.parametrize("length", [27, 28, 29, 30, 31, 33, 34, 35, 37, 40])
+    def test_invalid_length_rejected(self, length: int) -> None:
+        """Lengths outside 26/32/36 rejected."""
+        with pytest.raises(PydanticValidationError):
+            self._make_event(event_id="a" * length)
+
+    def test_invalid_hex_32_rejected(self) -> None:
+        """32 chars but not hex → rejected."""
+        with pytest.raises(PydanticValidationError):
+            self._make_event(event_id="zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz")
+
+    def test_causation_id_uuid_accepted(self) -> None:
+        """UUID format works for causation_id."""
+        event = self._make_event(
+            causation_id="550e8400-e29b-41d4-a716-446655440000"
+        )
+        assert event.causation_id == "550e8400-e29b-41d4-a716-446655440000"
+
+    def test_causation_id_none_accepted(self) -> None:
+        """None still works for causation_id."""
+        event = self._make_event(causation_id=None)
+        assert event.causation_id is None
+
+    def test_correlation_id_uuid_accepted(self) -> None:
+        """UUID format works for correlation_id."""
+        event = self._make_event(
+            correlation_id="550e8400-e29b-41d4-a716-446655440000"
+        )
+        assert event.correlation_id == "550e8400-e29b-41d4-a716-446655440000"
+
+    def test_normalize_event_id_function(self) -> None:
+        """normalize_event_id works as a standalone function."""
+        assert normalize_event_id("01ARZ3NDEKTSV4RRFFQ69G5FAV") == "01ARZ3NDEKTSV4RRFFQ69G5FAV"
+        assert normalize_event_id("550E8400E29B41D4A716446655440000") == "550e8400-e29b-41d4-a716-446655440000"
+        assert normalize_event_id("550e8400-e29b-41d4-a716-446655440000") == "550e8400-e29b-41d4-a716-446655440000"
+        with pytest.raises(ValueError):
+            normalize_event_id("too-short")
+
+    @pytest.mark.parametrize("bad_value", [123, 3.14, True, ["a" * 26], {"id": "x"}])
+    def test_non_string_event_id_rejected(self, bad_value: object) -> None:
+        """Non-string event_id raises PydanticValidationError, not TypeError."""
+        with pytest.raises(PydanticValidationError):
+            self._make_event(event_id=bad_value)  # type: ignore[arg-type]
+
+    def test_non_string_causation_id_rejected(self) -> None:
+        """Non-string causation_id raises PydanticValidationError, not TypeError."""
+        with pytest.raises(PydanticValidationError):
+            self._make_event(causation_id=999)  # type: ignore[arg-type]
+
+    def test_non_string_correlation_id_rejected(self) -> None:
+        """Non-string correlation_id raises PydanticValidationError, not TypeError."""
+        with pytest.raises(PydanticValidationError):
+            self._make_event(correlation_id=42)  # type: ignore[arg-type]
+
+    def test_normalize_event_id_non_string_raises_valueerror(self) -> None:
+        """normalize_event_id raises ValueError (not TypeError) for non-strings."""
+        with pytest.raises(ValueError, match="must be a string"):
+            normalize_event_id(123)  # type: ignore[arg-type]

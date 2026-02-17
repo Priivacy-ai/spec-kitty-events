@@ -8,9 +8,9 @@ from spec_kitty_events.schemas import list_schemas, load_schema, schema_path
 
 
 def test_list_schemas_returns_all_names() -> None:
-    """Test that list_schemas returns all 28 schema names."""
+    """Test that list_schemas returns all 37 schema names."""
     names = list_schemas()
-    assert len(names) == 28
+    assert len(names) == 37
     expected = [
         "auth_principal_binding",
         "comment_posted_payload",
@@ -22,6 +22,12 @@ def test_list_schemas_returns_all_names() -> None:
         "focus_target",
         "gate_failed_payload",
         "gate_passed_payload",
+        "generation_blocked_by_semantic_conflict_payload",
+        "glossary_clarification_requested_payload",
+        "glossary_clarification_resolved_payload",
+        "glossary_scope_activated_payload",
+        "glossary_sense_updated_payload",
+        "glossary_strictness_set_payload",
         "lane",
         "mission_cancelled_payload",
         "mission_completed_payload",
@@ -36,9 +42,12 @@ def test_list_schemas_returns_all_names() -> None:
         "prompt_step_execution_completed_payload",
         "prompt_step_execution_started_payload",
         "review_rollback_payload",
+        "semantic_check_evaluated_payload",
+        "semantic_conflict_entry",
         "session_linked_payload",
         "status_transition_payload",
         "sync_lane_v1",
+        "term_candidate_observed_payload",
         "warning_acknowledged_payload",
     ]
     assert names == expected

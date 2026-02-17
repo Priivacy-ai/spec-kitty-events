@@ -1,10 +1,54 @@
 """Core data models for spec-kitty-events library."""
+import re
 import uuid
 
-from pydantic import BaseModel, Field, ConfigDict
+from pydantic import BaseModel, Field, ConfigDict, field_validator
 from datetime import datetime
 from typing import Optional, Dict, Any, List
 from dataclasses import dataclass
+
+_UUID_HYPHEN_RE = re.compile(
+    r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+    re.IGNORECASE,
+)
+_UUID_BARE_RE = re.compile(r"^[0-9a-f]{32}$", re.IGNORECASE)
+
+# JSON Schema pattern accepting all 3 inbound formats:
+# 26-char (ULID, any charset), 32-char hex (bare UUID), 36-char hyphenated UUID
+_EVENT_ID_PATTERN = (
+    r"^.{26}$"
+    r"|^[0-9a-fA-F]{32}$"
+    r"|^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+)
+
+
+def normalize_event_id(v: object) -> str:
+    """Normalize an event ID to canonical form.
+
+    Accepts:
+    - 26-char strings — passed through unchanged (any charset)
+    - 36-char hyphenated UUIDs — lowercased to canonical form
+    - 32-char bare hex UUIDs — hyphenated and lowercased
+
+    Raises:
+        ValueError: If the input is not a string or does not match any
+            accepted format.
+    """
+    if not isinstance(v, str):
+        raise ValueError(
+            f"event_id must be a string; got {type(v).__name__}"
+        )
+    if len(v) == 26:
+        return v
+    if len(v) == 36 and _UUID_HYPHEN_RE.match(v):
+        return v.lower()
+    if len(v) == 32 and _UUID_BARE_RE.match(v):
+        h = v.lower()
+        return f"{h[:8]}-{h[8:12]}-{h[12:16]}-{h[16:20]}-{h[20:]}"
+    raise ValueError(
+        f"event_id must be 26 chars (ULID), 36-char UUID, "
+        f"or 32-char hex UUID; got {len(v)} chars"
+    )
 
 
 class Event(BaseModel):
@@ -15,8 +59,9 @@ class Event(BaseModel):
     event_id: str = Field(
         ...,
         min_length=26,
-        max_length=26,
-        description="Unique event identifier (ULID format)"
+        max_length=36,
+        description="Unique event identifier (26-char ULID or UUID accepted)",
+        json_schema_extra={"pattern": _EVENT_ID_PATTERN},
     )
     event_type: str = Field(
         ...,
@@ -49,8 +94,9 @@ class Event(BaseModel):
     causation_id: Optional[str] = Field(
         None,
         min_length=26,
-        max_length=26,
-        description="Event ID of the parent event (None for root events)"
+        max_length=36,
+        description="Event ID of the parent event (26-char ULID or UUID accepted, None for root events)",
+        json_schema_extra={"pattern": _EVENT_ID_PATTERN},
     )
     project_uuid: uuid.UUID = Field(
         ...,
@@ -63,8 +109,9 @@ class Event(BaseModel):
     correlation_id: str = Field(
         ...,
         min_length=26,
-        max_length=26,
-        description="ULID grouping all events in the same mission execution"
+        max_length=36,
+        description="Correlation identifier (26-char ULID or UUID accepted)",
+        json_schema_extra={"pattern": _EVENT_ID_PATTERN},
     )
     schema_version: str = Field(
         default="1.0.0",
@@ -77,6 +124,13 @@ class Event(BaseModel):
         le=4,
         description="Progressive data sharing tier (0=local, 4=telemetry)"
     )
+
+    @field_validator("event_id", "causation_id", "correlation_id", mode="before")
+    @classmethod
+    def _normalize_event_id(cls, v: object) -> object:
+        if v is None:
+            return v
+        return normalize_event_id(v)
 
     def __repr__(self) -> str:
         """Human-readable representation."""

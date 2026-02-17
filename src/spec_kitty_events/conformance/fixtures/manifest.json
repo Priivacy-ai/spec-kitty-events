@@ -320,6 +320,22 @@
       "event_type": "GlossaryClarificationRequested",
       "notes": "GlossaryClarificationRequestedPayload missing semantic_check_event_id",
       "min_version": "2.0.0"
+    },
+    {
+      "id": "event-uuid-hyphenated",
+      "path": "events/valid/event_uuid_hyphenated.json",
+      "expected_result": "valid",
+      "event_type": "Event",
+      "notes": "Event with UUID-format event_id (36-char hyphenated)",
+      "min_version": "2.2.0"
+    },
+    {
+      "id": "event-uuid-bare",
+      "path": "events/valid/event_uuid_bare.json",
+      "expected_result": "valid",
+      "event_type": "Event",
+      "notes": "Event with bare UUID event_id (32-char hex, normalized by model)",
+      "min_version": "2.2.0"
     }
   ]
 }

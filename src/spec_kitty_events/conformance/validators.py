@@ -148,6 +148,15 @@ _EVENT_TYPE_TO_SCHEMA: Dict[str, str] = {
     "CommentPosted": "comment_posted_payload",
     "DecisionCaptured": "decision_captured_payload",
     "SessionLinked": "session_linked_payload",
+    # Glossary semantic integrity contracts
+    "GlossaryScopeActivated": "glossary_scope_activated_payload",
+    "TermCandidateObserved": "term_candidate_observed_payload",
+    "SemanticCheckEvaluated": "semantic_check_evaluated_payload",
+    "GlossaryClarificationRequested": "glossary_clarification_requested_payload",
+    "GlossaryClarificationResolved": "glossary_clarification_resolved_payload",
+    "GlossarySenseUpdated": "glossary_sense_updated_payload",
+    "GenerationBlockedBySemanticConflict": "generation_blocked_by_semantic_conflict_payload",
+    "GlossaryStrictnessSet": "glossary_strictness_set_payload",
 }
 
 

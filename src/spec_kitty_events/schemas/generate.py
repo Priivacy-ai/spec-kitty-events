@@ -47,6 +47,17 @@ from spec_kitty_events.collaboration import (
     DecisionCapturedPayload,
     SessionLinkedPayload,
 )
+from spec_kitty_events.glossary import (
+    SemanticConflictEntry,
+    GlossaryScopeActivatedPayload,
+    TermCandidateObservedPayload,
+    GlossarySenseUpdatedPayload,
+    GlossaryStrictnessSetPayload,
+    SemanticCheckEvaluatedPayload,
+    GlossaryClarificationRequestedPayload,
+    GlossaryClarificationResolvedPayload,
+    GenerationBlockedBySemanticConflictPayload,
+)
 
 
 # Schema directory (same directory as this script)
@@ -82,6 +93,16 @@ PYDANTIC_MODELS: List[tuple[str, Type[BaseModel]]] = [
     ("comment_posted_payload", CommentPostedPayload),
     ("decision_captured_payload", DecisionCapturedPayload),
     ("session_linked_payload", SessionLinkedPayload),
+    # Glossary semantic integrity models
+    ("semantic_conflict_entry", SemanticConflictEntry),
+    ("glossary_scope_activated_payload", GlossaryScopeActivatedPayload),
+    ("term_candidate_observed_payload", TermCandidateObservedPayload),
+    ("glossary_sense_updated_payload", GlossarySenseUpdatedPayload),
+    ("glossary_strictness_set_payload", GlossaryStrictnessSetPayload),
+    ("semantic_check_evaluated_payload", SemanticCheckEvaluatedPayload),
+    ("glossary_clarification_requested_payload", GlossaryClarificationRequestedPayload),
+    ("glossary_clarification_resolved_payload", GlossaryClarificationResolvedPayload),
+    ("generation_blocked_by_semantic_conflict_payload", GenerationBlockedBySemanticConflictPayload),
 ]
 
 # Enums (use TypeAdapter)

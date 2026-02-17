@@ -340,3 +340,59 @@ class TestBurstCap:
 
         with pytest.raises(SpecKittyEventsError, match="Clarification burst cap exceeded"):
             reduce_glossary_events(events, mode="strict")
+
+
+# ── Schema Validation: Dual-Layer Active ─────────────────────────────────────
+
+
+class TestGlossarySchemaValidation:
+    """Assert glossary event types have dual-layer validation (not single-layer)."""
+
+    def test_scope_activated_schema_not_skipped(self) -> None:
+        """validate_event for GlossaryScopeActivated returns schema_check_skipped=False."""
+        data = _load_fixture("glossary/valid/glossary_scope_activated.json")
+        result = validate_event(data, "GlossaryScopeActivated")
+        assert result.valid is True
+        assert result.schema_check_skipped is False
+
+    def test_term_candidate_schema_not_skipped(self) -> None:
+        data = _load_fixture("glossary/valid/term_candidate_observed.json")
+        result = validate_event(data, "TermCandidateObserved")
+        assert result.valid is True
+        assert result.schema_check_skipped is False
+
+    def test_semantic_check_schema_not_skipped(self) -> None:
+        data = _load_fixture("glossary/valid/semantic_check_evaluated_block.json")
+        result = validate_event(data, "SemanticCheckEvaluated")
+        assert result.valid is True
+        assert result.schema_check_skipped is False
+
+    def test_clarification_requested_schema_not_skipped(self) -> None:
+        data = _load_fixture("glossary/valid/glossary_clarification_requested.json")
+        result = validate_event(data, "GlossaryClarificationRequested")
+        assert result.valid is True
+        assert result.schema_check_skipped is False
+
+    def test_clarification_resolved_schema_not_skipped(self) -> None:
+        data = _load_fixture("glossary/valid/glossary_clarification_resolved.json")
+        result = validate_event(data, "GlossaryClarificationResolved")
+        assert result.valid is True
+        assert result.schema_check_skipped is False
+
+    def test_sense_updated_schema_not_skipped(self) -> None:
+        data = _load_fixture("glossary/valid/glossary_sense_updated.json")
+        result = validate_event(data, "GlossarySenseUpdated")
+        assert result.valid is True
+        assert result.schema_check_skipped is False
+
+    def test_generation_blocked_schema_not_skipped(self) -> None:
+        data = _load_fixture("glossary/valid/generation_blocked.json")
+        result = validate_event(data, "GenerationBlockedBySemanticConflict")
+        assert result.valid is True
+        assert result.schema_check_skipped is False
+
+    def test_strictness_set_schema_not_skipped(self) -> None:
+        data = _load_fixture("glossary/valid/glossary_strictness_set.json")
+        result = validate_event(data, "GlossaryStrictnessSet")
+        assert result.valid is True
+        assert result.schema_check_skipped is False

@@ -13,7 +13,7 @@ Example:
     1
 """
 
-__version__ = "2.1.0"
+__version__ = "2.2.0"
 
 # Core data models
 from spec_kitty_events.models import (
@@ -24,6 +24,7 @@ from spec_kitty_events.models import (
     StorageError,
     ValidationError,
     CyclicDependencyError,
+    normalize_event_id,
 )
 
 # Storage abstractions
@@ -192,6 +193,7 @@ __all__ = [
     "Event",
     "ErrorEntry",
     "ConflictResolution",
+    "normalize_event_id",
     # Exceptions
     "SpecKittyEventsError",
     "StorageError",
