@@ -13,7 +13,7 @@ Example:
     1
 """
 
-__version__ = "2.3.0"
+__version__ = "2.3.1"
 
 # Core data models
 from spec_kitty_events.models import (

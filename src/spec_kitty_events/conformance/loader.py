@@ -55,6 +55,10 @@ def load_fixtures(category: str) -> List[FixtureCase]:
 
     entries: List[Dict[str, Any]] = manifest["fixtures"]
     for entry in entries:
+        # Skip replay stream fixtures (JSONL format, loaded via load_replay_stream)
+        if entry.get("fixture_type") == "replay_stream":
+            continue
+
         fixture_path: str = entry["path"]
         # Filter by category prefix in path
         if not fixture_path.startswith(category + "/"):
@@ -82,3 +86,59 @@ def load_fixtures(category: str) -> List[FixtureCase]:
         )
 
     return fixtures
+
+
+def load_replay_stream(fixture_id: str) -> List[Dict[str, Any]]:
+    """Load a replay stream fixture by manifest ID.
+
+    Args:
+        fixture_id: The ``"id"`` value from manifest.json (e.g.
+            ``"mission-next-replay-full-lifecycle"``).
+
+    Returns:
+        List of Event envelope dicts, one per JSONL line.
+        Empty lines are skipped. Each line is parsed with ``json.loads``.
+
+    Raises:
+        ValueError: If *fixture_id* is not found or does not have
+            ``fixture_type == "replay_stream"`` in the manifest.
+        FileNotFoundError: If the fixture file referenced by the manifest
+            entry does not exist on disk.
+        json.JSONDecodeError: If any non-empty line is not valid JSON.
+            No recovery -- malformed JSONL fails hard (no fallback).
+    """
+    with open(_MANIFEST_PATH, "r", encoding="utf-8") as fh:
+        manifest: Dict[str, Any] = json.load(fh)
+
+    entry: Dict[str, Any] | None = None
+    for candidate in manifest["fixtures"]:
+        if candidate["id"] == fixture_id:
+            entry = candidate
+            break
+
+    if entry is None:
+        raise ValueError(
+            f"Fixture ID not found in manifest: {fixture_id!r}"
+        )
+
+    if entry.get("fixture_type") != "replay_stream":
+        raise ValueError(
+            f"Fixture {fixture_id!r} is not a replay_stream "
+            f"(fixture_type={entry.get('fixture_type')!r})"
+        )
+
+    full_path = _FIXTURES_DIR / entry["path"]
+    if not full_path.exists():
+        raise FileNotFoundError(
+            f"Replay stream file referenced in manifest does not exist: {full_path}"
+        )
+
+    events: List[Dict[str, Any]] = []
+    with open(full_path, "r", encoding="utf-8") as fh:
+        for line in fh:
+            stripped = line.strip()
+            if not stripped:
+                continue
+            events.append(json.loads(stripped))
+
+    return events

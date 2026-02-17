@@ -408,6 +408,15 @@
       "event_type": "DecisionInputRequested",
       "notes": "DecisionInputRequestedPayload missing required question field",
       "min_version": "2.3.0"
+    },
+    {
+      "id": "mission-next-replay-full-lifecycle",
+      "path": "mission_next/replay/full_lifecycle.jsonl",
+      "expected_result": "valid",
+      "event_type": "MissionNextReplay",
+      "fixture_type": "replay_stream",
+      "notes": "Full 8-event mission-next lifecycle replay stream. Each line is a complete Event envelope.",
+      "min_version": "2.3.1"
     }
   ]
 }

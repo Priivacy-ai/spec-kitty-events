@@ -3,7 +3,7 @@
 Event log library with Lamport clocks, CRDT merge, and canonical event contracts for distributed
 systems.
 
-**Version**: 2.3.0 | **SCHEMA_VERSION**: 2.0.0 | **Python**: >= 3.10
+**Version**: 2.3.1 | **SCHEMA_VERSION**: 2.0.0 | **Python**: >= 3.10
 
 ## Features
 

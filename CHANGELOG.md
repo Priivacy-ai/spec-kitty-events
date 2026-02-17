@@ -5,6 +5,26 @@ All notable changes to spec-kitty-events will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.3.1] - 2026-02-17
+
+### Added
+
+- **Canonical replay fixture stream**: `full_lifecycle.jsonl` in
+  `conformance/fixtures/mission_next/replay/` -- 8-event JSONL stream covering
+  the full mission-next lifecycle. Each line is a complete `Event` envelope.
+  Consumers replay through projections for integration testing.
+- `load_replay_stream()` in `spec_kitty_events.conformance` for programmatic
+  replay fixture access.
+
+### Fixed
+
+- **First tagged release with mission-next contracts**: v2.3.0 was committed
+  but never tagged. This release (v2.3.1) is the first tagged release shipping
+  the mission-next reducer with all three correctness guards:
+  - Lifecycle `MissionCompleted` alias collision rejected via payload validation
+  - `run_id` consistency enforced on all post-start events
+  - Malformed payloads converted to anomalies (no reducer crash)
+
 ## [2.3.0] - 2026-02-17
 
 ### Added
@@ -223,6 +243,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+[2.3.1]: https://github.com/Priivacy-ai/spec-kitty-events/compare/v2.3.0...v2.3.1
+[2.3.0]: https://github.com/Priivacy-ai/spec-kitty-events/compare/v2.2.0...v2.3.0
 [2.2.0]: https://github.com/Priivacy-ai/spec-kitty-events/compare/v2.1.0...v2.2.0
 [2.1.0]: https://github.com/Priivacy-ai/spec-kitty-events/compare/v2.0.0rc1...v2.1.0
 [2.0.0rc1]: https://github.com/Priivacy-ai/spec-kitty-events/compare/v0.4.0-alpha...v2.0.0rc1

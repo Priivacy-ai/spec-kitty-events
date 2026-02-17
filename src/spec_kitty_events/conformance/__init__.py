@@ -5,6 +5,7 @@ Run: pytest --pyargs spec_kitty_events.conformance
 from spec_kitty_events.conformance.loader import (
     FixtureCase,
     load_fixtures,
+    load_replay_stream,
 )
 from spec_kitty_events.conformance.pytest_helpers import (
     assert_lane_mapping,
@@ -27,5 +28,6 @@ __all__ = [
     "assert_payload_conforms",
     "assert_payload_fails",
     "load_fixtures",
+    "load_replay_stream",
     "validate_event",
 ]

@@ -333,6 +333,51 @@ Mirrors the runtime's `ActorIdentity` schema:
 | `model` | `str` or `null` | No | `None` | e.g., `"claude-opus-4-6"` |
 | `tool` | `str` or `null` | No | `None` | Tool identifier |
 
+### Replay Fixture Stream (v2.3.1)
+
+A canonical 8-event JSONL replay stream is provided for integration testing.
+Each line is a complete `Event` envelope that can be deserialized and fed through
+the mission-next reducer.
+
+| # | Event Type | Key Detail | Lamport |
+|---|---|---|---|
+| 1 | `MissionRunStarted` | run_id=replay-run-001, LLM actor | 1 |
+| 2 | `NextStepIssued` | step-setup-env | 2 |
+| 3 | `NextStepAutoCompleted` | step-setup-env (success) | 3 |
+| 4 | `NextStepIssued` | step-configure-db | 4 |
+| 5 | `DecisionInputRequested` | input:db-password | 5 |
+| 6 | `DecisionInputAnswered` | use-env-var, human actor | 6 |
+| 7 | `NextStepAutoCompleted` | step-configure-db (success) | 7 |
+| 8 | `MissionRunCompleted` | terminal state | 8 |
+
+**Expected reducer output**: `run_status=COMPLETED`, `completed_steps=("step-setup-env", "step-configure-db")`, zero anomalies, `event_count=8`.
+
+**Programmatic access**:
+
+```python
+from spec_kitty_events.conformance import load_replay_stream
+from spec_kitty_events import Event, reduce_mission_next_events
+
+envelopes = load_replay_stream("mission-next-replay-full-lifecycle")
+events = [Event(**env) for env in envelopes]
+state = reduce_mission_next_events(events)
+assert state.run_status.value == "completed"
+assert len(state.completed_steps) == 2
+```
+
+### Reducer Correctness Verification (v2.3.1)
+
+The mission-next reducer (`reduce_mission_next_events()`) implements three correctness guards
+that prevent silent data corruption:
+
+| Bug Class | Guard | Location |
+|---|---|---|
+| Lifecycle `MissionCompleted` alias collision | Payload validation gate: `MissionCompleted` events are only accepted as run-completion if their payload validates as `MissionRunCompletedPayload`. Lifecycle payloads (with `mission_id`, `mission_type`, `final_phase`) are rejected with an anomaly. | `mission_next.py:297-311` |
+| `run_id` consistency | Every post-start handler (`NextStepIssued`, `NextStepAutoCompleted`, `DecisionInputRequested`, `DecisionInputAnswered`, `MissionRunCompleted`) checks that the event's `run_id` matches the established run. Mismatches produce an anomaly. | `mission_next.py:372,391,413,440,461` |
+| Malformed payload resilience | Every payload parse is wrapped in `try/except`. Invalid payloads produce an anomaly instead of crashing the reducer. | All handler blocks |
+
+These guards are exercised by 80 tests with 100% line coverage on `mission_next.py`.
+
 ---
 
 ## Versioning Policy

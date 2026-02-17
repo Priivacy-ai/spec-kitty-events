@@ -4,8 +4,13 @@ from __future__ import annotations
 
 import pytest
 
-from spec_kitty_events.conformance.loader import load_fixtures
+from spec_kitty_events.conformance.loader import load_fixtures, load_replay_stream
 from spec_kitty_events.conformance.validators import validate_event
+from spec_kitty_events.mission_next import (
+    MissionRunStatus,
+    reduce_mission_next_events,
+)
+from spec_kitty_events.models import Event
 
 
 class TestMissionNextConformanceValid:
@@ -96,3 +101,42 @@ class TestMissionCompletedAliasConformance:
         }
         result = validate_event(payload, "MissionRunCompleted")
         assert result.valid, f"Violations: {result.model_violations}"
+
+
+class TestMissionNextReplayFixture:
+    """Tests for the canonical replay fixture stream."""
+
+    def test_replay_full_lifecycle(self) -> None:
+        """Load stream, reduce through mission-next reducer, assert expected state."""
+        envelopes = load_replay_stream("mission-next-replay-full-lifecycle")
+        events = [Event(**env) for env in envelopes]
+        state = reduce_mission_next_events(events)
+
+        assert state.run_id == "replay-run-001"
+        assert state.mission_key == "replay-mission"
+        assert state.run_status == MissionRunStatus.COMPLETED
+        assert state.completed_steps == ("step-setup-env", "step-configure-db")
+        assert state.anomalies == ()
+        assert state.event_count == 8
+
+    def test_replay_events_individually_valid(self) -> None:
+        """Each envelope deserializes as valid Event with correct metadata."""
+        envelopes = load_replay_stream("mission-next-replay-full-lifecycle")
+        correlation_id: str | None = None
+
+        for i, env in enumerate(envelopes):
+            event = Event(**env)
+            assert event.lamport_clock == i + 1
+            if correlation_id is None:
+                correlation_id = event.correlation_id
+            else:
+                assert event.correlation_id == correlation_id
+
+    def test_replay_causal_chain(self) -> None:
+        """First event has no cause; each subsequent event's causation_id is the previous event_id."""
+        envelopes = load_replay_stream("mission-next-replay-full-lifecycle")
+        events = [Event(**env) for env in envelopes]
+
+        assert events[0].causation_id is None
+        for i in range(1, len(events)):
+            assert events[i].causation_id == events[i - 1].event_id

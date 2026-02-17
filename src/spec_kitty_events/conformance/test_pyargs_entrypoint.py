@@ -29,8 +29,12 @@ _MANIFEST: Dict[str, Any] = json.loads(
 
 
 def _event_fixture_entries() -> List[Dict[str, Any]]:
-    """Return manifest entries that are event-type fixtures (not LaneMapping)."""
-    return [f for f in _MANIFEST["fixtures"] if f["event_type"] != "LaneMapping"]
+    """Return manifest entries that are event-type fixtures (not LaneMapping or replay streams)."""
+    return [
+        f for f in _MANIFEST["fixtures"]
+        if f["event_type"] != "LaneMapping"
+        and f.get("fixture_type") != "replay_stream"
+    ]
 
 
 def _event_fixture_ids() -> List[str]:
