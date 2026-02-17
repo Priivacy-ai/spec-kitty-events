@@ -12,11 +12,12 @@ _UUID_HYPHEN_RE = re.compile(
     re.IGNORECASE,
 )
 _UUID_BARE_RE = re.compile(r"^[0-9a-f]{32}$", re.IGNORECASE)
+_ULID_RE = re.compile(r"^[0-9A-HJKMNP-TV-Z]{26}$", re.IGNORECASE)
 
 # JSON Schema pattern accepting all 3 inbound formats:
-# 26-char (ULID, any charset), 32-char hex (bare UUID), 36-char hyphenated UUID
+# 26-char Crockford base32 ULID, 32-char hex (bare UUID), 36-char hyphenated UUID
 _EVENT_ID_PATTERN = (
-    r"^.{26}$"
+    r"^[0-9A-HJKMNP-TV-Za-hjkmnp-tv-z]{26}$"
     r"|^[0-9a-fA-F]{32}$"
     r"|^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
 )
@@ -26,7 +27,7 @@ def normalize_event_id(v: object) -> str:
     """Normalize an event ID to canonical form.
 
     Accepts:
-    - 26-char strings — passed through unchanged (any charset)
+    - 26-char Crockford base32 ULIDs — uppercased to canonical form
     - 36-char hyphenated UUIDs — lowercased to canonical form
     - 32-char bare hex UUIDs — hyphenated and lowercased
 
@@ -39,14 +40,19 @@ def normalize_event_id(v: object) -> str:
             f"event_id must be a string; got {type(v).__name__}"
         )
     if len(v) == 26:
-        return v
+        if not _ULID_RE.match(v):
+            raise ValueError(
+                f"26-char event_id must be valid Crockford base32 "
+                f"(chars I, L, O, U are not allowed); got {v!r}"
+            )
+        return v.upper()
     if len(v) == 36 and _UUID_HYPHEN_RE.match(v):
         return v.lower()
     if len(v) == 32 and _UUID_BARE_RE.match(v):
         h = v.lower()
         return f"{h[:8]}-{h[8:12]}-{h[12:16]}-{h[16:20]}-{h[20:]}"
     raise ValueError(
-        f"event_id must be 26 chars (ULID), 36-char UUID, "
+        f"event_id must be 26-char ULID (Crockford base32), 36-char UUID, "
         f"or 32-char hex UUID; got {len(v)} chars"
     )
 

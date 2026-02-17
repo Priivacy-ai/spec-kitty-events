@@ -602,14 +602,24 @@ class TestEventIdFormats:
         return Event(**defaults)
 
     def test_ulid_format_accepted(self) -> None:
-        """26-char ULID passes unchanged."""
+        """26-char ULID uppercased to canonical form."""
         event = self._make_event(event_id="01ARZ3NDEKTSV4RRFFQ69G5FAV")
         assert event.event_id == "01ARZ3NDEKTSV4RRFFQ69G5FAV"
 
-    def test_26char_non_crockford_accepted(self) -> None:
-        """26-char string with lowercase/non-Base32 chars passes (backward compat)."""
-        event = self._make_event(event_id="abcdefghijklmnopqrstuvwxyz")
-        assert event.event_id == "abcdefghijklmnopqrstuvwxyz"
+    def test_ulid_lowercase_uppercased(self) -> None:
+        """Lowercase ULID uppercased to canonical form."""
+        event = self._make_event(event_id="01arz3ndektsv4rrffq69g5fav")
+        assert event.event_id == "01ARZ3NDEKTSV4RRFFQ69G5FAV"
+
+    def test_ulid_mixed_case_uppercased(self) -> None:
+        """Mixed-case ULID uppercased to canonical form."""
+        event = self._make_event(event_id="01Arz3NdEkTsV4RrFfQ69G5FaV")
+        assert event.event_id == "01ARZ3NDEKTSV4RRFFQ69G5FAV"
+
+    def test_26char_non_crockford_rejected(self) -> None:
+        """26-char string with invalid Crockford chars (I, L, O, U) rejected."""
+        with pytest.raises(PydanticValidationError):
+            self._make_event(event_id="abcdefghijklmnopqrstuvwxyz")
 
     def test_uuid_hyphenated_accepted(self) -> None:
         """36-char hyphenated UUID accepted, lowercased."""
@@ -662,9 +672,16 @@ class TestEventIdFormats:
 
     def test_normalize_event_id_function(self) -> None:
         """normalize_event_id works as a standalone function."""
+        # ULID uppercased
         assert normalize_event_id("01ARZ3NDEKTSV4RRFFQ69G5FAV") == "01ARZ3NDEKTSV4RRFFQ69G5FAV"
+        assert normalize_event_id("01arz3ndektsv4rrffq69g5fav") == "01ARZ3NDEKTSV4RRFFQ69G5FAV"
+        # UUID paths unchanged
         assert normalize_event_id("550E8400E29B41D4A716446655440000") == "550e8400-e29b-41d4-a716-446655440000"
         assert normalize_event_id("550e8400-e29b-41d4-a716-446655440000") == "550e8400-e29b-41d4-a716-446655440000"
+        # Invalid Crockford rejected
+        with pytest.raises(ValueError, match="Crockford"):
+            normalize_event_id("abcdefghijklmnopqrstuvwxyz")
+        # Invalid length rejected
         with pytest.raises(ValueError):
             normalize_event_id("too-short")
 
@@ -688,3 +705,20 @@ class TestEventIdFormats:
         """normalize_event_id raises ValueError (not TypeError) for non-strings."""
         with pytest.raises(ValueError, match="must be a string"):
             normalize_event_id(123)  # type: ignore[arg-type]
+
+    @pytest.mark.parametrize("bad_char", ["I", "L", "O", "U"])
+    def test_ulid_invalid_crockford_chars_rejected(self, bad_char: str) -> None:
+        """26-char strings with invalid Crockford chars I, L, O, U rejected."""
+        # Replace first alpha char in a valid ULID with an invalid char
+        bad_id = f"01ARZ3NDEKTSV4RRFFQ69G5FA{bad_char}"
+        with pytest.raises(PydanticValidationError):
+            self._make_event(event_id=bad_id)
+
+    def test_normalize_event_id_crockford_error_message(self) -> None:
+        """Error message for invalid Crockford mentions the constraint."""
+        with pytest.raises(ValueError, match="Crockford base32"):
+            normalize_event_id("abcdefghijklmnopqrstuvwxyz")
+
+    def test_normalize_event_id_ulid_uppercased(self) -> None:
+        """normalize_event_id uppercases valid Crockford ULIDs."""
+        assert normalize_event_id("01arz3ndektsv4rrffq69g5fav") == "01ARZ3NDEKTSV4RRFFQ69G5FAV"

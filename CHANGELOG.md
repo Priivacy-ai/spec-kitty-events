@@ -5,6 +5,25 @@ All notable changes to spec-kitty-events will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.0] - 2026-02-17
+
+### Added
+
+- **UUID event ID acceptance** (backward-compatible): Envelope fields (`event_id`,
+  `causation_id`, `correlation_id`) now accept ULID (26-char Crockford base32),
+  hyphenated UUID (36-char), and bare hex UUID (32-char).
+- `normalize_event_id()` public function for canonical ID normalization.
+  Exported in `__init__.py`.
+- JSON Schema patterns widened for all 3 inbound formats with strict Crockford
+  base32 validation for ULIDs.
+- 2 new conformance fixtures: `event-uuid-hyphenated`, `event-uuid-bare`.
+
+### Changed
+
+- **ULID canonicalization**: 26-char ULID IDs are now uppercased to canonical form
+  and validated against Crockford base32 charset (I, L, O, U rejected).
+- **UUID canonicalization**: UUID IDs lowercased to canonical hyphenated form.
+
 ## [2.1.0] - 2026-02-15
 
 ### Added
@@ -180,6 +199,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+[2.2.0]: https://github.com/Priivacy-ai/spec-kitty-events/compare/v2.1.0...v2.2.0
 [2.1.0]: https://github.com/Priivacy-ai/spec-kitty-events/compare/v2.0.0rc1...v2.1.0
 [2.0.0rc1]: https://github.com/Priivacy-ai/spec-kitty-events/compare/v0.4.0-alpha...v2.0.0rc1
 [0.4.0-alpha]: https://github.com/Priivacy-ai/spec-kitty-events/compare/v0.3.0-alpha...v0.4.0-alpha
