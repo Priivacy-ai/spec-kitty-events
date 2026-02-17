@@ -13,7 +13,7 @@ Example:
     1
 """
 
-__version__ = "2.2.0"
+__version__ = "2.3.0"
 
 # Core data models
 from spec_kitty_events.models import (
@@ -185,6 +185,31 @@ from spec_kitty_events.glossary import (
     reduce_glossary_events,
 )
 
+# Mission-next runtime contracts
+from spec_kitty_events.mission_next import (
+    MISSION_RUN_STARTED,
+    NEXT_STEP_PLANNED,
+    NEXT_STEP_ISSUED,
+    NEXT_STEP_AUTO_COMPLETED,
+    DECISION_INPUT_REQUESTED,
+    DECISION_INPUT_ANSWERED,
+    MISSION_RUN_COMPLETED,
+    _COMPLETION_ALIAS,
+    MISSION_NEXT_EVENT_TYPES,
+    MissionRunStatus,
+    TERMINAL_RUN_STATUSES,
+    RuntimeActorIdentity,
+    MissionRunStartedPayload,
+    NextStepIssuedPayload,
+    NextStepAutoCompletedPayload,
+    DecisionInputRequestedPayload,
+    DecisionInputAnsweredPayload,
+    MissionRunCompletedPayload,
+    MissionNextAnomaly,
+    ReducedMissionRunState,
+    reduce_mission_next_events,
+)
+
 # Public API (controls what's exported with "from spec_kitty_events import *")
 __all__ = [
     # Version
@@ -327,4 +352,26 @@ __all__ = [
     "ClarificationRecord",
     "ReducedGlossaryState",
     "reduce_glossary_events",
+    # Mission-next runtime contracts
+    "MISSION_RUN_STARTED",
+    "NEXT_STEP_PLANNED",
+    "NEXT_STEP_ISSUED",
+    "NEXT_STEP_AUTO_COMPLETED",
+    "DECISION_INPUT_REQUESTED",
+    "DECISION_INPUT_ANSWERED",
+    "MISSION_RUN_COMPLETED",
+    "_COMPLETION_ALIAS",
+    "MISSION_NEXT_EVENT_TYPES",
+    "MissionRunStatus",
+    "TERMINAL_RUN_STATUSES",
+    "RuntimeActorIdentity",
+    "MissionRunStartedPayload",
+    "NextStepIssuedPayload",
+    "NextStepAutoCompletedPayload",
+    "DecisionInputRequestedPayload",
+    "DecisionInputAnsweredPayload",
+    "MissionRunCompletedPayload",
+    "MissionNextAnomaly",
+    "ReducedMissionRunState",
+    "reduce_mission_next_events",
 ]

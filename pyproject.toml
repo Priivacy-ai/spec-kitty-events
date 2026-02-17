@@ -1,6 +1,6 @@
 [project]
 name = "spec-kitty-events"
-version = "2.2.0"
+version = "2.3.0"
 description = "Event log library with Lamport clocks and systematic error tracking"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -46,6 +46,8 @@ spec_kitty_events = [
     "conformance/fixtures/collaboration/invalid/*.json",
     "conformance/fixtures/glossary/valid/*.json",
     "conformance/fixtures/glossary/invalid/*.json",
+    "conformance/fixtures/mission_next/valid/*.json",
+    "conformance/fixtures/mission_next/invalid/*.json",
 ]
 
 [tool.pytest.ini_options]

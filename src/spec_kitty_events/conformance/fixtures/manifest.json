@@ -336,6 +336,78 @@
       "event_type": "Event",
       "notes": "Event with bare UUID event_id (32-char hex, normalized by model)",
       "min_version": "2.2.0"
+    },
+    {
+      "id": "mission-next-run-started-valid",
+      "path": "mission_next/valid/mission_run_started.json",
+      "expected_result": "valid",
+      "event_type": "MissionRunStarted",
+      "notes": "Valid MissionRunStartedPayload with LLM actor",
+      "min_version": "2.3.0"
+    },
+    {
+      "id": "mission-next-step-issued-valid",
+      "path": "mission_next/valid/next_step_issued.json",
+      "expected_result": "valid",
+      "event_type": "NextStepIssued",
+      "notes": "Valid NextStepIssuedPayload with step and agent IDs",
+      "min_version": "2.3.0"
+    },
+    {
+      "id": "mission-next-step-auto-completed-valid",
+      "path": "mission_next/valid/next_step_auto_completed.json",
+      "expected_result": "valid",
+      "event_type": "NextStepAutoCompleted",
+      "notes": "Valid NextStepAutoCompletedPayload with success result",
+      "min_version": "2.3.0"
+    },
+    {
+      "id": "mission-next-decision-requested-valid",
+      "path": "mission_next/valid/decision_input_requested.json",
+      "expected_result": "valid",
+      "event_type": "DecisionInputRequested",
+      "notes": "Valid DecisionInputRequestedPayload with input-keyed decision",
+      "min_version": "2.3.0"
+    },
+    {
+      "id": "mission-next-decision-answered-valid",
+      "path": "mission_next/valid/decision_input_answered.json",
+      "expected_result": "valid",
+      "event_type": "DecisionInputAnswered",
+      "notes": "Valid DecisionInputAnsweredPayload with human actor",
+      "min_version": "2.3.0"
+    },
+    {
+      "id": "mission-next-run-completed-valid",
+      "path": "mission_next/valid/mission_run_completed.json",
+      "expected_result": "valid",
+      "event_type": "MissionRunCompleted",
+      "notes": "Valid MissionRunCompletedPayload with LLM actor",
+      "min_version": "2.3.0"
+    },
+    {
+      "id": "mission-next-run-started-missing-run-id",
+      "path": "mission_next/invalid/mission_run_started_missing_run_id.json",
+      "expected_result": "invalid",
+      "event_type": "MissionRunStarted",
+      "notes": "MissionRunStartedPayload missing required run_id field",
+      "min_version": "2.3.0"
+    },
+    {
+      "id": "mission-next-step-issued-missing-step-id",
+      "path": "mission_next/invalid/next_step_issued_missing_step_id.json",
+      "expected_result": "invalid",
+      "event_type": "NextStepIssued",
+      "notes": "NextStepIssuedPayload missing required step_id field",
+      "min_version": "2.3.0"
+    },
+    {
+      "id": "mission-next-decision-requested-missing-question",
+      "path": "mission_next/invalid/decision_input_requested_missing_question.json",
+      "expected_result": "invalid",
+      "event_type": "DecisionInputRequested",
+      "notes": "DecisionInputRequestedPayload missing required question field",
+      "min_version": "2.3.0"
     }
   ]
 }

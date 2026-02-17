@@ -51,6 +51,14 @@ from spec_kitty_events.glossary import (
     GenerationBlockedBySemanticConflictPayload,
     GlossaryStrictnessSetPayload,
 )
+from spec_kitty_events.mission_next import (
+    MissionRunStartedPayload,
+    NextStepIssuedPayload,
+    NextStepAutoCompletedPayload,
+    DecisionInputRequestedPayload,
+    DecisionInputAnsweredPayload,
+    MissionRunCompletedPayload,
+)
 
 
 @dataclass(frozen=True)
@@ -120,6 +128,13 @@ _EVENT_TYPE_TO_MODEL: Dict[str, Type[Any]] = {
     "GlossarySenseUpdated": GlossarySenseUpdatedPayload,
     "GenerationBlockedBySemanticConflict": GenerationBlockedBySemanticConflictPayload,
     "GlossaryStrictnessSet": GlossaryStrictnessSetPayload,
+    # Mission-next runtime contracts
+    "MissionRunStarted": MissionRunStartedPayload,
+    "NextStepIssued": NextStepIssuedPayload,
+    "NextStepAutoCompleted": NextStepAutoCompletedPayload,
+    "DecisionInputRequested": DecisionInputRequestedPayload,
+    "DecisionInputAnswered": DecisionInputAnsweredPayload,
+    "MissionRunCompleted": MissionRunCompletedPayload,
 }
 
 # Event type to JSON Schema name mapping (used with load_schema())
@@ -157,6 +172,13 @@ _EVENT_TYPE_TO_SCHEMA: Dict[str, str] = {
     "GlossarySenseUpdated": "glossary_sense_updated_payload",
     "GenerationBlockedBySemanticConflict": "generation_blocked_by_semantic_conflict_payload",
     "GlossaryStrictnessSet": "glossary_strictness_set_payload",
+    # Mission-next runtime contracts
+    "MissionRunStarted": "mission_run_started_payload",
+    "NextStepIssued": "next_step_issued_payload",
+    "NextStepAutoCompleted": "next_step_auto_completed_payload",
+    "DecisionInputRequested": "decision_input_requested_payload",
+    "DecisionInputAnswered": "decision_input_answered_payload",
+    "MissionRunCompleted": "mission_run_completed_payload",
 }
 
 

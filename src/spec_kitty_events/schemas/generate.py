@@ -58,6 +58,15 @@ from spec_kitty_events.glossary import (
     GlossaryClarificationResolvedPayload,
     GenerationBlockedBySemanticConflictPayload,
 )
+from spec_kitty_events.mission_next import (
+    RuntimeActorIdentity,
+    MissionRunStartedPayload,
+    NextStepIssuedPayload,
+    NextStepAutoCompletedPayload,
+    DecisionInputRequestedPayload,
+    DecisionInputAnsweredPayload,
+    MissionRunCompletedPayload,
+)
 
 
 # Schema directory (same directory as this script)
@@ -103,6 +112,14 @@ PYDANTIC_MODELS: List[tuple[str, Type[BaseModel]]] = [
     ("glossary_clarification_requested_payload", GlossaryClarificationRequestedPayload),
     ("glossary_clarification_resolved_payload", GlossaryClarificationResolvedPayload),
     ("generation_blocked_by_semantic_conflict_payload", GenerationBlockedBySemanticConflictPayload),
+    # Mission-next runtime models
+    ("runtime_actor_identity", RuntimeActorIdentity),
+    ("mission_run_started_payload", MissionRunStartedPayload),
+    ("next_step_issued_payload", NextStepIssuedPayload),
+    ("next_step_auto_completed_payload", NextStepAutoCompletedPayload),
+    ("decision_input_requested_payload", DecisionInputRequestedPayload),
+    ("decision_input_answered_payload", DecisionInputAnsweredPayload),
+    ("mission_run_completed_payload", MissionRunCompletedPayload),
 ]
 
 # Enums (use TypeAdapter)

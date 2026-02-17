@@ -5,6 +5,30 @@ All notable changes to spec-kitty-events will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.3.0] - 2026-02-17
+
+### Added
+
+- **Mission-next runtime contracts**: 7 event type constants (`MissionRunStarted`,
+  `NextStepPlanned`, `NextStepIssued`, `NextStepAutoCompleted`,
+  `DecisionInputRequested`, `DecisionInputAnswered`, `MissionRunCompleted`)
+  and `MISSION_NEXT_EVENT_TYPES` frozenset.
+- `RuntimeActorIdentity` value object mirroring the runtime's `ActorIdentity`
+  schema (human, llm, service actor types with provider/model/tool metadata).
+- 6 typed payload models for run-scoped mission execution events.
+- `MissionRunStatus` enum (`RUNNING`, `COMPLETED`) with `TERMINAL_RUN_STATUSES`.
+- `MissionNextAnomaly` and `ReducedMissionRunState` reducer output models.
+- `reduce_mission_next_events()` — deterministic reducer for mission run state
+  materialization with step tracking, decision lifecycle, and anomaly detection.
+- Compatibility alias — `"MissionCompleted"` accepted as `"MissionRunCompleted"`
+  for run-scoped events during migration window.
+- `NextStepPlanned` reserved constant (payload contract deferred until runtime emits).
+- 7 new JSON Schema files for mission-next models (44 total).
+- 9 conformance payload fixtures (6 valid, 3 invalid) in `mission_next/` category.
+- Hypothesis property tests for reducer determinism (200 permutations) and
+  idempotent dedup (100 examples).
+- 22 new exports (total package exports: 126).
+
 ## [2.2.0] - 2026-02-17
 
 ### Added

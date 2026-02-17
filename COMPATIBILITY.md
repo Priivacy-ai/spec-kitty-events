@@ -9,6 +9,7 @@ per event type, versioning policy, and CI integration steps.
 - [Lane Mapping Contract](#lane-mapping-contract)
 - [Event Type Field Reference](#event-type-field-reference)
 - [Collaboration Event Contracts](#collaboration-event-contracts)
+- [Mission-Next Runtime Contracts](#mission-next-runtime-contracts)
 - [Versioning Policy](#versioning-policy)
 - [Migration Guide (0.x to 2.0.0)](#migration-guide-0x-to-200)
 - [Consumer CI Integration](#consumer-ci-integration)
@@ -281,6 +282,56 @@ The collaboration model uses **advisory warnings**, not hard locks:
   - SaaS backend fallback inference that detects conflicts from the event stream
 - **Soft coordination**: The system provides visibility into potential conflicts but does not
   enforce resolution. Participants retain full autonomy over their actions.
+
+---
+
+## Mission-Next Runtime Contracts
+
+Added in **2.3.0**. These contracts define typed payloads for run-scoped mission execution events
+emitted by the spec-kitty-runtime engine.
+
+### Event Type Reference
+
+| Event Type | Payload Model | Description |
+|---|---|---|
+| `MissionRunStarted` | `MissionRunStartedPayload` | Run initiated with actor identity |
+| `NextStepIssued` | `NextStepIssuedPayload` | Step dispatched to an agent |
+| `NextStepAutoCompleted` | `NextStepAutoCompletedPayload` | Step completed with result |
+| `DecisionInputRequested` | `DecisionInputRequestedPayload` | Decision required from user/service |
+| `DecisionInputAnswered` | `DecisionInputAnsweredPayload` | Decision answered |
+| `MissionRunCompleted` | `MissionRunCompletedPayload` | Run reached terminal state |
+| `NextStepPlanned` | *(reserved — no payload)* | Reserved constant; deferred until runtime emits |
+
+### `MissionCompleted` vs `MissionRunCompleted`
+
+These are distinct event types in different domains:
+
+| Aspect | Lifecycle `MissionCompleted` | Mission-Next `MissionRunCompleted` |
+|---|---|---|
+| Module | `lifecycle.py` | `mission_next.py` |
+| Scope | Mission-level (all phases done) | Run-level (single execution) |
+| Payload | `MissionCompletedPayload` (mission_id, mission_type, final_phase, actor) | `MissionRunCompletedPayload` (run_id, mission_key, actor) |
+| Key field | `mission_id` (str) | `run_id` (str) |
+| Actor type | `str` | `RuntimeActorIdentity` (structured) |
+
+**Migration note**: The runtime currently emits `"MissionCompleted"` as the event_type for run
+completion (in `engine.py:309`). During the compatibility window, the mission-next reducer accepts
+`"MissionCompleted"` as an alias for `"MissionRunCompleted"` when processing run-scoped events.
+The conformance validator continues to map `"MissionCompleted"` to the lifecycle
+`MissionCompletedPayload` for validation purposes.
+
+### RuntimeActorIdentity
+
+Mirrors the runtime's `ActorIdentity` schema:
+
+| Field | Type | Required | Default | Description |
+|---|---|---|---|---|
+| `actor_id` | `str` | Yes | — | Unique actor identifier |
+| `actor_type` | `"human"` / `"llm"` / `"service"` | Yes | — | Actor category |
+| `display_name` | `str` | No | `""` | Human-readable name |
+| `provider` | `str` or `null` | No | `None` | e.g., `"anthropic"`, `"openai"` |
+| `model` | `str` or `null` | No | `None` | e.g., `"claude-opus-4-6"` |
+| `tool` | `str` or `null` | No | `None` | Tool identifier |
 
 ---
 
