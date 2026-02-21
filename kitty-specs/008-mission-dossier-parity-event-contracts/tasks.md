@@ -87,12 +87,12 @@
 **Estimated prompt size**: ~480 lines
 
 ### Included Subtasks
-- [ ] T014 Create directory structure: `conformance/fixtures/dossier/valid/`, `.../invalid/`, `.../replay/`
-- [ ] T015 [P] Write 10 valid fixture JSON files in `dossier/valid/`
-- [ ] T016 [P] Write 3 invalid fixture JSON files in `dossier/invalid/`
-- [ ] T017 [P] Write 2 JSONL replay streams in `dossier/replay/`
-- [ ] T018 Add 13 fixture case entries + 2 replay stream entries to `manifest.json`
-- [ ] T019 Verify: `load_fixtures("dossier")` returns 13 cases; both replay streams load without error
+- [x] T014 Create directory structure: `conformance/fixtures/dossier/valid/`, `.../invalid/`, `.../replay/`
+- [x] T015 [P] Write 10 valid fixture JSON files in `dossier/valid/`
+- [x] T016 [P] Write 3 invalid fixture JSON files in `dossier/invalid/`
+- [x] T017 [P] Write 2 JSONL replay streams in `dossier/replay/`
+- [x] T018 Add 13 fixture case entries + 2 replay stream entries to `manifest.json`
+- [x] T019 Verify: `load_fixtures("dossier")` returns 13 cases; both replay streams load without error
 
 ### Implementation Notes
 - Fixture JSON files follow existing naming: `dossier_artifact_indexed_valid.json`, etc. (snake_case, mirrors manifest id with hyphens → underscores).
