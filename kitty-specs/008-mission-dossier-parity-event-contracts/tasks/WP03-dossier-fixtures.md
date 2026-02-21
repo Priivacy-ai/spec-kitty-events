@@ -1,27 +1,30 @@
 ---
-work_package_id: "WP03"
+work_package_id: WP03
+title: Dossier Fixtures
+lane: "doing"
+dependencies: [WP01]
+base_branch: 008-mission-dossier-parity-event-contracts-WP01
+base_commit: e635a19b1f84dda242d2261804d43ba36359fcd0
+created_at: '2026-02-21T14:28:15.205410+00:00'
 subtasks:
-  - "T014"
-  - "T015"
-  - "T016"
-  - "T017"
-  - "T018"
-  - "T019"
-title: "Dossier Fixtures"
-phase: "Phase 1 - Foundation"
-lane: "planned"
-assignee: ""
-agent: ""
-shell_pid: ""
-review_status: ""
-reviewed_by: ""
-dependencies: ["WP01"]
+- T014
+- T015
+- T016
+- T017
+- T018
+- T019
+phase: Phase 1 - Foundation
+assignee: ''
+agent: ''
+shell_pid: "16565"
+review_status: ''
+reviewed_by: ''
 history:
-  - timestamp: "2026-02-21T14:00:00Z"
-    lane: "planned"
-    agent: "system"
-    shell_pid: ""
-    action: "Prompt generated via /spec-kitty.tasks"
+- timestamp: '2026-02-21T14:00:00Z'
+  lane: planned
+  agent: system
+  shell_pid: ''
+  action: Prompt generated via /spec-kitty.tasks
 ---
 
 # Work Package Prompt: WP03 – Dossier Fixtures
