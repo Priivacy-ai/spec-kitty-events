@@ -157,11 +157,11 @@
 **Estimated prompt size**: ~280 lines
 
 ### Included Subtasks
-- [ ] T026 Prepend v2.4.0 section to `CHANGELOG.md` with migration notes for `spec-kitty` and `spec-kitty-saas`
-- [ ] T027 Run `python3.11 -m pytest` (full suite) and confirm all pass; run `--cov` to verify ≥98% coverage on `dossier.py`
-- [ ] T028 Run `mypy --strict src/spec_kitty_events/` and fix any remaining errors
-- [ ] T029 Run `python -m spec_kitty_events.schemas.generate --check` and verify exits 0 (no drift)
-- [ ] T030 Count exports in `__init__.py` and verify ~10 new dossier symbols are present; update version to 2.4.0 in `pyproject.toml`
+- [x] T026 Prepend v2.4.0 section to `CHANGELOG.md` with migration notes for `spec-kitty` and `spec-kitty-saas`
+- [x] T027 Run `python3.11 -m pytest` (full suite) and confirm all pass; run `--cov` to verify ≥98% coverage on `dossier.py`
+- [x] T028 Run `mypy --strict src/spec_kitty_events/` and fix any remaining errors
+- [x] T029 Run `python -m spec_kitty_events.schemas.generate --check` and verify exits 0 (no drift)
+- [x] T030 Count exports in `__init__.py` and verify ~10 new dossier symbols are present; update version to 2.4.0 in `pyproject.toml`
 
 ### Implementation Notes
 - CHANGELOG format: follow existing v2.x.y section headings. v2.4.0 section must include: Added (list all 10 new exports), Migration for spec-kitty, Migration for spec-kitty-saas (with explicit `>=2.4.0,<3.0.0` pins).
