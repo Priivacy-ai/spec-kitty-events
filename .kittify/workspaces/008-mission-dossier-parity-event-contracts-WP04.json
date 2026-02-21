@@ -1,0 +1,15 @@
+{
+  "wp_id": "WP04",
+  "feature_slug": "008-mission-dossier-parity-event-contracts",
+  "worktree_path": ".worktrees/008-mission-dossier-parity-event-contracts-WP04",
+  "branch_name": "008-mission-dossier-parity-event-contracts-WP04",
+  "base_branch": "008-mission-dossier-parity-event-contracts-WP02",
+  "base_commit": "ab00411586faffa0ed85063672b93c38b4306ba2",
+  "dependencies": [
+    "WP02",
+    "WP03"
+  ],
+  "created_at": "2026-02-21T14:40:06.104006+00:00",
+  "created_by": "implement-command",
+  "vcs_backend": "git"
+}
