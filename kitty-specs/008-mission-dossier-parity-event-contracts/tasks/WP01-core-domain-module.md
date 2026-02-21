@@ -1,7 +1,7 @@
 ---
 work_package_id: WP01
 title: Core Domain Module (dossier.py)
-lane: "for_review"
+lane: "doing"
 dependencies: []
 base_branch: main
 base_commit: 3a7bc8bb5c9aa0e4a33d99e89bf59e2a7cf37bc0
@@ -15,8 +15,8 @@ subtasks:
 - T006
 phase: Phase 1 - Foundation
 assignee: ''
-agent: "coordinator"
-shell_pid: "98594"
+agent: "codex"
+shell_pid: "2429"
 review_status: ''
 reviewed_by: ''
 history:
@@ -379,3 +379,4 @@ spec-kitty implement WP01
 - 2026-02-21T14:00:00Z – system – lane=planned – Prompt created.
 - 2026-02-21T14:14:14Z – coordinator – shell_pid=98594 – lane=doing – Assigned agent via workflow command
 - 2026-02-21T14:17:32Z – coordinator – shell_pid=98594 – lane=for_review – All subtasks done; mypy --strict passes (0 errors); dossier.py implemented with all 6 sections; 796 existing tests still pass; functional tests of reducer verified.
+- 2026-02-21T14:20:25Z – codex – shell_pid=2429 – lane=doing – Started review via workflow command
