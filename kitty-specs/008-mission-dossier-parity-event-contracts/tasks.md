@@ -17,12 +17,12 @@
 **Estimated prompt size**: ~450 lines
 
 ### Included Subtasks
-- [ ] T001 Add event type constants and `DOSSIER_EVENT_TYPES` frozenset to `dossier.py`
-- [ ] T002 Define `NamespaceMixedStreamError(ValueError)` with message carrying both namespace tuples
-- [ ] T003 [P] Define value objects: `LocalNamespaceTuple`, `ArtifactIdentity`, `ContentHashRef`, `ProvenanceRef`
-- [ ] T004 [P] Define 4 event payload models: `MissionDossierArtifactIndexedPayload`, `MissionDossierArtifactMissingPayload`, `MissionDossierSnapshotComputedPayload`, `MissionDossierParityDriftDetectedPayload`
-- [ ] T005 Define reducer output models: `ArtifactEntry`, `AnomalyEntry`, `SnapshotSummary`, `DriftRecord`, `MissionDossierState`
-- [ ] T006 Implement `reduce_mission_dossier(events)` using the filter → sort → dedup → namespace-check → fold pipeline
+- [x] T001 Add event type constants and `DOSSIER_EVENT_TYPES` frozenset to `dossier.py`
+- [x] T002 Define `NamespaceMixedStreamError(ValueError)` with message carrying both namespace tuples
+- [x] T003 [P] Define value objects: `LocalNamespaceTuple`, `ArtifactIdentity`, `ContentHashRef`, `ProvenanceRef`
+- [x] T004 [P] Define 4 event payload models: `MissionDossierArtifactIndexedPayload`, `MissionDossierArtifactMissingPayload`, `MissionDossierSnapshotComputedPayload`, `MissionDossierParityDriftDetectedPayload`
+- [x] T005 Define reducer output models: `ArtifactEntry`, `AnomalyEntry`, `SnapshotSummary`, `DriftRecord`, `MissionDossierState`
+- [x] T006 Implement `reduce_mission_dossier(events)` using the filter → sort → dedup → namespace-check → fold pipeline
 
 ### Implementation Notes
 - Follow the exact section structure from `mission_next.py` (constants, exception, value objects, payload models, reducer output models, reducer).
