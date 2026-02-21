@@ -14,7 +14,7 @@ subtasks:
 - T030
 phase: Phase 2 - Release Gate
 assignee: ''
-agent: ''
+agent: "coordinator"
 shell_pid: "41748"
 review_status: ''
 reviewed_by: ''
@@ -296,3 +296,4 @@ spec-kitty implement WP05 --base WP04
 ## Activity Log
 
 - 2026-02-21T14:00:00Z – system – lane=planned – Prompt created.
+- 2026-02-21T14:51:00Z – coordinator – shell_pid=41748 – lane=doing – Assigned agent via workflow command
