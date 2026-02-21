@@ -15,7 +15,7 @@ subtasks:
 - T006
 phase: Phase 1 - Foundation
 assignee: ''
-agent: ''
+agent: "coordinator"
 shell_pid: "98594"
 review_status: ''
 reviewed_by: ''
@@ -377,3 +377,4 @@ spec-kitty implement WP01
 ## Activity Log
 
 - 2026-02-21T14:00:00Z – system – lane=planned – Prompt created.
+- 2026-02-21T14:14:14Z – coordinator – shell_pid=98594 – lane=doing – Assigned agent via workflow command
