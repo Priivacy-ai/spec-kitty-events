@@ -1,7 +1,7 @@
 ---
 work_package_id: WP04
 title: Tests (Conformance + Reducer)
-lane: "doing"
+lane: "for_review"
 dependencies:
 - WP02
 - WP03
@@ -372,3 +372,4 @@ Coverage target: ≥98% for `src/spec_kitty_events/dossier.py`. Uncovered lines 
 
 - 2026-02-21T14:00:00Z – system – lane=planned – Prompt created.
 - 2026-02-21T14:40:06Z – coordinator – shell_pid=31414 – lane=doing – Assigned agent via workflow command
+- 2026-02-21T14:48:55Z – coordinator – shell_pid=31414 – lane=for_review – All tests pass; coverage 100% on dossier.py; 46 tests across conformance and reducer suites; Hypothesis runs 200 examples without failure
