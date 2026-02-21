@@ -1,7 +1,7 @@
 ---
 work_package_id: WP05
 title: Final Verification & Changelog
-lane: "doing"
+lane: "for_review"
 dependencies: [WP04]
 base_branch: 008-mission-dossier-parity-event-contracts-WP04
 base_commit: e445fb7bb2c1dabe66f12ede35b99932ad7d8a7e
@@ -297,3 +297,4 @@ spec-kitty implement WP05 --base WP04
 
 - 2026-02-21T14:00:00Z – system – lane=planned – Prompt created.
 - 2026-02-21T14:51:00Z – coordinator – shell_pid=41748 – lane=doing – Assigned agent via workflow command
+- 2026-02-21T14:56:21Z – coordinator – shell_pid=41748 – lane=for_review – Full suite passes (842 tests); dossier.py at 100% coverage; CHANGELOG.md v2.4.0 with Added and Migration subsections; version bumped to 2.4.0; mypy --strict clean; schema drift check passes (36 schemas up to date)
