@@ -1,7 +1,7 @@
 ---
 work_package_id: WP02
 title: Schemas & Conformance Wiring
-lane: "doing"
+lane: "for_review"
 dependencies: [WP01]
 base_branch: 008-mission-dossier-parity-event-contracts-WP01
 base_commit: e635a19b1f84dda242d2261804d43ba36359fcd0
@@ -282,3 +282,4 @@ spec-kitty implement WP02 --base WP01
 
 - 2026-02-21T14:00:00Z – system – lane=planned – Prompt created.
 - 2026-02-21T14:28:11Z – coordinator – shell_pid=16446 – lane=doing – Assigned agent via workflow command
+- 2026-02-21T14:31:34Z – coordinator – shell_pid=16446 – lane=for_review – All subtasks done; generate --check exits 0; smoke-test imports work; mypy --strict passes on 4 modified files
