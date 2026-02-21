@@ -122,12 +122,12 @@
 **Estimated prompt size**: ~480 lines
 
 ### Included Subtasks
-- [ ] T020 Create `tests/test_dossier_conformance.py`: valid fixtures pass dual-layer, invalid fixtures produce violations
-- [ ] T021 [P] Add category coverage test: `load_fixtures("dossier")` returns 13 cases; both replay streams loadable
-- [ ] T022 [P] Add round-trip schema conformance test: all valid fixtures pass both layers; all invalid produce ≥1 violation
-- [ ] T023 Create `tests/test_dossier_reducer.py`: unit tests (empty stream, happy-path, drift scenario, dedup, unknown event skip, supersedes)
-- [ ] T024 Add `NamespaceMixedStreamError` test: reducer raises on multi-namespace input; message contains both namespace values
-- [ ] T025 Add Hypothesis property test: `reduce_mission_dossier` output is identical across all causal-order-preserving permutations of the happy-path replay stream (200 examples)
+- [x] T020 Create `tests/test_dossier_conformance.py`: valid fixtures pass dual-layer, invalid fixtures produce violations
+- [x] T021 [P] Add category coverage test: `load_fixtures("dossier")` returns 13 cases; both replay streams loadable
+- [x] T022 [P] Add round-trip schema conformance test: all valid fixtures pass both layers; all invalid produce ≥1 violation
+- [x] T023 Create `tests/test_dossier_reducer.py`: unit tests (empty stream, happy-path, drift scenario, dedup, unknown event skip, supersedes)
+- [x] T024 Add `NamespaceMixedStreamError` test: reducer raises on multi-namespace input; message contains both namespace values
+- [x] T025 Add Hypothesis property test: `reduce_mission_dossier` output is identical across all causal-order-preserving permutations of the happy-path replay stream (200 examples)
 
 ### Implementation Notes
 - Follow `test_mission_next_conformance.py` and `test_mission_next_reducer.py` as structural models.
