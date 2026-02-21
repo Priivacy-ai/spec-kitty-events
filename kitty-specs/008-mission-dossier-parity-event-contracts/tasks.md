@@ -54,13 +54,13 @@
 **Estimated prompt size**: ~380 lines
 
 ### Included Subtasks
-- [ ] T007 [P] Add 8 dossier model imports to `generate.py` `PYDANTIC_MODELS` list and run generator to emit 8 `.schema.json` files
-- [ ] T008 Run `python -m spec_kitty_events.schemas.generate --check` and verify zero drift; commit schema files
-- [ ] T009 [P] Add `"dossier"` to `_VALID_CATEGORIES` frozenset in `loader.py`
-- [ ] T010 [P] Add 4 event types to `_EVENT_TYPE_TO_MODEL` and `_EVENT_TYPE_TO_SCHEMA` dicts in `validators.py`
-- [ ] T011 Add ~10 new exports to `src/spec_kitty_events/__init__.py`
-- [ ] T012 [P] Add 3 package-data globs to `pyproject.toml`
-- [ ] T013 Smoke-test: `python -c "from spec_kitty_events import MissionDossierArtifactIndexedPayload, reduce_mission_dossier, NamespaceMixedStreamError"` succeeds
+- [x] T007 [P] Add 8 dossier model imports to `generate.py` `PYDANTIC_MODELS` list and run generator to emit 8 `.schema.json` files
+- [x] T008 Run `python -m spec_kitty_events.schemas.generate --check` and verify zero drift; commit schema files
+- [x] T009 [P] Add `"dossier"` to `_VALID_CATEGORIES` frozenset in `loader.py`
+- [x] T010 [P] Add 4 event types to `_EVENT_TYPE_TO_MODEL` and `_EVENT_TYPE_TO_SCHEMA` dicts in `validators.py`
+- [x] T011 Add ~10 new exports to `src/spec_kitty_events/__init__.py`
+- [x] T012 [P] Add 3 package-data globs to `pyproject.toml`
+- [x] T013 Smoke-test: `python -c "from spec_kitty_events import MissionDossierArtifactIndexedPayload, reduce_mission_dossier, NamespaceMixedStreamError"` succeeds
 
 ### Implementation Notes
 - Schema file names follow snake_case convention: `artifact_identity.schema.json`, `content_hash_ref.schema.json`, `provenance_ref.schema.json`, `local_namespace_tuple.schema.json`, plus the 4 payload schemas.
