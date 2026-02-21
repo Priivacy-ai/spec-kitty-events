@@ -1,0 +1,9 @@
+{
+  "feature_number": "008",
+  "slug": "008-mission-dossier-parity-event-contracts",
+  "feature_slug": "008-mission-dossier-parity-event-contracts",
+  "friendly_name": "mission dossier parity event contracts",
+  "mission": "software-dev",
+  "target_branch": "2.x",
+  "created_at": "2026-02-21T13:37:15.063184+00:00"
+}
