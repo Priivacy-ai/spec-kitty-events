@@ -232,6 +232,98 @@ def test_only_dossier_events_trigger_namespace_check() -> None:
 
 
 # ---------------------------------------------------------------------------
+# P1 regression: step_id variance and malformed-first-event
+# ---------------------------------------------------------------------------
+
+
+def test_optional_step_id_variance_does_not_raise() -> None:
+    """Two events with identical 5-field namespace but different step_id must not raise.
+
+    Regression test for P1: step_id is optional context, not part of namespace
+    identity.  Events from the same mission can carry different step_id values.
+    """
+    ns_base = _make_valid_namespace_dict()
+    # Event 1: no step_id
+    event1 = _make_bare_dossier_event(
+        event_type="MissionDossierArtifactIndexed",
+        event_id="01JNRSTEPV0000000000000001",
+        lamport_clock=1,
+        payload={
+            "namespace": ns_base,
+            "artifact_id": {
+                "mission_key": "software-dev",
+                "path": "some/artifact.md",
+                "artifact_class": "input",
+            },
+            "content_ref": {"hash": "aabb0001", "algorithm": "sha256"},
+            "indexed_at": "2026-02-21T14:00:00Z",
+        },
+    )
+    # Event 2: same 5-field namespace, step_id set
+    ns_with_step = {**ns_base, "step_id": "step-02"}
+    event2 = _make_bare_dossier_event(
+        event_type="MissionDossierArtifactIndexed",
+        event_id="01JNRSTEPV0000000000000002",
+        lamport_clock=2,
+        payload={
+            "namespace": ns_with_step,
+            "artifact_id": {
+                "mission_key": "software-dev",
+                "path": "other/artifact.md",
+                "artifact_class": "output",
+            },
+            "content_ref": {"hash": "aabb0002", "algorithm": "sha256"},
+            "indexed_at": "2026-02-21T14:01:00Z",
+        },
+    )
+    # Must not raise; both events share the same logical namespace
+    state = reduce_mission_dossier([event1, event2])
+    assert state.event_count == 2
+    assert len(state.artifacts) == 2
+    assert state.namespace is not None
+
+
+def test_malformed_first_event_does_not_poison_valid_stream() -> None:
+    """A malformed first event (bad namespace) must be skipped, not poison subsequent
+    valid events.
+
+    Regression test for P1: _extract_namespace returns None for malformed events;
+    the reducer must not raise NamespaceMixedStreamError when a malformed event
+    precedes valid ones (None != real_ns was the bug).
+    """
+    ns = _make_valid_namespace_dict()
+    # First event: malformed namespace missing required fields
+    malformed_event = _make_bare_dossier_event(
+        event_type="MissionDossierArtifactIndexed",
+        event_id="01JNRC0BAD0000000000000001",
+        lamport_clock=1,
+        payload={"namespace": {"bad_key": "no_required_fields"}},
+    )
+    # Second event: fully valid
+    valid_event = _make_bare_dossier_event(
+        event_type="MissionDossierArtifactIndexed",
+        event_id="01JNRC0BAD0000000000000002",
+        lamport_clock=2,
+        payload={
+            "namespace": ns,
+            "artifact_id": {
+                "mission_key": "software-dev",
+                "path": "some/artifact.md",
+                "artifact_class": "input",
+            },
+            "content_ref": {"hash": "aabb1234", "algorithm": "sha256"},
+            "indexed_at": "2026-02-21T14:00:00Z",
+        },
+    )
+    # Must not raise; malformed event skipped, valid event processed
+    state = reduce_mission_dossier([malformed_event, valid_event])
+    assert state.event_count == 2  # both pass filter + dedup
+    assert len(state.artifacts) == 1  # malformed payload skipped in fold
+    assert state.namespace is not None
+    assert state.namespace.feature_slug == "008-mission-dossier-parity-event-contracts"
+
+
+# ---------------------------------------------------------------------------
 # T025: Hypothesis property test — reducer determinism across permutations
 # ---------------------------------------------------------------------------
 

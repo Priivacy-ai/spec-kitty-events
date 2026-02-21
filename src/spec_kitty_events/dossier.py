@@ -269,6 +269,22 @@ def _extract_namespace(event: Event) -> Optional[LocalNamespaceTuple]:
         return None
 
 
+def _namespace_key(ns: LocalNamespaceTuple) -> Tuple[str, str, str, str, str]:
+    """Return the 5-field identity key, excluding optional step_id.
+
+    step_id is optional context within a namespace — the same mission stream
+    can have events with different step_id values without constituting a
+    namespace mismatch.
+    """
+    return (
+        ns.project_uuid,
+        ns.feature_slug,
+        ns.target_branch,
+        ns.mission_key,
+        ns.manifest_version,
+    )
+
+
 def reduce_mission_dossier(events: Sequence[Event]) -> MissionDossierState:
     """Fold dossier events into deterministic MissionDossierState.
 
@@ -276,7 +292,9 @@ def reduce_mission_dossier(events: Sequence[Event]) -> MissionDossierState:
     1. Filter to DOSSIER_EVENT_TYPES
     2. Sort by (lamport_clock, timestamp, event_id) via status_event_sort_key
     3. Deduplicate by event_id via dedup_events
-    4. Validate namespace consistency — raise NamespaceMixedStreamError on mismatch
+    4. Validate namespace consistency (5-field key; step_id excluded) —
+       raise NamespaceMixedStreamError on mismatch; skip events with
+       malformed/missing namespace (they will also be skipped in fold)
     5. Fold each event into mutable intermediates
     6. Assemble and return frozen MissionDossierState
 
@@ -299,17 +317,25 @@ def reduce_mission_dossier(events: Sequence[Event]) -> MissionDossierState:
     unique_events = dedup_events(sorted_events)
 
     # 4. Validate single-namespace invariant
-    first_namespace = _extract_namespace(unique_events[0])
-    for ev in unique_events[1:]:
+    # Events with None namespace are malformed — skip them here; the fold loop
+    # will also skip them via try/except.  Compare using the 5-field key so
+    # that optional step_id variance does not falsely trigger a mismatch.
+    canonical_ns: Optional[LocalNamespaceTuple] = None
+    for ev in unique_events:
         ns = _extract_namespace(ev)
-        if ns != first_namespace:
+        if ns is None:
+            continue
+        if canonical_ns is None:
+            canonical_ns = ns
+            continue
+        if _namespace_key(ns) != _namespace_key(canonical_ns):
             raise NamespaceMixedStreamError(
                 f"Namespace mismatch in dossier event stream. "
-                f"Expected: {first_namespace!r}. Got: {ns!r}."
+                f"Expected: {canonical_ns!r}. Got: {ns!r}."
             )
 
     # 5. Fold events into mutable intermediates
-    namespace = first_namespace
+    namespace = canonical_ns
     artifacts: Dict[str, ArtifactEntry] = {}
     anomalies: List[AnomalyEntry] = []
     latest_snapshot: Optional[SnapshotSummary] = None
