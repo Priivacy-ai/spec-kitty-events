@@ -17,7 +17,7 @@ subtasks:
 - T025
 phase: Phase 2 - Validation
 assignee: ''
-agent: ''
+agent: "coordinator"
 shell_pid: "31414"
 review_status: ''
 reviewed_by: ''
@@ -371,3 +371,4 @@ Coverage target: ≥98% for `src/spec_kitty_events/dossier.py`. Uncovered lines 
 ## Activity Log
 
 - 2026-02-21T14:00:00Z – system – lane=planned – Prompt created.
+- 2026-02-21T14:40:06Z – coordinator – shell_pid=31414 – lane=doing – Assigned agent via workflow command
