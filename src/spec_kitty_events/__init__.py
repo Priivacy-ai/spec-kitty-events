@@ -13,7 +13,7 @@ Example:
     1
 """
 
-__version__ = "2.3.1"
+__version__ = "2.4.0"
 
 # Core data models
 from spec_kitty_events.models import (
@@ -210,6 +210,30 @@ from spec_kitty_events.mission_next import (
     reduce_mission_next_events,
 )
 
+# Dossier event contracts (v2.4.0)
+from spec_kitty_events.dossier import (
+    MISSION_DOSSIER_ARTIFACT_INDEXED,
+    MISSION_DOSSIER_ARTIFACT_MISSING,
+    MISSION_DOSSIER_SNAPSHOT_COMPUTED,
+    MISSION_DOSSIER_PARITY_DRIFT_DETECTED,
+    DOSSIER_EVENT_TYPES,
+    NamespaceMixedStreamError,
+    LocalNamespaceTuple,
+    ArtifactIdentity,
+    ContentHashRef,
+    ProvenanceRef,
+    MissionDossierArtifactIndexedPayload,
+    MissionDossierArtifactMissingPayload,
+    MissionDossierSnapshotComputedPayload,
+    MissionDossierParityDriftDetectedPayload,
+    ArtifactEntry,
+    AnomalyEntry,
+    SnapshotSummary,
+    DriftRecord,
+    MissionDossierState,
+    reduce_mission_dossier,
+)
+
 # Public API (controls what's exported with "from spec_kitty_events import *")
 __all__ = [
     # Version
@@ -374,4 +398,25 @@ __all__ = [
     "MissionNextAnomaly",
     "ReducedMissionRunState",
     "reduce_mission_next_events",
+    # Dossier event contracts
+    "MISSION_DOSSIER_ARTIFACT_INDEXED",
+    "MISSION_DOSSIER_ARTIFACT_MISSING",
+    "MISSION_DOSSIER_SNAPSHOT_COMPUTED",
+    "MISSION_DOSSIER_PARITY_DRIFT_DETECTED",
+    "DOSSIER_EVENT_TYPES",
+    "NamespaceMixedStreamError",
+    "LocalNamespaceTuple",
+    "ArtifactIdentity",
+    "ContentHashRef",
+    "ProvenanceRef",
+    "MissionDossierArtifactIndexedPayload",
+    "MissionDossierArtifactMissingPayload",
+    "MissionDossierSnapshotComputedPayload",
+    "MissionDossierParityDriftDetectedPayload",
+    "ArtifactEntry",
+    "AnomalyEntry",
+    "SnapshotSummary",
+    "DriftRecord",
+    "MissionDossierState",
+    "reduce_mission_dossier",
 ]

@@ -59,6 +59,12 @@ from spec_kitty_events.mission_next import (
     DecisionInputAnsweredPayload,
     MissionRunCompletedPayload,
 )
+from spec_kitty_events.dossier import (
+    MissionDossierArtifactIndexedPayload,
+    MissionDossierArtifactMissingPayload,
+    MissionDossierSnapshotComputedPayload,
+    MissionDossierParityDriftDetectedPayload,
+)
 
 
 @dataclass(frozen=True)
@@ -135,6 +141,11 @@ _EVENT_TYPE_TO_MODEL: Dict[str, Type[Any]] = {
     "DecisionInputRequested": DecisionInputRequestedPayload,
     "DecisionInputAnswered": DecisionInputAnsweredPayload,
     "MissionRunCompleted": MissionRunCompletedPayload,
+    # Dossier event contracts
+    "MissionDossierArtifactIndexed": MissionDossierArtifactIndexedPayload,
+    "MissionDossierArtifactMissing": MissionDossierArtifactMissingPayload,
+    "MissionDossierSnapshotComputed": MissionDossierSnapshotComputedPayload,
+    "MissionDossierParityDriftDetected": MissionDossierParityDriftDetectedPayload,
 }
 
 # Event type to JSON Schema name mapping (used with load_schema())
@@ -179,6 +190,11 @@ _EVENT_TYPE_TO_SCHEMA: Dict[str, str] = {
     "DecisionInputRequested": "decision_input_requested_payload",
     "DecisionInputAnswered": "decision_input_answered_payload",
     "MissionRunCompleted": "mission_run_completed_payload",
+    # Dossier event contracts
+    "MissionDossierArtifactIndexed": "mission_dossier_artifact_indexed_payload",
+    "MissionDossierArtifactMissing": "mission_dossier_artifact_missing_payload",
+    "MissionDossierSnapshotComputed": "mission_dossier_snapshot_computed_payload",
+    "MissionDossierParityDriftDetected": "mission_dossier_parity_drift_detected_payload",
 }
 
 

@@ -14,7 +14,14 @@ from typing import Any, Dict, List
 _FIXTURES_DIR = Path(__file__).parent / "fixtures"
 _MANIFEST_PATH = _FIXTURES_DIR / "manifest.json"
 
-_VALID_CATEGORIES = frozenset({"events", "lane_mapping", "edge_cases", "collaboration", "glossary", "mission_next"})
+_VALID_CATEGORIES = frozenset({
+    "events", "lane_mapping", "edge_cases",
+    "collaboration", "glossary", "mission_next",
+    "dossier",
+})
+
+# Replay stream fixture type sentinel
+_REPLAY_STREAM_TYPE = "replay_stream"
 
 
 @dataclass(frozen=True)
@@ -33,7 +40,8 @@ def load_fixtures(category: str) -> List[FixtureCase]:
     """Load canonical fixture cases for a category.
 
     Args:
-        category: One of ``"events"``, ``"lane_mapping"``, or ``"edge_cases"``.
+        category: One of ``"events"``, ``"lane_mapping"``, ``"edge_cases"``,
+            ``"collaboration"``, ``"glossary"``, ``"mission_next"``, or ``"dossier"``.
 
     Returns:
         List of :class:`FixtureCase` instances with payloads loaded from JSON.
@@ -55,13 +63,13 @@ def load_fixtures(category: str) -> List[FixtureCase]:
 
     entries: List[Dict[str, Any]] = manifest["fixtures"]
     for entry in entries:
-        # Skip replay stream fixtures (JSONL format, loaded via load_replay_stream)
-        if entry.get("fixture_type") == "replay_stream":
-            continue
-
         fixture_path: str = entry["path"]
         # Filter by category prefix in path
         if not fixture_path.startswith(category + "/"):
+            continue
+
+        # Skip replay stream entries — use load_replay_stream() for those
+        if entry.get("fixture_type") == _REPLAY_STREAM_TYPE:
             continue
 
         # Resolve full path to the fixture JSON file
@@ -89,23 +97,22 @@ def load_fixtures(category: str) -> List[FixtureCase]:
 
 
 def load_replay_stream(fixture_id: str) -> List[Dict[str, Any]]:
-    """Load a replay stream fixture by manifest ID.
+    """Load a replay stream fixture as a list of raw event dicts.
+
+    Replay streams are stored as newline-delimited JSON (JSONL) files.
+    Each line is a complete event dictionary.
 
     Args:
-        fixture_id: The ``"id"`` value from manifest.json (e.g.
+        fixture_id: The manifest ``id`` of the replay stream entry
+            (e.g. ``"dossier-replay-happy-path"`` or
             ``"mission-next-replay-full-lifecycle"``).
 
     Returns:
-        List of Event envelope dicts, one per JSONL line.
-        Empty lines are skipped. Each line is parsed with ``json.loads``.
+        List of raw event dictionaries, one per line in the JSONL file.
 
     Raises:
-        ValueError: If *fixture_id* is not found or does not have
-            ``fixture_type == "replay_stream"`` in the manifest.
-        FileNotFoundError: If the fixture file referenced by the manifest
-            entry does not exist on disk.
-        json.JSONDecodeError: If any non-empty line is not valid JSON.
-            No recovery -- malformed JSONL fails hard (no fallback).
+        ValueError: If *fixture_id* is not found or is not a replay_stream entry.
+        FileNotFoundError: If the JSONL file does not exist on disk.
     """
     with open(_MANIFEST_PATH, "r", encoding="utf-8") as fh:
         manifest: Dict[str, Any] = json.load(fh)
@@ -118,13 +125,14 @@ def load_replay_stream(fixture_id: str) -> List[Dict[str, Any]]:
 
     if entry is None:
         raise ValueError(
-            f"Fixture ID not found in manifest: {fixture_id!r}"
+            f"Replay stream fixture not found in manifest: {fixture_id!r}"
         )
 
-    if entry.get("fixture_type") != "replay_stream":
+    if entry.get("fixture_type") != _REPLAY_STREAM_TYPE:
         raise ValueError(
             f"Fixture {fixture_id!r} is not a replay_stream "
-            f"(fixture_type={entry.get('fixture_type')!r})"
+            f"(fixture_type={entry.get('fixture_type')!r}). "
+            f"Use load_fixtures() for regular fixture cases."
         )
 
     full_path = _FIXTURES_DIR / entry["path"]
@@ -135,10 +143,11 @@ def load_replay_stream(fixture_id: str) -> List[Dict[str, Any]]:
 
     events: List[Dict[str, Any]] = []
     with open(full_path, "r", encoding="utf-8") as fh:
-        for line in fh:
+        for line_number, line in enumerate(fh, start=1):
             stripped = line.strip()
             if not stripped:
                 continue
-            events.append(json.loads(stripped))
+            event_dict: Dict[str, Any] = json.loads(stripped)
+            events.append(event_dict)
 
     return events
