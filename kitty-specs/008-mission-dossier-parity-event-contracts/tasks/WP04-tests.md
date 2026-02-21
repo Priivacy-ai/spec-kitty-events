@@ -1,10 +1,13 @@
 ---
 work_package_id: WP04
 title: Tests (Conformance + Reducer)
-lane: planned
+lane: "doing"
 dependencies:
 - WP02
 - WP03
+base_branch: 008-mission-dossier-parity-event-contracts-WP02
+base_commit: ab00411586faffa0ed85063672b93c38b4306ba2
+created_at: '2026-02-21T14:40:06.104006+00:00'
 subtasks:
 - T020
 - T021
@@ -15,7 +18,7 @@ subtasks:
 phase: Phase 2 - Validation
 assignee: ''
 agent: ''
-shell_pid: ''
+shell_pid: "31414"
 review_status: ''
 reviewed_by: ''
 history:
