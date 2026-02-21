@@ -200,8 +200,7 @@ spec-kitty implement WP03 --base WP01
   Same as File 8 but `drift_kind: "artifact_mutated"` and different `actual_hash`.
 
   **File 10**: `dossier_namespace_collision_coverage.json` — two distinct namespace tuples (valid payload; used by namespace collision test)
-  Use `MissionDossierArtifactIndexedPayload` format with the standard namespace. This fixture is labelled valid. The conformance test for namespace collision loads TWO separate fixture payloads with different `feature_slug` values and asserts they produce distinct key tuples — the fixture itself is just a valid indexed artifact.
-  Alternate `feature_slug: "009-some-other-feature"` to show a second namespace. Actually make this a second valid fixture with a different feature_slug:
+  Use `MissionDossierArtifactIndexedPayload` format as a single valid fixture with an alternate `feature_slug` (for example `009-another-feature`). This fixture pairs with another valid indexed fixture that uses the standard namespace to prove tuple uniqueness in namespace-collision tests.
   ```json
   {
     "namespace": {

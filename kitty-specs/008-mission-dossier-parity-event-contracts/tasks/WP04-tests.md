@@ -4,6 +4,7 @@ title: Tests (Conformance + Reducer)
 lane: planned
 dependencies:
 - WP02
+- WP03
 subtasks:
 - T020
 - T021
@@ -63,9 +64,9 @@ Write two test modules that together cover all five conformance test categories 
 
 **Implementation command**:
 ```bash
-spec-kitty implement WP04 --base WP02
+spec-kitty implement WP04 --base <branch-with-WP02-and-WP03>
 ```
-(Use WP02 as base since WP02 and WP03 both depend on WP01; either can be the base for WP04.)
+(WP04 requires both WP02 wiring and WP03 fixtures. Base WP04 on a branch/worktree that already contains both.)
 
 ## Subtasks & Detailed Guidance
 
@@ -152,11 +153,12 @@ spec-kitty implement WP04 --base WP02
           assert len(result.model_violations) == 0, (
               f"{case.id}: unexpected model violations: {result.model_violations}"
           )
-          # Schema check should not be skipped for valid fixtures
-          if not result.schema_check_skipped:
-              assert len(result.schema_violations) == 0, (
-                  f"{case.id}: unexpected schema violations: {result.schema_violations}"
-              )
+          assert not result.schema_check_skipped, (
+              f"{case.id}: schema layer was skipped; install conformance extras"
+          )
+          assert len(result.schema_violations) == 0, (
+              f"{case.id}: unexpected schema violations: {result.schema_violations}"
+          )
 
 
   def test_invalid_fixtures_produce_violations_in_at_least_one_layer():
@@ -170,7 +172,7 @@ spec-kitty implement WP04 --base WP02
   ```
 
 - **Files**: `tests/test_dossier_conformance.py`
-- **Notes**: If `jsonschema` is not installed in the test environment, `schema_check_skipped` will be True. Use `strict=True` to force schema validation (requires `[conformance]` extra).
+- **Notes**: Dual-layer validation is mandatory for this WP. Ensure `jsonschema` is available (`pip install -e ".[conformance,dev]"`) so `schema_check_skipped` is always False in these tests.
 
 ### Subtask T023 – test_dossier_reducer.py: unit tests
 

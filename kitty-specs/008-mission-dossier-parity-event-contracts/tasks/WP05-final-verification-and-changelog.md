@@ -86,7 +86,7 @@ spec-kitty implement WP05 --base WP04
      - `MissionDossierParityDriftDetectedPayload` — emitted when drift vs baseline is detected
 
      **Provenance payload objects**:
-     - `LocalNamespaceTuple` — 6-field namespace key for collision-safe parity baseline scoping
+     - `LocalNamespaceTuple` — 5-field namespace key for collision-safe parity baseline scoping
      - `ArtifactIdentity` — canonical artifact identity (path, class, run, wp scoping)
      - `ContentHashRef` — content fingerprint (hash, algorithm, size, encoding)
      - `ProvenanceRef` — source trace (event IDs, git SHA/ref, actor metadata)
