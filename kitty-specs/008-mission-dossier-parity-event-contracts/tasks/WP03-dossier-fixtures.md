@@ -1,7 +1,7 @@
 ---
 work_package_id: WP03
 title: Dossier Fixtures
-lane: "doing"
+lane: "for_review"
 dependencies: [WP01]
 base_branch: 008-mission-dossier-parity-event-contracts-WP01
 base_commit: e635a19b1f84dda242d2261804d43ba36359fcd0
@@ -417,3 +417,4 @@ spec-kitty implement WP03 --base WP01
 
 - 2026-02-21T14:00:00Z – system – lane=planned – Prompt created.
 - 2026-02-21T14:28:15Z – coordinator – shell_pid=16565 – lane=doing – Assigned agent via workflow command
+- 2026-02-21T14:35:32Z – coordinator – shell_pid=16565 – lane=for_review – All subtasks done; 13 fixture cases; 2 replay streams load correctly
