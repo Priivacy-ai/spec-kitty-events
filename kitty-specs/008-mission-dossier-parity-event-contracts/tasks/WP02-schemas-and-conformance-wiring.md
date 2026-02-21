@@ -1,28 +1,31 @@
 ---
-work_package_id: "WP02"
+work_package_id: WP02
+title: Schemas & Conformance Wiring
+lane: "doing"
+dependencies: [WP01]
+base_branch: 008-mission-dossier-parity-event-contracts-WP01
+base_commit: e635a19b1f84dda242d2261804d43ba36359fcd0
+created_at: '2026-02-21T14:28:10.679937+00:00'
 subtasks:
-  - "T007"
-  - "T008"
-  - "T009"
-  - "T010"
-  - "T011"
-  - "T012"
-  - "T013"
-title: "Schemas & Conformance Wiring"
-phase: "Phase 1 - Foundation"
-lane: "planned"
-assignee: ""
-agent: ""
-shell_pid: ""
-review_status: ""
-reviewed_by: ""
-dependencies: ["WP01"]
+- T007
+- T008
+- T009
+- T010
+- T011
+- T012
+- T013
+phase: Phase 1 - Foundation
+assignee: ''
+agent: ''
+shell_pid: "16446"
+review_status: ''
+reviewed_by: ''
 history:
-  - timestamp: "2026-02-21T14:00:00Z"
-    lane: "planned"
-    agent: "system"
-    shell_pid: ""
-    action: "Prompt generated via /spec-kitty.tasks"
+- timestamp: '2026-02-21T14:00:00Z'
+  lane: planned
+  agent: system
+  shell_pid: ''
+  action: Prompt generated via /spec-kitty.tasks
 ---
 
 # Work Package Prompt: WP02 – Schemas & Conformance Wiring
