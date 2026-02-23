@@ -1,0 +1,14 @@
+{
+  "namespace": {
+    "project_uuid": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "feature_slug": "008-mission-dossier-parity-event-contracts",
+    "target_branch": "2.x",
+    "mission_key": "software-dev",
+    "manifest_version": "1.0.0"
+  },
+  "snapshot_hash": "deadbeef1234deadbeef1234deadbeef12345678",
+  "artifact_count": 2,
+  "anomaly_count": 1,
+  "computed_at": "2026-02-21T14:10:00Z",
+  "algorithm": "sha256"
+}

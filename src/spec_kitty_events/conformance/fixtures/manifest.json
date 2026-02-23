@@ -417,6 +417,128 @@
       "fixture_type": "replay_stream",
       "notes": "Full 8-event mission-next lifecycle replay stream. Each line is a complete Event envelope.",
       "min_version": "2.3.1"
+    },
+    {
+      "id": "dossier-artifact-indexed-valid",
+      "path": "dossier/valid/dossier_artifact_indexed_valid.json",
+      "event_type": "MissionDossierArtifactIndexed",
+      "expected_result": "valid",
+      "notes": "Happy-path: spec.md indexed as input artifact",
+      "min_version": "2.4.0"
+    },
+    {
+      "id": "dossier-artifact-indexed-supersedes",
+      "path": "dossier/valid/dossier_artifact_indexed_supersedes.json",
+      "event_type": "MissionDossierArtifactIndexed",
+      "expected_result": "valid",
+      "notes": "Artifact replacing prior version via supersedes field",
+      "min_version": "2.4.0"
+    },
+    {
+      "id": "dossier-artifact-indexed-with-provenance",
+      "path": "dossier/valid/dossier_artifact_indexed_with_provenance.json",
+      "event_type": "MissionDossierArtifactIndexed",
+      "expected_result": "valid",
+      "notes": "Full provenance populated with git_sha, actor_id, and step_id",
+      "min_version": "2.4.0"
+    },
+    {
+      "id": "dossier-artifact-missing-required-always",
+      "path": "dossier/valid/dossier_artifact_missing_required_always.json",
+      "event_type": "MissionDossierArtifactMissing",
+      "expected_result": "valid",
+      "notes": "required_always completeness check for plan.md workflow artifact",
+      "min_version": "2.4.0"
+    },
+    {
+      "id": "dossier-artifact-missing-required-by-step",
+      "path": "dossier/valid/dossier_artifact_missing_required_by_step.json",
+      "event_type": "MissionDossierArtifactMissing",
+      "expected_result": "valid",
+      "notes": "Step-scoped completeness check with manifest_step=plan",
+      "min_version": "2.4.0"
+    },
+    {
+      "id": "dossier-snapshot-computed-clean",
+      "path": "dossier/valid/dossier_snapshot_computed_clean.json",
+      "event_type": "MissionDossierSnapshotComputed",
+      "expected_result": "valid",
+      "notes": "Zero anomaly snapshot: 3 artifacts, 0 anomalies",
+      "min_version": "2.4.0"
+    },
+    {
+      "id": "dossier-snapshot-computed-with-anomalies",
+      "path": "dossier/valid/dossier_snapshot_computed_with_anomalies.json",
+      "event_type": "MissionDossierSnapshotComputed",
+      "expected_result": "valid",
+      "notes": "Non-zero anomaly count: 2 artifacts, 1 anomaly",
+      "min_version": "2.4.0"
+    },
+    {
+      "id": "dossier-parity-drift-artifact-added",
+      "path": "dossier/valid/dossier_parity_drift_artifact_added.json",
+      "event_type": "MissionDossierParityDriftDetected",
+      "expected_result": "valid",
+      "notes": "Drift detection with drift_kind=artifact_added",
+      "min_version": "2.4.0"
+    },
+    {
+      "id": "dossier-parity-drift-artifact-mutated",
+      "path": "dossier/valid/dossier_parity_drift_artifact_mutated.json",
+      "event_type": "MissionDossierParityDriftDetected",
+      "expected_result": "valid",
+      "notes": "Drift detection with drift_kind=artifact_mutated",
+      "min_version": "2.4.0"
+    },
+    {
+      "id": "dossier-namespace-collision-coverage",
+      "path": "dossier/valid/dossier_namespace_collision_coverage.json",
+      "event_type": "MissionDossierArtifactIndexed",
+      "expected_result": "valid",
+      "notes": "Alternate namespace (feature_slug=009-another-feature) for namespace collision tests",
+      "min_version": "2.4.0"
+    },
+    {
+      "id": "dossier-parity-drift-namespace-mismatch",
+      "path": "dossier/invalid/dossier_parity_drift_namespace_mismatch.json",
+      "event_type": "MissionDossierParityDriftDetected",
+      "expected_result": "invalid",
+      "notes": "Namespace missing required fields: target_branch, mission_key, manifest_version",
+      "min_version": "2.4.0"
+    },
+    {
+      "id": "dossier-artifact-indexed-missing-path",
+      "path": "dossier/invalid/dossier_artifact_indexed_missing_path.json",
+      "event_type": "MissionDossierArtifactIndexed",
+      "expected_result": "invalid",
+      "notes": "artifact_id.path is absent \u2014 Pydantic must reject",
+      "min_version": "2.4.0"
+    },
+    {
+      "id": "dossier-artifact-indexed-invalid-class",
+      "path": "dossier/invalid/dossier_artifact_indexed_invalid_class.json",
+      "event_type": "MissionDossierArtifactIndexed",
+      "expected_result": "invalid",
+      "notes": "artifact_id.artifact_class='INVALID_CLASS' is not a valid Literal value",
+      "min_version": "2.4.0"
+    },
+    {
+      "id": "dossier-replay-happy-path",
+      "path": "dossier/replay/dossier_happy_path.jsonl",
+      "fixture_type": "replay_stream",
+      "event_type": "mixed",
+      "expected_result": "valid",
+      "notes": "6-event happy-path stream: 3 indexed, 2 snapshots, 1 supersedes",
+      "min_version": "2.4.0"
+    },
+    {
+      "id": "dossier-replay-drift-scenario",
+      "path": "dossier/replay/dossier_drift_scenario.jsonl",
+      "fixture_type": "replay_stream",
+      "event_type": "mixed",
+      "expected_result": "valid",
+      "notes": "5-event drift scenario: 2 indexed, 1 snapshot, 1 missing, 1 drift detected",
+      "min_version": "2.4.0"
     }
   ]
 }
