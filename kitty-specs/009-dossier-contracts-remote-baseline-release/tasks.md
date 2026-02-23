@@ -189,5 +189,5 @@ WP01 (Recovery) → WP02 (Local Gate) → WP03 (PR & Release)
 <!-- status-model:start -->
 ## Canonical Status (Generated)
 - WP01: done
-- WP02: planned
+- WP02: for_review
 <!-- status-model:end -->
