@@ -114,13 +114,13 @@ succeeds on a fresh install from the tag; `CHANGELOG.md` at `v2.4.0` contains th
 **Prompt**: `tasks/WP03-pr-ci-merge-and-release-tag.md`
 
 ### Included Subtasks
-- [ ] T014 Open PR from `009-dossier-release` → `2.x` with structured description
-- [ ] T015 Monitor CI and confirm all checks pass
-- [ ] T016 Merge PR into `2.x` using merge commit (not squash)
-- [ ] T017 Verify `CHANGELOG.md` at `2.x` HEAD contains v2.4.0 section
-- [ ] T018 Create annotated `v2.4.0` tag from `2.x` HEAD
-- [ ] T019 Push `v2.4.0` tag to `origin`
-- [ ] T020 Verify tag visibility and smoke-test consumer import from tag
+- [x] T014 Open PR from `009-dossier-release` → `2.x` with structured description
+- [x] T015 Monitor CI and confirm all checks pass
+- [x] T016 Merge PR into `2.x` using merge commit (not squash)
+- [x] T017 Verify `CHANGELOG.md` at `2.x` HEAD contains v2.4.0 section
+- [x] T018 Create annotated `v2.4.0` tag from `2.x` HEAD
+- [x] T019 Push `v2.4.0` tag to `origin`
+- [x] T020 Verify tag visibility and smoke-test consumer import from tag
 
 ### Implementation Notes
 - PR title: `feat(008): promote dossier contracts to remote baseline (v2.4.0)`
@@ -189,5 +189,5 @@ WP01 (Recovery) → WP02 (Local Gate) → WP03 (PR & Release)
 <!-- status-model:start -->
 ## Canonical Status (Generated)
 - WP01: done
-- WP02: for_review
+- WP02: done
 <!-- status-model:end -->
