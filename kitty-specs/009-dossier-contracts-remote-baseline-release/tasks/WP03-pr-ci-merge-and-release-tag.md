@@ -14,7 +14,7 @@ lane: "planned"
 assignee: ""
 agent: ""
 shell_pid: ""
-review_status: ""
+review_status: "acknowledged"
 reviewed_by: ""
 dependencies: ["WP02"]
 history:
@@ -42,7 +42,7 @@ history:
 
 > **Populated by `/spec-kitty.review`**
 
-*[This section is empty initially.]*
+*Deferred all GitHub push/PR/tag operations for this sprint. Local readiness only.*
 
 ---
 
@@ -54,15 +54,14 @@ Use language identifiers in code blocks: ` ```python `, ` ```bash `
 
 ## Objectives & Success Criteria
 
-Land the recovered dossier contracts on `origin/2.x` with full PR traceability,
-CI validation, and publish the `v2.4.0` annotated release tag from the merge commit.
+Prepare the recovered dossier contracts for release. All GitHub push/PR/tag
+operations are deferred for this sprint; local readiness must be documented.
 
 **Done when all of the following are true**:
-1. PR from `009-dossier-release` → `2.x` is merged (merge commit, not squash).
-2. `git ls-remote --tags origin v2.4.0` returns a commit SHA.
-3. `git show v2.4.0 --stat` shows the dossier files (dossier.py, schemas, fixtures).
-4. `CHANGELOG.md` at `v2.4.0` contains the v2.4.0 release section listing all four contracts and the namespace fix.
-5. Consumer import smoke-test succeeds from the `v2.4.0` tag.
+1. `CHANGELOG.md` in the working tree contains the v2.4.0 release section listing all four contracts and the namespace fix.
+2. Local annotated `v2.4.0` tag exists (not pushed).
+3. Consumer import smoke-test succeeds from the local tree.
+4. GitHub operations (T014–T020) are explicitly deferred in documentation.
 
 **Implementation command** (depends on WP02):
 ```bash
@@ -73,7 +72,7 @@ spec-kitty implement WP03 --base WP02
 
 ## Context & Constraints
 
-- **Branch**: `009-dossier-release` must be pushed to `origin` (done in WP02/T013).
+- **Branch**: `009-dossier-release` push is deferred; do not attempt remote operations in this sprint.
 - **Merge strategy**: **Merge commit** — do NOT squash. Preserves attribution of the original Feature 008 cherry-picks and the namespace bugfix separately.
 - **Tag target**: The `v2.4.0` tag is cut from `2.x` HEAD **after** the PR merges, not from the integration branch SHA.
 - **Tag format**: Matches prior releases (`v2.3.0`, `v2.3.1`) — annotated, prefixed `v`.
@@ -87,11 +86,13 @@ spec-kitty implement WP03 --base WP02
 
 ## Subtasks & Detailed Guidance
 
-### Subtask T014 – Open PR from `009-dossier-release` → `2.x`
+### Subtask T014 – Open PR from `009-dossier-release` → `2.x` (Deferred)
 
 **Purpose**: Create the PR that will serve as the traceability record for the
 dossier contract promotion. The PR description links the recovery commits and
 references the feature requirements.
+**Deferred**: GitHub operations are not permitted in this sprint. Document the
+deferral in the Activity Log and release readiness log.
 
 **Steps**:
 
@@ -147,7 +148,7 @@ EOF
 
 ---
 
-### Subtask T015 – Monitor CI and confirm all checks pass
+### Subtask T015 – Monitor CI and confirm all checks pass (Deferred)
 
 **Purpose**: CI validates the recovered implementation in a clean environment.
 All checks must be green before merge.
@@ -185,7 +186,7 @@ mypy, coverage threshold.
 
 ---
 
-### Subtask T016 – Merge PR into `2.x` using merge commit
+### Subtask T016 – Merge PR into `2.x` using merge commit (Deferred)
 
 **Purpose**: Land the integration branch onto `2.x` with full commit history
 preserved. Merge commit (not squash) is required to maintain attribution.
@@ -254,7 +255,7 @@ git push origin 2.x
 
 ---
 
-### Subtask T018 – Create annotated `v2.4.0` tag from `2.x` HEAD
+### Subtask T018 – Create annotated `v2.4.0` tag from `2.x` HEAD (Deferred for remote)
 
 **Purpose**: FR-008 requires an annotated tag pointing to the merge commit on
 `2.x`. The tag matches the format of prior releases (`v2.3.0`, `v2.3.1`).
@@ -305,7 +306,7 @@ git show v2.4.0 --stat | head -5
 
 ---
 
-### Subtask T019 – Push `v2.4.0` tag to `origin`
+### Subtask T019 – Push `v2.4.0` tag to `origin` (Deferred)
 
 **Purpose**: Make the tag available to all consumers. SC-005 requires the tag
 to be visible on `origin`.
@@ -334,7 +335,7 @@ git ls-remote --tags origin v2.4.0
 
 ---
 
-### Subtask T020 – Verify tag visibility and smoke-test consumer import from tag
+### Subtask T020 – Verify tag visibility and smoke-test consumer import from tag (Deferred for remote visibility)
 
 **Purpose**: SC-001 and SC-006 require that consumers can install from `v2.4.0`
 without local patching. This smoke-test proves the tag is correctly structured.
@@ -426,3 +427,4 @@ WP03 does not run new tests. All test validation happened in WP02. WP03 performs
 ## Activity Log
 
 - 2026-02-23T17:55:00Z – system – lane=planned – Prompt created.
+- 2026-02-23T19:10:00Z – codex – lane=planned – Deferred all GitHub push/PR/tag operations for this sprint; local readiness documented.

@@ -8,13 +8,14 @@
 | T018 | Annotated v2.4.0 tag created locally | **Done**: `git tag -a v2.4.0 -m "Release v2.4.0: Mission Dossier Parity Event Contracts"` |
 | T020 | Smoke-test import | **Pass**: `from spec_kitty_events import MissionDossierArtifactIndexedPayload` succeeds |
 
-## Remaining Manual Steps (require GitHub access)
+## Deferred GitHub Steps
 
-These steps push to origin and are outside the local sprint:
+GitHub operations are deferred for this sprint. The items below are recorded
+for a future release pass.
 
 | Subtask | Action | Command |
 |---------|--------|---------|
-| T013 | Push integration branch | `git push -u origin 009-dossier-release` |
+| T013 (WP02) | Push integration branch | `git push -u origin 009-dossier-release` |
 | T014 | Open PR 009-dossier-release -> 2.x | `gh pr create --title "feat(008): promote dossier contracts to remote baseline (v2.4.0)" --base 2.x` |
 | T015 | Monitor CI | `gh pr checks <PR-NUMBER>` |
 | T016 | Merge PR (merge commit, not squash) | `gh pr merge <PR-NUMBER> --merge` |
@@ -32,6 +33,6 @@ These steps push to origin and are outside the local sprint:
 - [x] CHANGELOG.md contains v2.4.0 section
 - [x] Local v2.4.0 annotated tag created
 - [x] `MissionDossierArtifactIndexedPayload` import smoke-test passes
-- [ ] Push branch to origin (manual)
-- [ ] Open and merge PR (manual)
-- [ ] Push tag to origin (manual)
+- [ ] Push branch to origin (deferred)
+- [ ] Open and merge PR (deferred)
+- [ ] Push tag to origin (deferred)
