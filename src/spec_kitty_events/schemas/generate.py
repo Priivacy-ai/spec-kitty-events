@@ -67,6 +67,16 @@ from spec_kitty_events.mission_next import (
     DecisionInputAnsweredPayload,
     MissionRunCompletedPayload,
 )
+from spec_kitty_events.dossier import (
+    ArtifactIdentity,
+    ContentHashRef,
+    ProvenanceRef,
+    LocalNamespaceTuple,
+    MissionDossierArtifactIndexedPayload,
+    MissionDossierArtifactMissingPayload,
+    MissionDossierSnapshotComputedPayload,
+    MissionDossierParityDriftDetectedPayload,
+)
 
 
 # Schema directory (same directory as this script)
@@ -120,6 +130,15 @@ PYDANTIC_MODELS: List[tuple[str, Type[BaseModel]]] = [
     ("decision_input_requested_payload", DecisionInputRequestedPayload),
     ("decision_input_answered_payload", DecisionInputAnsweredPayload),
     ("mission_run_completed_payload", MissionRunCompletedPayload),
+    # Dossier event contract models
+    ("artifact_identity", ArtifactIdentity),
+    ("content_hash_ref", ContentHashRef),
+    ("provenance_ref", ProvenanceRef),
+    ("local_namespace_tuple", LocalNamespaceTuple),
+    ("mission_dossier_artifact_indexed_payload", MissionDossierArtifactIndexedPayload),
+    ("mission_dossier_artifact_missing_payload", MissionDossierArtifactMissingPayload),
+    ("mission_dossier_snapshot_computed_payload", MissionDossierSnapshotComputedPayload),
+    ("mission_dossier_parity_drift_detected_payload", MissionDossierParityDriftDetectedPayload),
 ]
 
 # Enums (use TypeAdapter)

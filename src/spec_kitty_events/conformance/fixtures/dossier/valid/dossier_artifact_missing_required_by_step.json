@@ -1,0 +1,16 @@
+{
+  "namespace": {
+    "project_uuid": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "feature_slug": "008-mission-dossier-parity-event-contracts",
+    "target_branch": "2.x",
+    "mission_key": "software-dev",
+    "manifest_version": "1.0.0"
+  },
+  "expected_identity": {
+    "mission_key": "software-dev",
+    "path": "kitty-specs/008-mission-dossier-parity-event-contracts/plan.md",
+    "artifact_class": "workflow"
+  },
+  "manifest_step": "plan",
+  "checked_at": "2026-02-21T14:05:00Z"
+}
