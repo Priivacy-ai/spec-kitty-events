@@ -1,7 +1,7 @@
 ---
 work_package_id: WP01
 title: Integration Branch Setup & Recovery
-lane: "doing"
+lane: "done"
 dependencies: []
 base_branch: main
 base_commit: 5a24a93249042fe1abba402a2768d4471ed93d33
@@ -15,10 +15,10 @@ subtasks:
 - T006
 phase: Phase 1 - Recovery
 assignee: ''
-agent: "codex"
-shell_pid: "24900"
-review_status: ''
-reviewed_by: ''
+agent: codex
+shell_pid: '24900'
+review_status: "approved"
+reviewed_by: "Robert Douglass"
 history:
 - timestamp: '2026-02-23T00:00:00Z'
   lane: planned
@@ -92,3 +92,4 @@ None (starting package).
 - 2026-02-23T18:21:36Z – claude-code – shell_pid=7051 – lane=doing – Assigned agent via workflow command
 - 2026-02-23T18:24:20Z – claude-code – shell_pid=7051 – lane=for_review – Ready for review: 009-dossier-release branch created from origin/2.x with 5237894 and 139ca09 cherry-picked cleanly. 35 source files recovered (dossier.py, tests, schemas, fixtures). Branch at e8b9feb.
 - 2026-02-23T18:26:30Z – codex – shell_pid=24900 – lane=doing – Started review via workflow command
+- 2026-02-23T18:29:15Z – codex – shell_pid=24900 – lane=done – Review passed: 009-dossier-release shows 3d5f9ec/e8b9feb atop 640709f; verification log present
