@@ -1,11 +1,11 @@
 ---
 work_package_id: WP01
 title: Integration Branch Setup & Recovery
-lane: "planned"
+lane: "doing"
 dependencies: []
 base_branch: main
-base_commit: 59bbb3af14be089462c96533d920bd0271dc39dd
-created_at: '2026-02-23T00:00:00.000000+00:00'
+base_commit: 5a24a93249042fe1abba402a2768d4471ed93d33
+created_at: '2026-02-23T18:21:35.828350+00:00'
 subtasks:
 - T001
 - T002
@@ -16,7 +16,7 @@ subtasks:
 phase: Phase 1 - Recovery
 assignee: ''
 agent: ''
-shell_pid: ''
+shell_pid: "7051"
 review_status: ''
 reviewed_by: ''
 history:
