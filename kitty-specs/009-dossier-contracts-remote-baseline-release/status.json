@@ -1,24 +1,31 @@
 {
-  "event_count": 2,
+  "event_count": 9,
   "feature_slug": "009-dossier-contracts-remote-baseline-release",
-  "last_event_id": "01KJ5VXG7N71FTZ69Z5HQ4AQR5",
-  "materialized_at": "2026-02-23T18:24:20.213398+00:00",
+  "last_event_id": "01KJ5XBJT3DZNM4KHMWG679YPG",
+  "materialized_at": "2026-02-23T18:49:30.179658+00:00",
   "summary": {
     "blocked": 0,
     "canceled": 0,
     "claimed": 0,
-    "done": 0,
-    "for_review": 1,
+    "done": 1,
+    "for_review": 0,
     "in_progress": 0,
-    "planned": 0
+    "planned": 1
   },
   "work_packages": {
     "WP01": {
       "actor": "user",
-      "force_count": 1,
-      "lane": "for_review",
-      "last_event_id": "01KJ5VXG7N71FTZ69Z5HQ4AQR5",
-      "last_transition_at": "2026-02-23T18:24:20.213212+00:00"
+      "force_count": 2,
+      "lane": "done",
+      "last_event_id": "01KJ5W6G78QBQE99JFB1M5NM6Y",
+      "last_transition_at": "2026-02-23T18:29:15.112117+00:00"
+    },
+    "WP02": {
+      "actor": "user",
+      "force_count": 2,
+      "lane": "planned",
+      "last_event_id": "01KJ5XBJT3DZNM4KHMWG679YPG",
+      "last_transition_at": "2026-02-23T18:49:30.179418+00:00"
     }
   }
 }
