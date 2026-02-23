@@ -1,7 +1,7 @@
 ---
 work_package_id: WP03
 title: PR, CI Gate, Merge & Release Tag
-lane: "doing"
+lane: "for_review"
 dependencies:
 - WP02
 base_branch: 2.x
@@ -17,8 +17,8 @@ subtasks:
 - T020
 phase: Phase 3 - Release
 assignee: ''
-agent: "claude-code"
-shell_pid: "75837"
+agent: claude-code
+shell_pid: '75837'
 review_status: ''
 reviewed_by: ''
 history:
@@ -97,3 +97,4 @@ None — all steps are serial within this WP.
 ## Activity Log
 
 - 2026-02-23T18:55:02Z – claude-code – shell_pid=75837 – lane=doing – Assigned agent via workflow command
+- 2026-02-23T18:56:22Z – claude-code – shell_pid=75837 – lane=for_review – Release readiness verified locally: CHANGELOG v2.4.0 present, local tag created, import smoke-test passes. GitHub operations (push, PR, merge, tag push) documented as manual steps.
