@@ -12,6 +12,7 @@ All quality gates executed from WP02 worktree against merged dossier implementat
 | T010 | mypy --strict | **0 issues** in 25 source files |
 | T011 | Dossier conformance suite | **23/23 passed** (10 valid accepted, 3 invalid rejected) |
 | T012 | Replay/reducer tests | **25/25 passed** |
+| T013 | Push `009-dossier-release` to origin | **Deferred** (remote pushes not permitted at this time) |
 
 ## Overall Coverage
 

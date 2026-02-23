@@ -62,9 +62,9 @@ to `origin`.
 1. `python3.11 -m pytest` reports ≥1,117 tests, 0 failures, 0 errors.
 2. Coverage on `src/spec_kitty_events/dossier.py` is ≥98%.
 3. `mypy --strict src/spec_kitty_events/` reports 0 new errors (compared to `origin/2.x` baseline).
-4. `python3.11 -m pytest tests/test_dossier_conformance.py -v` — all 9 valid fixtures pass; both invalid fixtures are rejected with named errors.
+4. `python3.11 -m pytest tests/test_dossier_conformance.py -v` — all 10 valid fixtures pass; all 3 invalid fixtures are rejected with named errors.
 5. `python3.11 -m pytest tests/test_dossier_reducer.py -v -k "replay"` — both replay scenarios produce a deterministic `MissionDossierState`.
-6. `git push -u origin 009-dossier-release` succeeds.
+6. `git push -u origin 009-dossier-release` succeeds (deferred until remote pushes are permitted).
 
 **Implementation command** (depends on WP01):
 ```bash
