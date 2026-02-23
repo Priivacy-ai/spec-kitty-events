@@ -1,0 +1,9 @@
+{
+  "feature_number": "009",
+  "slug": "009-dossier-contracts-remote-baseline-release",
+  "feature_slug": "009-dossier-contracts-remote-baseline-release",
+  "friendly_name": "dossier contracts remote baseline release",
+  "mission": "software-dev",
+  "target_branch": "2.x",
+  "created_at": "2026-02-23T17:40:31.791811+00:00"
+}
