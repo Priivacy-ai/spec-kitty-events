@@ -1,7 +1,7 @@
 ---
 work_package_id: WP02
 title: Local Verification Gate
-lane: "for_review"
+lane: "doing"
 dependencies:
 - WP01
 base_branch: 2.x
@@ -17,8 +17,8 @@ subtasks:
 - T013
 phase: Phase 2 - Verification
 assignee: ''
-agent: codex
-shell_pid: '24900'
+agent: "codex"
+shell_pid: "24900"
 review_status: has_feedback
 reviewed_by: Robert Douglass
 history:
@@ -108,3 +108,4 @@ the expected `MissionDossierState`.
 - 2026-02-23T18:48:08Z – codex – shell_pid=24900 – lane=doing – Started review via workflow command
 - 2026-02-23T18:49:30Z – codex – shell_pid=24900 – lane=planned – Moved to planned
 - 2026-02-23T18:52:20Z – codex – shell_pid=24900 – lane=for_review – Updated WP02 scope: defer T013 push; conformance counts aligned
+- 2026-02-23T18:52:27Z – codex – shell_pid=24900 – lane=doing – Started review via workflow command
