@@ -15,7 +15,7 @@ subtasks:
 - T006
 phase: Phase 1 - Recovery
 assignee: ''
-agent: ''
+agent: "claude-code"
 shell_pid: "7051"
 review_status: ''
 reviewed_by: ''
@@ -86,3 +86,7 @@ None (starting package).
   immediately at T001.
 - **Cherry-pick conflicts**: `640709f` is docs-only, so conflicts are unlikely;
   if they occur, investigate before forcing.
+
+## Activity Log
+
+- 2026-02-23T18:21:36Z – claude-code – shell_pid=7051 – lane=doing – Assigned agent via workflow command
