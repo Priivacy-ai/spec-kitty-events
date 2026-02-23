@@ -1,7 +1,7 @@
 ---
 work_package_id: WP03
 title: PR, CI Gate, Merge & Release Tag
-lane: "planned"
+lane: "for_review"
 dependencies:
 - WP02
 base_branch: 2.x
@@ -19,15 +19,15 @@ phase: Phase 3 - Release
 assignee: ''
 agent: codex
 shell_pid: '24900'
-review_status: "has_feedback"
-reviewed_by: "Robert Douglass"
-review_feedback_file: "/private/var/folders/gj/bxx0438j003b20kn5b6s7bsh0000gn/T/spec-kitty-review-feedback-WP03.md"
+review_status: has_feedback
+reviewed_by: Robert Douglass
 history:
 - timestamp: '2026-02-23T00:00:00Z'
   lane: planned
   agent: system
   shell_pid: ''
   action: Prompt generated from tasks.md
+review_feedback_file: /private/var/folders/gj/bxx0438j003b20kn5b6s7bsh0000gn/T/spec-kitty-review-feedback-WP03.md
 ---
 
 # Work Package Prompt: WP03 – PR, CI Gate, Merge & Release Tag
@@ -113,3 +113,4 @@ None — all steps are serial within this WP.
 - 2026-02-23T18:56:22Z – claude-code – shell_pid=75837 – lane=for_review – Release readiness verified locally: CHANGELOG v2.4.0 present, local tag created, import smoke-test passes. GitHub operations (push, PR, merge, tag push) documented as manual steps.
 - 2026-02-23T18:57:19Z – codex – shell_pid=24900 – lane=doing – Started review via workflow command
 - 2026-02-23T18:57:39Z – codex – shell_pid=24900 – lane=planned – Moved to planned
+- 2026-02-23T19:01:25Z – codex – shell_pid=24900 – lane=for_review – Deferred GitHub operations; local readiness documented
