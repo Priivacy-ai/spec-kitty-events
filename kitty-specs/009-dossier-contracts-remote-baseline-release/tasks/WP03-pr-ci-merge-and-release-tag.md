@@ -1,12 +1,12 @@
 ---
 work_package_id: WP03
 title: PR, CI Gate, Merge & Release Tag
-lane: "planned"
+lane: "doing"
 dependencies:
 - WP02
-base_branch: main
-base_commit: 59bbb3af14be089462c96533d920bd0271dc39dd
-created_at: '2026-02-23T00:00:00.000000+00:00'
+base_branch: 2.x
+base_commit: 1385b17bd3d4edfc30bd6d8adc321376ec9f5aa9
+created_at: '2026-02-23T18:55:02.075410+00:00'
 subtasks:
 - T014
 - T015
@@ -18,7 +18,7 @@ subtasks:
 phase: Phase 3 - Release
 assignee: ''
 agent: ''
-shell_pid: ''
+shell_pid: "75837"
 review_status: ''
 reviewed_by: ''
 history:
