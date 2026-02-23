@@ -1,7 +1,7 @@
 ---
 work_package_id: WP02
 title: Local Verification Gate
-lane: "for_review"
+lane: "doing"
 dependencies:
 - WP01
 base_branch: 2.x
@@ -17,8 +17,8 @@ subtasks:
 - T013
 phase: Phase 2 - Verification
 assignee: ''
-agent: claude-code
-shell_pid: '37914'
+agent: "codex"
+shell_pid: "24900"
 review_status: ''
 reviewed_by: ''
 history:
@@ -92,3 +92,4 @@ the expected `MissionDossierState`.
 
 - 2026-02-23T18:30:43Z – claude-code – shell_pid=37914 – lane=doing – Assigned agent via workflow command
 - 2026-02-23T18:45:28Z – claude-code – shell_pid=37914 – lane=for_review – All local quality gates green: 1117 tests/0 failures, dossier.py 100% coverage, mypy clean, 23/23 conformance, 25/25 reducer. T013 (push to origin) is a manual step outside the local sprint.
+- 2026-02-23T18:48:08Z – codex – shell_pid=24900 – lane=doing – Started review via workflow command
