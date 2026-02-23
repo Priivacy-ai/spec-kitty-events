@@ -1,7 +1,7 @@
 ---
 work_package_id: WP02
 title: Local Verification Gate
-lane: "planned"
+lane: "for_review"
 dependencies:
 - WP01
 base_branch: 2.x
@@ -19,15 +19,15 @@ phase: Phase 2 - Verification
 assignee: ''
 agent: codex
 shell_pid: '24900'
-review_status: "has_feedback"
-reviewed_by: "Robert Douglass"
-review_feedback_file: "/private/var/folders/gj/bxx0438j003b20kn5b6s7bsh0000gn/T/spec-kitty-review-feedback-WP02.md"
+review_status: has_feedback
+reviewed_by: Robert Douglass
 history:
 - timestamp: '2026-02-23T00:00:00Z'
   lane: planned
   agent: system
   shell_pid: ''
   action: Prompt generated from tasks.md
+review_feedback_file: /private/var/folders/gj/bxx0438j003b20kn5b6s7bsh0000gn/T/spec-kitty-review-feedback-WP02.md
 ---
 
 # Work Package Prompt: WP02 – Local Verification Gate
@@ -107,3 +107,4 @@ the expected `MissionDossierState`.
 - 2026-02-23T18:45:28Z – claude-code – shell_pid=37914 – lane=for_review – All local quality gates green: 1117 tests/0 failures, dossier.py 100% coverage, mypy clean, 23/23 conformance, 25/25 reducer. T013 (push to origin) is a manual step outside the local sprint.
 - 2026-02-23T18:48:08Z – codex – shell_pid=24900 – lane=doing – Started review via workflow command
 - 2026-02-23T18:49:30Z – codex – shell_pid=24900 – lane=planned – Moved to planned
+- 2026-02-23T18:52:20Z – codex – shell_pid=24900 – lane=for_review – Updated WP02 scope: defer T013 push; conformance counts aligned
