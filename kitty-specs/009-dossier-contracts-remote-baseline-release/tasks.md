@@ -28,12 +28,12 @@ with no conflicts.
 **Prompt**: `tasks/WP01-integration-branch-setup-and-recovery.md`
 
 ### Included Subtasks
-- [ ] T001 Verify reflog accessibility for both recovery commits
-- [ ] T002 Create `009-dossier-release` branch from `origin/2.x`
-- [ ] T003 Cherry-pick `5237894` (feat(008) merge commit)
-- [ ] T004 Cherry-pick `139ca09` (namespace mismatch fix)
-- [ ] T005 Confirm `640709f` is an ancestor of the branch
-- [ ] T006 Verify recovered file inventory matches expected 41-file set
+- [x] T001 Verify reflog accessibility for both recovery commits
+- [x] T002 Create `009-dossier-release` branch from `origin/2.x`
+- [x] T003 Cherry-pick `5237894` (feat(008) merge commit)
+- [x] T004 Cherry-pick `139ca09` (namespace mismatch fix)
+- [x] T005 Confirm `640709f` is an ancestor of the branch
+- [x] T006 Verify recovered file inventory matches expected 41-file set
 
 ### Implementation Notes
 - Work directly in the main repo root (not a worktree)
