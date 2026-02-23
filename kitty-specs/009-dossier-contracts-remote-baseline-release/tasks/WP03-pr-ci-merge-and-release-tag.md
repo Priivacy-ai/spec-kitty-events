@@ -17,7 +17,7 @@ subtasks:
 - T020
 phase: Phase 3 - Release
 assignee: ''
-agent: ''
+agent: "claude-code"
 shell_pid: "75837"
 review_status: ''
 reviewed_by: ''
@@ -93,3 +93,7 @@ None — all steps are serial within this WP.
 - **CHANGELOG missing**: Cherry-pick captured the CHANGELOG addition in `5237894`;
   if absent, the cherry-pick may have dropped the file. Inspect with
   `git show HEAD -- CHANGELOG.md` and add manually.
+
+## Activity Log
+
+- 2026-02-23T18:55:02Z – claude-code – shell_pid=75837 – lane=doing – Assigned agent via workflow command
