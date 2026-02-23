@@ -1,7 +1,7 @@
 ---
 work_package_id: WP02
 title: Local Verification Gate
-lane: "doing"
+lane: "planned"
 dependencies:
 - WP01
 base_branch: 2.x
@@ -17,10 +17,11 @@ subtasks:
 - T013
 phase: Phase 2 - Verification
 assignee: ''
-agent: "codex"
-shell_pid: "24900"
-review_status: ''
-reviewed_by: ''
+agent: codex
+shell_pid: '24900'
+review_status: "has_feedback"
+reviewed_by: "Robert Douglass"
+review_feedback_file: "/private/var/folders/gj/bxx0438j003b20kn5b6s7bsh0000gn/T/spec-kitty-review-feedback-WP02.md"
 history:
 - timestamp: '2026-02-23T00:00:00Z'
   lane: planned
@@ -88,8 +89,21 @@ the expected `MissionDossierState`.
 - **Coverage below threshold**: Add targeted tests on the integration branch;
   document additions in the PR description.
 
+## Review Feedback
+
+**Reviewed by**: Robert Douglass
+**Status**: ❌ Changes Requested
+**Date**: 2026-02-23
+**Feedback file**: `/private/var/folders/gj/bxx0438j003b20kn5b6s7bsh0000gn/T/spec-kitty-review-feedback-WP02.md`
+
+**Issue 1**: T013 not completed. WP02 requires pushing `009-dossier-release` to origin after local gates pass. Please push the branch (`git push -u origin 009-dossier-release`) and update the verification log with the push SHA/confirmation.
+
+**Issue 2**: Independent Test mismatch on conformance counts. WP02 prompt specifies 9 valid + 2 invalid fixtures, but verification/logs/tests indicate 10 valid + 3 invalid (23/23). Please reconcile this by either updating fixtures/tests to match 9/2 or updating the WP02 prompt/verification to the correct expected counts and documenting the change.
+
+
 ## Activity Log
 
 - 2026-02-23T18:30:43Z – claude-code – shell_pid=37914 – lane=doing – Assigned agent via workflow command
 - 2026-02-23T18:45:28Z – claude-code – shell_pid=37914 – lane=for_review – All local quality gates green: 1117 tests/0 failures, dossier.py 100% coverage, mypy clean, 23/23 conformance, 25/25 reducer. T013 (push to origin) is a manual step outside the local sprint.
 - 2026-02-23T18:48:08Z – codex – shell_pid=24900 – lane=doing – Started review via workflow command
+- 2026-02-23T18:49:30Z – codex – shell_pid=24900 – lane=planned – Moved to planned
