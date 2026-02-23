@@ -41,6 +41,30 @@ from spec_kitty_events.collaboration import (
     DecisionCapturedPayload,
     SessionLinkedPayload,
 )
+from spec_kitty_events.glossary import (
+    GlossaryScopeActivatedPayload,
+    TermCandidateObservedPayload,
+    SemanticCheckEvaluatedPayload,
+    GlossaryClarificationRequestedPayload,
+    GlossaryClarificationResolvedPayload,
+    GlossarySenseUpdatedPayload,
+    GenerationBlockedBySemanticConflictPayload,
+    GlossaryStrictnessSetPayload,
+)
+from spec_kitty_events.mission_next import (
+    MissionRunStartedPayload,
+    NextStepIssuedPayload,
+    NextStepAutoCompletedPayload,
+    DecisionInputRequestedPayload,
+    DecisionInputAnsweredPayload,
+    MissionRunCompletedPayload,
+)
+from spec_kitty_events.dossier import (
+    MissionDossierArtifactIndexedPayload,
+    MissionDossierArtifactMissingPayload,
+    MissionDossierSnapshotComputedPayload,
+    MissionDossierParityDriftDetectedPayload,
+)
 
 
 @dataclass(frozen=True)
@@ -101,6 +125,27 @@ _EVENT_TYPE_TO_MODEL: Dict[str, Type[Any]] = {
     "CommentPosted": CommentPostedPayload,
     "DecisionCaptured": DecisionCapturedPayload,
     "SessionLinked": SessionLinkedPayload,
+    # Glossary semantic integrity contracts
+    "GlossaryScopeActivated": GlossaryScopeActivatedPayload,
+    "TermCandidateObserved": TermCandidateObservedPayload,
+    "SemanticCheckEvaluated": SemanticCheckEvaluatedPayload,
+    "GlossaryClarificationRequested": GlossaryClarificationRequestedPayload,
+    "GlossaryClarificationResolved": GlossaryClarificationResolvedPayload,
+    "GlossarySenseUpdated": GlossarySenseUpdatedPayload,
+    "GenerationBlockedBySemanticConflict": GenerationBlockedBySemanticConflictPayload,
+    "GlossaryStrictnessSet": GlossaryStrictnessSetPayload,
+    # Mission-next runtime contracts
+    "MissionRunStarted": MissionRunStartedPayload,
+    "NextStepIssued": NextStepIssuedPayload,
+    "NextStepAutoCompleted": NextStepAutoCompletedPayload,
+    "DecisionInputRequested": DecisionInputRequestedPayload,
+    "DecisionInputAnswered": DecisionInputAnsweredPayload,
+    "MissionRunCompleted": MissionRunCompletedPayload,
+    # Dossier event contracts
+    "MissionDossierArtifactIndexed": MissionDossierArtifactIndexedPayload,
+    "MissionDossierArtifactMissing": MissionDossierArtifactMissingPayload,
+    "MissionDossierSnapshotComputed": MissionDossierSnapshotComputedPayload,
+    "MissionDossierParityDriftDetected": MissionDossierParityDriftDetectedPayload,
 }
 
 # Event type to JSON Schema name mapping (used with load_schema())
@@ -129,6 +174,27 @@ _EVENT_TYPE_TO_SCHEMA: Dict[str, str] = {
     "CommentPosted": "comment_posted_payload",
     "DecisionCaptured": "decision_captured_payload",
     "SessionLinked": "session_linked_payload",
+    # Glossary semantic integrity contracts
+    "GlossaryScopeActivated": "glossary_scope_activated_payload",
+    "TermCandidateObserved": "term_candidate_observed_payload",
+    "SemanticCheckEvaluated": "semantic_check_evaluated_payload",
+    "GlossaryClarificationRequested": "glossary_clarification_requested_payload",
+    "GlossaryClarificationResolved": "glossary_clarification_resolved_payload",
+    "GlossarySenseUpdated": "glossary_sense_updated_payload",
+    "GenerationBlockedBySemanticConflict": "generation_blocked_by_semantic_conflict_payload",
+    "GlossaryStrictnessSet": "glossary_strictness_set_payload",
+    # Mission-next runtime contracts
+    "MissionRunStarted": "mission_run_started_payload",
+    "NextStepIssued": "next_step_issued_payload",
+    "NextStepAutoCompleted": "next_step_auto_completed_payload",
+    "DecisionInputRequested": "decision_input_requested_payload",
+    "DecisionInputAnswered": "decision_input_answered_payload",
+    "MissionRunCompleted": "mission_run_completed_payload",
+    # Dossier event contracts
+    "MissionDossierArtifactIndexed": "mission_dossier_artifact_indexed_payload",
+    "MissionDossierArtifactMissing": "mission_dossier_artifact_missing_payload",
+    "MissionDossierSnapshotComputed": "mission_dossier_snapshot_computed_payload",
+    "MissionDossierParityDriftDetected": "mission_dossier_parity_drift_detected_payload",
 }
 
 
@@ -257,15 +323,19 @@ def validate_event(
         )
 
     model_class = _EVENT_TYPE_TO_MODEL[event_type]
-    schema_name = _EVENT_TYPE_TO_SCHEMA[event_type]
+    schema_name = _EVENT_TYPE_TO_SCHEMA.get(event_type)
 
     # Layer 1: Pydantic validation
     model_violations = _validate_with_model(payload, model_class)
 
-    # Layer 2: JSON Schema validation
-    schema_violations, schema_skipped = _validate_with_schema(
-        payload, schema_name, strict=strict
-    )
+    # Layer 2: JSON Schema validation (skip if no schema mapping exists)
+    if schema_name is not None:
+        schema_violations, schema_skipped = _validate_with_schema(
+            payload, schema_name, strict=strict
+        )
+    else:
+        schema_violations = ()
+        schema_skipped = True
 
     # Determine overall validity
     valid = len(model_violations) == 0 and (

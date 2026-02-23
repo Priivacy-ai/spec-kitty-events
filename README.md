@@ -3,7 +3,7 @@
 Event log library with Lamport clocks, CRDT merge, and canonical event contracts for distributed
 systems.
 
-**Version**: 2.1.0 | **SCHEMA_VERSION**: 2.0.0 | **Python**: >= 3.10
+**Version**: 2.3.1 | **SCHEMA_VERSION**: 2.0.0 | **Python**: >= 3.10
 
 ## Features
 
@@ -18,9 +18,11 @@ systems.
 - **Lifecycle Events**: Mission lifecycle contracts with typed payloads and reducer
 - **Collaboration Events**: N-participant mission collaboration with advisory coordination (soft
   locks, not hard locks), 14 event types, dual-mode reducer
+- **Mission-Next Runtime Events**: Run-scoped execution contracts (7 event types, 6 payloads,
+  deterministic reducer) with `RuntimeActorIdentity` and decision lifecycle tracking
 - **Conformance Suite**: Dual-layer validation (Pydantic + JSON Schema), manifest-driven fixtures,
   pytest-runnable conformance tests
-- **JSON Schemas**: 28 committed schema artifacts generated from Pydantic models
+- **JSON Schemas**: 44 committed schema artifacts generated from Pydantic models
 - **Error Logging**: Systematic error tracking with retention policies
 - **Storage Adapters**: Abstract storage interfaces (bring your own database)
 - **Type Safety**: Full `mypy --strict` compliance with `py.typed` marker
@@ -166,6 +168,42 @@ assert state.event_count == 0
 See [COMPATIBILITY.md](COMPATIBILITY.md) for the full collaboration event contracts, reducer
 pipeline details, and SaaS-authoritative participation model.
 
+### Mission-Next Runtime Events (New in 2.3.0)
+
+Run-scoped execution contracts for the spec-kitty-runtime engine. 7 event types with typed
+payloads and a deterministic reducer for state materialization.
+
+```python
+from spec_kitty_events import (
+    RuntimeActorIdentity,
+    MissionRunStartedPayload,
+    reduce_mission_next_events,
+    MissionRunStatus,
+)
+
+# Construct an actor identity
+actor = RuntimeActorIdentity(
+    actor_id="agent-claude",
+    actor_type="llm",
+    provider="anthropic",
+    model="claude-opus-4-6",
+)
+
+# Build a run-started payload
+payload = MissionRunStartedPayload(
+    run_id="run-001",
+    mission_key="feature-login",
+    actor=actor,
+)
+
+# Reduce events into materialized run state
+state = reduce_mission_next_events([])
+assert state.run_status is None  # no events yet
+```
+
+See [COMPATIBILITY.md](COMPATIBILITY.md) for event type reference, the `MissionCompleted` vs
+`MissionRunCompleted` distinction table, and migration notes.
+
 ### Conflict Detection and Resolution
 
 ```python
@@ -186,9 +224,9 @@ if is_concurrent(event1, event2):
 - **Type hints**: Full mypy --strict compliance (source is the documentation)
 - **Conformance suite**: `pytest --pyargs spec_kitty_events.conformance -v`
 
-## Public API (104 Exports)
+## Public API (126 Exports)
 
-The `spec_kitty_events` package exports 104 symbols covering:
+The `spec_kitty_events` package exports 126 symbols covering:
 
 | Category | Count | Key Exports |
 |---|---|---|

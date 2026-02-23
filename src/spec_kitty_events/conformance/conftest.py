@@ -26,6 +26,8 @@ def fixture_cases(manifest: Dict[str, Any], fixtures_dir: Path) -> List[Dict[str
     """All fixture cases with loaded payloads."""
     cases: List[Dict[str, Any]] = []
     for entry in manifest["fixtures"]:
+        if entry.get("fixture_type") == "replay_stream":
+            continue
         fixture_path = fixtures_dir / entry["path"]
         payload: Any = json.loads(fixture_path.read_text(encoding="utf-8"))
         cases.append({

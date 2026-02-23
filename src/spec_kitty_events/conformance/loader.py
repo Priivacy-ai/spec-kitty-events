@@ -14,7 +14,14 @@ from typing import Any, Dict, List
 _FIXTURES_DIR = Path(__file__).parent / "fixtures"
 _MANIFEST_PATH = _FIXTURES_DIR / "manifest.json"
 
-_VALID_CATEGORIES = frozenset({"events", "lane_mapping", "edge_cases"})
+_VALID_CATEGORIES = frozenset({
+    "events", "lane_mapping", "edge_cases",
+    "collaboration", "glossary", "mission_next",
+    "dossier",
+})
+
+# Replay stream fixture type sentinel
+_REPLAY_STREAM_TYPE = "replay_stream"
 
 
 @dataclass(frozen=True)
@@ -33,7 +40,8 @@ def load_fixtures(category: str) -> List[FixtureCase]:
     """Load canonical fixture cases for a category.
 
     Args:
-        category: One of ``"events"``, ``"lane_mapping"``, or ``"edge_cases"``.
+        category: One of ``"events"``, ``"lane_mapping"``, ``"edge_cases"``,
+            ``"collaboration"``, ``"glossary"``, ``"mission_next"``, or ``"dossier"``.
 
     Returns:
         List of :class:`FixtureCase` instances with payloads loaded from JSON.
@@ -60,6 +68,10 @@ def load_fixtures(category: str) -> List[FixtureCase]:
         if not fixture_path.startswith(category + "/"):
             continue
 
+        # Skip replay stream entries — use load_replay_stream() for those
+        if entry.get("fixture_type") == _REPLAY_STREAM_TYPE:
+            continue
+
         # Resolve full path to the fixture JSON file
         full_path = _FIXTURES_DIR / fixture_path
         if not full_path.exists():
@@ -82,3 +94,60 @@ def load_fixtures(category: str) -> List[FixtureCase]:
         )
 
     return fixtures
+
+
+def load_replay_stream(fixture_id: str) -> List[Dict[str, Any]]:
+    """Load a replay stream fixture as a list of raw event dicts.
+
+    Replay streams are stored as newline-delimited JSON (JSONL) files.
+    Each line is a complete event dictionary.
+
+    Args:
+        fixture_id: The manifest ``id`` of the replay stream entry
+            (e.g. ``"dossier-replay-happy-path"`` or
+            ``"mission-next-replay-full-lifecycle"``).
+
+    Returns:
+        List of raw event dictionaries, one per line in the JSONL file.
+
+    Raises:
+        ValueError: If *fixture_id* is not found or is not a replay_stream entry.
+        FileNotFoundError: If the JSONL file does not exist on disk.
+    """
+    with open(_MANIFEST_PATH, "r", encoding="utf-8") as fh:
+        manifest: Dict[str, Any] = json.load(fh)
+
+    entry: Dict[str, Any] | None = None
+    for candidate in manifest["fixtures"]:
+        if candidate["id"] == fixture_id:
+            entry = candidate
+            break
+
+    if entry is None:
+        raise ValueError(
+            f"Replay stream fixture not found in manifest: {fixture_id!r}"
+        )
+
+    if entry.get("fixture_type") != _REPLAY_STREAM_TYPE:
+        raise ValueError(
+            f"Fixture {fixture_id!r} is not a replay_stream "
+            f"(fixture_type={entry.get('fixture_type')!r}). "
+            f"Use load_fixtures() for regular fixture cases."
+        )
+
+    full_path = _FIXTURES_DIR / entry["path"]
+    if not full_path.exists():
+        raise FileNotFoundError(
+            f"Replay stream file referenced in manifest does not exist: {full_path}"
+        )
+
+    events: List[Dict[str, Any]] = []
+    with open(full_path, "r", encoding="utf-8") as fh:
+        for line_number, line in enumerate(fh, start=1):
+            stripped = line.strip()
+            if not stripped:
+                continue
+            event_dict: Dict[str, Any] = json.loads(stripped)
+            events.append(event_dict)
+
+    return events

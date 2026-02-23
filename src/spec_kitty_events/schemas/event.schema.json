@@ -12,7 +12,7 @@
     "causation_id": {
       "anyOf": [
         {
-          "maxLength": 26,
+          "maxLength": 36,
           "minLength": 26,
           "type": "string"
         },
@@ -21,13 +21,15 @@
         }
       ],
       "default": null,
-      "description": "Event ID of the parent event (None for root events)",
+      "description": "Event ID of the parent event (26-char ULID or UUID accepted, None for root events)",
+      "pattern": "^[0-9A-HJKMNP-TV-Za-hjkmnp-tv-z]{26}$|^[0-9a-fA-F]{32}$|^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
       "title": "Causation Id"
     },
     "correlation_id": {
-      "description": "ULID grouping all events in the same mission execution",
-      "maxLength": 26,
+      "description": "Correlation identifier (26-char ULID or UUID accepted)",
+      "maxLength": 36,
       "minLength": 26,
+      "pattern": "^[0-9A-HJKMNP-TV-Za-hjkmnp-tv-z]{26}$|^[0-9a-fA-F]{32}$|^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
       "title": "Correlation Id",
       "type": "string"
     },
@@ -40,9 +42,10 @@
       "type": "integer"
     },
     "event_id": {
-      "description": "Unique event identifier (ULID format)",
-      "maxLength": 26,
+      "description": "Unique event identifier (26-char ULID or UUID accepted)",
+      "maxLength": 36,
       "minLength": 26,
+      "pattern": "^[0-9A-HJKMNP-TV-Za-hjkmnp-tv-z]{26}$|^[0-9a-fA-F]{32}$|^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
       "title": "Event Id",
       "type": "string"
     },

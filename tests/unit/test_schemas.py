@@ -8,24 +8,43 @@ from spec_kitty_events.schemas import list_schemas, load_schema, schema_path
 
 
 def test_list_schemas_returns_all_names() -> None:
-    """Test that list_schemas returns all 28 schema names."""
+    """Test that list_schemas returns all 52 schema names."""
     names = list_schemas()
-    assert len(names) == 28
+    assert len(names) == 52
     expected = [
+        "artifact_identity",
         "auth_principal_binding",
         "comment_posted_payload",
         "concurrent_driver_warning_payload",
+        "content_hash_ref",
         "decision_captured_payload",
+        "decision_input_answered_payload",
+        "decision_input_requested_payload",
         "drive_intent_set_payload",
         "event",
         "focus_changed_payload",
         "focus_target",
         "gate_failed_payload",
         "gate_passed_payload",
+        "generation_blocked_by_semantic_conflict_payload",
+        "glossary_clarification_requested_payload",
+        "glossary_clarification_resolved_payload",
+        "glossary_scope_activated_payload",
+        "glossary_sense_updated_payload",
+        "glossary_strictness_set_payload",
         "lane",
+        "local_namespace_tuple",
         "mission_cancelled_payload",
         "mission_completed_payload",
+        "mission_dossier_artifact_indexed_payload",
+        "mission_dossier_artifact_missing_payload",
+        "mission_dossier_parity_drift_detected_payload",
+        "mission_dossier_snapshot_computed_payload",
+        "mission_run_completed_payload",
+        "mission_run_started_payload",
         "mission_started_payload",
+        "next_step_auto_completed_payload",
+        "next_step_issued_payload",
         "participant_identity",
         "participant_invited_payload",
         "participant_joined_payload",
@@ -35,10 +54,15 @@ def test_list_schemas_returns_all_names() -> None:
         "presence_heartbeat_payload",
         "prompt_step_execution_completed_payload",
         "prompt_step_execution_started_payload",
+        "provenance_ref",
         "review_rollback_payload",
+        "runtime_actor_identity",
+        "semantic_check_evaluated_payload",
+        "semantic_conflict_entry",
         "session_linked_payload",
         "status_transition_payload",
         "sync_lane_v1",
+        "term_candidate_observed_payload",
         "warning_acknowledged_payload",
     ]
     assert names == expected

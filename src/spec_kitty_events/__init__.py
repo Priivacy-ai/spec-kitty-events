@@ -13,7 +13,7 @@ Example:
     1
 """
 
-__version__ = "2.1.0"
+__version__ = "2.4.0"
 
 # Core data models
 from spec_kitty_events.models import (
@@ -24,6 +24,7 @@ from spec_kitty_events.models import (
     StorageError,
     ValidationError,
     CyclicDependencyError,
+    normalize_event_id,
 )
 
 # Storage abstractions
@@ -158,6 +159,81 @@ from spec_kitty_events.collaboration import (
     reduce_collaboration_events,
 )
 
+# Glossary semantic integrity contracts
+from spec_kitty_events.glossary import (
+    GLOSSARY_SCOPE_ACTIVATED,
+    TERM_CANDIDATE_OBSERVED,
+    SEMANTIC_CHECK_EVALUATED,
+    GLOSSARY_CLARIFICATION_REQUESTED,
+    GLOSSARY_CLARIFICATION_RESOLVED,
+    GLOSSARY_SENSE_UPDATED,
+    GENERATION_BLOCKED_BY_SEMANTIC_CONFLICT,
+    GLOSSARY_STRICTNESS_SET,
+    GLOSSARY_EVENT_TYPES,
+    SemanticConflictEntry,
+    GlossaryScopeActivatedPayload,
+    TermCandidateObservedPayload,
+    SemanticCheckEvaluatedPayload,
+    GlossaryClarificationRequestedPayload,
+    GlossaryClarificationResolvedPayload,
+    GlossarySenseUpdatedPayload,
+    GenerationBlockedBySemanticConflictPayload,
+    GlossaryStrictnessSetPayload,
+    GlossaryAnomaly,
+    ClarificationRecord,
+    ReducedGlossaryState,
+    reduce_glossary_events,
+)
+
+# Mission-next runtime contracts
+from spec_kitty_events.mission_next import (
+    MISSION_RUN_STARTED,
+    NEXT_STEP_PLANNED,
+    NEXT_STEP_ISSUED,
+    NEXT_STEP_AUTO_COMPLETED,
+    DECISION_INPUT_REQUESTED,
+    DECISION_INPUT_ANSWERED,
+    MISSION_RUN_COMPLETED,
+    _COMPLETION_ALIAS,
+    MISSION_NEXT_EVENT_TYPES,
+    MissionRunStatus,
+    TERMINAL_RUN_STATUSES,
+    RuntimeActorIdentity,
+    MissionRunStartedPayload,
+    NextStepIssuedPayload,
+    NextStepAutoCompletedPayload,
+    DecisionInputRequestedPayload,
+    DecisionInputAnsweredPayload,
+    MissionRunCompletedPayload,
+    MissionNextAnomaly,
+    ReducedMissionRunState,
+    reduce_mission_next_events,
+)
+
+# Dossier event contracts (v2.4.0)
+from spec_kitty_events.dossier import (
+    MISSION_DOSSIER_ARTIFACT_INDEXED,
+    MISSION_DOSSIER_ARTIFACT_MISSING,
+    MISSION_DOSSIER_SNAPSHOT_COMPUTED,
+    MISSION_DOSSIER_PARITY_DRIFT_DETECTED,
+    DOSSIER_EVENT_TYPES,
+    NamespaceMixedStreamError,
+    LocalNamespaceTuple,
+    ArtifactIdentity,
+    ContentHashRef,
+    ProvenanceRef,
+    MissionDossierArtifactIndexedPayload,
+    MissionDossierArtifactMissingPayload,
+    MissionDossierSnapshotComputedPayload,
+    MissionDossierParityDriftDetectedPayload,
+    ArtifactEntry,
+    AnomalyEntry,
+    SnapshotSummary,
+    DriftRecord,
+    MissionDossierState,
+    reduce_mission_dossier,
+)
+
 # Public API (controls what's exported with "from spec_kitty_events import *")
 __all__ = [
     # Version
@@ -166,6 +242,7 @@ __all__ = [
     "Event",
     "ErrorEntry",
     "ConflictResolution",
+    "normalize_event_id",
     # Exceptions
     "SpecKittyEventsError",
     "StorageError",
@@ -276,4 +353,70 @@ __all__ = [
     "CollaborationAnomaly",
     "UnknownParticipantError",
     "reduce_collaboration_events",
+    # Glossary semantic integrity contracts
+    "GLOSSARY_SCOPE_ACTIVATED",
+    "TERM_CANDIDATE_OBSERVED",
+    "SEMANTIC_CHECK_EVALUATED",
+    "GLOSSARY_CLARIFICATION_REQUESTED",
+    "GLOSSARY_CLARIFICATION_RESOLVED",
+    "GLOSSARY_SENSE_UPDATED",
+    "GENERATION_BLOCKED_BY_SEMANTIC_CONFLICT",
+    "GLOSSARY_STRICTNESS_SET",
+    "GLOSSARY_EVENT_TYPES",
+    "SemanticConflictEntry",
+    "GlossaryScopeActivatedPayload",
+    "TermCandidateObservedPayload",
+    "SemanticCheckEvaluatedPayload",
+    "GlossaryClarificationRequestedPayload",
+    "GlossaryClarificationResolvedPayload",
+    "GlossarySenseUpdatedPayload",
+    "GenerationBlockedBySemanticConflictPayload",
+    "GlossaryStrictnessSetPayload",
+    "GlossaryAnomaly",
+    "ClarificationRecord",
+    "ReducedGlossaryState",
+    "reduce_glossary_events",
+    # Mission-next runtime contracts
+    "MISSION_RUN_STARTED",
+    "NEXT_STEP_PLANNED",
+    "NEXT_STEP_ISSUED",
+    "NEXT_STEP_AUTO_COMPLETED",
+    "DECISION_INPUT_REQUESTED",
+    "DECISION_INPUT_ANSWERED",
+    "MISSION_RUN_COMPLETED",
+    "_COMPLETION_ALIAS",
+    "MISSION_NEXT_EVENT_TYPES",
+    "MissionRunStatus",
+    "TERMINAL_RUN_STATUSES",
+    "RuntimeActorIdentity",
+    "MissionRunStartedPayload",
+    "NextStepIssuedPayload",
+    "NextStepAutoCompletedPayload",
+    "DecisionInputRequestedPayload",
+    "DecisionInputAnsweredPayload",
+    "MissionRunCompletedPayload",
+    "MissionNextAnomaly",
+    "ReducedMissionRunState",
+    "reduce_mission_next_events",
+    # Dossier event contracts
+    "MISSION_DOSSIER_ARTIFACT_INDEXED",
+    "MISSION_DOSSIER_ARTIFACT_MISSING",
+    "MISSION_DOSSIER_SNAPSHOT_COMPUTED",
+    "MISSION_DOSSIER_PARITY_DRIFT_DETECTED",
+    "DOSSIER_EVENT_TYPES",
+    "NamespaceMixedStreamError",
+    "LocalNamespaceTuple",
+    "ArtifactIdentity",
+    "ContentHashRef",
+    "ProvenanceRef",
+    "MissionDossierArtifactIndexedPayload",
+    "MissionDossierArtifactMissingPayload",
+    "MissionDossierSnapshotComputedPayload",
+    "MissionDossierParityDriftDetectedPayload",
+    "ArtifactEntry",
+    "AnomalyEntry",
+    "SnapshotSummary",
+    "DriftRecord",
+    "MissionDossierState",
+    "reduce_mission_dossier",
 ]

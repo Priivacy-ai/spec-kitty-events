@@ -80,8 +80,9 @@ Plus standard reducer bookkeeping: `mission_id`, `anomalies`, `event_count`, `la
 **Decision**: First work package cuts `2.x` from `main` HEAD and tags it.
 
 **Sequence**:
-1. `git branch 2.x 4aa95a6` — create branch from current HEAD
-2. `git tag 2.x-baseline 4aa95a6` — tag for downstream alignment
+1. `BASE_SHA=$(git rev-parse HEAD)` — capture current `main` HEAD at branch-cut time
+2. `git branch 2.x "$BASE_SHA"` — create branch from captured baseline
+3. `git tag 2.x-baseline "$BASE_SHA"` — tag for downstream alignment
 3. `git checkout 2.x` — switch to new branch
 4. All feature work happens on `2.x`
 5. `main` stays maintenance-only

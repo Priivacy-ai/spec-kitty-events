@@ -112,7 +112,7 @@ tests/
 
 ### D7: Branch `2.x` setup
 
-**Decision**: Cut `2.x` from current `main` HEAD (`4aa95a6`). Tag the cut point as `2.x-baseline`.
+**Decision**: Cut `2.x` from current `main` HEAD at branch-cut time (`f4692ea` at planning time). Tag the cut point as `2.x-baseline`.
 **Rationale**: Includes spec artifacts (planning metadata, not runtime code). Avoids cherry-pick divergence. Downstream repos can align to the tagged commit.
 
 ## Complexity Tracking

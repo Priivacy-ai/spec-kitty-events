@@ -224,6 +224,321 @@
       "event_type": "FocusChanged",
       "notes": "FocusChangedPayload missing required focus_target field",
       "min_version": "2.1.0"
+    },
+    {
+      "id": "glossary-scope-activated-valid",
+      "path": "glossary/valid/glossary_scope_activated.json",
+      "expected_result": "valid",
+      "event_type": "GlossaryScopeActivated",
+      "notes": "Valid GlossaryScopeActivatedPayload with team_domain scope",
+      "min_version": "2.0.0"
+    },
+    {
+      "id": "glossary-term-candidate-observed-valid",
+      "path": "glossary/valid/term_candidate_observed.json",
+      "expected_result": "valid",
+      "event_type": "TermCandidateObserved",
+      "notes": "Valid TermCandidateObservedPayload with confidence 0.7",
+      "min_version": "2.0.0"
+    },
+    {
+      "id": "glossary-semantic-check-block-valid",
+      "path": "glossary/valid/semantic_check_evaluated_block.json",
+      "expected_result": "valid",
+      "event_type": "SemanticCheckEvaluated",
+      "notes": "Valid SemanticCheckEvaluatedPayload with high severity and block action",
+      "min_version": "2.0.0"
+    },
+    {
+      "id": "glossary-semantic-check-warn-valid",
+      "path": "glossary/valid/semantic_check_evaluated_warn.json",
+      "expected_result": "valid",
+      "event_type": "SemanticCheckEvaluated",
+      "notes": "Valid SemanticCheckEvaluatedPayload with medium severity and warn action",
+      "min_version": "2.0.0"
+    },
+    {
+      "id": "glossary-generation-blocked-valid",
+      "path": "glossary/valid/generation_blocked.json",
+      "expected_result": "valid",
+      "event_type": "GenerationBlockedBySemanticConflict",
+      "notes": "Valid GenerationBlockedBySemanticConflictPayload with max strictness",
+      "min_version": "2.0.0"
+    },
+    {
+      "id": "glossary-clarification-requested-valid",
+      "path": "glossary/valid/glossary_clarification_requested.json",
+      "expected_result": "valid",
+      "event_type": "GlossaryClarificationRequested",
+      "notes": "Valid GlossaryClarificationRequestedPayload with high urgency",
+      "min_version": "2.0.0"
+    },
+    {
+      "id": "glossary-clarification-resolved-valid",
+      "path": "glossary/valid/glossary_clarification_resolved.json",
+      "expected_result": "valid",
+      "event_type": "GlossaryClarificationResolved",
+      "notes": "Valid GlossaryClarificationResolvedPayload referencing clarification event",
+      "min_version": "2.0.0"
+    },
+    {
+      "id": "glossary-sense-updated-valid",
+      "path": "glossary/valid/glossary_sense_updated.json",
+      "expected_result": "valid",
+      "event_type": "GlossarySenseUpdated",
+      "notes": "Valid GlossarySenseUpdatedPayload with before and after sense",
+      "min_version": "2.0.0"
+    },
+    {
+      "id": "glossary-strictness-set-valid",
+      "path": "glossary/valid/glossary_strictness_set.json",
+      "expected_result": "valid",
+      "event_type": "GlossaryStrictnessSet",
+      "notes": "Valid GlossaryStrictnessSetPayload changing from medium to max",
+      "min_version": "2.0.0"
+    },
+    {
+      "id": "glossary-semantic-check-missing-step-id",
+      "path": "glossary/invalid/semantic_check_missing_step_id.json",
+      "expected_result": "invalid",
+      "event_type": "SemanticCheckEvaluated",
+      "notes": "SemanticCheckEvaluatedPayload missing required step_id field",
+      "min_version": "2.0.0"
+    },
+    {
+      "id": "glossary-scope-invalid-type",
+      "path": "glossary/invalid/glossary_scope_invalid_type.json",
+      "expected_result": "invalid",
+      "event_type": "GlossaryScopeActivated",
+      "notes": "GlossaryScopeActivatedPayload with invalid scope_type value",
+      "min_version": "2.0.0"
+    },
+    {
+      "id": "glossary-clarification-missing-check-ref",
+      "path": "glossary/invalid/clarification_missing_check_ref.json",
+      "expected_result": "invalid",
+      "event_type": "GlossaryClarificationRequested",
+      "notes": "GlossaryClarificationRequestedPayload missing semantic_check_event_id",
+      "min_version": "2.0.0"
+    },
+    {
+      "id": "event-uuid-hyphenated",
+      "path": "events/valid/event_uuid_hyphenated.json",
+      "expected_result": "valid",
+      "event_type": "Event",
+      "notes": "Event with UUID-format event_id (36-char hyphenated)",
+      "min_version": "2.2.0"
+    },
+    {
+      "id": "event-uuid-bare",
+      "path": "events/valid/event_uuid_bare.json",
+      "expected_result": "valid",
+      "event_type": "Event",
+      "notes": "Event with bare UUID event_id (32-char hex, normalized by model)",
+      "min_version": "2.2.0"
+    },
+    {
+      "id": "mission-next-run-started-valid",
+      "path": "mission_next/valid/mission_run_started.json",
+      "expected_result": "valid",
+      "event_type": "MissionRunStarted",
+      "notes": "Valid MissionRunStartedPayload with LLM actor",
+      "min_version": "2.3.0"
+    },
+    {
+      "id": "mission-next-step-issued-valid",
+      "path": "mission_next/valid/next_step_issued.json",
+      "expected_result": "valid",
+      "event_type": "NextStepIssued",
+      "notes": "Valid NextStepIssuedPayload with step and agent IDs",
+      "min_version": "2.3.0"
+    },
+    {
+      "id": "mission-next-step-auto-completed-valid",
+      "path": "mission_next/valid/next_step_auto_completed.json",
+      "expected_result": "valid",
+      "event_type": "NextStepAutoCompleted",
+      "notes": "Valid NextStepAutoCompletedPayload with success result",
+      "min_version": "2.3.0"
+    },
+    {
+      "id": "mission-next-decision-requested-valid",
+      "path": "mission_next/valid/decision_input_requested.json",
+      "expected_result": "valid",
+      "event_type": "DecisionInputRequested",
+      "notes": "Valid DecisionInputRequestedPayload with input-keyed decision",
+      "min_version": "2.3.0"
+    },
+    {
+      "id": "mission-next-decision-answered-valid",
+      "path": "mission_next/valid/decision_input_answered.json",
+      "expected_result": "valid",
+      "event_type": "DecisionInputAnswered",
+      "notes": "Valid DecisionInputAnsweredPayload with human actor",
+      "min_version": "2.3.0"
+    },
+    {
+      "id": "mission-next-run-completed-valid",
+      "path": "mission_next/valid/mission_run_completed.json",
+      "expected_result": "valid",
+      "event_type": "MissionRunCompleted",
+      "notes": "Valid MissionRunCompletedPayload with LLM actor",
+      "min_version": "2.3.0"
+    },
+    {
+      "id": "mission-next-run-started-missing-run-id",
+      "path": "mission_next/invalid/mission_run_started_missing_run_id.json",
+      "expected_result": "invalid",
+      "event_type": "MissionRunStarted",
+      "notes": "MissionRunStartedPayload missing required run_id field",
+      "min_version": "2.3.0"
+    },
+    {
+      "id": "mission-next-step-issued-missing-step-id",
+      "path": "mission_next/invalid/next_step_issued_missing_step_id.json",
+      "expected_result": "invalid",
+      "event_type": "NextStepIssued",
+      "notes": "NextStepIssuedPayload missing required step_id field",
+      "min_version": "2.3.0"
+    },
+    {
+      "id": "mission-next-decision-requested-missing-question",
+      "path": "mission_next/invalid/decision_input_requested_missing_question.json",
+      "expected_result": "invalid",
+      "event_type": "DecisionInputRequested",
+      "notes": "DecisionInputRequestedPayload missing required question field",
+      "min_version": "2.3.0"
+    },
+    {
+      "id": "mission-next-replay-full-lifecycle",
+      "path": "mission_next/replay/full_lifecycle.jsonl",
+      "expected_result": "valid",
+      "event_type": "MissionNextReplay",
+      "fixture_type": "replay_stream",
+      "notes": "Full 8-event mission-next lifecycle replay stream. Each line is a complete Event envelope.",
+      "min_version": "2.3.1"
+    },
+    {
+      "id": "dossier-artifact-indexed-valid",
+      "path": "dossier/valid/dossier_artifact_indexed_valid.json",
+      "event_type": "MissionDossierArtifactIndexed",
+      "expected_result": "valid",
+      "notes": "Happy-path: spec.md indexed as input artifact",
+      "min_version": "2.4.0"
+    },
+    {
+      "id": "dossier-artifact-indexed-supersedes",
+      "path": "dossier/valid/dossier_artifact_indexed_supersedes.json",
+      "event_type": "MissionDossierArtifactIndexed",
+      "expected_result": "valid",
+      "notes": "Artifact replacing prior version via supersedes field",
+      "min_version": "2.4.0"
+    },
+    {
+      "id": "dossier-artifact-indexed-with-provenance",
+      "path": "dossier/valid/dossier_artifact_indexed_with_provenance.json",
+      "event_type": "MissionDossierArtifactIndexed",
+      "expected_result": "valid",
+      "notes": "Full provenance populated with git_sha, actor_id, and step_id",
+      "min_version": "2.4.0"
+    },
+    {
+      "id": "dossier-artifact-missing-required-always",
+      "path": "dossier/valid/dossier_artifact_missing_required_always.json",
+      "event_type": "MissionDossierArtifactMissing",
+      "expected_result": "valid",
+      "notes": "required_always completeness check for plan.md workflow artifact",
+      "min_version": "2.4.0"
+    },
+    {
+      "id": "dossier-artifact-missing-required-by-step",
+      "path": "dossier/valid/dossier_artifact_missing_required_by_step.json",
+      "event_type": "MissionDossierArtifactMissing",
+      "expected_result": "valid",
+      "notes": "Step-scoped completeness check with manifest_step=plan",
+      "min_version": "2.4.0"
+    },
+    {
+      "id": "dossier-snapshot-computed-clean",
+      "path": "dossier/valid/dossier_snapshot_computed_clean.json",
+      "event_type": "MissionDossierSnapshotComputed",
+      "expected_result": "valid",
+      "notes": "Zero anomaly snapshot: 3 artifacts, 0 anomalies",
+      "min_version": "2.4.0"
+    },
+    {
+      "id": "dossier-snapshot-computed-with-anomalies",
+      "path": "dossier/valid/dossier_snapshot_computed_with_anomalies.json",
+      "event_type": "MissionDossierSnapshotComputed",
+      "expected_result": "valid",
+      "notes": "Non-zero anomaly count: 2 artifacts, 1 anomaly",
+      "min_version": "2.4.0"
+    },
+    {
+      "id": "dossier-parity-drift-artifact-added",
+      "path": "dossier/valid/dossier_parity_drift_artifact_added.json",
+      "event_type": "MissionDossierParityDriftDetected",
+      "expected_result": "valid",
+      "notes": "Drift detection with drift_kind=artifact_added",
+      "min_version": "2.4.0"
+    },
+    {
+      "id": "dossier-parity-drift-artifact-mutated",
+      "path": "dossier/valid/dossier_parity_drift_artifact_mutated.json",
+      "event_type": "MissionDossierParityDriftDetected",
+      "expected_result": "valid",
+      "notes": "Drift detection with drift_kind=artifact_mutated",
+      "min_version": "2.4.0"
+    },
+    {
+      "id": "dossier-namespace-collision-coverage",
+      "path": "dossier/valid/dossier_namespace_collision_coverage.json",
+      "event_type": "MissionDossierArtifactIndexed",
+      "expected_result": "valid",
+      "notes": "Alternate namespace (feature_slug=009-another-feature) for namespace collision tests",
+      "min_version": "2.4.0"
+    },
+    {
+      "id": "dossier-parity-drift-namespace-mismatch",
+      "path": "dossier/invalid/dossier_parity_drift_namespace_mismatch.json",
+      "event_type": "MissionDossierParityDriftDetected",
+      "expected_result": "invalid",
+      "notes": "Namespace missing required fields: target_branch, mission_key, manifest_version",
+      "min_version": "2.4.0"
+    },
+    {
+      "id": "dossier-artifact-indexed-missing-path",
+      "path": "dossier/invalid/dossier_artifact_indexed_missing_path.json",
+      "event_type": "MissionDossierArtifactIndexed",
+      "expected_result": "invalid",
+      "notes": "artifact_id.path is absent \u2014 Pydantic must reject",
+      "min_version": "2.4.0"
+    },
+    {
+      "id": "dossier-artifact-indexed-invalid-class",
+      "path": "dossier/invalid/dossier_artifact_indexed_invalid_class.json",
+      "event_type": "MissionDossierArtifactIndexed",
+      "expected_result": "invalid",
+      "notes": "artifact_id.artifact_class='INVALID_CLASS' is not a valid Literal value",
+      "min_version": "2.4.0"
+    },
+    {
+      "id": "dossier-replay-happy-path",
+      "path": "dossier/replay/dossier_happy_path.jsonl",
+      "fixture_type": "replay_stream",
+      "event_type": "mixed",
+      "expected_result": "valid",
+      "notes": "6-event happy-path stream: 3 indexed, 2 snapshots, 1 supersedes",
+      "min_version": "2.4.0"
+    },
+    {
+      "id": "dossier-replay-drift-scenario",
+      "path": "dossier/replay/dossier_drift_scenario.jsonl",
+      "fixture_type": "replay_stream",
+      "event_type": "mixed",
+      "expected_result": "valid",
+      "notes": "5-event drift scenario: 2 indexed, 1 snapshot, 1 missing, 1 drift detected",
+      "min_version": "2.4.0"
     }
   ]
 }

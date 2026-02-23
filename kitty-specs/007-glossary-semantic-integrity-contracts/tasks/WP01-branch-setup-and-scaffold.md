@@ -1,25 +1,28 @@
 ---
-work_package_id: "WP01"
-subtasks:
-  - "T001"
-  - "T002"
-  - "T003"
-  - "T004"
-title: "Branch Setup & Module Scaffold"
-phase: "Phase 0 - Setup"
-lane: "planned"
-assignee: ""
-agent: ""
-shell_pid: ""
-review_status: ""
-reviewed_by: ""
+work_package_id: WP01
+title: Branch Setup & Module Scaffold
+lane: "done"
 dependencies: []
+base_branch: 2.x
+base_commit: 1ffeb090612a59c7864871c8bfb0aad41b9db81c
+created_at: '2026-02-16T13:14:17.708514+00:00'
+subtasks:
+- T001
+- T002
+- T003
+- T004
+phase: Phase 0 - Setup
+assignee: ''
+agent: "claude-opus"
+shell_pid: "18339"
+review_status: "approved"
+reviewed_by: "Robert Douglass"
 history:
-  - timestamp: "2026-02-16T12:00:00Z"
-    lane: "planned"
-    agent: "system"
-    shell_pid: ""
-    action: "Prompt generated via /spec-kitty.tasks"
+- timestamp: '2026-02-16T12:00:00Z'
+  lane: planned
+  agent: system
+  shell_pid: ''
+  action: Prompt generated via /spec-kitty.tasks
 ---
 
 # Work Package Prompt: WP01 – Branch Setup & Module Scaffold
@@ -39,7 +42,7 @@ history:
 
 ## Objectives & Success Criteria
 
-- Cut `2.x` branch from `main` HEAD (`4aa95a6`) and tag as `2.x-baseline`.
+- Cut `2.x` branch from `main` HEAD at branch-cut time (`f4692ea` at planning time) and tag as `2.x-baseline`.
 - Create the `glossary.py` module in `src/spec_kitty_events/` with the correct scaffold structure.
 - Define all 8 event type constants and the `GLOSSARY_EVENT_TYPES` frozenset.
 - Update `pyproject.toml` to include glossary conformance fixture paths.
@@ -62,9 +65,9 @@ history:
 
 - **Purpose**: Establish the `2.x` branch as the target for all glossary feature work. Main stays maintenance-only.
 - **Steps**:
-  1. Verify current HEAD is `4aa95a6`: `git rev-parse HEAD`
-  2. Create the branch: `git branch 2.x`
-  3. Tag the cut point: `git tag 2.x-baseline`
+  1. Capture current `main` HEAD: `BASE_SHA=$(git rev-parse HEAD)`
+  2. Create the branch: `git branch 2.x "$BASE_SHA"`
+  3. Tag the cut point: `git tag 2.x-baseline "$BASE_SHA"`
   4. Switch to the new branch: `git checkout 2.x`
   5. Verify: `git branch --show-current` should output `2.x`
 - **Files**: None (git operations only).
@@ -158,7 +161,7 @@ history:
 
 ## Review Guidance
 
-- Verify `2.x` branch points to `4aa95a6`.
+- Verify `2.x` branch points to the captured `BASE_SHA` (`f4692ea` at planning time).
 - Verify `2.x-baseline` tag points to the same commit.
 - Verify `glossary.py` has correct section structure matching `collaboration.py`.
 - Verify all 8 constant values are PascalCase and `GLOSSARY_EVENT_TYPES` has exactly 8 members.
@@ -167,3 +170,6 @@ history:
 ## Activity Log
 
 - 2026-02-16T12:00:00Z – system – lane=planned – Prompt created.
+- 2026-02-16T13:14:17Z – claude-opus – shell_pid=18339 – lane=doing – Assigned agent via workflow command
+- 2026-02-16T13:16:12Z – claude-opus – shell_pid=18339 – lane=for_review – Ready for review: glossary.py scaffold with 8 event constants, pyproject.toml updated, mypy strict passes
+- 2026-02-16T13:16:24Z – claude-opus – shell_pid=18339 – lane=done – Reviewed: 8 constants verified, mypy passes, import works correctly

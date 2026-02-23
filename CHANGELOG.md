@@ -5,6 +5,163 @@ All notable changes to spec-kitty-events will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 2.4.0 — Mission Dossier Parity Event Contracts (2026-02-21)
+
+### Added
+
+**Domain events (4 new event types)**:
+- `MissionDossierArtifactIndexedPayload` — emitted when an artifact is catalogued
+- `MissionDossierArtifactMissingPayload` — emitted when an expected artifact is absent
+- `MissionDossierSnapshotComputedPayload` — emitted when a dossier snapshot is computed
+- `MissionDossierParityDriftDetectedPayload` — emitted when drift vs baseline is detected
+
+**Provenance payload objects**:
+- `LocalNamespaceTuple` — 5-field namespace key for collision-safe parity baseline scoping
+- `ArtifactIdentity` — canonical artifact identity (path, class, run, wp scoping)
+- `ContentHashRef` — content fingerprint (hash, algorithm, size, encoding)
+- `ProvenanceRef` — source trace (event IDs, git SHA/ref, actor metadata)
+
+**Reducer**:
+- `MissionDossierState` — deterministic dossier projection output
+- `reduce_mission_dossier(events)` — pure reducer: filter → sort → dedup → namespace-check → fold
+- `NamespaceMixedStreamError` — raised when event stream spans multiple namespace tuples
+
+**Conformance infrastructure**:
+- 8 new JSON schemas in `src/spec_kitty_events/schemas/`
+- 13 fixture cases + 2 replay streams in `conformance/fixtures/dossier/`
+- `dossier` fixture category registered in `load_fixtures()`
+- 5 new conformance test categories (§7.6)
+
+### Key Invariants
+
+- `artifact_class` is exclusively in `ArtifactIdentity` — never a top-level event payload field
+- `manifest_version` is exclusively in `LocalNamespaceTuple` — never in event payloads
+- Reducer sort key: `(lamport_clock, timestamp, event_id)` — three-field total order
+- `NamespaceMixedStreamError` carries both expected and offending namespace tuples in the message
+
+### Migration: spec-kitty consumers
+
+**Version pin**: `spec-kitty-events>=2.4.0,<3.0.0`
+
+No breaking changes. All existing exports (Event envelope, WPStatusChanged,
+lifecycle, collaboration, glossary, mission-next families) are unchanged.
+
+To emit dossier events:
+
+```python
+from spec_kitty_events import (
+    MissionDossierArtifactIndexedPayload,
+    LocalNamespaceTuple, ArtifactIdentity, ContentHashRef,
+    MISSION_DOSSIER_ARTIFACT_INDEXED,
+)
+```
+
+Always include a full `LocalNamespaceTuple` with all 5 required fields.
+Use `validate_event(payload_dict, event_type)` to validate before emitting.
+
+To reduce a dossier event stream:
+
+```python
+from spec_kitty_events import reduce_mission_dossier, NamespaceMixedStreamError
+try:
+    state = reduce_mission_dossier(events)
+except NamespaceMixedStreamError:
+    # partition stream by namespace first
+    ...
+```
+
+### Migration: spec-kitty-saas consumers
+
+**Version pin**: `spec-kitty-events>=2.4.0,<3.0.0`
+
+No breaking changes. Import the four dossier payload models for ingestion-side validation:
+
+```python
+from spec_kitty_events import (
+    MissionDossierArtifactIndexedPayload,
+    MissionDossierArtifactMissingPayload,
+    MissionDossierSnapshotComputedPayload,
+    MissionDossierParityDriftDetectedPayload,
+)
+from spec_kitty_events.conformance import validate_event, load_replay_stream
+```
+
+Use fixture replay streams for integration test baselines:
+
+```python
+events = load_replay_stream("dossier-replay-happy-path")
+events = load_replay_stream("dossier-replay-drift-scenario")
+```
+
+Namespace collision prevention: always include the full `LocalNamespaceTuple` when
+keying parity baselines. The reducer rejects mixed-namespace streams; callers must
+partition by namespace before calling `reduce_mission_dossier()`.
+
+---
+
+## [2.3.1] - 2026-02-17
+
+### Added
+
+- **Canonical replay fixture stream**: `full_lifecycle.jsonl` in
+  `conformance/fixtures/mission_next/replay/` -- 8-event JSONL stream covering
+  the full mission-next lifecycle. Each line is a complete `Event` envelope.
+  Consumers replay through projections for integration testing.
+- `load_replay_stream()` in `spec_kitty_events.conformance` for programmatic
+  replay fixture access.
+
+### Fixed
+
+- **First tagged release with mission-next contracts**: v2.3.0 was committed
+  but never tagged. This release (v2.3.1) is the first tagged release shipping
+  the mission-next reducer with all three correctness guards:
+  - Lifecycle `MissionCompleted` alias collision rejected via payload validation
+  - `run_id` consistency enforced on all post-start events
+  - Malformed payloads converted to anomalies (no reducer crash)
+
+## [2.3.0] - 2026-02-17
+
+### Added
+
+- **Mission-next runtime contracts**: 7 event type constants (`MissionRunStarted`,
+  `NextStepPlanned`, `NextStepIssued`, `NextStepAutoCompleted`,
+  `DecisionInputRequested`, `DecisionInputAnswered`, `MissionRunCompleted`)
+  and `MISSION_NEXT_EVENT_TYPES` frozenset.
+- `RuntimeActorIdentity` value object mirroring the runtime's `ActorIdentity`
+  schema (human, llm, service actor types with provider/model/tool metadata).
+- 6 typed payload models for run-scoped mission execution events.
+- `MissionRunStatus` enum (`RUNNING`, `COMPLETED`) with `TERMINAL_RUN_STATUSES`.
+- `MissionNextAnomaly` and `ReducedMissionRunState` reducer output models.
+- `reduce_mission_next_events()` — deterministic reducer for mission run state
+  materialization with step tracking, decision lifecycle, and anomaly detection.
+- Compatibility alias — `"MissionCompleted"` accepted as `"MissionRunCompleted"`
+  for run-scoped events during migration window.
+- `NextStepPlanned` reserved constant (payload contract deferred until runtime emits).
+- 7 new JSON Schema files for mission-next models (44 total).
+- 9 conformance payload fixtures (6 valid, 3 invalid) in `mission_next/` category.
+- Hypothesis property tests for reducer determinism (200 permutations) and
+  idempotent dedup (100 examples).
+- 22 new exports (total package exports: 126).
+
+## [2.2.0] - 2026-02-17
+
+### Added
+
+- **UUID event ID acceptance** (backward-compatible): Envelope fields (`event_id`,
+  `causation_id`, `correlation_id`) now accept ULID (26-char Crockford base32),
+  hyphenated UUID (36-char), and bare hex UUID (32-char).
+- `normalize_event_id()` public function for canonical ID normalization.
+  Exported in `__init__.py`.
+- JSON Schema patterns widened for all 3 inbound formats with strict Crockford
+  base32 validation for ULIDs.
+- 2 new conformance fixtures: `event-uuid-hyphenated`, `event-uuid-bare`.
+
+### Changed
+
+- **ULID canonicalization**: 26-char ULID IDs are now uppercased to canonical form
+  and validated against Crockford base32 charset (I, L, O, U rejected).
+- **UUID canonicalization**: UUID IDs lowercased to canonical hyphenated form.
+
 ## [2.1.0] - 2026-02-15
 
 ### Added
@@ -180,6 +337,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+[2.3.1]: https://github.com/Priivacy-ai/spec-kitty-events/compare/v2.3.0...v2.3.1
+[2.3.0]: https://github.com/Priivacy-ai/spec-kitty-events/compare/v2.2.0...v2.3.0
+[2.2.0]: https://github.com/Priivacy-ai/spec-kitty-events/compare/v2.1.0...v2.2.0
 [2.1.0]: https://github.com/Priivacy-ai/spec-kitty-events/compare/v2.0.0rc1...v2.1.0
 [2.0.0rc1]: https://github.com/Priivacy-ai/spec-kitty-events/compare/v0.4.0-alpha...v2.0.0rc1
 [0.4.0-alpha]: https://github.com/Priivacy-ai/spec-kitty-events/compare/v0.3.0-alpha...v0.4.0-alpha

@@ -94,10 +94,10 @@ class TestValidEventFixtures:
             f"Conformance failure for {path}: {result.model_violations}"
         )
 
-    def test_nine_valid_event_fixtures_exist(self) -> None:
+    def test_eleven_valid_event_fixtures_exist(self) -> None:
         valid_dir = _FIXTURES_DIR / "events" / "valid"
         files = sorted(valid_dir.glob("*.json"))
-        assert len(files) == 9, f"Expected 9 valid event fixtures, got {len(files)}"
+        assert len(files) == 11, f"Expected 11 valid event fixtures, got {len(files)}"
 
 
 # ---------------------------------------------------------------------------
@@ -356,7 +356,7 @@ class TestLoadFixtures:
     def test_events_valid_cases_expected_valid_true(self) -> None:
         cases = load_fixtures("events")
         valid_cases = [c for c in cases if c.expected_valid]
-        assert len(valid_cases) == 9
+        assert len(valid_cases) == 11
 
     def test_events_invalid_cases_expected_valid_false(self) -> None:
         cases = load_fixtures("events")

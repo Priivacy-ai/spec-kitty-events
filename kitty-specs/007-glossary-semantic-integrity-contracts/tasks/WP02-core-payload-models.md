@@ -1,26 +1,29 @@
 ---
-work_package_id: "WP02"
+work_package_id: WP02
+title: Core Payload Models — Scope, Term, Sense, Strictness
+lane: "done"
+dependencies: [WP01]
+base_branch: 007-glossary-semantic-integrity-contracts-WP01
+base_commit: b784a988a468e02443875607213646fa89a9a4bc
+created_at: '2026-02-16T13:16:38.576849+00:00'
 subtasks:
-  - "T005"
-  - "T006"
-  - "T007"
-  - "T008"
-  - "T009"
-title: "Core Payload Models — Scope, Term, Sense, Strictness"
-phase: "Phase 1 - Payload Models"
-lane: "planned"
-assignee: ""
-agent: ""
-shell_pid: ""
-review_status: ""
-reviewed_by: ""
-dependencies: ["WP01"]
+- T005
+- T006
+- T007
+- T008
+- T009
+phase: Phase 1 - Payload Models
+assignee: ''
+agent: "claude-opus"
+shell_pid: "19899"
+review_status: "approved"
+reviewed_by: "Robert Douglass"
 history:
-  - timestamp: "2026-02-16T12:00:00Z"
-    lane: "planned"
-    agent: "system"
-    shell_pid: ""
-    action: "Prompt generated via /spec-kitty.tasks"
+- timestamp: '2026-02-16T12:00:00Z'
+  lane: planned
+  agent: system
+  shell_pid: ''
+  action: Prompt generated via /spec-kitty.tasks
 ---
 
 # Work Package Prompt: WP02 – Core Payload Models — Scope, Term, Sense, Strictness
@@ -201,3 +204,6 @@ history:
 ## Activity Log
 
 - 2026-02-16T12:00:00Z – system – lane=planned – Prompt created.
+- 2026-02-16T13:16:38Z – claude-opus – shell_pid=19899 – lane=doing – Assigned agent via workflow command
+- 2026-02-16T13:18:02Z – claude-opus – shell_pid=19899 – lane=for_review – 5 frozen Pydantic models with round-trip verification and mypy --strict pass
+- 2026-02-16T13:18:08Z – claude-opus – shell_pid=19899 – lane=done – Reviewed: all 5 models correct, frozen, round-trip verified

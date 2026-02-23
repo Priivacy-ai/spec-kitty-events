@@ -1,0 +1,7 @@
+{
+  "mission_key": "feature-login",
+  "actor": {
+    "actor_id": "agent-claude",
+    "actor_type": "llm"
+  }
+}

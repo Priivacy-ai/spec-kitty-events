@@ -9,6 +9,7 @@ per event type, versioning policy, and CI integration steps.
 - [Lane Mapping Contract](#lane-mapping-contract)
 - [Event Type Field Reference](#event-type-field-reference)
 - [Collaboration Event Contracts](#collaboration-event-contracts)
+- [Mission-Next Runtime Contracts](#mission-next-runtime-contracts)
 - [Versioning Policy](#versioning-policy)
 - [Migration Guide (0.x to 2.0.0)](#migration-guide-0x-to-200)
 - [Consumer CI Integration](#consumer-ci-integration)
@@ -281,6 +282,101 @@ The collaboration model uses **advisory warnings**, not hard locks:
   - SaaS backend fallback inference that detects conflicts from the event stream
 - **Soft coordination**: The system provides visibility into potential conflicts but does not
   enforce resolution. Participants retain full autonomy over their actions.
+
+---
+
+## Mission-Next Runtime Contracts
+
+Added in **2.3.0**. These contracts define typed payloads for run-scoped mission execution events
+emitted by the spec-kitty-runtime engine.
+
+### Event Type Reference
+
+| Event Type | Payload Model | Description |
+|---|---|---|
+| `MissionRunStarted` | `MissionRunStartedPayload` | Run initiated with actor identity |
+| `NextStepIssued` | `NextStepIssuedPayload` | Step dispatched to an agent |
+| `NextStepAutoCompleted` | `NextStepAutoCompletedPayload` | Step completed with result |
+| `DecisionInputRequested` | `DecisionInputRequestedPayload` | Decision required from user/service |
+| `DecisionInputAnswered` | `DecisionInputAnsweredPayload` | Decision answered |
+| `MissionRunCompleted` | `MissionRunCompletedPayload` | Run reached terminal state |
+| `NextStepPlanned` | *(reserved — no payload)* | Reserved constant; deferred until runtime emits |
+
+### `MissionCompleted` vs `MissionRunCompleted`
+
+These are distinct event types in different domains:
+
+| Aspect | Lifecycle `MissionCompleted` | Mission-Next `MissionRunCompleted` |
+|---|---|---|
+| Module | `lifecycle.py` | `mission_next.py` |
+| Scope | Mission-level (all phases done) | Run-level (single execution) |
+| Payload | `MissionCompletedPayload` (mission_id, mission_type, final_phase, actor) | `MissionRunCompletedPayload` (run_id, mission_key, actor) |
+| Key field | `mission_id` (str) | `run_id` (str) |
+| Actor type | `str` | `RuntimeActorIdentity` (structured) |
+
+**Migration note**: The runtime currently emits `"MissionCompleted"` as the event_type for run
+completion (in `engine.py:309`). During the compatibility window, the mission-next reducer accepts
+`"MissionCompleted"` as an alias for `"MissionRunCompleted"` when processing run-scoped events.
+The conformance validator continues to map `"MissionCompleted"` to the lifecycle
+`MissionCompletedPayload` for validation purposes.
+
+### RuntimeActorIdentity
+
+Mirrors the runtime's `ActorIdentity` schema:
+
+| Field | Type | Required | Default | Description |
+|---|---|---|---|---|
+| `actor_id` | `str` | Yes | — | Unique actor identifier |
+| `actor_type` | `"human"` / `"llm"` / `"service"` | Yes | — | Actor category |
+| `display_name` | `str` | No | `""` | Human-readable name |
+| `provider` | `str` or `null` | No | `None` | e.g., `"anthropic"`, `"openai"` |
+| `model` | `str` or `null` | No | `None` | e.g., `"claude-opus-4-6"` |
+| `tool` | `str` or `null` | No | `None` | Tool identifier |
+
+### Replay Fixture Stream (v2.3.1)
+
+A canonical 8-event JSONL replay stream is provided for integration testing.
+Each line is a complete `Event` envelope that can be deserialized and fed through
+the mission-next reducer.
+
+| # | Event Type | Key Detail | Lamport |
+|---|---|---|---|
+| 1 | `MissionRunStarted` | run_id=replay-run-001, LLM actor | 1 |
+| 2 | `NextStepIssued` | step-setup-env | 2 |
+| 3 | `NextStepAutoCompleted` | step-setup-env (success) | 3 |
+| 4 | `NextStepIssued` | step-configure-db | 4 |
+| 5 | `DecisionInputRequested` | input:db-password | 5 |
+| 6 | `DecisionInputAnswered` | use-env-var, human actor | 6 |
+| 7 | `NextStepAutoCompleted` | step-configure-db (success) | 7 |
+| 8 | `MissionRunCompleted` | terminal state | 8 |
+
+**Expected reducer output**: `run_status=COMPLETED`, `completed_steps=("step-setup-env", "step-configure-db")`, zero anomalies, `event_count=8`.
+
+**Programmatic access**:
+
+```python
+from spec_kitty_events.conformance import load_replay_stream
+from spec_kitty_events import Event, reduce_mission_next_events
+
+envelopes = load_replay_stream("mission-next-replay-full-lifecycle")
+events = [Event(**env) for env in envelopes]
+state = reduce_mission_next_events(events)
+assert state.run_status.value == "completed"
+assert len(state.completed_steps) == 2
+```
+
+### Reducer Correctness Verification (v2.3.1)
+
+The mission-next reducer (`reduce_mission_next_events()`) implements three correctness guards
+that prevent silent data corruption:
+
+| Bug Class | Guard | Location |
+|---|---|---|
+| Lifecycle `MissionCompleted` alias collision | Payload validation gate: `MissionCompleted` events are only accepted as run-completion if their payload validates as `MissionRunCompletedPayload`. Lifecycle payloads (with `mission_id`, `mission_type`, `final_phase`) are rejected with an anomaly. | `mission_next.py:297-311` |
+| `run_id` consistency | Every post-start handler (`NextStepIssued`, `NextStepAutoCompleted`, `DecisionInputRequested`, `DecisionInputAnswered`, `MissionRunCompleted`) checks that the event's `run_id` matches the established run. Mismatches produce an anomaly. | `mission_next.py:372,391,413,440,461` |
+| Malformed payload resilience | Every payload parse is wrapped in `try/except`. Invalid payloads produce an anomaly instead of crashing the reducer. | All handler blocks |
+
+These guards are exercised by 80 tests with 100% line coverage on `mission_next.py`.
 
 ---
 
