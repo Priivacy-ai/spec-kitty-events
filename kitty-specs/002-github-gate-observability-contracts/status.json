@@ -1,0 +1,38 @@
+{
+  "event_count": 3,
+  "feature_slug": "002-github-gate-observability-contracts",
+  "last_event_id": "01KJ5V2V7ANZ7A0AKP3Y2526MK",
+  "materialized_at": "2026-02-23T18:09:46.731002+00:00",
+  "summary": {
+    "blocked": 0,
+    "canceled": 0,
+    "claimed": 0,
+    "done": 3,
+    "for_review": 0,
+    "in_progress": 0,
+    "planned": 0
+  },
+  "work_packages": {
+    "WP01": {
+      "actor": "migration",
+      "force_count": 1,
+      "lane": "done",
+      "last_event_id": "01KJ5V2V76PCAASRWYVW7YREX4",
+      "last_transition_at": "2026-02-07T00:00:00Z"
+    },
+    "WP02": {
+      "actor": "migration",
+      "force_count": 1,
+      "lane": "done",
+      "last_event_id": "01KJ5V2V78C8GC6186X3RJA9JG",
+      "last_transition_at": "2026-02-07T00:00:00Z"
+    },
+    "WP03": {
+      "actor": "migration",
+      "force_count": 1,
+      "lane": "done",
+      "last_event_id": "01KJ5V2V7ANZ7A0AKP3Y2526MK",
+      "last_transition_at": "2026-02-07T00:00:00Z"
+    }
+  }
+}

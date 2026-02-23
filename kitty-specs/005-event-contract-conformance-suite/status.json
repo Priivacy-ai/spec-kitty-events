@@ -1,0 +1,66 @@
+{
+  "event_count": 7,
+  "feature_slug": "005-event-contract-conformance-suite",
+  "last_event_id": "01KJ5V2V848XNE7DNCKQYBP0KW",
+  "materialized_at": "2026-02-23T18:09:46.757339+00:00",
+  "summary": {
+    "blocked": 0,
+    "canceled": 0,
+    "claimed": 0,
+    "done": 7,
+    "for_review": 0,
+    "in_progress": 0,
+    "planned": 0
+  },
+  "work_packages": {
+    "WP01": {
+      "actor": "migration",
+      "force_count": 1,
+      "lane": "done",
+      "last_event_id": "01KJ5V2V7ST1P6QADAH6TH1ZDD",
+      "last_transition_at": "2026-02-23T18:09:46.744997+00:00"
+    },
+    "WP02": {
+      "actor": "migration",
+      "force_count": 1,
+      "lane": "done",
+      "last_event_id": "01KJ5V2V7TAKCM0ZCHR03GMDBB",
+      "last_transition_at": "2026-02-23T18:09:46.746887+00:00"
+    },
+    "WP03": {
+      "actor": "migration",
+      "force_count": 1,
+      "lane": "done",
+      "last_event_id": "01KJ5V2V7WS14ZR7QDJXRM9XHH",
+      "last_transition_at": "2026-02-23T18:09:46.748924+00:00"
+    },
+    "WP04": {
+      "actor": "migration",
+      "force_count": 1,
+      "lane": "done",
+      "last_event_id": "01KJ5V2V7YTZXARFWA0314428K",
+      "last_transition_at": "2026-02-23T18:09:46.750940+00:00"
+    },
+    "WP05": {
+      "actor": "migration",
+      "force_count": 1,
+      "lane": "done",
+      "last_event_id": "01KJ5V2V80H5T5B7W8FQ7ED7P4",
+      "last_transition_at": "2026-02-23T18:09:46.752796+00:00"
+    },
+    "WP06": {
+      "actor": "migration",
+      "force_count": 1,
+      "lane": "done",
+      "last_event_id": "01KJ5V2V8298QJXCGQSMH62KAA",
+      "last_transition_at": "2026-02-23T18:09:46.754715+00:00"
+    },
+    "WP07": {
+      "actor": "migration",
+      "force_count": 1,
+      "lane": "done",
+      "last_event_id": "01KJ5V2V848XNE7DNCKQYBP0KW",
+      "last_transition_at": "2026-02-23T18:09:46.756789+00:00"
+    }
+  }
+}

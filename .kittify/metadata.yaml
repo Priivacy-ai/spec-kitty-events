@@ -3,9 +3,9 @@
 # DO NOT EDIT MANUALLY
 
 spec_kitty:
-  version: 0.16.1
+  version: 2.0.0
   initialized_at: '2026-02-07T07:46:50.090112'
-  last_upgraded_at: '2026-02-21T15:58:41.228251'
+  last_upgraded_at: '2026-02-23T19:09:46.821311'
 environment:
   python_version: 3.14.0
   platform: darwin
@@ -16,3 +16,24 @@ migrations:
     applied_at: '2026-02-07T13:05:59.357137'
     result: skipped
     notes: Not applicable
+  - id: 2.0.0a5_remove_wp_status_gitignore_rule
+    applied_at: '2026-02-23T19:09:46.708454'
+    result: skipped
+    notes: Not applicable
+  - id: 2.0.0_constitution_directory
+    applied_at: '2026-02-23T19:09:46.708554'
+    result: skipped
+    notes: Not applicable
+  - id: 2.0.0_historical_status_migration
+    applied_at: '2026-02-23T19:09:46.818831'
+    result: success
+    notes: '001-event-model-project-identity: migrated (3 WPs, 3 events); 002-github-gate-observability-contracts:
+      migrated (3 WPs, 3 events); 003-status-state-model-contracts: migrated (4 WPs,
+      4 events); 005-event-contract-conformance-suite: migrated (7 WPs, 7 events);
+      006-mission-collaboration-soft-coordination-contracts: migrated (9 WPs, 9 events);
+      008-mission-dossier-parity-event-contracts: migrated (5 WPs, 5 events)'
+  - id: 2.0.0_retire_git_hooks
+    applied_at: '2026-02-23T19:09:46.821303'
+    result: success
+    notes: 'Removed 3 managed git hook(s); Removed managed hook: pre-commit; Removed
+      managed hook: pre-commit-agent-check; Removed managed hook: pre-commit-encoding-check'

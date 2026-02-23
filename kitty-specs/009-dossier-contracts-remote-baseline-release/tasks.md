@@ -185,3 +185,8 @@ WP01 (Recovery) → WP02 (Local Gate) → WP03 (PR & Release)
 | T018 | Create annotated v2.4.0 tag | WP03 | P0 | No |
 | T019 | Push v2.4.0 tag to origin | WP03 | P0 | No |
 | T020 | Verify tag + smoke-test import | WP03 | P0 | No |
+
+<!-- status-model:start -->
+## Canonical Status (Generated)
+- WP01: for_review
+<!-- status-model:end -->
