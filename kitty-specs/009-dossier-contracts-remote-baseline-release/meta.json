@@ -2,8 +2,10 @@
   "feature_number": "009",
   "slug": "009-dossier-contracts-remote-baseline-release",
   "feature_slug": "009-dossier-contracts-remote-baseline-release",
-  "friendly_name": "dossier contracts remote baseline release",
+  "friendly_name": "Dossier Contracts Remote Baseline Release",
   "mission": "software-dev",
   "target_branch": "2.x",
-  "created_at": "2026-02-23T17:40:31.791811+00:00"
+  "vcs": "git",
+  "created_at": "2026-02-23T17:40:31.791811+00:00",
+  "source_description": "Recover Feature 008 dossier contract implementation (commits 5237894 + 139ca09) from git reflog onto a branch from origin/2.x, merge upstream security statement commit (640709f), run full conformance + fixture replay tests, push to origin/2.x, and publish release tag v2.4.0. Makes four dossier/parity event contracts available to runtime and SaaS consumers without re-implementation."
 }
