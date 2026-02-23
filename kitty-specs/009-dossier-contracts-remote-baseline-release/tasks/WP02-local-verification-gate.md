@@ -1,12 +1,12 @@
 ---
 work_package_id: WP02
 title: Local Verification Gate
-lane: "planned"
+lane: "doing"
 dependencies:
 - WP01
-base_branch: main
-base_commit: 59bbb3af14be089462c96533d920bd0271dc39dd
-created_at: '2026-02-23T00:00:00.000000+00:00'
+base_branch: 2.x
+base_commit: 1385b17bd3d4edfc30bd6d8adc321376ec9f5aa9
+created_at: '2026-02-23T18:30:43.288623+00:00'
 subtasks:
 - T007
 - T008
@@ -18,7 +18,7 @@ subtasks:
 phase: Phase 2 - Verification
 assignee: ''
 agent: ''
-shell_pid: ''
+shell_pid: "37914"
 review_status: ''
 reviewed_by: ''
 history:
