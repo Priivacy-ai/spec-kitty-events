@@ -75,7 +75,7 @@ the expected `MissionDossierState`.
 - [x] T010 Run `mypy --strict` and confirm zero new errors
 - [x] T011 Run dossier conformance suite (valid fixtures pass, invalid rejected)
 - [x] T012 Run replay scenario tests and verify deterministic state
-- [ ] T013 Push `009-dossier-release` to `origin`
+- [x] T013 Push `009-dossier-release` to `origin`
 
 ### Implementation Notes
 - Use `pip install -e ".[dev,conformance]"` (not plain `pip install -e .`)
