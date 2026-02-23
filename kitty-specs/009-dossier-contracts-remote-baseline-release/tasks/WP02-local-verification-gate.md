@@ -17,7 +17,7 @@ subtasks:
 - T013
 phase: Phase 2 - Verification
 assignee: ''
-agent: ''
+agent: "claude-code"
 shell_pid: "37914"
 review_status: ''
 reviewed_by: ''
@@ -87,3 +87,7 @@ the expected `MissionDossierState`.
   commit on the integration branch, document delta.
 - **Coverage below threshold**: Add targeted tests on the integration branch;
   document additions in the PR description.
+
+## Activity Log
+
+- 2026-02-23T18:30:43Z – claude-code – shell_pid=37914 – lane=doing – Assigned agent via workflow command
