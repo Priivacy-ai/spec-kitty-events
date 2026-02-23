@@ -69,12 +69,12 @@ the expected `MissionDossierState`.
 **Prompt**: `tasks/WP02-local-verification-gate.md`
 
 ### Included Subtasks
-- [ ] T007 Install package with dev + conformance extras
-- [ ] T008 Run full pytest suite and verify count + zero failures
-- [ ] T009 Check coverage report for `dossier.py` (≥98%)
-- [ ] T010 Run `mypy --strict` and confirm zero new errors
-- [ ] T011 Run dossier conformance suite (valid fixtures pass, invalid rejected)
-- [ ] T012 Run replay scenario tests and verify deterministic state
+- [x] T007 Install package with dev + conformance extras
+- [x] T008 Run full pytest suite and verify count + zero failures
+- [x] T009 Check coverage report for `dossier.py` (≥98%)
+- [x] T010 Run `mypy --strict` and confirm zero new errors
+- [x] T011 Run dossier conformance suite (valid fixtures pass, invalid rejected)
+- [x] T012 Run replay scenario tests and verify deterministic state
 - [ ] T013 Push `009-dossier-release` to `origin`
 
 ### Implementation Notes
@@ -188,5 +188,5 @@ WP01 (Recovery) → WP02 (Local Gate) → WP03 (PR & Release)
 
 <!-- status-model:start -->
 ## Canonical Status (Generated)
-- WP01: for_review
+- WP01: done
 <!-- status-model:end -->
