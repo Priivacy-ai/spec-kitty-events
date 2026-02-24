@@ -10,6 +10,7 @@ Covers spec §7.6 conformance categories:
 from __future__ import annotations
 
 import json
+from pathlib import Path
 from typing import Any, Dict, List
 
 import pytest
@@ -78,6 +79,20 @@ def test_happy_path_stream_artifacts_present() -> None:
         "kitty-specs/008-mission-dossier-parity-event-contracts/tasks.md",
     }
     assert set(state.artifacts.keys()) == expected_paths
+
+
+def test_happy_path_matches_canonical_output_snapshot() -> None:
+    """Reducer output for happy-path replay must match committed canonical snapshot."""
+    events = _events_from_replay("dossier-replay-happy-path")
+    state = reduce_mission_dossier(events)
+
+    snapshot_path = (
+        Path(__file__).resolve().parents[1]
+        / "src/spec_kitty_events/conformance/fixtures/dossier/replay/canonical_output_snapshot.json"
+    )
+    expected = json.loads(snapshot_path.read_text(encoding="utf-8"))
+
+    assert state.model_dump(mode="json") == expected
 
 
 def test_drift_scenario_produces_drifted_state() -> None:
@@ -281,6 +296,52 @@ def test_optional_step_id_variance_does_not_raise() -> None:
     assert state.event_count == 2
     assert len(state.artifacts) == 2
     assert state.namespace is not None
+
+
+def test_mixed_step_ids_normalize_to_none() -> None:
+    """When multiple non-null step_ids appear, projected namespace.step_id is None."""
+    ns_base = _make_valid_namespace_dict()
+
+    event_a = _make_bare_dossier_event(
+        event_type="MissionDossierArtifactIndexed",
+        event_id="01JNRSTEPN0000000000000001",
+        lamport_clock=1,
+        payload={
+            "namespace": {**ns_base, "step_id": "step-A"},
+            "artifact_id": {
+                "mission_key": "software-dev",
+                "path": "docs/spec.md",
+                "artifact_class": "input",
+            },
+            "content_ref": {"hash": "aabb0101", "algorithm": "sha256"},
+            "indexed_at": "2026-02-21T14:00:00Z",
+        },
+    )
+    event_b = _make_bare_dossier_event(
+        event_type="MissionDossierArtifactIndexed",
+        event_id="01JNRSTEPN0000000000000002",
+        lamport_clock=2,
+        payload={
+            "namespace": {**ns_base, "step_id": "step-B"},
+            "artifact_id": {
+                "mission_key": "software-dev",
+                "path": "docs/plan.md",
+                "artifact_class": "workflow",
+            },
+            "content_ref": {"hash": "aabb0102", "algorithm": "sha256"},
+            "indexed_at": "2026-02-21T14:01:00Z",
+        },
+    )
+
+    state = reduce_mission_dossier([event_a, event_b])
+
+    assert state.namespace is not None
+    assert state.namespace.step_id is None
+    assert state.namespace.project_uuid == ns_base["project_uuid"]
+    assert state.namespace.feature_slug == ns_base["feature_slug"]
+    assert state.namespace.target_branch == ns_base["target_branch"]
+    assert state.namespace.mission_key == ns_base["mission_key"]
+    assert state.namespace.manifest_version == ns_base["manifest_version"]
 
 
 def test_malformed_first_event_does_not_poison_valid_stream() -> None:

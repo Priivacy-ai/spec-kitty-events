@@ -68,8 +68,9 @@ def load_fixtures(category: str) -> List[FixtureCase]:
         if not fixture_path.startswith(category + "/"):
             continue
 
-        # Skip replay stream entries — use load_replay_stream() for those
-        if entry.get("fixture_type") == _REPLAY_STREAM_TYPE:
+        # Skip non-event fixtures (replay streams, reducer snapshots, etc.).
+        # Dedicated loaders/tests handle those fixture types explicitly.
+        if entry.get("fixture_type") is not None:
             continue
 
         # Resolve full path to the fixture JSON file

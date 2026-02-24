@@ -51,6 +51,7 @@ spec_kitty_events = [
     "conformance/fixtures/mission_next/replay/*.jsonl",
     "conformance/fixtures/dossier/valid/*.json",
     "conformance/fixtures/dossier/invalid/*.json",
+    "conformance/fixtures/dossier/replay/*.json",
     "conformance/fixtures/dossier/replay/*.jsonl",
 ]
 

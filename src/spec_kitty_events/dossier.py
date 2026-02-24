@@ -321,10 +321,13 @@ def reduce_mission_dossier(events: Sequence[Event]) -> MissionDossierState:
     # will also skip them via try/except.  Compare using the 5-field key so
     # that optional step_id variance does not falsely trigger a mismatch.
     canonical_ns: Optional[LocalNamespaceTuple] = None
+    observed_step_ids: set[str] = set()
     for ev in unique_events:
         ns = _extract_namespace(ev)
         if ns is None:
             continue
+        if ns.step_id is not None:
+            observed_step_ids.add(ns.step_id)
         if canonical_ns is None:
             canonical_ns = ns
             continue
@@ -333,6 +336,12 @@ def reduce_mission_dossier(events: Sequence[Event]) -> MissionDossierState:
                 f"Namespace mismatch in dossier event stream. "
                 f"Expected: {canonical_ns!r}. Got: {ns!r}."
             )
+
+    # If multiple step_ids were observed within one logical namespace,
+    # normalize step_id to None in the projected namespace to avoid implying a
+    # single canonical step scope.
+    if canonical_ns is not None and len(observed_step_ids) > 1:
+        canonical_ns = canonical_ns.model_copy(update={"step_id": None})
 
     # 5. Fold events into mutable intermediates
     namespace = canonical_ns
