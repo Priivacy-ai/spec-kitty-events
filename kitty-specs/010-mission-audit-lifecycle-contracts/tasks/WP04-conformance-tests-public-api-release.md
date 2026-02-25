@@ -27,7 +27,7 @@ history:
 
 ## Goal
 
-Write the conformance test suite for mission-audit fixtures, add 23 exports to `__init__.py`, bump version 2.4.0 → 2.5.0 in both `pyproject.toml` and `__init__.py`, and update `pyproject.toml` package-data globs to include mission-audit fixture files. Verify all quality gates pass with zero regressions.
+Write the conformance test suite for mission-audit fixtures, add 21 exports to `__init__.py`, bump version 2.4.0 → 2.5.0 in both `pyproject.toml` and `__init__.py`, and update `pyproject.toml` package-data globs to include mission-audit fixture files. Verify all quality gates pass with zero regressions.
 
 **Independent Test**: `python3.11 -m pytest tests/ -v --tb=short` — all pass. `mypy --strict src/spec_kitty_events/__init__.py src/spec_kitty_events/mission_audit.py` — zero errors.
 
@@ -207,7 +207,7 @@ def test_schema_drift(model_class, schema_name):
     )
 ```
 
-### T020 — Update `src/spec_kitty_events/__init__.py` — add 23 exports
+### T020 — Update `src/spec_kitty_events/__init__.py` — add 21 exports
 
 Add after the dossier import block (after `reduce_mission_dossier,`):
 
@@ -240,7 +240,7 @@ from spec_kitty_events.mission_audit import (
 
 **Note**: The `as X` syntax (`from ... import X as X`) is required for mypy strict mode. Without it, mypy treats re-exports as "implicit" and raises `[no-redef]` or `[attr-defined]` errors depending on configuration.
 
-Also add these 23 names to `__all__` (after the dossier entries in the list):
+Also add these 21 names to `__all__` (after the dossier entries in the list):
 
 ```python
     # Mission Audit Lifecycle Contracts (2.5.0)
@@ -267,7 +267,7 @@ Also add these 23 names to `__all__` (after the dossier entries in the list):
     "reduce_mission_audit_events",
 ```
 
-Wait — that is 21 names above. The full count per tasks.md is 23. The remaining 2 are `AUDIT_SCHEMA_VERSION` and `TERMINAL_AUDIT_STATUSES` which ARE included in the list above. Count confirms: 5 event type constants + MISSION_AUDIT_EVENT_TYPES + 3 enums + 2 value objects (AuditArtifactRef, PendingDecision) + MissionAuditAnomaly + 5 payload models + ReducedMissionAuditState + reduce_mission_audit_events + AUDIT_SCHEMA_VERSION + TERMINAL_AUDIT_STATUSES = 21 names. That matches 21 items in `__all__` (tasks.md says "~23" which accounts for rounding). Export all of the above.
+Count confirms: 5 event type constants + MISSION_AUDIT_EVENT_TYPES + 3 enums + 2 value objects (AuditArtifactRef, PendingDecision) + MissionAuditAnomaly + 5 payload models + ReducedMissionAuditState + reduce_mission_audit_events + AUDIT_SCHEMA_VERSION + TERMINAL_AUDIT_STATUSES = 21 names. Export all of the above.
 
 **Verify export completeness**:
 ```bash
