@@ -23,6 +23,13 @@ _VALID_CATEGORIES = frozenset({
 # Replay stream fixture type sentinel
 _REPLAY_STREAM_TYPE = "replay_stream"
 
+# Known special fixture types that load_fixtures() skips.
+# Typos in manifest fixture_type values will raise ValueError.
+_SPECIAL_FIXTURE_TYPES: frozenset[str] = frozenset({
+    "replay_stream",
+    "reducer_output",
+})
+
 
 @dataclass(frozen=True)
 class FixtureCase:
@@ -68,8 +75,17 @@ def load_fixtures(category: str) -> List[FixtureCase]:
         if not fixture_path.startswith(category + "/"):
             continue
 
-        # Skip replay stream entries — use load_replay_stream() for those
-        if entry.get("fixture_type") == _REPLAY_STREAM_TYPE:
+        # Skip entries with a known special fixture_type (e.g. replay_stream,
+        # reducer_output) — only regular event fixtures are loaded here.
+        # Raise on unknown fixture_type to catch manifest typos early.
+        ft: str | None = entry.get("fixture_type")
+        if ft is not None:
+            if ft not in _SPECIAL_FIXTURE_TYPES:
+                raise ValueError(
+                    f"Unknown fixture_type {ft!r} in manifest entry "
+                    f"{entry.get('id', '?')!r}. "
+                    f"Known types: {sorted(_SPECIAL_FIXTURE_TYPES)}"
+                )
             continue
 
         # Resolve full path to the fixture JSON file

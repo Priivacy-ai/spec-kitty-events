@@ -334,6 +334,16 @@ def reduce_mission_dossier(events: Sequence[Event]) -> MissionDossierState:
                 f"Expected: {canonical_ns!r}. Got: {ns!r}."
             )
 
+    # 4b. Normalize step_id: if multiple distinct non-null step_ids seen, set None
+    if canonical_ns is not None:
+        seen_step_ids: set[str] = set()
+        for ev in unique_events:
+            ns = _extract_namespace(ev)
+            if ns is not None and ns.step_id is not None:
+                seen_step_ids.add(ns.step_id)
+        if len(seen_step_ids) > 1:
+            canonical_ns = canonical_ns.model_copy(update={"step_id": None})
+
     # 5. Fold events into mutable intermediates
     namespace = canonical_ns
     artifacts: Dict[str, ArtifactEntry] = {}

@@ -283,6 +283,57 @@ def test_optional_step_id_variance_does_not_raise() -> None:
     assert state.namespace is not None
 
 
+def test_mixed_step_ids_normalize_to_none() -> None:
+    """When multiple distinct step_ids appear, state.namespace.step_id must be None."""
+    ns_base = _make_valid_namespace_dict()
+    # Event 1: step_id="step-A"
+    ns_a = {**ns_base, "step_id": "step-A"}
+    event1 = _make_bare_dossier_event(
+        event_type="MissionDossierArtifactIndexed",
+        event_id="01JNRSTEPNRM000000000000A1",
+        lamport_clock=1,
+        payload={
+            "namespace": ns_a,
+            "artifact_id": {
+                "mission_key": "software-dev",
+                "path": "some/artifact-a.md",
+                "artifact_class": "input",
+            },
+            "content_ref": {"hash": "aabb0001", "algorithm": "sha256"},
+            "indexed_at": "2026-02-21T14:00:00Z",
+        },
+    )
+    # Event 2: step_id="step-B"
+    ns_b = {**ns_base, "step_id": "step-B"}
+    event2 = _make_bare_dossier_event(
+        event_type="MissionDossierArtifactIndexed",
+        event_id="01JNRSTEPNRM000000000000A2",
+        lamport_clock=2,
+        payload={
+            "namespace": ns_b,
+            "artifact_id": {
+                "mission_key": "software-dev",
+                "path": "some/artifact-b.md",
+                "artifact_class": "output",
+            },
+            "content_ref": {"hash": "aabb0002", "algorithm": "sha256"},
+            "indexed_at": "2026-02-21T14:01:00Z",
+        },
+    )
+    state = reduce_mission_dossier([event1, event2])
+    # Mixed step_ids → normalized to None
+    assert state.namespace is not None
+    assert state.namespace.step_id is None
+    # 5-field identity preserved
+    assert state.namespace.project_uuid == ns_base["project_uuid"]
+    assert state.namespace.feature_slug == ns_base["feature_slug"]
+    assert state.namespace.target_branch == ns_base["target_branch"]
+    assert state.namespace.mission_key == ns_base["mission_key"]
+    assert state.namespace.manifest_version == ns_base["manifest_version"]
+    assert state.event_count == 2
+    assert len(state.artifacts) == 2
+
+
 def test_malformed_first_event_does_not_poison_valid_stream() -> None:
     """A malformed first event (bad namespace) must be skipped, not poison subsequent
     valid events.

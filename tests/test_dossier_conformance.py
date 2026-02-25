@@ -5,8 +5,11 @@ Covers spec §7.6 conformance categories:
 - Parity drift detection
 - Namespace collision prevention
 - Round-trip schema conformance
+- Canonical reducer output snapshot regression
 """
 from __future__ import annotations
+
+import json
 
 import pytest
 
@@ -143,3 +146,35 @@ def test_all_valid_fixture_event_types_are_known() -> None:
         # if it returns a result the type is known
         result = validate_event(case.payload, case.event_type, strict=True)
         assert result.event_type == case.event_type
+
+
+# ---------------------------------------------------------------------------
+# Canonical reducer output snapshot regression
+# ---------------------------------------------------------------------------
+
+
+def test_canonical_output_snapshot_matches_reducer() -> None:
+    """Reducer output for happy-path stream must match committed canonical snapshot.
+
+    Prevents silent drift between the reducer and the published consumer contract
+    fixture. Uses mode="json" so tuples serialize to lists for JSON equality.
+    """
+    from importlib.resources import files
+
+    from spec_kitty_events.dossier import reduce_mission_dossier
+    from spec_kitty_events.models import Event
+
+    raw = load_replay_stream("dossier-replay-happy-path")
+    events = [Event(**e) for e in raw]
+    state = reduce_mission_dossier(events)
+
+    fixture_path = (
+        files("spec_kitty_events.conformance.fixtures.dossier.replay")
+        / "canonical_output_snapshot.json"
+    )
+    expected = json.loads(fixture_path.read_text())
+
+    assert state.model_dump(mode="json") == expected, (
+        "Reducer output does not match canonical_output_snapshot.json. "
+        "If the reducer changed intentionally, regenerate the snapshot."
+    )

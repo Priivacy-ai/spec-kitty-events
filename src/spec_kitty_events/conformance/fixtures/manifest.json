@@ -539,6 +539,15 @@
       "expected_result": "valid",
       "notes": "5-event drift scenario: 2 indexed, 1 snapshot, 1 missing, 1 drift detected",
       "min_version": "2.4.0"
+    },
+    {
+      "id": "dossier-canonical-output-snapshot",
+      "path": "dossier/replay/canonical_output_snapshot.json",
+      "fixture_type": "reducer_output",
+      "event_type": "MissionDossierState",
+      "expected_result": "valid",
+      "notes": "Known-good reducer output from dossier_happy_path.jsonl for downstream consumer verification",
+      "min_version": "2.4.0"
     }
   ]
 }
