@@ -548,6 +548,148 @@
       "expected_result": "valid",
       "notes": "Known-good reducer output from dossier_happy_path.jsonl for downstream consumer verification",
       "min_version": "2.4.0"
+    },
+    {
+      "id": "mission-audit-requested-manual",
+      "path": "mission_audit/valid/mission_audit_requested_manual.json",
+      "event_type": "MissionAuditRequested",
+      "expected_result": "valid",
+      "notes": "Manual trigger with advisory enforcement, 3-item audit scope",
+      "min_version": "2.5.0"
+    },
+    {
+      "id": "mission-audit-requested-post-merge",
+      "path": "mission_audit/valid/mission_audit_requested_post_merge.json",
+      "event_type": "MissionAuditRequested",
+      "expected_result": "valid",
+      "notes": "Post-merge trigger with blocking enforcement, 5-item audit scope",
+      "min_version": "2.5.0"
+    },
+    {
+      "id": "mission-audit-started-valid",
+      "path": "mission_audit/valid/mission_audit_started_valid.json",
+      "event_type": "MissionAuditStarted",
+      "expected_result": "valid",
+      "notes": "Valid started event with audit_scope_hash",
+      "min_version": "2.5.0"
+    },
+    {
+      "id": "mission-audit-decision-requested-valid",
+      "path": "mission_audit/valid/mission_audit_decision_requested_valid.json",
+      "event_type": "MissionAuditDecisionRequested",
+      "expected_result": "valid",
+      "notes": "Decision checkpoint with warning severity",
+      "min_version": "2.5.0"
+    },
+    {
+      "id": "mission-audit-completed-pass",
+      "path": "mission_audit/valid/mission_audit_completed_pass.json",
+      "event_type": "MissionAuditCompleted",
+      "expected_result": "valid",
+      "notes": "Pass verdict with info severity, zero findings, artifact_ref populated",
+      "min_version": "2.5.0"
+    },
+    {
+      "id": "mission-audit-completed-fail",
+      "path": "mission_audit/valid/mission_audit_completed_fail.json",
+      "event_type": "MissionAuditCompleted",
+      "expected_result": "valid",
+      "notes": "Fail verdict with error severity, 3 findings, artifact_ref populated",
+      "min_version": "2.5.0"
+    },
+    {
+      "id": "mission-audit-failed-valid",
+      "path": "mission_audit/valid/mission_audit_failed_valid.json",
+      "event_type": "MissionAuditFailed",
+      "expected_result": "valid",
+      "notes": "Timeout failure with null partial_artifact_ref",
+      "min_version": "2.5.0"
+    },
+    {
+      "id": "mission-audit-completed-missing-verdict",
+      "path": "mission_audit/invalid/mission_audit_completed_missing_verdict.json",
+      "event_type": "MissionAuditCompleted",
+      "expected_result": "invalid",
+      "notes": "verdict field absent \u2014 Pydantic must reject with missing field violation",
+      "min_version": "2.5.0"
+    },
+    {
+      "id": "mission-audit-completed-missing-artifact-ref",
+      "path": "mission_audit/invalid/mission_audit_completed_missing_artifact_ref.json",
+      "event_type": "MissionAuditCompleted",
+      "expected_result": "invalid",
+      "notes": "artifact_ref absent \u2014 required (not Optional) per FR-006; Pydantic must reject",
+      "min_version": "2.5.0"
+    },
+    {
+      "id": "mission-audit-requested-bad-trigger",
+      "path": "mission_audit/invalid/mission_audit_requested_bad_trigger.json",
+      "event_type": "MissionAuditRequested",
+      "expected_result": "invalid",
+      "notes": "trigger_mode='scheduled' violates Literal[manual, post_merge] constraint",
+      "min_version": "2.5.0"
+    },
+    {
+      "id": "mission-audit-decision-missing-id",
+      "path": "mission_audit/invalid/mission_audit_decision_missing_id.json",
+      "event_type": "MissionAuditDecisionRequested",
+      "expected_result": "invalid",
+      "notes": "decision_id field absent \u2014 required with min_length=1",
+      "min_version": "2.5.0"
+    },
+    {
+      "id": "mission-audit-replay-pass",
+      "path": "mission_audit/replay/mission_audit_replay_pass.jsonl",
+      "fixture_type": "replay_stream",
+      "event_type": "mixed",
+      "expected_result": "valid",
+      "notes": "3-event pass lifecycle: Requested \u2192 Started \u2192 Completed(pass)",
+      "min_version": "2.5.0"
+    },
+    {
+      "id": "mission-audit-replay-fail",
+      "path": "mission_audit/replay/mission_audit_replay_fail.jsonl",
+      "fixture_type": "replay_stream",
+      "event_type": "mixed",
+      "expected_result": "valid",
+      "notes": "3-event fail lifecycle: Requested \u2192 Started \u2192 Failed(TIMEOUT)",
+      "min_version": "2.5.0"
+    },
+    {
+      "id": "mission-audit-replay-decision-checkpoint",
+      "path": "mission_audit/replay/mission_audit_replay_decision_checkpoint.jsonl",
+      "fixture_type": "replay_stream",
+      "event_type": "mixed",
+      "expected_result": "valid",
+      "notes": "4-event decision checkpoint: Requested \u2192 Started \u2192 DecisionRequested \u2192 Completed",
+      "min_version": "2.5.0"
+    },
+    {
+      "id": "mission-audit-replay-pass-output",
+      "path": "mission_audit/replay/mission_audit_replay_pass_output.json",
+      "fixture_type": "reducer_output",
+      "event_type": "MissionAuditState",
+      "expected_result": "valid",
+      "notes": "Golden reducer output for mission_audit_replay_pass.jsonl \u2014 audit_status=completed, verdict=pass",
+      "min_version": "2.5.0"
+    },
+    {
+      "id": "mission-audit-replay-fail-output",
+      "path": "mission_audit/replay/mission_audit_replay_fail_output.json",
+      "fixture_type": "reducer_output",
+      "event_type": "MissionAuditState",
+      "expected_result": "valid",
+      "notes": "Golden reducer output for mission_audit_replay_fail.jsonl \u2014 audit_status=failed",
+      "min_version": "2.5.0"
+    },
+    {
+      "id": "mission-audit-replay-decision-checkpoint-output",
+      "path": "mission_audit/replay/mission_audit_replay_decision_checkpoint_output.json",
+      "fixture_type": "reducer_output",
+      "event_type": "MissionAuditState",
+      "expected_result": "valid",
+      "notes": "Golden reducer output for mission_audit_replay_decision_checkpoint.jsonl \u2014 pending_decisions cleared on Completed",
+      "min_version": "2.5.0"
     }
   ]
 }

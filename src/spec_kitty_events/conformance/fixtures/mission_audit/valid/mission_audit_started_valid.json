@@ -1,0 +1,7 @@
+{
+  "mission_id": "mission-010",
+  "run_id": "run-001",
+  "feature_slug": "010-mission-audit-lifecycle-contracts",
+  "actor": "agent-claude",
+  "audit_scope_hash": "sha256:a1b2c3d4e5f6789012345678901234567890123456789012345678901234567890"
+}
