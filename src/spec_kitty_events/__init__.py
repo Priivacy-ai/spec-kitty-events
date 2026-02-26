@@ -13,7 +13,7 @@ Example:
     1
 """
 
-__version__ = "2.4.0"
+__version__ = "2.5.0"
 
 # Core data models
 from spec_kitty_events.models import (
@@ -234,6 +234,31 @@ from spec_kitty_events.dossier import (
     reduce_mission_dossier,
 )
 
+# Mission Audit Lifecycle Contracts (2.5.0)
+from spec_kitty_events.mission_audit import (
+    AUDIT_SCHEMA_VERSION as AUDIT_SCHEMA_VERSION,
+    MISSION_AUDIT_REQUESTED as MISSION_AUDIT_REQUESTED,
+    MISSION_AUDIT_STARTED as MISSION_AUDIT_STARTED,
+    MISSION_AUDIT_DECISION_REQUESTED as MISSION_AUDIT_DECISION_REQUESTED,
+    MISSION_AUDIT_COMPLETED as MISSION_AUDIT_COMPLETED,
+    MISSION_AUDIT_FAILED as MISSION_AUDIT_FAILED,
+    MISSION_AUDIT_EVENT_TYPES as MISSION_AUDIT_EVENT_TYPES,
+    TERMINAL_AUDIT_STATUSES as TERMINAL_AUDIT_STATUSES,
+    AuditVerdict as AuditVerdict,
+    AuditSeverity as AuditSeverity,
+    AuditStatus as AuditStatus,
+    AuditArtifactRef as AuditArtifactRef,
+    PendingDecision as PendingDecision,
+    MissionAuditAnomaly as MissionAuditAnomaly,
+    MissionAuditRequestedPayload as MissionAuditRequestedPayload,
+    MissionAuditStartedPayload as MissionAuditStartedPayload,
+    MissionAuditDecisionRequestedPayload as MissionAuditDecisionRequestedPayload,
+    MissionAuditCompletedPayload as MissionAuditCompletedPayload,
+    MissionAuditFailedPayload as MissionAuditFailedPayload,
+    ReducedMissionAuditState as ReducedMissionAuditState,
+    reduce_mission_audit_events as reduce_mission_audit_events,
+)
+
 # Backward-compatible dossier aliases without the Payload suffix.
 # Older consumers import these names directly.
 MissionDossierArtifactIndexed = MissionDossierArtifactIndexedPayload
@@ -430,4 +455,26 @@ __all__ = [
     "DriftRecord",
     "MissionDossierState",
     "reduce_mission_dossier",
+    # Mission Audit Lifecycle Contracts (2.5.0)
+    "AUDIT_SCHEMA_VERSION",
+    "MISSION_AUDIT_REQUESTED",
+    "MISSION_AUDIT_STARTED",
+    "MISSION_AUDIT_DECISION_REQUESTED",
+    "MISSION_AUDIT_COMPLETED",
+    "MISSION_AUDIT_FAILED",
+    "MISSION_AUDIT_EVENT_TYPES",
+    "TERMINAL_AUDIT_STATUSES",
+    "AuditVerdict",
+    "AuditSeverity",
+    "AuditStatus",
+    "AuditArtifactRef",
+    "PendingDecision",
+    "MissionAuditAnomaly",
+    "MissionAuditRequestedPayload",
+    "MissionAuditStartedPayload",
+    "MissionAuditDecisionRequestedPayload",
+    "MissionAuditCompletedPayload",
+    "MissionAuditFailedPayload",
+    "ReducedMissionAuditState",
+    "reduce_mission_audit_events",
 ]
