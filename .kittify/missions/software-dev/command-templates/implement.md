@@ -2,6 +2,16 @@
 description: Create an isolated workspace (worktree) for implementing a specific work package.
 ---
 
+## Constitution Context Bootstrap (required)
+
+Before running workflow implement, load constitution context for this action:
+
+```bash
+spec-kitty constitution context --action implement --json
+```
+
+Use JSON `text` as governance context. On first load (`mode=bootstrap`), follow referenced docs as needed.
+
 ## ⚠️ CRITICAL: Working Directory Requirement
 
 **After running `spec-kitty implement WP##`, you MUST:**
@@ -27,6 +37,14 @@ Run this command to get the work package prompt and implementation instructions:
 spec-kitty agent workflow implement $ARGUMENTS --agent <your-name>
 ```
 
+<details><summary>PowerShell equivalent</summary>
+
+```powershell
+spec-kitty agent workflow implement $ARGUMENTS --agent <your-name>
+```
+
+</details>
+
 **CRITICAL**: You MUST provide `--agent <your-name>` to track who is implementing!
 
 If no WP ID is provided, it will automatically find the first work package with `lane: "planned"` and move it to "doing" for you.
@@ -39,9 +57,21 @@ If no WP ID is provided, it will automatically find the first work package with 
 
 ```bash
 cd .worktrees/###-feature-WP##/
-git add -A
+# Stage only expected deliverables for this WP (never use `git add -A`)
+git add <deliverable-path-1> <deliverable-path-2> ...
 git commit -m "feat(WP##): <describe your implementation>"
 ```
+
+<details><summary>PowerShell equivalent</summary>
+
+```powershell
+Set-Location .worktrees\###-feature-WP##\
+# Stage only expected deliverables for this WP (never use `git add -A`)
+git add <deliverable-path-1> <deliverable-path-2> ...
+git commit -m "feat(WP##): <describe your implementation>"
+```
+
+</details>
 
 **Then move to review:**
 ```bash
