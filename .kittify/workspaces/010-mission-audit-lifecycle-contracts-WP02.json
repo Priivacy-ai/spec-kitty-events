@@ -1,0 +1,14 @@
+{
+  "wp_id": "WP02",
+  "feature_slug": "010-mission-audit-lifecycle-contracts",
+  "worktree_path": ".worktrees/010-mission-audit-lifecycle-contracts-WP02",
+  "branch_name": "010-mission-audit-lifecycle-contracts-WP02",
+  "base_branch": "main",
+  "base_commit": "cee0731b0016e2eb66c2aabd9a8ec5f7d186d9c3",
+  "dependencies": [
+    "WP01"
+  ],
+  "created_at": "2026-02-26T12:35:56.800294+00:00",
+  "created_by": "implement-command",
+  "vcs_backend": "git"
+}
