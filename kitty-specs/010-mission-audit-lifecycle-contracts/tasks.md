@@ -66,13 +66,13 @@
 
 ### Included Subtasks
 
-- [ ] T005 Implement `reduce_mission_audit_events()` pipeline in `mission_audit.py` (sort via `status_event_sort_key`, dedup via `dedup_events`, filter to MISSION_AUDIT_EVENT_TYPES, fold via match/dispatch, return frozen `ReducedMissionAuditState`)
-- [ ] T006 Implement state machine transitions in reducer fold (pending→running on Started; running→awaiting_decision on DecisionRequested; running/awaiting_decision→completed on Completed; running/awaiting_decision→failed on Failed)
-- [ ] T007 Implement anomaly detection in reducer (`event_before_requested`, `event_after_terminal`, `duplicate_decision_id`, `unrecognized_event_type`)
-- [ ] T008 Implement pending_decisions management (append PendingDecision on DecisionRequested, dedup by decision_id, clear on terminal event Completed/Failed)
-- [ ] T009 [P] Write unit tests — `tests/unit/test_mission_audit.py` (5 payload round-trips, required field rejection x5, Literal constraint rejection x2, Field constraint rejection x2, enum validation x3, AuditArtifactRef composition, frozen immutability x5, PendingDecision construction)
-- [ ] T010 [P] Write reducer unit tests — `tests/test_mission_audit_reducer.py` (happy-path pass, happy-path fail, decision checkpoint, empty stream, dedup, 4 anomaly scenarios, terminal clears pending, partial artifact, 3 golden-file replay)
-- [ ] T011 [P] Write Hypothesis property tests — `tests/property/test_mission_audit_determinism.py` (order independence ≥200 examples, idempotent dedup ≥200 examples, monotonic event_count ≥200 examples)
+- [x] T005 Implement `reduce_mission_audit_events()` pipeline in `mission_audit.py` (sort via `status_event_sort_key`, dedup via `dedup_events`, filter to MISSION_AUDIT_EVENT_TYPES, fold via match/dispatch, return frozen `ReducedMissionAuditState`)
+- [x] T006 Implement state machine transitions in reducer fold (pending→running on Started; running→awaiting_decision on DecisionRequested; running/awaiting_decision→completed on Completed; running/awaiting_decision→failed on Failed)
+- [x] T007 Implement anomaly detection in reducer (`event_before_requested`, `event_after_terminal`, `duplicate_decision_id`, `unrecognized_event_type`)
+- [x] T008 Implement pending_decisions management (append PendingDecision on DecisionRequested, dedup by decision_id, clear on terminal event Completed/Failed)
+- [x] T009 [P] Write unit tests — `tests/unit/test_mission_audit.py` (5 payload round-trips, required field rejection x5, Literal constraint rejection x2, Field constraint rejection x2, enum validation x3, AuditArtifactRef composition, frozen immutability x5, PendingDecision construction)
+- [x] T010 [P] Write reducer unit tests — `tests/test_mission_audit_reducer.py` (happy-path pass, happy-path fail, decision checkpoint, empty stream, dedup, 4 anomaly scenarios, terminal clears pending, partial artifact, 3 golden-file replay)
+- [x] T011 [P] Write Hypothesis property tests — `tests/property/test_mission_audit_determinism.py` (order independence ≥200 examples, idempotent dedup ≥200 examples, monotonic event_count ≥200 examples)
 
 ### Implementation Notes
 
@@ -223,5 +223,5 @@
 
 <!-- status-model:start -->
 ## Canonical Status (Generated)
-- WP01: for_review
+- WP01: done
 <!-- status-model:end -->
