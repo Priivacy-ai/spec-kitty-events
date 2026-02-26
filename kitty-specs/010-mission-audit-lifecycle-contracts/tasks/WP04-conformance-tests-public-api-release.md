@@ -1,7 +1,7 @@
 ---
 work_package_id: WP04
 title: Conformance Tests + Public API + Release
-lane: "done"
+lane: "doing"
 dependencies:
 - WP02
 - WP03
@@ -15,8 +15,8 @@ subtasks:
 - T022
 phase: Phase 4 - Public API + Release
 assignee: ''
-agent: claude-reviewer-sonnet
-shell_pid: '65709'
+agent: "claude-sonnet"
+shell_pid: "69230"
 review_status: "approved"
 reviewed_by: "Robert Douglass"
 history:
@@ -459,3 +459,4 @@ When all subtasks are done and acceptance criteria pass:
 - 2026-02-26T13:32:25Z – claude-sonnet – shell_pid=57708 – lane=for_review – Conformance tests pass (22 tests: 7 valid + 4 invalid + 3 replay golden + 5 schema drift), all 21 exports verified, version 2.5.0, 1186 tests pass, mypy --strict zero errors, 97% coverage, zero regressions
 - 2026-02-26T13:32:55Z – claude-reviewer-sonnet – shell_pid=65709 – lane=doing – Started review via workflow command
 - 2026-02-26T13:36:39Z – claude-reviewer-sonnet – shell_pid=65709 – lane=done – Review passed: All 22 conformance tests pass (7 valid + 4 invalid + 3 count + 3 replay golden + 5 schema drift). All 21 mission-audit exports verified from top-level. Version bumped 2.4.0→2.5.0 in both pyproject.toml and __init__.py. Package-data globs correct (schemas/*.json already covered). mypy --strict zero errors. 1186 tests pass, 97% coverage, zero regressions. WP04 is terminal—no dependents to notify.
+- 2026-02-26T13:38:18Z – claude-sonnet – shell_pid=69230 – lane=doing – Started implementation via workflow command
