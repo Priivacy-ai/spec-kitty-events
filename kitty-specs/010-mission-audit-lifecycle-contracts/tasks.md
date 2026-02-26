@@ -23,10 +23,10 @@
 
 ### Included Subtasks
 
-- [ ] T001 Create enums + constants in `mission_audit.py` (AuditVerdict, AuditSeverity, AuditStatus, TERMINAL_AUDIT_STATUSES, AUDIT_SCHEMA_VERSION, 5 event type constants, MISSION_AUDIT_EVENT_TYPES)
-- [ ] T002 Add frozen value objects to `mission_audit.py` (AuditArtifactRef composing ContentHashRef+ProvenanceRef from dossier.py; PendingDecision; MissionAuditAnomaly)
-- [ ] T003 [P] Add 5 frozen payload models to `mission_audit.py` (MissionAuditRequestedPayload, MissionAuditStartedPayload, MissionAuditDecisionRequestedPayload, MissionAuditCompletedPayload, MissionAuditFailedPayload)
-- [ ] T004 Add `ReducedMissionAuditState` frozen output model to `mission_audit.py` (18 fields with defaults; stub `reduce_mission_audit_events()` signature)
+- [x] T001 Create enums + constants in `mission_audit.py` (AuditVerdict, AuditSeverity, AuditStatus, TERMINAL_AUDIT_STATUSES, AUDIT_SCHEMA_VERSION, 5 event type constants, MISSION_AUDIT_EVENT_TYPES)
+- [x] T002 Add frozen value objects to `mission_audit.py` (AuditArtifactRef composing ContentHashRef+ProvenanceRef from dossier.py; PendingDecision; MissionAuditAnomaly)
+- [x] T003 [P] Add 5 frozen payload models to `mission_audit.py` (MissionAuditRequestedPayload, MissionAuditStartedPayload, MissionAuditDecisionRequestedPayload, MissionAuditCompletedPayload, MissionAuditFailedPayload)
+- [x] T004 Add `ReducedMissionAuditState` frozen output model to `mission_audit.py` (18 fields with defaults; stub `reduce_mission_audit_events()` signature)
 
 ### Implementation Notes
 
