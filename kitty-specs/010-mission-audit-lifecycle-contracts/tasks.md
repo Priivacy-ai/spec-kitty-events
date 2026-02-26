@@ -220,3 +220,8 @@
 | T020 | Add 21 exports to __init__.py | WP04 | P2 | Yes |
 | T021 | Bump version 2.4.0 → 2.5.0 | WP04 | P2 | Yes |
 | T022 | Update pyproject.toml package-data globs | WP04 | P2 | Yes |
+
+<!-- status-model:start -->
+## Canonical Status (Generated)
+- WP01: for_review
+<!-- status-model:end -->
