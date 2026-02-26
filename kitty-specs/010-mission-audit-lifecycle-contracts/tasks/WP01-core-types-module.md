@@ -1,7 +1,7 @@
 ---
 work_package_id: WP01
 title: Core Types Module
-lane: "for_review"
+lane: "doing"
 dependencies: []
 base_branch: main
 base_commit: a7ba75c9d083900f32eaf9c041d9657e316c0dd2
@@ -13,8 +13,8 @@ subtasks:
 - T004
 phase: Phase 1 - Core Types
 assignee: ''
-agent: claude-sonnet
-shell_pid: '28510'
+agent: "claude-sonnet-reviewer"
+shell_pid: "31909"
 review_status: ''
 reviewed_by: ''
 history:
@@ -350,3 +350,4 @@ When all subtasks are done and acceptance criteria pass:
 
 - 2026-02-26T12:28:54Z – claude-sonnet – shell_pid=28510 – lane=doing – Assigned agent via workflow command
 - 2026-02-26T12:31:48Z – claude-sonnet – shell_pid=28510 – lane=for_review – Ready for review: mission_audit.py created with all enums, value objects (AuditArtifactRef, PendingDecision, MissionAuditAnomaly), 5 payload models, ReducedMissionAuditState, and reducer stub. All acceptance criteria pass: imports OK, mypy --strict zero errors, round-trips clean, Literal/ge constraints enforced, frozen immutability confirmed.
+- 2026-02-26T12:33:30Z – claude-sonnet-reviewer – shell_pid=31909 – lane=doing – Started review via workflow command
