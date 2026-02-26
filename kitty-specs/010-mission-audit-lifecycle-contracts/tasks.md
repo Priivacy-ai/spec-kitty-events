@@ -110,13 +110,13 @@
 
 ### Included Subtasks
 
-- [ ] T012 Generate 5 JSON schema files in `src/spec_kitty_events/schemas/` via `TypeAdapter(...).json_schema()` (mission_audit_requested_payload.json, mission_audit_started_payload.json, mission_audit_decision_requested_payload.json, mission_audit_completed_payload.json, mission_audit_failed_payload.json)
-- [ ] T013 Update `src/spec_kitty_events/conformance/validators.py` — add 5 imports from `mission_audit`, 5 entries to `_EVENT_TYPE_TO_MODEL`, 5 entries to `_EVENT_TYPE_TO_SCHEMA`
-- [ ] T014 Update `src/spec_kitty_events/conformance/loader.py` — add `"mission_audit"` to `_VALID_CATEGORIES` frozenset
-- [ ] T015 [P] Create 7 valid fixture JSON files in `src/spec_kitty_events/conformance/fixtures/mission_audit/valid/`
-- [ ] T016 [P] Create 4 invalid fixture JSON files in `src/spec_kitty_events/conformance/fixtures/mission_audit/invalid/`
-- [ ] T017 [P] Create 3 replay JSONL files + 3 golden reducer output JSON files in `src/spec_kitty_events/conformance/fixtures/mission_audit/replay/`
-- [ ] T018 Update `src/spec_kitty_events/conformance/fixtures/manifest.json` with 17 new entries (7 valid + 4 invalid + 3 replay_stream + 3 reducer_output), all `min_version: "2.5.0"`
+- [x] T012 Generate 5 JSON schema files in `src/spec_kitty_events/schemas/` via `TypeAdapter(...).json_schema()` (mission_audit_requested_payload.json, mission_audit_started_payload.json, mission_audit_decision_requested_payload.json, mission_audit_completed_payload.json, mission_audit_failed_payload.json)
+- [x] T013 Update `src/spec_kitty_events/conformance/validators.py` — add 5 imports from `mission_audit`, 5 entries to `_EVENT_TYPE_TO_MODEL`, 5 entries to `_EVENT_TYPE_TO_SCHEMA`
+- [x] T014 Update `src/spec_kitty_events/conformance/loader.py` — add `"mission_audit"` to `_VALID_CATEGORIES` frozenset
+- [x] T015 [P] Create 7 valid fixture JSON files in `src/spec_kitty_events/conformance/fixtures/mission_audit/valid/`
+- [x] T016 [P] Create 4 invalid fixture JSON files in `src/spec_kitty_events/conformance/fixtures/mission_audit/invalid/`
+- [x] T017 [P] Create 3 replay JSONL files + 3 golden reducer output JSON files in `src/spec_kitty_events/conformance/fixtures/mission_audit/replay/`
+- [x] T018 Update `src/spec_kitty_events/conformance/fixtures/manifest.json` with 17 new entries (7 valid + 4 invalid + 3 replay_stream + 3 reducer_output), all `min_version: "2.5.0"`
 
 ### Implementation Notes
 
@@ -224,4 +224,5 @@
 <!-- status-model:start -->
 ## Canonical Status (Generated)
 - WP01: done
+- WP02: for_review
 <!-- status-model:end -->
