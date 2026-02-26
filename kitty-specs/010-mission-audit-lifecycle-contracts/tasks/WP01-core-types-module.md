@@ -13,7 +13,7 @@ subtasks:
 - T004
 phase: Phase 1 - Core Types
 assignee: ''
-agent: ''
+agent: "claude-sonnet"
 shell_pid: "28510"
 review_status: ''
 reviewed_by: ''
@@ -345,3 +345,7 @@ When all subtasks are done and acceptance criteria pass:
 1. Run the smoke test and mypy check (commands above).
 2. Commit: `git add src/spec_kitty_events/mission_audit.py && git commit -m "feat(010): core types module — enums, value objects, payload models, reducer stub"`
 3. Update this WP file's `lane` from `planned` → `for_review` and append to `history`.
+
+## Activity Log
+
+- 2026-02-26T12:28:54Z – claude-sonnet – shell_pid=28510 – lane=doing – Assigned agent via workflow command
