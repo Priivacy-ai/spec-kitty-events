@@ -1,11 +1,25 @@
 {
+  "accept_commit": null,
+  "acceptance_history": [
+    {
+      "accepted_at": "2026-02-26T13:54:09Z",
+      "accepted_by": "claude",
+      "accepted_from_commit": "ba7d8032dad1cd8fb614e272eaf34db1944d980f",
+      "branch": "main",
+      "mode": "local"
+    }
+  ],
+  "acceptance_mode": "local",
+  "accepted_at": "2026-02-26T13:54:09Z",
+  "accepted_by": "claude",
+  "accepted_from_commit": "ba7d8032dad1cd8fb614e272eaf34db1944d980f",
+  "created_at": "2026-02-25T16:13:03.049580+00:00",
   "feature_number": "010",
-  "slug": "010-mission-audit-lifecycle-contracts",
   "feature_slug": "010-mission-audit-lifecycle-contracts",
   "friendly_name": "mission audit lifecycle contracts",
   "mission": "software-dev",
+  "slug": "010-mission-audit-lifecycle-contracts",
   "target_branch": "main",
-  "created_at": "2026-02-25T16:13:03.049580+00:00",
   "vcs": "git",
   "vcs_locked_at": "2026-02-26T12:28:53.721649+00:00"
 }
