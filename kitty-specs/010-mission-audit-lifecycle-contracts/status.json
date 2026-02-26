@@ -1,14 +1,14 @@
 {
-  "event_count": 9,
+  "event_count": 15,
   "feature_slug": "010-mission-audit-lifecycle-contracts",
-  "last_event_id": "01KJCZSQA6T10QQRYHEEE1ASY0",
-  "materialized_at": "2026-02-26T12:46:51.718397+00:00",
+  "last_event_id": "01KJD1CWSVNWVYYHVK297RH1EJ",
+  "materialized_at": "2026-02-26T13:14:48.507949+00:00",
   "summary": {
     "blocked": 0,
     "canceled": 0,
     "claimed": 0,
-    "done": 1,
-    "for_review": 2,
+    "done": 2,
+    "for_review": 1,
     "in_progress": 0,
     "planned": 0
   },
@@ -22,17 +22,17 @@
     },
     "WP02": {
       "actor": "user",
-      "force_count": 1,
-      "lane": "for_review",
-      "last_event_id": "01KJCZP5G3ZT3XVG71DXYQRE25",
-      "last_transition_at": "2026-02-26T12:44:55.171698+00:00"
+      "force_count": 2,
+      "lane": "done",
+      "last_event_id": "01KJCZYNK34Z2BBA5HQNGH9WX6",
+      "last_transition_at": "2026-02-26T12:49:33.795298+00:00"
     },
     "WP03": {
       "actor": "user",
-      "force_count": 1,
+      "force_count": 4,
       "lane": "for_review",
-      "last_event_id": "01KJCZSQA6T10QQRYHEEE1ASY0",
-      "last_transition_at": "2026-02-26T12:46:51.718186+00:00"
+      "last_event_id": "01KJD1CWSVNWVYYHVK297RH1EJ",
+      "last_transition_at": "2026-02-26T13:14:48.507670+00:00"
     }
   }
 }
