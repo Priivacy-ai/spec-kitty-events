@@ -1,26 +1,29 @@
 ---
-work_package_id: "WP04"
-title: "Conformance Tests + Public API + Release"
-lane: "planned"
-subtasks:
-  - "T019"
-  - "T020"
-  - "T021"
-  - "T022"
-phase: "Phase 4 - Public API + Release"
-assignee: ""
-agent: ""
-shell_pid: ""
-review_status: ""
-reviewed_by: ""
+work_package_id: WP04
+title: Conformance Tests + Public API + Release
+lane: "doing"
 dependencies:
-  - "WP02"
-  - "WP03"
+- WP02
+- WP03
+base_branch: main
+base_commit: 355e99183acf9aefa3ba514b7534a91bce068c01
+created_at: '2026-02-26T13:19:12.745854+00:00'
+subtasks:
+- T019
+- T020
+- T021
+- T022
+phase: Phase 4 - Public API + Release
+assignee: ''
+agent: ''
+shell_pid: "57708"
+review_status: ''
+reviewed_by: ''
 history:
-  - timestamp: "2026-02-25T00:00:00Z"
-    lane: "planned"
-    agent: "system"
-    action: "Prompt generated via /spec-kitty.tasks"
+- timestamp: '2026-02-25T00:00:00Z'
+  lane: planned
+  agent: system
+  action: Prompt generated via /spec-kitty.tasks
 ---
 
 # Work Package Prompt: WP04 – Conformance Tests + Public API + Release
