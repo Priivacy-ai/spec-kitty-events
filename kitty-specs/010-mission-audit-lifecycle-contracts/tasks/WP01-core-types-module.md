@@ -1,24 +1,27 @@
 ---
-work_package_id: "WP01"
-title: "Core Types Module"
-lane: "planned"
-subtasks:
-  - "T001"
-  - "T002"
-  - "T003"
-  - "T004"
-phase: "Phase 1 - Core Types"
-assignee: ""
-agent: ""
-shell_pid: ""
-review_status: ""
-reviewed_by: ""
+work_package_id: WP01
+title: Core Types Module
+lane: "doing"
 dependencies: []
+base_branch: main
+base_commit: a7ba75c9d083900f32eaf9c041d9657e316c0dd2
+created_at: '2026-02-26T12:28:54.064323+00:00'
+subtasks:
+- T001
+- T002
+- T003
+- T004
+phase: Phase 1 - Core Types
+assignee: ''
+agent: ''
+shell_pid: "28510"
+review_status: ''
+reviewed_by: ''
 history:
-  - timestamp: "2026-02-25T00:00:00Z"
-    lane: "planned"
-    agent: "system"
-    action: "Prompt generated via /spec-kitty.tasks"
+- timestamp: '2026-02-25T00:00:00Z'
+  lane: planned
+  agent: system
+  action: Prompt generated via /spec-kitty.tasks
 ---
 
 # Work Package Prompt: WP01 – Core Types Module
