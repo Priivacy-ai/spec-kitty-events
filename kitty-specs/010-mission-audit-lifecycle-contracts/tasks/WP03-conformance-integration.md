@@ -17,7 +17,7 @@ subtasks:
 - T018
 phase: Phase 3 - Conformance Integration
 assignee: ''
-agent: ''
+agent: "claude-sonnet"
 shell_pid: "34120"
 review_status: ''
 reviewed_by: ''
@@ -565,3 +565,7 @@ When all subtasks are done and acceptance criteria pass:
 3. Mark subtasks done: `spec-kitty agent tasks mark-status T012 T013 T014 T015 T016 T017 T018 --status done`
 4. Rebase on main: `git rebase main`
 5. Move to review: `spec-kitty agent tasks move-task WP03 --to for_review --note "Conformance integration complete: 5 schemas, 7 valid + 4 invalid + 3 replay fixtures, manifest updated with 17 entries"`
+
+## Activity Log
+
+- 2026-02-26T12:35:58Z – claude-sonnet – shell_pid=34120 – lane=doing – Assigned agent via workflow command
