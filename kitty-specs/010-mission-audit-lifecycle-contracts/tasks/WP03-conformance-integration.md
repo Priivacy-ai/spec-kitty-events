@@ -1,7 +1,7 @@
 ---
 work_package_id: WP03
 title: Conformance Integration
-lane: "doing"
+lane: "planned"
 dependencies:
 - WP01
 base_branch: main
@@ -17,8 +17,8 @@ subtasks:
 - T018
 phase: Phase 3 - Conformance Integration
 assignee: ''
-agent: "claude-reviewer"
-shell_pid: "45764"
+agent: claude-reviewer
+shell_pid: '45764'
 review_status: ''
 reviewed_by: ''
 history:
@@ -571,3 +571,4 @@ When all subtasks are done and acceptance criteria pass:
 - 2026-02-26T12:35:58Z – claude-sonnet – shell_pid=34120 – lane=doing – Assigned agent via workflow command
 - 2026-02-26T12:46:51Z – claude-sonnet – shell_pid=34120 – lane=for_review – Conformance integration complete: 5 schemas (with $schema/$id), 7 valid + 4 invalid + 3 replay JSONL fixtures, manifest updated with 17 entries, validators.py and loader.py updated. Golden reducer output files are placeholders pending WP02 merge. All 1119 unit tests pass, 11/11 mission_audit fixture validation tests pass.
 - 2026-02-26T12:48:35Z – claude-reviewer – shell_pid=45764 – lane=doing – Started review via workflow command
+- 2026-02-26T13:10:02Z – claude-reviewer – shell_pid=45764 – lane=planned – Changes requested: generate.py + schema count
