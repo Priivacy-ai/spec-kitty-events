@@ -156,10 +156,10 @@
 
 ### Included Subtasks
 
-- [ ] T019 [P] Write conformance tests — `tests/test_mission_audit_conformance.py` (7 valid fixture validation, 4 invalid fixture rejection with field-level violations, 3 replay stream validation + reducer golden comparison, 5 schema drift checks)
-- [ ] T020 Update `src/spec_kitty_events/__init__.py` — add 21 new exports: 5 event type constants, MISSION_AUDIT_EVENT_TYPES, 3 enums, 2 value objects, 5 payload models, MissionAuditAnomaly, ReducedMissionAuditState, reduce_mission_audit_events, AUDIT_SCHEMA_VERSION, TERMINAL_AUDIT_STATUSES
-- [ ] T021 Bump version 2.4.0 → 2.5.0 in `pyproject.toml` (version field) and `__init__.py` (__version__)
-- [ ] T022 Update `pyproject.toml` package-data globs to include `conformance/fixtures/mission_audit/**` so fixtures are shipped with the package
+- [x] T019 [P] Write conformance tests — `tests/test_mission_audit_conformance.py` (7 valid fixture validation, 4 invalid fixture rejection with field-level violations, 3 replay stream validation + reducer golden comparison, 5 schema drift checks)
+- [x] T020 Update `src/spec_kitty_events/__init__.py` — add 21 new exports: 5 event type constants, MISSION_AUDIT_EVENT_TYPES, 3 enums, 2 value objects, 5 payload models, MissionAuditAnomaly, ReducedMissionAuditState, reduce_mission_audit_events, AUDIT_SCHEMA_VERSION, TERMINAL_AUDIT_STATUSES
+- [x] T021 Bump version 2.4.0 → 2.5.0 in `pyproject.toml` (version field) and `__init__.py` (__version__)
+- [x] T022 Update `pyproject.toml` package-data globs to include `conformance/fixtures/mission_audit/**` so fixtures are shipped with the package
 
 ### Implementation Notes
 
