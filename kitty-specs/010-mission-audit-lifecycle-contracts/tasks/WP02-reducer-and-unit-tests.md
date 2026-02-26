@@ -17,7 +17,7 @@ subtasks:
 - T011
 phase: Phase 2 - Reducer
 assignee: ''
-agent: ''
+agent: "claude-sonnet"
 shell_pid: "34022"
 review_status: ''
 reviewed_by: ''
@@ -497,3 +497,7 @@ When all subtasks are done and acceptance criteria pass:
 3. Mark subtasks done: `spec-kitty agent tasks mark-status T005 T006 T007 T008 T009 T010 T011 --status done`
 4. Rebase on main: `git rebase main`
 5. Move to review: `spec-kitty agent tasks move-task WP02 --to for_review --note "Reducer implemented, all tests pass, mypy clean"`
+
+## Activity Log
+
+- 2026-02-26T12:35:56Z – claude-sonnet – shell_pid=34022 – lane=doing – Assigned agent via workflow command
