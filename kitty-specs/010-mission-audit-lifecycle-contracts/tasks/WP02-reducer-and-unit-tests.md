@@ -1,28 +1,31 @@
 ---
-work_package_id: "WP02"
-title: "Reducer Implementation + Unit Tests"
-lane: "planned"
-subtasks:
-  - "T005"
-  - "T006"
-  - "T007"
-  - "T008"
-  - "T009"
-  - "T010"
-  - "T011"
-phase: "Phase 2 - Reducer"
-assignee: ""
-agent: ""
-shell_pid: ""
-review_status: ""
-reviewed_by: ""
+work_package_id: WP02
+title: Reducer Implementation + Unit Tests
+lane: "doing"
 dependencies:
-  - "WP01"
+- WP01
+base_branch: main
+base_commit: cee0731b0016e2eb66c2aabd9a8ec5f7d186d9c3
+created_at: '2026-02-26T12:35:56.800294+00:00'
+subtasks:
+- T005
+- T006
+- T007
+- T008
+- T009
+- T010
+- T011
+phase: Phase 2 - Reducer
+assignee: ''
+agent: ''
+shell_pid: "34022"
+review_status: ''
+reviewed_by: ''
 history:
-  - timestamp: "2026-02-25T00:00:00Z"
-    lane: "planned"
-    agent: "system"
-    action: "Prompt generated via /spec-kitty.tasks"
+- timestamp: '2026-02-25T00:00:00Z'
+  lane: planned
+  agent: system
+  action: Prompt generated via /spec-kitty.tasks
 ---
 
 # Work Package Prompt: WP02 – Reducer Implementation + Unit Tests
