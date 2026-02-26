@@ -15,7 +15,7 @@ subtasks:
 - T022
 phase: Phase 4 - Public API + Release
 assignee: ''
-agent: ''
+agent: "claude-sonnet"
 shell_pid: "57708"
 review_status: ''
 reviewed_by: ''
@@ -452,3 +452,7 @@ When all subtasks are done and acceptance criteria pass:
 5. Mark subtasks done: `spec-kitty agent tasks mark-status T019 T020 T021 T022 --status done`
 6. Rebase on main: `git rebase main`
 7. Move to review: `spec-kitty agent tasks move-task WP04 --to for_review --note "Conformance tests pass, all exports verified, version bumped to 2.5.0, zero regressions"`
+
+## Activity Log
+
+- 2026-02-26T13:19:12Z – claude-sonnet – shell_pid=57708 – lane=doing – Assigned agent via workflow command
