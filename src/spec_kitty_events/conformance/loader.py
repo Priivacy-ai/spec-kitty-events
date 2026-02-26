@@ -17,7 +17,7 @@ _MANIFEST_PATH = _FIXTURES_DIR / "manifest.json"
 _VALID_CATEGORIES = frozenset({
     "events", "lane_mapping", "edge_cases",
     "collaboration", "glossary", "mission_next",
-    "dossier",
+    "dossier", "mission_audit",
 })
 
 # Replay stream fixture type sentinel
@@ -48,7 +48,8 @@ def load_fixtures(category: str) -> List[FixtureCase]:
 
     Args:
         category: One of ``"events"``, ``"lane_mapping"``, ``"edge_cases"``,
-            ``"collaboration"``, ``"glossary"``, ``"mission_next"``, or ``"dossier"``.
+            ``"collaboration"``, ``"glossary"``, ``"mission_next"``, ``"dossier"``,
+            or ``"mission_audit"``.
 
     Returns:
         List of :class:`FixtureCase` instances with payloads loaded from JSON.

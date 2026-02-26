@@ -1,0 +1,10 @@
+{
+  "mission_id": "mission-010",
+  "run_id": "run-001",
+  "feature_slug": "010-mission-audit-lifecycle-contracts",
+  "actor": "agent-claude",
+  "decision_id": "dec-001",
+  "question": "Should the missing acceptance criteria be treated as a blocker?",
+  "context_summary": "spec.md section 3 lacks measurable success criteria for SC-003.",
+  "severity": "warning"
+}

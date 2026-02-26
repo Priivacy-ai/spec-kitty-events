@@ -65,6 +65,13 @@ from spec_kitty_events.dossier import (
     MissionDossierSnapshotComputedPayload,
     MissionDossierParityDriftDetectedPayload,
 )
+from spec_kitty_events.mission_audit import (
+    MissionAuditRequestedPayload,
+    MissionAuditStartedPayload,
+    MissionAuditDecisionRequestedPayload,
+    MissionAuditCompletedPayload,
+    MissionAuditFailedPayload,
+)
 
 
 @dataclass(frozen=True)
@@ -146,6 +153,12 @@ _EVENT_TYPE_TO_MODEL: Dict[str, Type[Any]] = {
     "MissionDossierArtifactMissing": MissionDossierArtifactMissingPayload,
     "MissionDossierSnapshotComputed": MissionDossierSnapshotComputedPayload,
     "MissionDossierParityDriftDetected": MissionDossierParityDriftDetectedPayload,
+    # Mission audit lifecycle contracts (2.5.0)
+    "MissionAuditRequested": MissionAuditRequestedPayload,
+    "MissionAuditStarted": MissionAuditStartedPayload,
+    "MissionAuditDecisionRequested": MissionAuditDecisionRequestedPayload,
+    "MissionAuditCompleted": MissionAuditCompletedPayload,
+    "MissionAuditFailed": MissionAuditFailedPayload,
 }
 
 # Event type to JSON Schema name mapping (used with load_schema())
@@ -195,6 +208,12 @@ _EVENT_TYPE_TO_SCHEMA: Dict[str, str] = {
     "MissionDossierArtifactMissing": "mission_dossier_artifact_missing_payload",
     "MissionDossierSnapshotComputed": "mission_dossier_snapshot_computed_payload",
     "MissionDossierParityDriftDetected": "mission_dossier_parity_drift_detected_payload",
+    # Mission audit lifecycle contracts (2.5.0)
+    "MissionAuditRequested": "mission_audit_requested_payload",
+    "MissionAuditStarted": "mission_audit_started_payload",
+    "MissionAuditDecisionRequested": "mission_audit_decision_requested_payload",
+    "MissionAuditCompleted": "mission_audit_completed_payload",
+    "MissionAuditFailed": "mission_audit_failed_payload",
 }
 
 
