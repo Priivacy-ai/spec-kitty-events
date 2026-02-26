@@ -218,4 +218,150 @@ def reduce_mission_audit_events(events: Sequence[Event]) -> ReducedMissionAuditS
 
     Pipeline: sort → dedup → filter(MISSION_AUDIT_EVENT_TYPES) → reduce → freeze.
     """
-    raise NotImplementedError  # WP02 fills in the full implementation
+    # Step 1: Sort by (timestamp, lamport_clock) for determinism
+    sorted_events = sorted(events, key=status_event_sort_key)
+
+    # Step 2: Deduplicate by event_id
+    deduped_events = dedup_events(sorted_events)
+
+    # Step 3: Count events after dedup (before filter) — event_count is post-dedup
+    event_count = len(deduped_events)
+
+    # Step 4: Filter to mission-audit family only
+    audit_events = [e for e in deduped_events if e.event_type in MISSION_AUDIT_EVENT_TYPES]
+
+    # Step 5: Mutable accumulator for the fold
+    pending_decisions_list: List[PendingDecision] = []
+    anomalies_list: List[MissionAuditAnomaly] = []
+    audit_status: AuditStatus = AuditStatus.PENDING
+    verdict: Optional[AuditVerdict] = None
+    severity: Optional[AuditSeverity] = None
+    findings_count: Optional[int] = None
+    artifact_ref: Optional[AuditArtifactRef] = None
+    partial_artifact_ref: Optional[AuditArtifactRef] = None
+    summary: Optional[str] = None
+    error_code: Optional[str] = None
+    error_message: Optional[str] = None
+    mission_id: Optional[str] = None
+    run_id: Optional[str] = None
+    feature_slug: Optional[str] = None
+    trigger_mode: Optional[str] = None
+    enforcement_mode: Optional[str] = None
+    audit_scope: Optional[Tuple[str, ...]] = None
+    audit_scope_hash: Optional[str] = None
+    requested_seen = False
+    terminal_seen = False
+
+    for event in audit_events:
+        event_type = event.event_type
+        event_id = event.event_id
+        payload_dict = event.payload if isinstance(event.payload, dict) else {}
+
+        # Anomaly: unrecognized event type (within family — defensive)
+        if event_type not in MISSION_AUDIT_EVENT_TYPES:
+            anomalies_list.append(MissionAuditAnomaly(
+                kind="unrecognized_event_type",
+                event_id=event_id,
+                message=f"Unrecognized event type in audit family: {event_type!r}",
+            ))
+            continue
+
+        # Anomaly: event after terminal
+        if terminal_seen:
+            anomalies_list.append(MissionAuditAnomaly(
+                kind="event_after_terminal",
+                event_id=event_id,
+                message=f"Event {event_type!r} arrived after terminal state",
+            ))
+            continue
+
+        # Anomaly: event before Requested (except Requested itself)
+        if not requested_seen and event_type != MISSION_AUDIT_REQUESTED:
+            anomalies_list.append(MissionAuditAnomaly(
+                kind="event_before_requested",
+                event_id=event_id,
+                message=f"Event {event_type!r} arrived before MissionAuditRequested",
+            ))
+            # Still process state transitions for robustness — do not skip
+
+        if event_type == MISSION_AUDIT_REQUESTED:
+            requested_seen = True
+            req_payload: MissionAuditRequestedPayload = MissionAuditRequestedPayload.model_validate(payload_dict)
+            mission_id = req_payload.mission_id
+            run_id = req_payload.run_id
+            feature_slug = req_payload.feature_slug
+            trigger_mode = req_payload.trigger_mode
+            enforcement_mode = req_payload.enforcement_mode
+            audit_scope = tuple(req_payload.audit_scope)
+            # status stays PENDING after Requested
+
+        elif event_type == MISSION_AUDIT_STARTED:
+            started_payload: MissionAuditStartedPayload = MissionAuditStartedPayload.model_validate(payload_dict)
+            audit_scope_hash = started_payload.audit_scope_hash
+            if not mission_id:
+                mission_id = started_payload.mission_id
+                run_id = started_payload.run_id
+                feature_slug = started_payload.feature_slug
+            audit_status = AuditStatus.RUNNING
+
+        elif event_type == MISSION_AUDIT_DECISION_REQUESTED:
+            dec_payload: MissionAuditDecisionRequestedPayload = MissionAuditDecisionRequestedPayload.model_validate(payload_dict)
+            # Anomaly: duplicate decision_id
+            existing_ids = [d.decision_id for d in pending_decisions_list]
+            if dec_payload.decision_id in existing_ids:
+                anomalies_list.append(MissionAuditAnomaly(
+                    kind="duplicate_decision_id",
+                    event_id=event_id,
+                    message=f"Duplicate decision_id: {dec_payload.decision_id!r}",
+                ))
+            else:
+                pending_decisions_list.append(PendingDecision(
+                    decision_id=dec_payload.decision_id,
+                    question=dec_payload.question,
+                    context_summary=dec_payload.context_summary,
+                    severity=dec_payload.severity,
+                ))
+            audit_status = AuditStatus.AWAITING_DECISION
+
+        elif event_type == MISSION_AUDIT_COMPLETED:
+            comp_payload: MissionAuditCompletedPayload = MissionAuditCompletedPayload.model_validate(payload_dict)
+            verdict = comp_payload.verdict
+            severity = comp_payload.severity
+            findings_count = comp_payload.findings_count
+            artifact_ref = comp_payload.artifact_ref
+            summary = comp_payload.summary
+            pending_decisions_list = []  # implicit resolution on terminal
+            audit_status = AuditStatus.COMPLETED
+            terminal_seen = True
+
+        elif event_type == MISSION_AUDIT_FAILED:
+            fail_payload: MissionAuditFailedPayload = MissionAuditFailedPayload.model_validate(payload_dict)
+            error_code = fail_payload.error_code
+            error_message = fail_payload.error_message
+            partial_artifact_ref = fail_payload.partial_artifact_ref
+            pending_decisions_list = []  # implicit resolution on terminal
+            audit_status = AuditStatus.FAILED
+            terminal_seen = True
+
+    # Step 6: Freeze and return
+    return ReducedMissionAuditState(
+        audit_status=audit_status,
+        verdict=verdict,
+        severity=severity,
+        findings_count=findings_count,
+        artifact_ref=artifact_ref,
+        partial_artifact_ref=partial_artifact_ref,
+        summary=summary,
+        error_code=error_code,
+        error_message=error_message,
+        pending_decisions=tuple(pending_decisions_list),
+        mission_id=mission_id,
+        run_id=run_id,
+        feature_slug=feature_slug,
+        trigger_mode=trigger_mode,
+        enforcement_mode=enforcement_mode,
+        audit_scope=audit_scope,
+        audit_scope_hash=audit_scope_hash,
+        anomalies=tuple(anomalies_list),
+        event_count=event_count,
+    )

@@ -1,0 +1,24 @@
+{
+  "anomalies": [],
+  "artifact_ref": null,
+  "audit_scope": [
+    "src/a.py",
+    "src/b.py"
+  ],
+  "audit_scope_hash": "sha256:abc123",
+  "audit_status": "failed",
+  "enforcement_mode": "advisory",
+  "error_code": "TIMEOUT",
+  "error_message": "Audit timed out",
+  "event_count": 3,
+  "feature_slug": "feature-x",
+  "findings_count": null,
+  "mission_id": "m-001",
+  "partial_artifact_ref": null,
+  "pending_decisions": [],
+  "run_id": "run-001",
+  "severity": null,
+  "summary": null,
+  "trigger_mode": "manual",
+  "verdict": null
+}
