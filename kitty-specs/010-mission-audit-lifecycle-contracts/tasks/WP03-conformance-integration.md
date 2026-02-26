@@ -1,28 +1,31 @@
 ---
-work_package_id: "WP03"
-title: "Conformance Integration"
-lane: "planned"
-subtasks:
-  - "T012"
-  - "T013"
-  - "T014"
-  - "T015"
-  - "T016"
-  - "T017"
-  - "T018"
-phase: "Phase 3 - Conformance Integration"
-assignee: ""
-agent: ""
-shell_pid: ""
-review_status: ""
-reviewed_by: ""
+work_package_id: WP03
+title: Conformance Integration
+lane: "doing"
 dependencies:
-  - "WP01"
+- WP01
+base_branch: main
+base_commit: 99c99d961d069053ea1d444c4f26d66026c99f1e
+created_at: '2026-02-26T12:35:58.809376+00:00'
+subtasks:
+- T012
+- T013
+- T014
+- T015
+- T016
+- T017
+- T018
+phase: Phase 3 - Conformance Integration
+assignee: ''
+agent: ''
+shell_pid: "34120"
+review_status: ''
+reviewed_by: ''
 history:
-  - timestamp: "2026-02-25T00:00:00Z"
-    lane: "planned"
-    agent: "system"
-    action: "Prompt generated via /spec-kitty.tasks"
+- timestamp: '2026-02-25T00:00:00Z'
+  lane: planned
+  agent: system
+  action: Prompt generated via /spec-kitty.tasks
 ---
 
 # Work Package Prompt: WP03 – Conformance Integration
