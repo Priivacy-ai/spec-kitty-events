@@ -1,7 +1,7 @@
 ---
 work_package_id: WP03
 title: Conformance Integration
-lane: "doing"
+lane: "for_review"
 dependencies:
 - WP01
 base_branch: main
@@ -17,8 +17,8 @@ subtasks:
 - T018
 phase: Phase 3 - Conformance Integration
 assignee: ''
-agent: "claude-sonnet"
-shell_pid: "52958"
+agent: claude-sonnet
+shell_pid: '52958'
 review_status: ''
 reviewed_by: ''
 history:
@@ -573,3 +573,4 @@ When all subtasks are done and acceptance criteria pass:
 - 2026-02-26T12:48:35Z – claude-reviewer – shell_pid=45764 – lane=doing – Started review via workflow command
 - 2026-02-26T13:10:02Z – claude-reviewer – shell_pid=45764 – lane=planned – Changes requested: generate.py + schema count
 - 2026-02-26T13:10:38Z – claude-sonnet – shell_pid=52958 – lane=doing – Started implementation via workflow command
+- 2026-02-26T13:14:48Z – claude-sonnet – shell_pid=52958 – lane=for_review – Fix P1 review findings: generate.py now registers 5 MissionAudit*Payload models (resolves schema drift); test_schemas.py updated 52->57 with correct sorted names. All 1119 tests pass.
