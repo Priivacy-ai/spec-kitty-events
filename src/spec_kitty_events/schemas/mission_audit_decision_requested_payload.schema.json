@@ -1,0 +1,67 @@
+{
+  "$defs": {
+    "AuditSeverity": {
+      "enum": [
+        "info",
+        "warning",
+        "error",
+        "critical"
+      ],
+      "title": "AuditSeverity",
+      "type": "string"
+    }
+  },
+  "$id": "spec-kitty-events/mission_audit_decision_requested_payload",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Payload for MissionAuditDecisionRequested events (FR-005).",
+  "properties": {
+    "actor": {
+      "minLength": 1,
+      "title": "Actor",
+      "type": "string"
+    },
+    "context_summary": {
+      "title": "Context Summary",
+      "type": "string"
+    },
+    "decision_id": {
+      "minLength": 1,
+      "title": "Decision Id",
+      "type": "string"
+    },
+    "feature_slug": {
+      "minLength": 1,
+      "title": "Feature Slug",
+      "type": "string"
+    },
+    "mission_id": {
+      "minLength": 1,
+      "title": "Mission Id",
+      "type": "string"
+    },
+    "question": {
+      "title": "Question",
+      "type": "string"
+    },
+    "run_id": {
+      "minLength": 1,
+      "title": "Run Id",
+      "type": "string"
+    },
+    "severity": {
+      "$ref": "#/$defs/AuditSeverity"
+    }
+  },
+  "required": [
+    "mission_id",
+    "run_id",
+    "feature_slug",
+    "actor",
+    "decision_id",
+    "question",
+    "context_summary",
+    "severity"
+  ],
+  "title": "MissionAuditDecisionRequestedPayload",
+  "type": "object"
+}

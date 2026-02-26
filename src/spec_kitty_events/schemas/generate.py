@@ -77,6 +77,13 @@ from spec_kitty_events.dossier import (
     MissionDossierSnapshotComputedPayload,
     MissionDossierParityDriftDetectedPayload,
 )
+from spec_kitty_events.mission_audit import (
+    MissionAuditRequestedPayload,
+    MissionAuditStartedPayload,
+    MissionAuditDecisionRequestedPayload,
+    MissionAuditCompletedPayload,
+    MissionAuditFailedPayload,
+)
 
 
 # Schema directory (same directory as this script)
@@ -139,6 +146,12 @@ PYDANTIC_MODELS: List[tuple[str, Type[BaseModel]]] = [
     ("mission_dossier_artifact_missing_payload", MissionDossierArtifactMissingPayload),
     ("mission_dossier_snapshot_computed_payload", MissionDossierSnapshotComputedPayload),
     ("mission_dossier_parity_drift_detected_payload", MissionDossierParityDriftDetectedPayload),
+    # Mission audit lifecycle contracts (2.5.0)
+    ("mission_audit_requested_payload", MissionAuditRequestedPayload),
+    ("mission_audit_started_payload", MissionAuditStartedPayload),
+    ("mission_audit_decision_requested_payload", MissionAuditDecisionRequestedPayload),
+    ("mission_audit_completed_payload", MissionAuditCompletedPayload),
+    ("mission_audit_failed_payload", MissionAuditFailedPayload),
 ]
 
 # Enums (use TypeAdapter)

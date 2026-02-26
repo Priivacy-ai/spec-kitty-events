@@ -1,0 +1,9 @@
+{
+  "mission_id": "mission-010",
+  "run_id": "run-004",
+  "feature_slug": "010-mission-audit-lifecycle-contracts",
+  "actor": "agent-claude",
+  "error_code": "TIMEOUT",
+  "error_message": "Audit execution timed out after 300 seconds.",
+  "partial_artifact_ref": null
+}

@@ -1,0 +1,9 @@
+{
+  "mission_id": "mission-010",
+  "run_id": "run-001",
+  "feature_slug": "010-mission-audit-lifecycle-contracts",
+  "actor": "agent-claude",
+  "trigger_mode": "scheduled",
+  "audit_scope": ["spec.md"],
+  "enforcement_mode": "advisory"
+}

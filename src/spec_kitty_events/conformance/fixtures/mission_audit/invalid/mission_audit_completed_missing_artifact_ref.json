@@ -1,0 +1,10 @@
+{
+  "mission_id": "mission-010",
+  "run_id": "run-001",
+  "feature_slug": "010-mission-audit-lifecycle-contracts",
+  "actor": "agent-claude",
+  "verdict": "pass",
+  "severity": "info",
+  "findings_count": 0,
+  "summary": "All checks passed."
+}
