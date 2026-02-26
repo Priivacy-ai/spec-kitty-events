@@ -234,6 +234,13 @@ from spec_kitty_events.dossier import (
     reduce_mission_dossier,
 )
 
+# Backward-compatible dossier aliases without the Payload suffix.
+# Older consumers import these names directly.
+MissionDossierArtifactIndexed = MissionDossierArtifactIndexedPayload
+MissionDossierArtifactMissing = MissionDossierArtifactMissingPayload
+MissionDossierSnapshotComputed = MissionDossierSnapshotComputedPayload
+MissionDossierParityDriftDetected = MissionDossierParityDriftDetectedPayload
+
 # Public API (controls what's exported with "from spec_kitty_events import *")
 __all__ = [
     # Version
@@ -413,6 +420,10 @@ __all__ = [
     "MissionDossierArtifactMissingPayload",
     "MissionDossierSnapshotComputedPayload",
     "MissionDossierParityDriftDetectedPayload",
+    "MissionDossierArtifactIndexed",
+    "MissionDossierArtifactMissing",
+    "MissionDossierSnapshotComputed",
+    "MissionDossierParityDriftDetected",
     "ArtifactEntry",
     "AnomalyEntry",
     "SnapshotSummary",
