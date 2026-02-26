@@ -1,7 +1,7 @@
 ---
 work_package_id: WP02
 title: Reducer Implementation + Unit Tests
-lane: "doing"
+lane: "for_review"
 dependencies:
 - WP01
 base_branch: main
@@ -17,8 +17,8 @@ subtasks:
 - T011
 phase: Phase 2 - Reducer
 assignee: ''
-agent: "claude-sonnet"
-shell_pid: "34022"
+agent: claude-sonnet
+shell_pid: '34022'
 review_status: ''
 reviewed_by: ''
 history:
@@ -501,3 +501,4 @@ When all subtasks are done and acceptance criteria pass:
 ## Activity Log
 
 - 2026-02-26T12:35:56Z – claude-sonnet – shell_pid=34022 – lane=doing – Assigned agent via workflow command
+- 2026-02-26T12:44:55Z – claude-sonnet – shell_pid=34022 – lane=for_review – Reducer implemented, 45 tests pass, mypy --strict clean. Golden replay × 3 committed. Merged WP01 branch to get core types.
