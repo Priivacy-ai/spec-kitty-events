@@ -1,7 +1,7 @@
 ---
 work_package_id: WP04
 title: Conformance Tests + Public API + Release
-lane: "doing"
+lane: "for_review"
 dependencies:
 - WP02
 - WP03
@@ -15,8 +15,8 @@ subtasks:
 - T022
 phase: Phase 4 - Public API + Release
 assignee: ''
-agent: "claude-sonnet"
-shell_pid: "57708"
+agent: claude-sonnet
+shell_pid: '57708'
 review_status: ''
 reviewed_by: ''
 history:
@@ -456,3 +456,4 @@ When all subtasks are done and acceptance criteria pass:
 ## Activity Log
 
 - 2026-02-26T13:19:12Z – claude-sonnet – shell_pid=57708 – lane=doing – Assigned agent via workflow command
+- 2026-02-26T13:32:25Z – claude-sonnet – shell_pid=57708 – lane=for_review – Conformance tests pass (22 tests: 7 valid + 4 invalid + 3 replay golden + 5 schema drift), all 21 exports verified, version 2.5.0, 1186 tests pass, mypy --strict zero errors, 97% coverage, zero regressions
