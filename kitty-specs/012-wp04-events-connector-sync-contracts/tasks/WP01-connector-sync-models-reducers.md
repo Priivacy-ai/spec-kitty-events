@@ -1,13 +1,15 @@
 ---
 work_package_id: WP01
 title: Connector and Sync Models, Constants, Schemas, Validators, Reducers
-lane: "doing"
+lane: "for_review"
 dependencies: []
 base_branch: codex/wp04-events-connector-sync-contracts
 base_commit: b208aad4aaa4fdce08c1fdca1681134b54331d6c
 created_at: '2026-02-27T12:21:46.457708+00:00'
-agent: "coordinator"
-shell_pid: "54810"
+agent: coordinator
+shell_pid: '54810'
+review_status: has_feedback
+reviewed_by: Robert Douglass
 requirement_refs:
 - FR-001
 - FR-002
@@ -16,9 +18,7 @@ requirement_refs:
 - FR-005
 - FR-006
 - FR-007
-review_status: "has_feedback"
-reviewed_by: "Robert Douglass"
-review_feedback_file: "/private/var/folders/gj/bxx0438j003b20kn5b6s7bsh0000gn/T/spec-kitty-review-feedback-WP01.md"
+review_feedback_file: /private/var/folders/gj/bxx0438j003b20kn5b6s7bsh0000gn/T/spec-kitty-review-feedback-WP01.md
 ---
 
 # Work Package Prompt: WP01 - Connector and Sync Models, Constants, Schemas, Validators, Reducers
@@ -196,3 +196,4 @@ Create the canonical connector lifecycle and sync lifecycle contract core in the
 - 2026-02-27T12:33:39Z – codex – shell_pid=54810 – lane=doing – Started review via workflow command
 - 2026-02-27T12:38:18Z – codex – shell_pid=54810 – lane=planned – Moved to planned
 - 2026-02-27T12:38:30Z – coordinator – shell_pid=54810 – lane=doing – Started implementation via workflow command
+- 2026-02-27T12:42:34Z – coordinator – shell_pid=54810 – lane=for_review – Ready for re-review: 2.7.0 version parity fixed, connector/sync schemas committed, full suite 1390 passing, schema --check green
