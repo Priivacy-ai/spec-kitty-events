@@ -15,6 +15,7 @@ requirement_refs:
 - FR-006
 - FR-007
 shell_pid: "54810"
+agent: "coordinator"
 ---
 
 # Work Package Prompt: WP01 - Connector and Sync Models, Constants, Schemas, Validators, Reducers
@@ -155,3 +156,7 @@ Create the canonical connector lifecycle and sync lifecycle contract core in the
 - Include a contract summary listing all event names, required payload fields, transition rules, and idempotency invariants.
 - Cite FR coverage explicitly: FR-001, FR-002, FR-003, FR-004, FR-005, FR-006, FR-007.
 - Include test evidence for connector transitions, sync idempotent dedup, and deterministic reduction.
+
+## Activity Log
+
+- 2026-02-27T12:21:46Z – coordinator – shell_pid=54810 – lane=doing – Assigned agent via workflow command
