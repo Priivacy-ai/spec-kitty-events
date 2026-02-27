@@ -1,108 +1,98 @@
-# Implementation Plan: [FEATURE]
-*Path: [templates/plan-template.md](templates/plan-template.md)*
+# Implementation Plan: Connector and Sync Lifecycle Contracts
 
-
-**Branch**: `[###-feature-name]` | **Date**: [DATE] | **Spec**: [link]
-**Input**: Feature specification from `/kitty-specs/[###-feature-name]/spec.md`
-
-**Note**: This template is filled in by the `/spec-kitty.plan` command. See `src/specify_cli/missions/software-dev/command-templates/plan.md` for the execution workflow.
-
-The planner will not begin until all planning questions have been answered—capture those answers in this document before progressing to later phases.
+**Branch**: `codex/wp04-events-connector-sync-contracts` | **Date**: 2026-02-27 | **Spec**: [spec.md](spec.md)
+**Input**: Feature specification from `/kitty-specs/012-wp04-events-connector-sync-contracts/spec.md`
 
 ## Summary
 
-[Extract from feature spec: primary requirement + technical approach from research]
+Add canonical connector lifecycle and sync lifecycle contract families to `spec-kitty-events` with idempotent ingest markers, external reference linking, deterministic reducer transitions, conformance fixtures, and explicit versioning/export notes for downstream `spec-kitty-tracker` and `spec-kitty-saas` consumers.
 
 ## Technical Context
 
-<!--
-  ACTION REQUIRED: Replace the content in this section with the technical details
-  for the project. The structure here is presented in advisory capacity to guide
-  the iteration process.
--->
+**Language/Version**: Python >=3.10, strict typing via mypy
+**Primary Dependencies**: pydantic v2, pytest, hypothesis, jsonschema (conformance extra)
+**Storage**: N/A (pure event contract package)
+**Testing**: pytest unit/integration/property/conformance suites
+**Target Platform**: PyPI package consumed by `spec-kitty-tracker` and `spec-kitty-saas`
+**Project Type**: Single package (`src/spec_kitty_events/`)
+**Current Package Version**: 2.6.0
+**Planned Contract Min Version**: 2.7.0 (additive 2.x)
 
-**Language/Version**: [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION]  
-**Primary Dependencies**: [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION]  
-**Storage**: [if applicable, e.g., PostgreSQL, CoreData, files or N/A]  
-**Testing**: [e.g., pytest, XCTest, cargo test or NEEDS CLARIFICATION]  
-**Target Platform**: [e.g., Linux server, iOS 15+, WASM or NEEDS CLARIFICATION]
-**Project Type**: [single/web/mobile - determines source structure]  
-**Performance Goals**: [domain-specific, e.g., 1000 req/s, 10k lines/sec, 60 fps or NEEDS CLARIFICATION]  
-**Constraints**: [domain-specific, e.g., <200ms p95, <100MB memory, offline-capable or NEEDS CLARIFICATION]  
-**Scale/Scope**: [domain-specific, e.g., 10k users, 1M LOC, 50 screens or NEEDS CLARIFICATION]
+## Current Modules and Touchpoints
 
-## Constitution Check
+Planned source touchpoints in this repository:
 
-*GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
+- `src/spec_kitty_events/connector.py` (new): Connector lifecycle constants, enums, payloads, reducer, output models.
+- `src/spec_kitty_events/sync.py` (new): Sync lifecycle constants, enums, payloads, reducer, output models. Includes `ExternalReferenceLinkedPayload`.
+- `src/spec_kitty_events/status.py` (reuse only): deterministic sort/dedup helpers via `status_event_sort_key` and `dedup_events`.
+- `src/spec_kitty_events/conformance/validators.py`: register connector and sync event type -> model and schema mappings.
+- `src/spec_kitty_events/conformance/loader.py`: add `connector` and `sync` fixture categories.
+- `src/spec_kitty_events/conformance/fixtures/manifest.json`: add valid/invalid/replay and reducer-output fixture entries for connector and sync families.
+- `src/spec_kitty_events/conformance/fixtures/connector/{valid,invalid,replay}` (new): Connector lifecycle fixture files.
+- `src/spec_kitty_events/conformance/fixtures/sync/{valid,invalid,replay}` (new): Sync lifecycle fixture files.
+- `src/spec_kitty_events/schemas/generate.py`: include connector and sync payload models in deterministic schema generation list.
+- `src/spec_kitty_events/schemas/*.schema.json`: committed generated schemas for connector and sync payloads.
+- `src/spec_kitty_events/__init__.py`: public exports for connector and sync constants/models/reducers.
 
-[Gates determined based on constitution file]
+Planned test touchpoints:
 
-## Project Structure
+- `tests/unit/test_connector.py`
+- `tests/unit/test_sync.py`
+- `tests/test_connector_reducer.py`
+- `tests/test_sync_reducer.py`
+- `tests/property/test_connector_determinism.py`
+- `tests/property/test_sync_determinism.py`
+- `tests/test_connector_conformance.py`
+- `tests/test_sync_conformance.py`
 
-### Documentation (this feature)
+## Schema and Versioning Touchpoints
 
-```
-kitty-specs/[###-feature]/
-├── plan.md              # This file (/spec-kitty.plan command output)
-├── research.md          # Phase 0 output (/spec-kitty.plan command)
-├── data-model.md        # Phase 1 output (/spec-kitty.plan command)
-├── quickstart.md        # Phase 1 output (/spec-kitty.plan command)
-├── contracts/           # Phase 1 output (/spec-kitty.plan command)
-└── tasks.md             # Phase 2 output (/spec-kitty.tasks command - NOT created by /spec-kitty.plan)
-```
+- Add `CONNECTOR_SCHEMA_VERSION = "2.7.0"` in the connector module.
+- Add `SYNC_SCHEMA_VERSION = "2.7.0"` in the sync module.
+- Add conformance manifest entries for connector and sync fixtures with `min_version: "2.7.0"`.
+- Ensure schema generation is deterministic (`sort_keys=True` JSON output in schema generator flow).
+- Publish connector and sync API through `__init__.py` export list.
+- Version/export notes must call out additive 2.x contract introduction and required consumer pin (`>=2.7.0`).
 
-### Source Code (repository root)
-<!--
-  ACTION REQUIRED: Replace the placeholder tree below with the concrete layout
-  for this feature. Delete unused options and expand the chosen structure with
-  real paths (e.g., apps/admin, packages/something). The delivered plan must
-  not include Option labels.
--->
+## Execution Plan
 
-```
-# [REMOVE IF UNUSED] Option 1: Single project (DEFAULT)
-src/
-├── models/
-├── services/
-├── cli/
-└── lib/
+### Phase 1 (WP01): Contract Core -- Models, Constants, Schemas, Validators, Reducers
 
-tests/
-├── contract/
-├── integration/
-└── unit/
+- Define connector lifecycle event constants, state enum, and frozen payload models with mandatory fields.
+- Define sync lifecycle event constants, outcome enum, and frozen payload models with mandatory idempotency fields.
+- Define `ExternalReferenceLinkedPayload` with mandatory external/internal binding fields.
+- Implement connector lifecycle reducer with deterministic transitions and anomaly recording.
+- Implement sync lifecycle reducer with idempotent ingest dedup and cumulative outcome tracking.
+- Add unit tests for payload validation, transition correctness, idempotent dedup, and anomaly behavior.
+- Wire connector and sync models into schema generation and conformance validator mappings.
 
-# [REMOVE IF UNUSED] Option 2: Web application (when "frontend" + "backend" detected)
-backend/
-├── src/
-│   ├── models/
-│   ├── services/
-│   └── api/
-└── tests/
+### Phase 2 (WP02): Conformance Fixtures, Replay Scenarios, Compatibility Notes, Tests
 
-frontend/
-├── src/
-│   ├── components/
-│   ├── pages/
-│   └── services/
-└── tests/
+- Add conformance fixtures (valid, invalid, replay, golden outputs) for connector, sync, and external reference families.
+- Register connector and sync fixture categories in conformance loader.
+- Add manifest entries with `min_version: "2.7.0"`.
+- Add replay determinism tests and property checks for both reducers.
+- Add public export/versioning/downstream impact notes.
+- Package fixture assets for wheel/sdist distribution.
 
-# [REMOVE IF UNUSED] Option 3: Mobile + API (when "iOS/Android" detected)
-api/
-└── [same as backend above]
+## Risks
 
-ios/ or android/
-└── [platform-specific structure: feature modules, UI flows, platform tests]
-```
+| Risk | Impact | Mitigation |
+|---|---|---|
+| Naming overlap with existing sync-related concepts (`SyncLaneV1`, `canonical_to_sync_v1`) | Consumer confusion between lane-sync mapping and sync-lifecycle events | Use dedicated `sync` event family prefix and explicit namespace separation in module docs |
+| Idempotent dedup complexity for `(delivery_id, source_event_fingerprint)` pairs | False positive dedup if fingerprinting is inconsistent across providers | Define fingerprint as opaque string, push provider-specific hashing to caller, validate non-empty |
+| Connector state machine complexity with `reconnected` re-entry | Ambiguous transitions when connectors cycle through degraded/reconnected multiple times | Cap reducer anomaly-free cycles and record anomalies for repeated degraded-reconnected loops |
+| Non-deterministic replay output from dual-reducer (connector + sync) | Broken SaaS/runtime projections when replaying mixed streams | Keep strict sort+dedup pipeline per family and commit separate golden replay outputs |
+| Versioning drift across fixtures/schema/exports | Partial adoption failures downstream | Gate merge on manifest/schema/export checks and explicit min-version assertions |
 
-**Structure Decision**: [Document the selected structure and reference the real
-directories captured above]
+## Acceptance Gate
 
-## Complexity Tracking
+All of the following must pass before the feature is considered complete:
 
-*Fill ONLY if Constitution Check has violations that must be justified*
-
-| Violation | Why Needed | Simpler Alternative Rejected Because |
-|-----------|------------|-------------------------------------|
-| [e.g., 4th project] | [current need] | [why 3 projects insufficient] |
-| [e.g., Repository pattern] | [specific problem] | [why direct DB access insufficient] |
+1. `python3.11 -m mypy --strict src/spec_kitty_events/connector.py src/spec_kitty_events/sync.py`
+2. `python3.11 -m pytest tests/unit/test_connector.py tests/unit/test_sync.py tests/test_connector_reducer.py tests/test_sync_reducer.py -v`
+3. `python3.11 -m pytest tests/property/test_connector_determinism.py tests/property/test_sync_determinism.py -v`
+4. `python3.11 -m pytest tests/test_connector_conformance.py tests/test_sync_conformance.py -v`
+5. `python3.11 -m pytest --pyargs spec_kitty_events.conformance`
+6. `python3.11 -m pytest tests/ -q` (no regressions)
+7. Public import smoke check succeeds for all connector and sync exports from `spec_kitty_events`.
