@@ -1,8 +1,11 @@
 ---
 work_package_id: WP01
 title: Connector and Sync Models, Constants, Schemas, Validators, Reducers
-lane: planned
+lane: "doing"
 dependencies: []
+base_branch: codex/wp04-events-connector-sync-contracts
+base_commit: b208aad4aaa4fdce08c1fdca1681134b54331d6c
+created_at: '2026-02-27T12:21:46.457708+00:00'
 requirement_refs:
 - FR-001
 - FR-002
@@ -11,6 +14,7 @@ requirement_refs:
 - FR-005
 - FR-006
 - FR-007
+shell_pid: "54810"
 ---
 
 # Work Package Prompt: WP01 - Connector and Sync Models, Constants, Schemas, Validators, Reducers
