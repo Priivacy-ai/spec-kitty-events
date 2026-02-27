@@ -11,6 +11,7 @@ requirement_refs:
 - FR-002
 - FR-003
 shell_pid: "54810"
+agent: "coordinator"
 ---
 
 # Work Package Prompt: WP01 - DecisionPoint Event Constants, Payload Models, and Reducer Transitions
@@ -71,3 +72,7 @@ Create the canonical DecisionPoint lifecycle contract core in the events package
 - Include a short contract summary listing event names, required payload fields, and transition rules.
 - Cite FR coverage explicitly: FR-001, FR-002, FR-003.
 - Include test evidence for authority-policy constraints and deterministic reduction.
+
+## Activity Log
+
+- 2026-02-27T11:06:48Z – coordinator – shell_pid=54810 – lane=doing – Assigned agent via workflow command
