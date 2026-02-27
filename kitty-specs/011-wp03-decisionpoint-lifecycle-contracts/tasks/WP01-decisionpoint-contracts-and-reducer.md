@@ -1,13 +1,13 @@
 ---
 work_package_id: WP01
 title: DecisionPoint Event Constants, Payload Models, and Reducer Transitions
-lane: "for_review"
+lane: "doing"
 dependencies: []
 base_branch: codex/wp03-events-decisionpoint-contracts
 base_commit: d31fce18b5f215e0f12eddf2c5b051891e9207ba
 created_at: '2026-02-27T11:06:48.227189+00:00'
-agent: coordinator
-shell_pid: '54810'
+agent: "codex"
+shell_pid: "54810"
 requirement_refs:
 - FR-001
 - FR-002
@@ -77,3 +77,4 @@ Create the canonical DecisionPoint lifecycle contract core in the events package
 
 - 2026-02-27T11:06:48Z – coordinator – shell_pid=54810 – lane=doing – Assigned agent via workflow command
 - 2026-02-27T11:21:27Z – coordinator – shell_pid=54810 – lane=for_review – Ready for review: DecisionPoint lifecycle contracts with mypy --strict passing, 65 tests (31 reducer + 34 unit), 99% coverage, authority/LLM policy enforcement, golden-file replay. FR-001/FR-002/FR-003 covered.
+- 2026-02-27T11:23:55Z – codex – shell_pid=54810 – lane=doing – Started review via workflow command
