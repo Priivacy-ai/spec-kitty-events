@@ -78,6 +78,21 @@ from spec_kitty_events.decisionpoint import (
     DecisionPointResolvedPayload,
     DecisionPointOverriddenPayload,
 )
+from spec_kitty_events.connector import (
+    ConnectorProvisionedPayload,
+    ConnectorHealthCheckedPayload,
+    ConnectorDegradedPayload,
+    ConnectorRevokedPayload,
+    ConnectorReconnectedPayload,
+)
+from spec_kitty_events.sync import (
+    SyncIngestAcceptedPayload,
+    SyncIngestRejectedPayload,
+    SyncRetryScheduledPayload,
+    SyncDeadLetteredPayload,
+    SyncReplayCompletedPayload,
+    ExternalReferenceLinkedPayload,
+)
 
 
 @dataclass(frozen=True)
@@ -170,6 +185,19 @@ _EVENT_TYPE_TO_MODEL: Dict[str, Type[Any]] = {
     "DecisionPointDiscussing": DecisionPointDiscussingPayload,
     "DecisionPointResolved": DecisionPointResolvedPayload,
     "DecisionPointOverridden": DecisionPointOverriddenPayload,
+    # Connector lifecycle contracts (2.7.0)
+    "ConnectorProvisioned": ConnectorProvisionedPayload,
+    "ConnectorHealthChecked": ConnectorHealthCheckedPayload,
+    "ConnectorDegraded": ConnectorDegradedPayload,
+    "ConnectorRevoked": ConnectorRevokedPayload,
+    "ConnectorReconnected": ConnectorReconnectedPayload,
+    # Sync lifecycle contracts (2.7.0)
+    "SyncIngestAccepted": SyncIngestAcceptedPayload,
+    "SyncIngestRejected": SyncIngestRejectedPayload,
+    "SyncRetryScheduled": SyncRetryScheduledPayload,
+    "SyncDeadLettered": SyncDeadLetteredPayload,
+    "SyncReplayCompleted": SyncReplayCompletedPayload,
+    "ExternalReferenceLinked": ExternalReferenceLinkedPayload,
 }
 
 # Event type to JSON Schema name mapping (used with load_schema())
@@ -230,6 +258,19 @@ _EVENT_TYPE_TO_SCHEMA: Dict[str, str] = {
     "DecisionPointDiscussing": "decision_point_discussing_payload",
     "DecisionPointResolved": "decision_point_resolved_payload",
     "DecisionPointOverridden": "decision_point_overridden_payload",
+    # Connector lifecycle contracts (2.7.0)
+    "ConnectorProvisioned": "connector_provisioned_payload",
+    "ConnectorHealthChecked": "connector_health_checked_payload",
+    "ConnectorDegraded": "connector_degraded_payload",
+    "ConnectorRevoked": "connector_revoked_payload",
+    "ConnectorReconnected": "connector_reconnected_payload",
+    # Sync lifecycle contracts (2.7.0)
+    "SyncIngestAccepted": "sync_ingest_accepted_payload",
+    "SyncIngestRejected": "sync_ingest_rejected_payload",
+    "SyncRetryScheduled": "sync_retry_scheduled_payload",
+    "SyncDeadLettered": "sync_dead_lettered_payload",
+    "SyncReplayCompleted": "sync_replay_completed_payload",
+    "ExternalReferenceLinked": "external_reference_linked_payload",
 }
 
 

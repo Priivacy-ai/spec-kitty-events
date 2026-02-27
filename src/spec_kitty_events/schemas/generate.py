@@ -90,6 +90,21 @@ from spec_kitty_events.decisionpoint import (
     DecisionPointResolvedPayload,
     DecisionPointOverriddenPayload,
 )
+from spec_kitty_events.connector import (
+    ConnectorProvisionedPayload,
+    ConnectorHealthCheckedPayload,
+    ConnectorDegradedPayload,
+    ConnectorRevokedPayload,
+    ConnectorReconnectedPayload,
+)
+from spec_kitty_events.sync import (
+    SyncIngestAcceptedPayload,
+    SyncIngestRejectedPayload,
+    SyncRetryScheduledPayload,
+    SyncDeadLetteredPayload,
+    SyncReplayCompletedPayload,
+    ExternalReferenceLinkedPayload,
+)
 
 
 # Schema directory (same directory as this script)
@@ -163,6 +178,19 @@ PYDANTIC_MODELS: List[tuple[str, Type[BaseModel]]] = [
     ("decision_point_discussing_payload", DecisionPointDiscussingPayload),
     ("decision_point_resolved_payload", DecisionPointResolvedPayload),
     ("decision_point_overridden_payload", DecisionPointOverriddenPayload),
+    # Connector lifecycle contracts (2.7.0)
+    ("connector_provisioned_payload", ConnectorProvisionedPayload),
+    ("connector_health_checked_payload", ConnectorHealthCheckedPayload),
+    ("connector_degraded_payload", ConnectorDegradedPayload),
+    ("connector_revoked_payload", ConnectorRevokedPayload),
+    ("connector_reconnected_payload", ConnectorReconnectedPayload),
+    # Sync lifecycle contracts (2.7.0)
+    ("sync_ingest_accepted_payload", SyncIngestAcceptedPayload),
+    ("sync_ingest_rejected_payload", SyncIngestRejectedPayload),
+    ("sync_retry_scheduled_payload", SyncRetryScheduledPayload),
+    ("sync_dead_lettered_payload", SyncDeadLetteredPayload),
+    ("sync_replay_completed_payload", SyncReplayCompletedPayload),
+    ("external_reference_linked_payload", ExternalReferenceLinkedPayload),
 ]
 
 # Enums (use TypeAdapter)
