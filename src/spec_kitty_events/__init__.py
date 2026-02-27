@@ -18,7 +18,7 @@ Versioning and Export Notes (2.6.0 -- DecisionPoint Lifecycle Contracts):
     were modified.  All new symbols are listed under the "DecisionPoint
     Lifecycle Contracts (2.6.0)" block in ``__all__``.
 
-    Exported symbols (14 total):
+    Exported symbols (15 total):
         Constants: DECISIONPOINT_SCHEMA_VERSION, DECISION_POINT_OPENED,
             DECISION_POINT_DISCUSSING, DECISION_POINT_RESOLVED,
             DECISION_POINT_OVERRIDDEN, DECISION_POINT_EVENT_TYPES
@@ -46,7 +46,7 @@ Versioning and Export Notes (2.6.0 -- DecisionPoint Lifecycle Contracts):
               suites (``load_fixtures("decisionpoint")``).
 """
 
-__version__ = "2.5.0"
+__version__ = "2.6.0"
 
 # Core data models
 from spec_kitty_events.models import (
