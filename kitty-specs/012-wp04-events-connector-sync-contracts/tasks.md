@@ -34,14 +34,14 @@
 
 ### Included Subtasks
 
-- [ ] T010 Register connector and sync fixture categories in conformance loader.
-- [ ] T011 Add connector valid (6), invalid (4), and replay (1) fixtures with manifest entries.
-- [ ] T012 Add sync valid (6), invalid (4), and replay (1) fixtures with manifest entries.
-- [ ] T013 Add external-reference-linked valid (2) fixtures with manifest entries.
-- [ ] T014 Add mixed connector+sync replay stream (1) with golden reducer outputs.
-- [ ] T015 Add conformance and property tests for replay determinism and dedup idempotence.
-- [ ] T016 Add schema generation entries, public exports, and versioning/downstream impact notes.
-- [ ] T017 Update package-data configuration for connector and sync fixture assets in distributions.
+- [x] T010 Register connector and sync fixture categories in conformance loader.
+- [x] T011 Add connector valid (6), invalid (4), and replay (1) fixtures with manifest entries.
+- [x] T012 Add sync valid (6), invalid (4), and replay (1) fixtures with manifest entries.
+- [x] T013 Add external-reference-linked valid (2) fixtures with manifest entries.
+- [x] T014 Add mixed connector+sync replay stream (1) with golden reducer outputs.
+- [x] T015 Add conformance and property tests for replay determinism and dedup idempotence.
+- [x] T016 Add schema generation entries, public exports, and versioning/downstream impact notes.
+- [x] T017 Update package-data configuration for connector and sync fixture assets in distributions.
 
 ## Requirement Mapping
 
