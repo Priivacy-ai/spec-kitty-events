@@ -1,18 +1,21 @@
 ---
 work_package_id: WP02
 title: Conformance Fixtures, Replay Scenarios, Compatibility Notes, Tests
-lane: "doing"
+lane: "planned"
 dependencies:
 - WP01
 base_branch: codex/wp04-events-connector-sync-contracts
 base_commit: 87248791e64edefcdc7512e459c2f14efa76e675
 created_at: '2026-02-27T12:53:08.624785+00:00'
-agent: "claude"
-shell_pid: "54810"
+agent: claude
+shell_pid: '54810'
 requirement_refs:
 - FR-008
 - FR-009
 - FR-010
+review_status: "has_feedback"
+reviewed_by: "Robert Douglass"
+review_feedback_file: "/Users/robert/ClaudeCowork/Spec-Kitty-Cowork/spec-kitty-events/.worktrees/012-wp04-events-connector-sync-contracts-WP02/WP02_review_feedback.md"
 ---
 
 # Work Package Prompt: WP02 - Conformance Fixtures, Replay Scenarios, Compatibility Notes, Tests
@@ -200,8 +203,33 @@ Deliver conformance-grade connector and sync lifecycle fixtures and replay scena
 - Cite FR coverage explicitly: FR-008, FR-009, FR-010.
 - Include downstream migration note block: required version pin, exported symbols, and expected consumer code touchpoints for both spec-kitty-tracker and spec-kitty-saas.
 
+## Review Feedback
+
+**Reviewed by**: Robert Douglass
+**Status**: ❌ Changes Requested
+**Date**: 2026-02-27
+**Feedback file**: `/Users/robert/ClaudeCowork/Spec-Kitty-Cowork/spec-kitty-events/.worktrees/012-wp04-events-connector-sync-contracts-WP02/WP02_review_feedback.md`
+
+# WP02 Review Feedback (Claude Sonnet 4.6)
+
+## Finding 1 (P1): Missing required 2.7.0 versioning/downstream impact notes block in module docstring
+- Evidence: `src/spec_kitty_events/__init__.py` contains the existing `2.6.0` DecisionPoint "Versioning and Export Notes" block, plus 2.7.0 connector/sync exports in code, but no corresponding `2.7.0` docstring notes block.
+- Requirement impact:
+  - WP02 requirement 14 requires a versioning/export notes block in the module docstring following the DecisionPoint pattern.
+  - WP02 requirement 15 requires downstream impact notes for `spec-kitty-tracker` and `spec-kitty-saas` for 2.7.0 connector/sync adoption.
+- Required change:
+  - Add a `2.7.0` docstring section in `src/spec_kitty_events/__init__.py` that explicitly documents:
+    - additive export notes for connector/sync contracts,
+    - downstream impact for `spec-kitty-tracker` (`spec-kitty-events>=2.7.0`, reducer imports, event-family filters),
+    - downstream impact for `spec-kitty-saas` (`spec-kitty-events>=2.7.0`, schema loading, fixture categories `connector` and `sync`).
+
+## Notes
+- Functional validation is green (`pytest` acceptance checks pass), and fixture/schema/package-data coverage for WP02 is otherwise complete.
+
+
 ## Activity Log
 
 - 2026-02-27T12:53:08Z – coordinator – shell_pid=54810 – lane=doing – Assigned agent via workflow command
 - 2026-02-27T13:14:34Z – coordinator – shell_pid=54810 – lane=for_review – Ready for review: Conformance fixtures (6 valid + 4 invalid connector, 8 valid + 4 invalid sync + 2 external-ref), 3 replay streams with golden outputs, manifest updated, pyproject.toml package-data updated, test_connector_conformance.py (19 tests), test_sync_conformance.py (25 tests), property tests for connector and sync determinism. All 1438 tests pass. Covers FR-008, FR-009, FR-010.
 - 2026-02-27T13:15:00Z – claude – shell_pid=54810 – lane=doing – Started review via workflow command
+- 2026-02-27T13:20:00Z – claude – shell_pid=54810 – lane=planned – Moved to planned
