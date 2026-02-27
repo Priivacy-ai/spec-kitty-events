@@ -1,14 +1,14 @@
 ---
 work_package_id: WP02
 title: DecisionPoint Conformance, Replay Determinism, Versioning, and Downstream Notes
-lane: "for_review"
+lane: "doing"
 dependencies:
 - WP01
 base_branch: 011-wp03-decisionpoint-lifecycle-contracts-WP01
 base_commit: 28c480c2203b1e73db29db8502f3dd3a85b2360e
 created_at: '2026-02-27T11:31:10.629612+00:00'
-agent: coordinator
-shell_pid: '54810'
+agent: "codex"
+shell_pid: "54810"
 review_status: has_feedback
 reviewed_by: Robert Douglass
 requirement_refs:
@@ -120,3 +120,4 @@ Deliver conformance-grade DecisionPoint fixtures and replay scenarios, register 
 - 2026-02-27T11:58:44Z – codex – shell_pid=54810 – lane=planned – Moved to planned
 - 2026-02-27T11:58:51Z – coordinator – shell_pid=54810 – lane=doing – Started implementation via workflow command
 - 2026-02-27T12:01:29Z – coordinator – shell_pid=54810 – lane=for_review – Ready for re-review: packaged decisionpoint fixtures for wheel/sdist
+- 2026-02-27T12:02:00Z – codex – shell_pid=54810 – lane=doing – Started review via workflow command
