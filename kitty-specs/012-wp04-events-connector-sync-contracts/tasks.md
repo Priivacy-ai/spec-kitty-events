@@ -14,15 +14,15 @@
 
 ### Included Subtasks
 
-- [ ] T001 Create connector lifecycle event constants, ConnectorState enum, and CONNECTOR_EVENT_TYPES frozen set.
-- [ ] T002 Implement frozen connector payload models with required fields per FR-002.
-- [ ] T003 Create sync lifecycle event constants, SyncOutcome enum, and SYNC_EVENT_TYPES frozen set.
-- [ ] T004 Implement frozen sync payload models with idempotency fields per FR-004.
-- [ ] T005 Implement ExternalReferenceLinkedPayload with external/internal binding fields per FR-005.
-- [ ] T006 Implement connector lifecycle reducer with deterministic transitions and anomaly handling per FR-006.
-- [ ] T007 Implement sync lifecycle reducer with idempotent ingest dedup and outcome tracking per FR-007.
-- [ ] T008 Wire connector and sync models into schema generation and conformance validator mappings.
-- [ ] T009 Add unit and reducer tests for transitions, dedup, idempotency, and anomaly behavior.
+- [x] T001 Create connector lifecycle event constants, ConnectorState enum, and CONNECTOR_EVENT_TYPES frozen set.
+- [x] T002 Implement frozen connector payload models with required fields per FR-002.
+- [x] T003 Create sync lifecycle event constants, SyncOutcome enum, and SYNC_EVENT_TYPES frozen set.
+- [x] T004 Implement frozen sync payload models with idempotency fields per FR-004.
+- [x] T005 Implement ExternalReferenceLinkedPayload with external/internal binding fields per FR-005.
+- [x] T006 Implement connector lifecycle reducer with deterministic transitions and anomaly handling per FR-006.
+- [x] T007 Implement sync lifecycle reducer with idempotent ingest dedup and outcome tracking per FR-007.
+- [x] T008 Wire connector and sync models into schema generation and conformance validator mappings.
+- [x] T009 Add unit and reducer tests for transitions, dedup, idempotency, and anomaly behavior.
 
 ## Work Package WP02: Conformance Fixtures, Replay Scenarios, Compatibility Notes, Tests (Priority: P1)
 
