@@ -38,3 +38,8 @@
 
 - WP01 -> FR-001, FR-002, FR-003
 - WP02 -> FR-004, FR-005, FR-006
+
+<!-- status-model:start -->
+## Canonical Status (Generated)
+- WP01: for_review
+<!-- status-model:end -->
