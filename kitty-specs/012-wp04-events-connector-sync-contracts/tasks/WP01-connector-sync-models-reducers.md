@@ -1,13 +1,13 @@
 ---
 work_package_id: WP01
 title: Connector and Sync Models, Constants, Schemas, Validators, Reducers
-lane: "doing"
+lane: "planned"
 dependencies: []
 base_branch: codex/wp04-events-connector-sync-contracts
 base_commit: b208aad4aaa4fdce08c1fdca1681134b54331d6c
 created_at: '2026-02-27T12:21:46.457708+00:00'
-agent: "codex"
-shell_pid: "54810"
+agent: codex
+shell_pid: '54810'
 requirement_refs:
 - FR-001
 - FR-002
@@ -16,6 +16,9 @@ requirement_refs:
 - FR-005
 - FR-006
 - FR-007
+review_status: "has_feedback"
+reviewed_by: "Robert Douglass"
+review_feedback_file: "/private/var/folders/gj/bxx0438j003b20kn5b6s7bsh0000gn/T/spec-kitty-review-feedback-WP01.md"
 ---
 
 # Work Package Prompt: WP01 - Connector and Sync Models, Constants, Schemas, Validators, Reducers
@@ -157,8 +160,38 @@ Create the canonical connector lifecycle and sync lifecycle contract core in the
 - Cite FR coverage explicitly: FR-001, FR-002, FR-003, FR-004, FR-005, FR-006, FR-007.
 - Include test evidence for connector transitions, sync idempotent dedup, and deterministic reduction.
 
+## Review Feedback
+
+**Reviewed by**: Robert Douglass
+**Status**: ❌ Changes Requested
+**Date**: 2026-02-27
+**Feedback file**: `/private/var/folders/gj/bxx0438j003b20kn5b6s7bsh0000gn/T/spec-kitty-review-feedback-WP01.md`
+
+# WP01 Review Feedback (Codex)
+
+## Finding 1 (P1): Commit generated JSON schemas for new 2.7.0 payloads
+- Evidence: `src/spec_kitty_events/schemas/generate.py` registers connector/sync payloads (`connector_*`, `sync_*`, `external_reference_linked`) but corresponding `*.schema.json` artifacts were not committed.
+- Impact: `python -m spec_kitty_events.schemas.generate --check` fails; strict conformance validation for these events cannot load schemas.
+- Required change:
+  - Generate and commit all new schema artifacts for connector/sync payloads.
+  - Verify `list_schemas()`/`load_schema()` can resolve each newly mapped schema.
+
+## Finding 2 (P1): Package metadata version mismatch
+- Evidence: `src/spec_kitty_events/__init__.py` sets `__version__ = "2.7.0"` while `pyproject.toml` still reports `version = "2.6.0"`.
+- Impact: runtime/package metadata divergence; placeholder/version consistency tests fail.
+- Required change:
+  - Update `pyproject.toml` version to `2.7.0` so runtime and package metadata align.
+
+## Acceptance checks for re-review
+- `python3.11 -m mypy --strict src/spec_kitty_events/connector.py src/spec_kitty_events/sync.py`
+- `python3.11 -m pytest tests/unit/test_connector.py tests/unit/test_sync.py tests/test_connector_reducer.py tests/test_sync_reducer.py -v`
+- `python3.11 -m pytest tests/ -q`
+- `python3.11 -m spec_kitty_events.schemas.generate --check`
+
+
 ## Activity Log
 
 - 2026-02-27T12:21:46Z – coordinator – shell_pid=54810 – lane=doing – Assigned agent via workflow command
 - 2026-02-27T12:33:08Z – coordinator – shell_pid=54810 – lane=for_review – Ready for review: connector.py (5 event types, 3 enums, 5 payload models, reducer with FR-006 transitions), sync.py (5 event types, 5 payload models with idempotency fields, ExternalReferenceLinkedPayload, reducer with FR-007 dedup), schema/validator wiring, 112 tests pass, mypy --strict clean
 - 2026-02-27T12:33:39Z – codex – shell_pid=54810 – lane=doing – Started review via workflow command
+- 2026-02-27T12:38:18Z – codex – shell_pid=54810 – lane=planned – Moved to planned
