@@ -1,18 +1,18 @@
 ---
 work_package_id: WP02
 title: DecisionPoint Conformance, Replay Determinism, Versioning, and Downstream Notes
-lane: "doing"
+lane: "for_review"
 dependencies:
 - WP01
 base_branch: 011-wp03-decisionpoint-lifecycle-contracts-WP01
 base_commit: 28c480c2203b1e73db29db8502f3dd3a85b2360e
 created_at: '2026-02-27T11:31:10.629612+00:00'
+agent: coordinator
+shell_pid: '54810'
 requirement_refs:
 - FR-004
 - FR-005
 - FR-006
-shell_pid: "54810"
-agent: "coordinator"
 ---
 
 # Work Package Prompt: WP02 - DecisionPoint Conformance, Replay Determinism, Versioning, and Downstream Notes
@@ -71,3 +71,4 @@ Deliver conformance-grade DecisionPoint fixtures and replay scenarios, register 
 ## Activity Log
 
 - 2026-02-27T11:31:10Z – coordinator – shell_pid=54810 – lane=doing – Assigned agent via workflow command
+- 2026-02-27T11:44:53Z – coordinator – shell_pid=54810 – lane=for_review – Ready for review: 8 valid + 6 invalid conformance fixtures, 3 replay streams with golden outputs, 4 JSON schemas generated, conformance and property tests passing (1278 tests total), downstream impact notes added
