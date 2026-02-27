@@ -61,6 +61,16 @@ spec_kitty_events = [
     "conformance/fixtures/decisionpoint/invalid/*.json",
     "conformance/fixtures/decisionpoint/replay/*.jsonl",
     "conformance/fixtures/decisionpoint/replay/*.json",
+    "conformance/fixtures/connector/valid/*.json",
+    "conformance/fixtures/connector/invalid/*.json",
+    "conformance/fixtures/connector/replay/*.jsonl",
+    "conformance/fixtures/connector/replay/*_output.json",
+    "conformance/fixtures/sync/valid/*.json",
+    "conformance/fixtures/sync/invalid/*.json",
+    "conformance/fixtures/sync/replay/*.jsonl",
+    "conformance/fixtures/sync/replay/*_output.json",
+    "conformance/fixtures/replay/*.jsonl",
+    "conformance/fixtures/replay/*.json",
 ]
 
 [tool.pytest.ini_options]
