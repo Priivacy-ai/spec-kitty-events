@@ -1,14 +1,14 @@
 ---
 work_package_id: WP02
 title: Conformance Fixtures, Replay Scenarios, Compatibility Notes, Tests
-lane: "for_review"
+lane: "doing"
 dependencies:
 - WP01
 base_branch: codex/wp04-events-connector-sync-contracts
 base_commit: 87248791e64edefcdc7512e459c2f14efa76e675
 created_at: '2026-02-27T12:53:08.624785+00:00'
-agent: coordinator
-shell_pid: '54810'
+agent: "claude"
+shell_pid: "54810"
 requirement_refs:
 - FR-008
 - FR-009
@@ -204,3 +204,4 @@ Deliver conformance-grade connector and sync lifecycle fixtures and replay scena
 
 - 2026-02-27T12:53:08Z – coordinator – shell_pid=54810 – lane=doing – Assigned agent via workflow command
 - 2026-02-27T13:14:34Z – coordinator – shell_pid=54810 – lane=for_review – Ready for review: Conformance fixtures (6 valid + 4 invalid connector, 8 valid + 4 invalid sync + 2 external-ref), 3 replay streams with golden outputs, manifest updated, pyproject.toml package-data updated, test_connector_conformance.py (19 tests), test_sync_conformance.py (25 tests), property tests for connector and sync determinism. All 1438 tests pass. Covers FR-008, FR-009, FR-010.
+- 2026-02-27T13:15:00Z – claude – shell_pid=54810 – lane=doing – Started review via workflow command
