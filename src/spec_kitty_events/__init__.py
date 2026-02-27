@@ -46,7 +46,7 @@ Versioning and Export Notes (2.6.0 -- DecisionPoint Lifecycle Contracts):
               suites (``load_fixtures("decisionpoint")``).
 """
 
-__version__ = "2.6.0"
+__version__ = "2.7.0"
 
 # Core data models
 from spec_kitty_events.models import (
@@ -311,6 +311,50 @@ from spec_kitty_events.decisionpoint import (
     reduce_decision_point_events as reduce_decision_point_events,
 )
 
+# Connector Lifecycle Contracts (2.7.0)
+from spec_kitty_events.connector import (
+    CONNECTOR_SCHEMA_VERSION as CONNECTOR_SCHEMA_VERSION,
+    CONNECTOR_PROVISIONED as CONNECTOR_PROVISIONED,
+    CONNECTOR_HEALTH_CHECKED as CONNECTOR_HEALTH_CHECKED,
+    CONNECTOR_DEGRADED as CONNECTOR_DEGRADED,
+    CONNECTOR_REVOKED as CONNECTOR_REVOKED,
+    CONNECTOR_RECONNECTED as CONNECTOR_RECONNECTED,
+    CONNECTOR_EVENT_TYPES as CONNECTOR_EVENT_TYPES,
+    ConnectorState as ConnectorState,
+    HealthStatus as HealthStatus,
+    ReconnectStrategy as ReconnectStrategy,
+    ConnectorAnomaly as ConnectorAnomaly,
+    ConnectorProvisionedPayload as ConnectorProvisionedPayload,
+    ConnectorHealthCheckedPayload as ConnectorHealthCheckedPayload,
+    ConnectorDegradedPayload as ConnectorDegradedPayload,
+    ConnectorRevokedPayload as ConnectorRevokedPayload,
+    ConnectorReconnectedPayload as ConnectorReconnectedPayload,
+    ReducedConnectorState as ReducedConnectorState,
+    reduce_connector_events as reduce_connector_events,
+)
+
+# Sync Lifecycle Contracts (2.7.0)
+from spec_kitty_events.sync import (
+    SYNC_SCHEMA_VERSION as SYNC_SCHEMA_VERSION,
+    SYNC_INGEST_ACCEPTED as SYNC_INGEST_ACCEPTED,
+    SYNC_INGEST_REJECTED as SYNC_INGEST_REJECTED,
+    SYNC_RETRY_SCHEDULED as SYNC_RETRY_SCHEDULED,
+    SYNC_DEAD_LETTERED as SYNC_DEAD_LETTERED,
+    SYNC_REPLAY_COMPLETED as SYNC_REPLAY_COMPLETED,
+    SYNC_EVENT_TYPES as SYNC_EVENT_TYPES,
+    EXTERNAL_REFERENCE_LINKED as EXTERNAL_REFERENCE_LINKED,
+    SyncOutcome as SyncOutcome,
+    SyncAnomaly as SyncAnomaly,
+    SyncIngestAcceptedPayload as SyncIngestAcceptedPayload,
+    SyncIngestRejectedPayload as SyncIngestRejectedPayload,
+    SyncRetryScheduledPayload as SyncRetryScheduledPayload,
+    SyncDeadLetteredPayload as SyncDeadLetteredPayload,
+    SyncReplayCompletedPayload as SyncReplayCompletedPayload,
+    ExternalReferenceLinkedPayload as ExternalReferenceLinkedPayload,
+    ReducedSyncState as ReducedSyncState,
+    reduce_sync_events as reduce_sync_events,
+)
+
 # Backward-compatible dossier aliases without the Payload suffix.
 # Older consumers import these names directly.
 MissionDossierArtifactIndexed = MissionDossierArtifactIndexedPayload
@@ -545,4 +589,42 @@ __all__ = [
     "DecisionPointOverriddenPayload",
     "ReducedDecisionPointState",
     "reduce_decision_point_events",
+    # Connector Lifecycle Contracts (2.7.0)
+    "CONNECTOR_SCHEMA_VERSION",
+    "CONNECTOR_PROVISIONED",
+    "CONNECTOR_HEALTH_CHECKED",
+    "CONNECTOR_DEGRADED",
+    "CONNECTOR_REVOKED",
+    "CONNECTOR_RECONNECTED",
+    "CONNECTOR_EVENT_TYPES",
+    "ConnectorState",
+    "HealthStatus",
+    "ReconnectStrategy",
+    "ConnectorAnomaly",
+    "ConnectorProvisionedPayload",
+    "ConnectorHealthCheckedPayload",
+    "ConnectorDegradedPayload",
+    "ConnectorRevokedPayload",
+    "ConnectorReconnectedPayload",
+    "ReducedConnectorState",
+    "reduce_connector_events",
+    # Sync Lifecycle Contracts (2.7.0)
+    "SYNC_SCHEMA_VERSION",
+    "SYNC_INGEST_ACCEPTED",
+    "SYNC_INGEST_REJECTED",
+    "SYNC_RETRY_SCHEDULED",
+    "SYNC_DEAD_LETTERED",
+    "SYNC_REPLAY_COMPLETED",
+    "SYNC_EVENT_TYPES",
+    "EXTERNAL_REFERENCE_LINKED",
+    "SyncOutcome",
+    "SyncAnomaly",
+    "SyncIngestAcceptedPayload",
+    "SyncIngestRejectedPayload",
+    "SyncRetryScheduledPayload",
+    "SyncDeadLetteredPayload",
+    "SyncReplayCompletedPayload",
+    "ExternalReferenceLinkedPayload",
+    "ReducedSyncState",
+    "reduce_sync_events",
 ]

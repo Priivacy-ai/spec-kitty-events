@@ -8,14 +8,19 @@ from spec_kitty_events.schemas import list_schemas, load_schema, schema_path
 
 
 def test_list_schemas_returns_all_names() -> None:
-    """Test that list_schemas returns all 61 schema names."""
+    """Test that list_schemas returns all 72 schema names."""
     names = list_schemas()
-    assert len(names) == 61
+    assert len(names) == 72
     expected = [
         "artifact_identity",
         "auth_principal_binding",
         "comment_posted_payload",
         "concurrent_driver_warning_payload",
+        "connector_degraded_payload",
+        "connector_health_checked_payload",
+        "connector_provisioned_payload",
+        "connector_reconnected_payload",
+        "connector_revoked_payload",
         "content_hash_ref",
         "decision_captured_payload",
         "decision_input_answered_payload",
@@ -26,6 +31,7 @@ def test_list_schemas_returns_all_names() -> None:
         "decision_point_resolved_payload",
         "drive_intent_set_payload",
         "event",
+        "external_reference_linked_payload",
         "focus_changed_payload",
         "focus_target",
         "gate_failed_payload",
@@ -70,7 +76,12 @@ def test_list_schemas_returns_all_names() -> None:
         "semantic_conflict_entry",
         "session_linked_payload",
         "status_transition_payload",
+        "sync_dead_lettered_payload",
+        "sync_ingest_accepted_payload",
+        "sync_ingest_rejected_payload",
         "sync_lane_v1",
+        "sync_replay_completed_payload",
+        "sync_retry_scheduled_payload",
         "term_candidate_observed_payload",
         "warning_acknowledged_payload",
     ]
