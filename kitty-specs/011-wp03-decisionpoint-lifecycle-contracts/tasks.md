@@ -17,7 +17,7 @@
 - [x] T001 Create DecisionPoint event constants and state/role enums.
 - [x] T002 Implement frozen payload models with required audit-trail fields.
 - [x] T003 Implement deterministic reducer and transition validation with anomaly handling.
-- [ ] T004 Add unit and reducer tests for transition and authority rules.
+- [x] T004 Add unit and reducer tests for transition and authority rules.
 
 ## Work Package WP02: Conformance Fixtures, Replay, Versioning, Downstream Notes (Priority: P1)
 
