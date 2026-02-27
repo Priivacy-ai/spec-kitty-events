@@ -51,4 +51,5 @@
 <!-- status-model:start -->
 ## Canonical Status (Generated)
 - WP01: done
+- WP02: planned
 <!-- status-model:end -->
