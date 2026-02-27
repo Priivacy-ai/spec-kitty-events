@@ -1,21 +1,21 @@
 ---
 work_package_id: WP02
 title: DecisionPoint Conformance, Replay Determinism, Versioning, and Downstream Notes
-lane: "doing"
+lane: "planned"
 dependencies:
 - WP01
 base_branch: 011-wp03-decisionpoint-lifecycle-contracts-WP01
 base_commit: 28c480c2203b1e73db29db8502f3dd3a85b2360e
 created_at: '2026-02-27T11:31:10.629612+00:00'
-agent: "codex"
-shell_pid: "54810"
-review_status: has_feedback
-reviewed_by: Robert Douglass
+agent: codex
+shell_pid: '54810'
+review_status: "has_feedback"
+reviewed_by: "Robert Douglass"
 requirement_refs:
 - FR-004
 - FR-005
 - FR-006
-review_feedback_file: /private/var/folders/gj/bxx0438j003b20kn5b6s7bsh0000gn/T/spec-kitty-review-feedback-WP02.md
+review_feedback_file: "/private/var/folders/gj/bxx0438j003b20kn5b6s7bsh0000gn/T/spec-kitty-review-feedback-WP02.md"
 ---
 
 # Work Package Prompt: WP02 - DecisionPoint Conformance, Replay Determinism, Versioning, and Downstream Notes
@@ -80,6 +80,19 @@ Deliver conformance-grade DecisionPoint fixtures and replay scenarios, register 
 
 # WP02 Review Feedback (Codex)
 
+## Finding 1 (P1): DecisionPoint fixtures not packaged for distribution
+- Evidence: `src/spec_kitty_events/conformance/loader.py` now exposes `load_fixtures("decisionpoint")`, but `pyproject.toml` package-data globs were not updated to include `src/spec_kitty_events/conformance/fixtures/decisionpoint/**` assets.
+- Impact: Installed wheel/sdist consumers will fail with `FileNotFoundError` when loading DecisionPoint fixtures/replay/golden outputs.
+- Required change:
+  - Update package-data configuration so all DecisionPoint fixture assets (`valid/*.json`, `invalid/*.json`, `replay/*.jsonl`, `replay/*_output.json`) are included in distributions.
+  - Re-run acceptance checks after the packaging change.
+- Acceptance check:
+  - Build/install artifact context continues to pass:
+    - `python3.11 -m pytest tests/test_decisionpoint_conformance.py tests/property/test_decisionpoint_determinism.py -v`
+    - `python3.11 -m pytest --pyargs spec_kitty_events.conformance`
+    - `python3.11 -m pytest tests/ -q`
+
+
 ## Finding 1 (P1): Package version mismatch
 - Evidence: `src/spec_kitty_events/__init__.py` keeps `__version__ = "2.5.0"` while DecisionPoint release artifacts and notes are explicitly 2.6.0.
 - Impact: Downstream pinning / release automation ambiguity; docs and artifact versioning diverge from package version.
@@ -104,3 +117,4 @@ Deliver conformance-grade DecisionPoint fixtures and replay scenarios, register 
 - 2026-02-27T11:49:55Z – coordinator – shell_pid=54810 – lane=doing – Started implementation via workflow command
 - 2026-02-27T11:54:51Z – coordinator – shell_pid=54810 – lane=for_review – Ready for re-review: fixed package version to 2.6.0 and corrected export count note
 - 2026-02-27T11:55:21Z – codex – shell_pid=54810 – lane=doing – Started review via workflow command
+- 2026-02-27T11:58:44Z – codex – shell_pid=54810 – lane=planned – Moved to planned
