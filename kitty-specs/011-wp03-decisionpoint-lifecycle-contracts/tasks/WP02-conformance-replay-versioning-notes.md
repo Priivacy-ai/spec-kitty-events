@@ -12,6 +12,7 @@ requirement_refs:
 - FR-005
 - FR-006
 shell_pid: "54810"
+agent: "coordinator"
 ---
 
 # Work Package Prompt: WP02 - DecisionPoint Conformance, Replay Determinism, Versioning, and Downstream Notes
@@ -66,3 +67,7 @@ Deliver conformance-grade DecisionPoint fixtures and replay scenarios, register 
 - Include fixture inventory table (valid/invalid/replay/reducer-output) in PR description.
 - Cite FR coverage explicitly: FR-004, FR-005, FR-006.
 - Include downstream migration note block: required version pin, exported symbols, and expected consumer code touchpoints.
+
+## Activity Log
+
+- 2026-02-27T11:31:10Z – coordinator – shell_pid=54810 – lane=doing – Assigned agent via workflow command
