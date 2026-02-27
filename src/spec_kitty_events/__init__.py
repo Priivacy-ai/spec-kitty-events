@@ -259,6 +259,25 @@ from spec_kitty_events.mission_audit import (
     reduce_mission_audit_events as reduce_mission_audit_events,
 )
 
+# DecisionPoint Lifecycle Contracts (2.6.0)
+from spec_kitty_events.decisionpoint import (
+    DECISIONPOINT_SCHEMA_VERSION as DECISIONPOINT_SCHEMA_VERSION,
+    DECISION_POINT_OPENED as DECISION_POINT_OPENED,
+    DECISION_POINT_DISCUSSING as DECISION_POINT_DISCUSSING,
+    DECISION_POINT_RESOLVED as DECISION_POINT_RESOLVED,
+    DECISION_POINT_OVERRIDDEN as DECISION_POINT_OVERRIDDEN,
+    DECISION_POINT_EVENT_TYPES as DECISION_POINT_EVENT_TYPES,
+    DecisionPointState as DecisionPointState,
+    DecisionAuthorityRole as DecisionAuthorityRole,
+    DecisionPointAnomaly as DecisionPointAnomaly,
+    DecisionPointOpenedPayload as DecisionPointOpenedPayload,
+    DecisionPointDiscussingPayload as DecisionPointDiscussingPayload,
+    DecisionPointResolvedPayload as DecisionPointResolvedPayload,
+    DecisionPointOverriddenPayload as DecisionPointOverriddenPayload,
+    ReducedDecisionPointState as ReducedDecisionPointState,
+    reduce_decision_point_events as reduce_decision_point_events,
+)
+
 # Backward-compatible dossier aliases without the Payload suffix.
 # Older consumers import these names directly.
 MissionDossierArtifactIndexed = MissionDossierArtifactIndexedPayload
@@ -477,4 +496,20 @@ __all__ = [
     "MissionAuditFailedPayload",
     "ReducedMissionAuditState",
     "reduce_mission_audit_events",
+    # DecisionPoint Lifecycle Contracts (2.6.0)
+    "DECISIONPOINT_SCHEMA_VERSION",
+    "DECISION_POINT_OPENED",
+    "DECISION_POINT_DISCUSSING",
+    "DECISION_POINT_RESOLVED",
+    "DECISION_POINT_OVERRIDDEN",
+    "DECISION_POINT_EVENT_TYPES",
+    "DecisionPointState",
+    "DecisionAuthorityRole",
+    "DecisionPointAnomaly",
+    "DecisionPointOpenedPayload",
+    "DecisionPointDiscussingPayload",
+    "DecisionPointResolvedPayload",
+    "DecisionPointOverriddenPayload",
+    "ReducedDecisionPointState",
+    "reduce_decision_point_events",
 ]
