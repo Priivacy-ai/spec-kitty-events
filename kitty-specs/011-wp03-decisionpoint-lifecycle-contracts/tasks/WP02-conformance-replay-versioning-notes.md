@@ -1,13 +1,17 @@
 ---
 work_package_id: WP02
 title: DecisionPoint Conformance, Replay Determinism, Versioning, and Downstream Notes
-lane: planned
+lane: "doing"
 dependencies:
-  - WP01
+- WP01
+base_branch: 011-wp03-decisionpoint-lifecycle-contracts-WP01
+base_commit: 28c480c2203b1e73db29db8502f3dd3a85b2360e
+created_at: '2026-02-27T11:31:10.629612+00:00'
 requirement_refs:
-  - FR-004
-  - FR-005
-  - FR-006
+- FR-004
+- FR-005
+- FR-006
+shell_pid: "54810"
 ---
 
 # Work Package Prompt: WP02 - DecisionPoint Conformance, Replay Determinism, Versioning, and Downstream Notes
