@@ -29,10 +29,10 @@
 
 ### Included Subtasks
 
-- [ ] T005 Register DecisionPoint models/schemas in conformance validator and loader.
-- [ ] T006 Add DecisionPoint valid, invalid, replay, and reducer-output fixtures with manifest entries.
-- [ ] T007 Add conformance and property tests for replay determinism and dedup idempotence.
-- [ ] T008 Add schema generation entries, public exports, and versioning/downstream impact notes.
+- [x] T005 Register DecisionPoint models/schemas in conformance validator and loader.
+- [x] T006 Add DecisionPoint valid, invalid, replay, and reducer-output fixtures with manifest entries.
+- [x] T007 Add conformance and property tests for replay determinism and dedup idempotence.
+- [x] T008 Add schema generation entries, public exports, and versioning/downstream impact notes.
 
 ## Requirement Mapping
 
