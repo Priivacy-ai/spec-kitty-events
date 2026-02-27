@@ -1,13 +1,17 @@
 ---
 work_package_id: WP02
 title: Conformance Fixtures, Replay Scenarios, Compatibility Notes, Tests
-lane: planned
+lane: "doing"
 dependencies:
 - WP01
+base_branch: codex/wp04-events-connector-sync-contracts
+base_commit: 87248791e64edefcdc7512e459c2f14efa76e675
+created_at: '2026-02-27T12:53:08.624785+00:00'
 requirement_refs:
 - FR-008
 - FR-009
 - FR-010
+shell_pid: "54810"
 ---
 
 # Work Package Prompt: WP02 - Conformance Fixtures, Replay Scenarios, Compatibility Notes, Tests
