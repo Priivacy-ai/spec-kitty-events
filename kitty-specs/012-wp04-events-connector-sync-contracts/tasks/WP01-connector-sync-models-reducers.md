@@ -1,11 +1,13 @@
 ---
 work_package_id: WP01
 title: Connector and Sync Models, Constants, Schemas, Validators, Reducers
-lane: "doing"
+lane: "for_review"
 dependencies: []
 base_branch: codex/wp04-events-connector-sync-contracts
 base_commit: b208aad4aaa4fdce08c1fdca1681134b54331d6c
 created_at: '2026-02-27T12:21:46.457708+00:00'
+agent: coordinator
+shell_pid: '54810'
 requirement_refs:
 - FR-001
 - FR-002
@@ -14,8 +16,6 @@ requirement_refs:
 - FR-005
 - FR-006
 - FR-007
-shell_pid: "54810"
-agent: "coordinator"
 ---
 
 # Work Package Prompt: WP01 - Connector and Sync Models, Constants, Schemas, Validators, Reducers
@@ -160,3 +160,4 @@ Create the canonical connector lifecycle and sync lifecycle contract core in the
 ## Activity Log
 
 - 2026-02-27T12:21:46Z – coordinator – shell_pid=54810 – lane=doing – Assigned agent via workflow command
+- 2026-02-27T12:33:08Z – coordinator – shell_pid=54810 – lane=for_review – Ready for review: connector.py (5 event types, 3 enums, 5 payload models, reducer with FR-006 transitions), sync.py (5 event types, 5 payload models with idempotency fields, ExternalReferenceLinkedPayload, reducer with FR-007 dedup), schema/validator wiring, 112 tests pass, mypy --strict clean
