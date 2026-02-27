@@ -1,21 +1,21 @@
 ---
 work_package_id: WP02
 title: Conformance Fixtures, Replay Scenarios, Compatibility Notes, Tests
-lane: "doing"
+lane: "for_review"
 dependencies:
 - WP01
 base_branch: codex/wp04-events-connector-sync-contracts
 base_commit: 87248791e64edefcdc7512e459c2f14efa76e675
 created_at: '2026-02-27T12:53:08.624785+00:00'
-agent: "coordinator"
-shell_pid: "54810"
+agent: coordinator
+shell_pid: '54810'
+review_status: has_feedback
+reviewed_by: Robert Douglass
 requirement_refs:
 - FR-008
 - FR-009
 - FR-010
-review_status: "has_feedback"
-reviewed_by: "Robert Douglass"
-review_feedback_file: "/Users/robert/ClaudeCowork/Spec-Kitty-Cowork/spec-kitty-events/.worktrees/012-wp04-events-connector-sync-contracts-WP02/WP02_review_feedback.md"
+review_feedback_file: /Users/robert/ClaudeCowork/Spec-Kitty-Cowork/spec-kitty-events/.worktrees/012-wp04-events-connector-sync-contracts-WP02/WP02_review_feedback.md
 ---
 
 # Work Package Prompt: WP02 - Conformance Fixtures, Replay Scenarios, Compatibility Notes, Tests
@@ -234,3 +234,4 @@ Deliver conformance-grade connector and sync lifecycle fixtures and replay scena
 - 2026-02-27T13:15:00Z – claude – shell_pid=54810 – lane=doing – Started review via workflow command
 - 2026-02-27T13:20:00Z – claude – shell_pid=54810 – lane=planned – Moved to planned
 - 2026-02-27T13:20:20Z – coordinator – shell_pid=54810 – lane=doing – Started implementation via workflow command
+- 2026-02-27T13:22:42Z – coordinator – shell_pid=54810 – lane=for_review – Ready for re-review: resolved feedback by adding 2.7.0 versioning/export and downstream impact notes for tracker and saas in __init__.py docstring; acceptance checks remain green.
