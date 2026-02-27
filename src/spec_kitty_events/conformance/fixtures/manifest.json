@@ -690,6 +690,172 @@
       "expected_result": "valid",
       "notes": "Golden reducer output for mission_audit_replay_decision_checkpoint.jsonl \u2014 pending_decisions cleared on Completed",
       "min_version": "2.5.0"
+    },
+    {
+      "id": "decisionpoint-opened-valid",
+      "path": "decisionpoint/valid/decision_point_opened.json",
+      "event_type": "DecisionPointOpened",
+      "expected_result": "valid",
+      "notes": "Valid DecisionPointOpenedPayload with human mission_owner actor",
+      "min_version": "2.6.0"
+    },
+    {
+      "id": "decisionpoint-discussing-valid",
+      "path": "decisionpoint/valid/decision_point_discussing.json",
+      "event_type": "DecisionPointDiscussing",
+      "expected_result": "valid",
+      "notes": "Valid DecisionPointDiscussingPayload with advisory human actor",
+      "min_version": "2.6.0"
+    },
+    {
+      "id": "decisionpoint-resolved-valid",
+      "path": "decisionpoint/valid/decision_point_resolved.json",
+      "event_type": "DecisionPointResolved",
+      "expected_result": "valid",
+      "notes": "Valid DecisionPointResolvedPayload with human mission_owner",
+      "min_version": "2.6.0"
+    },
+    {
+      "id": "decisionpoint-overridden-valid",
+      "path": "decisionpoint/valid/decision_point_overridden.json",
+      "event_type": "DecisionPointOverridden",
+      "expected_result": "valid",
+      "notes": "Valid DecisionPointOverriddenPayload with human mission_owner",
+      "min_version": "2.6.0"
+    },
+    {
+      "id": "decisionpoint-opened-llm-p0-valid",
+      "path": "decisionpoint/valid/decision_point_opened_llm_p0.json",
+      "event_type": "DecisionPointOpened",
+      "expected_result": "valid",
+      "notes": "Valid LLM actor in P0 phase with advisory role and no owner authority",
+      "min_version": "2.6.0"
+    },
+    {
+      "id": "decisionpoint-opened-service-valid",
+      "path": "decisionpoint/valid/decision_point_opened_service.json",
+      "event_type": "DecisionPointOpened",
+      "expected_result": "valid",
+      "notes": "Valid service actor with informed role",
+      "min_version": "2.6.0"
+    },
+    {
+      "id": "decisionpoint-discussing-llm-p0-valid",
+      "path": "decisionpoint/valid/decision_point_discussing_llm_p0.json",
+      "event_type": "DecisionPointDiscussing",
+      "expected_result": "valid",
+      "notes": "Valid LLM actor contributing to discussion in P0 phase",
+      "min_version": "2.6.0"
+    },
+    {
+      "id": "decisionpoint-resolved-multi-evidence-valid",
+      "path": "decisionpoint/valid/decision_point_resolved_with_multiple_evidence.json",
+      "event_type": "DecisionPointResolved",
+      "expected_result": "valid",
+      "notes": "Resolved with multiple alternatives and evidence refs",
+      "min_version": "2.6.0"
+    },
+    {
+      "id": "decisionpoint-missing-decision-point-id",
+      "path": "decisionpoint/invalid/decision_point_missing_decision_point_id.json",
+      "event_type": "DecisionPointOpened",
+      "expected_result": "invalid",
+      "notes": "decision_point_id field absent \u2014 required with min_length=1; Pydantic must reject",
+      "min_version": "2.6.0"
+    },
+    {
+      "id": "decisionpoint-missing-rationale",
+      "path": "decisionpoint/invalid/decision_point_missing_rationale.json",
+      "event_type": "DecisionPointOpened",
+      "expected_result": "invalid",
+      "notes": "rationale field absent \u2014 required audit field; Pydantic must reject",
+      "min_version": "2.6.0"
+    },
+    {
+      "id": "decisionpoint-invalid-actor-type",
+      "path": "decisionpoint/invalid/decision_point_invalid_actor_type.json",
+      "event_type": "DecisionPointOpened",
+      "expected_result": "invalid",
+      "notes": "actor_type='bot' violates pattern ^(human|llm|service)$ constraint",
+      "min_version": "2.6.0"
+    },
+    {
+      "id": "decisionpoint-invalid-authority-role",
+      "path": "decisionpoint/invalid/decision_point_invalid_authority_role.json",
+      "event_type": "DecisionPointOpened",
+      "expected_result": "invalid",
+      "notes": "authority_role='admin' not in DecisionAuthorityRole enum \u2014 authority-policy failure",
+      "min_version": "2.6.0"
+    },
+    {
+      "id": "decisionpoint-empty-alternatives",
+      "path": "decisionpoint/invalid/decision_point_empty_alternatives.json",
+      "event_type": "DecisionPointOpened",
+      "expected_result": "invalid",
+      "notes": "alternatives_considered is empty list \u2014 violates min_length=1 constraint",
+      "min_version": "2.6.0"
+    },
+    {
+      "id": "decisionpoint-empty-evidence-refs",
+      "path": "decisionpoint/invalid/decision_point_empty_evidence_refs.json",
+      "event_type": "DecisionPointOpened",
+      "expected_result": "invalid",
+      "notes": "evidence_refs is empty list \u2014 violates min_length=1 constraint",
+      "min_version": "2.6.0"
+    },
+    {
+      "id": "decisionpoint-replay-full-lifecycle",
+      "path": "decisionpoint/replay/decisionpoint_full_lifecycle.jsonl",
+      "fixture_type": "replay_stream",
+      "event_type": "mixed",
+      "expected_result": "valid",
+      "notes": "4-event full lifecycle: Opened \u2192 Discussing \u2192 Resolved \u2192 Overridden",
+      "min_version": "2.6.0"
+    },
+    {
+      "id": "decisionpoint-replay-open-resolved",
+      "path": "decisionpoint/replay/decisionpoint_open_resolved.jsonl",
+      "fixture_type": "replay_stream",
+      "event_type": "mixed",
+      "expected_result": "valid",
+      "notes": "2-event shortcut: Opened \u2192 Resolved (skipping Discussing)",
+      "min_version": "2.6.0"
+    },
+    {
+      "id": "decisionpoint-replay-with-anomaly",
+      "path": "decisionpoint/replay/decisionpoint_with_anomaly.jsonl",
+      "fixture_type": "replay_stream",
+      "event_type": "mixed",
+      "expected_result": "valid",
+      "notes": "4-event stream with event_after_terminal anomaly: Opened \u2192 Resolved \u2192 Overridden \u2192 Discussing(anomaly)",
+      "min_version": "2.6.0"
+    },
+    {
+      "id": "decisionpoint-replay-full-lifecycle-output",
+      "path": "decisionpoint/replay/decisionpoint_full_lifecycle_output.json",
+      "fixture_type": "reducer_output",
+      "event_type": "DecisionPointState",
+      "expected_result": "valid",
+      "notes": "Golden reducer output for decisionpoint_full_lifecycle.jsonl \u2014 state=overridden, 4 events, 0 anomalies",
+      "min_version": "2.6.0"
+    },
+    {
+      "id": "decisionpoint-replay-open-resolved-output",
+      "path": "decisionpoint/replay/decisionpoint_open_resolved_output.json",
+      "fixture_type": "reducer_output",
+      "event_type": "DecisionPointState",
+      "expected_result": "valid",
+      "notes": "Golden reducer output for decisionpoint_open_resolved.jsonl \u2014 state=resolved, 2 events, 0 anomalies",
+      "min_version": "2.6.0"
+    },
+    {
+      "id": "decisionpoint-replay-with-anomaly-output",
+      "path": "decisionpoint/replay/decisionpoint_with_anomaly_output.json",
+      "fixture_type": "reducer_output",
+      "event_type": "DecisionPointState",
+      "expected_result": "valid",
+      "notes": "Golden reducer output for decisionpoint_with_anomaly.jsonl \u2014 state=overridden, 1 anomaly (event_after_terminal)",
+      "min_version": "2.6.0"
     }
   ]
 }

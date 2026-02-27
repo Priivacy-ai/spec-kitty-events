@@ -84,6 +84,12 @@ from spec_kitty_events.mission_audit import (
     MissionAuditCompletedPayload,
     MissionAuditFailedPayload,
 )
+from spec_kitty_events.decisionpoint import (
+    DecisionPointOpenedPayload,
+    DecisionPointDiscussingPayload,
+    DecisionPointResolvedPayload,
+    DecisionPointOverriddenPayload,
+)
 
 
 # Schema directory (same directory as this script)
@@ -152,6 +158,11 @@ PYDANTIC_MODELS: List[tuple[str, Type[BaseModel]]] = [
     ("mission_audit_decision_requested_payload", MissionAuditDecisionRequestedPayload),
     ("mission_audit_completed_payload", MissionAuditCompletedPayload),
     ("mission_audit_failed_payload", MissionAuditFailedPayload),
+    # DecisionPoint lifecycle contracts (2.6.0)
+    ("decision_point_opened_payload", DecisionPointOpenedPayload),
+    ("decision_point_discussing_payload", DecisionPointDiscussingPayload),
+    ("decision_point_resolved_payload", DecisionPointResolvedPayload),
+    ("decision_point_overridden_payload", DecisionPointOverriddenPayload),
 ]
 
 # Enums (use TypeAdapter)

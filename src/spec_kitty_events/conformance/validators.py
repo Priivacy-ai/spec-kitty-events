@@ -72,6 +72,12 @@ from spec_kitty_events.mission_audit import (
     MissionAuditCompletedPayload,
     MissionAuditFailedPayload,
 )
+from spec_kitty_events.decisionpoint import (
+    DecisionPointOpenedPayload,
+    DecisionPointDiscussingPayload,
+    DecisionPointResolvedPayload,
+    DecisionPointOverriddenPayload,
+)
 
 
 @dataclass(frozen=True)
@@ -159,6 +165,11 @@ _EVENT_TYPE_TO_MODEL: Dict[str, Type[Any]] = {
     "MissionAuditDecisionRequested": MissionAuditDecisionRequestedPayload,
     "MissionAuditCompleted": MissionAuditCompletedPayload,
     "MissionAuditFailed": MissionAuditFailedPayload,
+    # DecisionPoint lifecycle contracts (2.6.0)
+    "DecisionPointOpened": DecisionPointOpenedPayload,
+    "DecisionPointDiscussing": DecisionPointDiscussingPayload,
+    "DecisionPointResolved": DecisionPointResolvedPayload,
+    "DecisionPointOverridden": DecisionPointOverriddenPayload,
 }
 
 # Event type to JSON Schema name mapping (used with load_schema())
@@ -214,6 +225,11 @@ _EVENT_TYPE_TO_SCHEMA: Dict[str, str] = {
     "MissionAuditDecisionRequested": "mission_audit_decision_requested_payload",
     "MissionAuditCompleted": "mission_audit_completed_payload",
     "MissionAuditFailed": "mission_audit_failed_payload",
+    # DecisionPoint lifecycle contracts (2.6.0)
+    "DecisionPointOpened": "decision_point_opened_payload",
+    "DecisionPointDiscussing": "decision_point_discussing_payload",
+    "DecisionPointResolved": "decision_point_resolved_payload",
+    "DecisionPointOverridden": "decision_point_overridden_payload",
 }
 
 

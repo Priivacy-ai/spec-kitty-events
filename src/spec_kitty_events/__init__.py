@@ -11,9 +11,42 @@ Example:
     >>> clock = LamportClock(node_id="alice", storage=storage)
     >>> clock.tick()
     1
+
+Versioning and Export Notes (2.6.0 -- DecisionPoint Lifecycle Contracts):
+    The DecisionPoint domain (DECISIONPOINT_SCHEMA_VERSION = "2.6.0") is an
+    **additive-only** extension.  No existing symbols, models, or schemas
+    were modified.  All new symbols are listed under the "DecisionPoint
+    Lifecycle Contracts (2.6.0)" block in ``__all__``.
+
+    Exported symbols (15 total):
+        Constants: DECISIONPOINT_SCHEMA_VERSION, DECISION_POINT_OPENED,
+            DECISION_POINT_DISCUSSING, DECISION_POINT_RESOLVED,
+            DECISION_POINT_OVERRIDDEN, DECISION_POINT_EVENT_TYPES
+        Enums: DecisionPointState, DecisionAuthorityRole
+        Models: DecisionPointAnomaly, DecisionPointOpenedPayload,
+            DecisionPointDiscussingPayload, DecisionPointResolvedPayload,
+            DecisionPointOverriddenPayload, ReducedDecisionPointState
+        Reducer: reduce_decision_point_events
+
+    Downstream Impact Notes:
+        spec-kitty runtime:
+            - Pin ``spec-kitty-events>=2.6.0`` once this version is published.
+            - Import ``reduce_decision_point_events`` for DecisionPoint state
+              projection alongside the existing mission-audit reducer.
+            - The ``DECISION_POINT_EVENT_TYPES`` frozenset can be used to
+              filter event streams by family.
+
+        spec-kitty-saas:
+            - Pin ``spec-kitty-events>=2.6.0``.
+            - DecisionPoint schemas (decision_point_*.schema.json) are
+              available via ``spec_kitty_events.schemas.load_schema()``
+              for API contract validation.
+            - Conformance fixtures in ``spec_kitty_events.conformance``
+              include the ``"decisionpoint"`` category for integration test
+              suites (``load_fixtures("decisionpoint")``).
 """
 
-__version__ = "2.5.0"
+__version__ = "2.6.0"
 
 # Core data models
 from spec_kitty_events.models import (
