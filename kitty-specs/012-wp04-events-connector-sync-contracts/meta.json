@@ -1,0 +1,11 @@
+{
+  "feature_number": "012",
+  "slug": "012-wp04-events-connector-sync-contracts",
+  "feature_slug": "012-wp04-events-connector-sync-contracts",
+  "friendly_name": "wp04 events connector sync contracts",
+  "mission": "software-dev",
+  "target_branch": "codex/wp04-events-connector-sync-contracts",
+  "created_at": "2026-02-27T12:11:06.699698+00:00",
+  "vcs": "git",
+  "vcs_locked_at": "2026-02-27T12:21:45.978739+00:00"
+}

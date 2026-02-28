@@ -7,33 +7,12 @@ spec_kitty:
   initialized_at: '2026-02-07T07:46:50.090112'
   last_upgraded_at: '2026-02-26T13:32:24.712574'
 environment:
-  python_version: 3.14.0
+  python_version: 3.11.14
   platform: darwin
-  platform_version: macOS-15.7.3-arm64-arm-64bit-Mach-O
+  platform_version: macOS-15.7.3-arm64-arm-64bit
 migrations:
   applied:
-  - id: 0.14.0_centralized_feature_detection
-    applied_at: '2026-02-07T13:05:59.357137'
-    result: skipped
-    notes: Not applicable
-  - id: 2.0.0a5_remove_wp_status_gitignore_rule
-    applied_at: '2026-02-23T19:09:46.708454'
-    result: skipped
-    notes: Not applicable
-  - id: 2.0.0_constitution_directory
-    applied_at: '2026-02-23T19:09:46.708554'
-    result: skipped
-    notes: Not applicable
   - id: 2.0.0_historical_status_migration
-    applied_at: '2026-02-23T19:09:46.818831'
+    applied_at: '2026-02-26T13:21:24.158541'
     result: success
-    notes: '001-event-model-project-identity: migrated (3 WPs, 3 events); 002-github-gate-observability-contracts:
-      migrated (3 WPs, 3 events); 003-status-state-model-contracts: migrated (4 WPs,
-      4 events); 005-event-contract-conformance-suite: migrated (7 WPs, 7 events);
-      006-mission-collaboration-soft-coordination-contracts: migrated (9 WPs, 9 events);
-      008-mission-dossier-parity-event-contracts: migrated (5 WPs, 5 events)'
-  - id: 2.0.0_retire_git_hooks
-    applied_at: '2026-02-23T19:09:46.821303'
-    result: success
-    notes: 'Removed 3 managed git hook(s); Removed managed hook: pre-commit; Removed
-      managed hook: pre-commit-agent-check; Removed managed hook: pre-commit-encoding-check'
+    notes: '007-glossary-semantic-integrity-contracts: migrated (10 WPs, 10 events)'
