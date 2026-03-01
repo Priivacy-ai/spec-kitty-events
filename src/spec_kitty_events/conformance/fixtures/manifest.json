@@ -856,6 +856,245 @@
       "expected_result": "valid",
       "notes": "Golden reducer output for decisionpoint_with_anomaly.jsonl \u2014 state=overridden, 1 anomaly (event_after_terminal)",
       "min_version": "2.6.0"
+    },
+    {
+      "id": "connector-provisioned-github",
+      "path": "connector/valid/connector-provisioned-github.json",
+      "expected_result": "valid",
+      "event_type": "ConnectorProvisioned",
+      "notes": "ConnectorProvisioned for a GitHub connector with all mandatory fields",
+      "min_version": "2.7.0"
+    },
+    {
+      "id": "connector-provisioned-jira",
+      "path": "connector/valid/connector-provisioned-jira.json",
+      "expected_result": "valid",
+      "event_type": "ConnectorProvisioned",
+      "notes": "ConnectorProvisioned for a Jira connector",
+      "min_version": "2.7.0"
+    },
+    {
+      "id": "connector-health-checked-healthy",
+      "path": "connector/valid/connector-health-checked-healthy.json",
+      "expected_result": "valid",
+      "event_type": "ConnectorHealthChecked",
+      "notes": "ConnectorHealthChecked with health_status=healthy and latency_ms=42.5",
+      "min_version": "2.7.0"
+    },
+    {
+      "id": "connector-health-checked-degraded",
+      "path": "connector/valid/connector-health-checked-degraded.json",
+      "expected_result": "valid",
+      "event_type": "ConnectorHealthChecked",
+      "notes": "ConnectorHealthChecked with health_status=degraded and latency_ms=3200.0",
+      "min_version": "2.7.0"
+    },
+    {
+      "id": "connector-degraded-timeout",
+      "path": "connector/valid/connector-degraded-timeout.json",
+      "expected_result": "valid",
+      "event_type": "ConnectorDegraded",
+      "notes": "ConnectorDegraded with degradation_reason=connection_timeout",
+      "min_version": "2.7.0"
+    },
+    {
+      "id": "connector-reconnected-automatic",
+      "path": "connector/valid/connector-reconnected-automatic.json",
+      "expected_result": "valid",
+      "event_type": "ConnectorReconnected",
+      "notes": "ConnectorReconnected with previous_state=degraded and reconnect_strategy=automatic",
+      "min_version": "2.7.0"
+    },
+    {
+      "id": "connector-missing-connector-id",
+      "path": "connector/invalid/connector-missing-connector-id.json",
+      "expected_result": "invalid",
+      "event_type": "ConnectorProvisioned",
+      "notes": "ConnectorProvisioned payload missing connector_id field",
+      "min_version": "2.7.0"
+    },
+    {
+      "id": "connector-missing-endpoint-url",
+      "path": "connector/invalid/connector-missing-endpoint-url.json",
+      "expected_result": "invalid",
+      "event_type": "ConnectorProvisioned",
+      "notes": "ConnectorProvisioned payload missing endpoint_url field",
+      "min_version": "2.7.0"
+    },
+    {
+      "id": "connector-invalid-health-status",
+      "path": "connector/invalid/connector-invalid-health-status.json",
+      "expected_result": "invalid",
+      "event_type": "ConnectorHealthChecked",
+      "notes": "ConnectorHealthChecked with health_status=unknown (not in enum)",
+      "min_version": "2.7.0"
+    },
+    {
+      "id": "connector-missing-revocation-reason",
+      "path": "connector/invalid/connector-missing-revocation-reason.json",
+      "expected_result": "invalid",
+      "event_type": "ConnectorRevoked",
+      "notes": "ConnectorRevoked payload missing revocation_reason field",
+      "min_version": "2.7.0"
+    },
+    {
+      "id": "connector-lifecycle-full",
+      "path": "connector/replay/connector-lifecycle-full.jsonl",
+      "fixture_type": "replay_stream",
+      "event_type": "mixed",
+      "expected_result": "valid",
+      "notes": "6-event full connector lifecycle: Provisioned \u2192 HealthChecked(healthy) \u2192 Degraded \u2192 Reconnected \u2192 HealthChecked(healthy) \u2192 Revoked",
+      "min_version": "2.7.0"
+    },
+    {
+      "id": "connector-lifecycle-full-output",
+      "path": "connector/replay/connector-lifecycle-full_output.json",
+      "fixture_type": "reducer_output",
+      "event_type": "ReducedConnectorState",
+      "expected_result": "valid",
+      "notes": "Golden reducer output for connector-lifecycle-full.jsonl \u2014 state=revoked, 6 events, 0 anomalies",
+      "min_version": "2.7.0"
+    },
+    {
+      "id": "sync-ingest-accepted-batch",
+      "path": "sync/valid/sync-ingest-accepted-batch.json",
+      "expected_result": "valid",
+      "event_type": "SyncIngestAccepted",
+      "notes": "SyncIngestAccepted with ingest_batch_id and ingested_count=15",
+      "min_version": "2.7.0"
+    },
+    {
+      "id": "sync-ingest-accepted-single",
+      "path": "sync/valid/sync-ingest-accepted-single.json",
+      "expected_result": "valid",
+      "event_type": "SyncIngestAccepted",
+      "notes": "SyncIngestAccepted with ingested_count=1",
+      "min_version": "2.7.0"
+    },
+    {
+      "id": "sync-ingest-rejected-schema-mismatch",
+      "path": "sync/valid/sync-ingest-rejected-schema-mismatch.json",
+      "expected_result": "valid",
+      "event_type": "SyncIngestRejected",
+      "notes": "SyncIngestRejected with rejection_reason=payload_schema_mismatch",
+      "min_version": "2.7.0"
+    },
+    {
+      "id": "sync-retry-scheduled-first-attempt",
+      "path": "sync/valid/sync-retry-scheduled-first-attempt.json",
+      "expected_result": "valid",
+      "event_type": "SyncRetryScheduled",
+      "notes": "SyncRetryScheduled with retry_attempt=1 and max_retries=3",
+      "min_version": "2.7.0"
+    },
+    {
+      "id": "sync-dead-lettered-max-retries",
+      "path": "sync/valid/sync-dead-lettered-max-retries.json",
+      "expected_result": "valid",
+      "event_type": "SyncDeadLettered",
+      "notes": "SyncDeadLettered with total_attempts=3 and failure_reason=max_retries_exceeded",
+      "min_version": "2.7.0"
+    },
+    {
+      "id": "sync-replay-completed-full",
+      "path": "sync/valid/sync-replay-completed-full.json",
+      "expected_result": "valid",
+      "event_type": "SyncReplayCompleted",
+      "notes": "SyncReplayCompleted with replayed_count=42 and replay_source=dead_letter_queue",
+      "min_version": "2.7.0"
+    },
+    {
+      "id": "external-ref-linked-github-pr",
+      "path": "sync/valid/external-ref-linked-github-pr.json",
+      "expected_result": "valid",
+      "event_type": "ExternalReferenceLinked",
+      "notes": "ExternalReferenceLinked binding a GitHub PR to a mission WP",
+      "min_version": "2.7.0"
+    },
+    {
+      "id": "external-ref-linked-jira-issue",
+      "path": "sync/valid/external-ref-linked-jira-issue.json",
+      "expected_result": "valid",
+      "event_type": "ExternalReferenceLinked",
+      "notes": "ExternalReferenceLinked binding a Jira issue to a mission",
+      "min_version": "2.7.0"
+    },
+    {
+      "id": "sync-missing-delivery-id",
+      "path": "sync/invalid/sync-missing-delivery-id.json",
+      "expected_result": "invalid",
+      "event_type": "SyncIngestAccepted",
+      "notes": "SyncIngestAccepted payload missing delivery_id field",
+      "min_version": "2.7.0"
+    },
+    {
+      "id": "sync-missing-source-fingerprint",
+      "path": "sync/invalid/sync-missing-source-fingerprint.json",
+      "expected_result": "invalid",
+      "event_type": "SyncIngestAccepted",
+      "notes": "SyncIngestAccepted payload missing source_event_fingerprint field",
+      "min_version": "2.7.0"
+    },
+    {
+      "id": "sync-negative-retry-attempt",
+      "path": "sync/invalid/sync-negative-retry-attempt.json",
+      "expected_result": "invalid",
+      "event_type": "SyncRetryScheduled",
+      "notes": "SyncRetryScheduled with retry_attempt=0 (must be >= 1)",
+      "min_version": "2.7.0"
+    },
+    {
+      "id": "sync-missing-failure-reason",
+      "path": "sync/invalid/sync-missing-failure-reason.json",
+      "expected_result": "invalid",
+      "event_type": "SyncDeadLettered",
+      "notes": "SyncDeadLettered payload missing failure_reason field",
+      "min_version": "2.7.0"
+    },
+    {
+      "id": "sync-ingest-lifecycle",
+      "path": "sync/replay/sync-ingest-lifecycle.jsonl",
+      "fixture_type": "replay_stream",
+      "event_type": "mixed",
+      "expected_result": "valid",
+      "notes": "7-event sync ingest lifecycle: Accepted \u2192 Accepted(different) \u2192 Rejected \u2192 RetryScheduled \u2192 RetryScheduled(attempt 2) \u2192 DeadLettered \u2192 ReplayCompleted",
+      "min_version": "2.7.0"
+    },
+    {
+      "id": "sync-ingest-lifecycle-output",
+      "path": "sync/replay/sync-ingest-lifecycle_output.json",
+      "fixture_type": "reducer_output",
+      "event_type": "ReducedSyncState",
+      "expected_result": "valid",
+      "notes": "Golden reducer output for sync-ingest-lifecycle.jsonl \u2014 7 events, all outcome types covered",
+      "min_version": "2.7.0"
+    },
+    {
+      "id": "mixed-connector-sync-lifecycle",
+      "path": "replay/mixed-connector-sync-lifecycle.jsonl",
+      "fixture_type": "replay_stream",
+      "event_type": "mixed",
+      "expected_result": "valid",
+      "notes": "10-event interleaved connector and sync lifecycle stream",
+      "min_version": "2.7.0"
+    },
+    {
+      "id": "mixed-connector-sync-lifecycle-connector-output",
+      "path": "replay/mixed-connector-sync-lifecycle_connector_output.json",
+      "fixture_type": "reducer_output",
+      "event_type": "ReducedConnectorState",
+      "expected_result": "valid",
+      "notes": "Golden connector reducer output for mixed-connector-sync-lifecycle.jsonl \u2014 state=healthy, 10 events",
+      "min_version": "2.7.0"
+    },
+    {
+      "id": "mixed-connector-sync-lifecycle-sync-output",
+      "path": "replay/mixed-connector-sync-lifecycle_sync_output.json",
+      "fixture_type": "reducer_output",
+      "event_type": "ReducedSyncState",
+      "expected_result": "valid",
+      "notes": "Golden sync reducer output for mixed-connector-sync-lifecycle.jsonl \u2014 10 events, 5 unique delivery pairs",
+      "min_version": "2.7.0"
     }
   ]
 }
