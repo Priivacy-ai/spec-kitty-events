@@ -11,9 +11,42 @@ Example:
     >>> clock = LamportClock(node_id="alice", storage=storage)
     >>> clock.tick()
     1
+
+Versioning and Export Notes (2.6.0 -- DecisionPoint Lifecycle Contracts):
+    The DecisionPoint domain (DECISIONPOINT_SCHEMA_VERSION = "2.6.0") is an
+    **additive-only** extension.  No existing symbols, models, or schemas
+    were modified.  All new symbols are listed under the "DecisionPoint
+    Lifecycle Contracts (2.6.0)" block in ``__all__``.
+
+    Exported symbols (15 total):
+        Constants: DECISIONPOINT_SCHEMA_VERSION, DECISION_POINT_OPENED,
+            DECISION_POINT_DISCUSSING, DECISION_POINT_RESOLVED,
+            DECISION_POINT_OVERRIDDEN, DECISION_POINT_EVENT_TYPES
+        Enums: DecisionPointState, DecisionAuthorityRole
+        Models: DecisionPointAnomaly, DecisionPointOpenedPayload,
+            DecisionPointDiscussingPayload, DecisionPointResolvedPayload,
+            DecisionPointOverriddenPayload, ReducedDecisionPointState
+        Reducer: reduce_decision_point_events
+
+    Downstream Impact Notes:
+        spec-kitty runtime:
+            - Pin ``spec-kitty-events>=2.6.0`` once this version is published.
+            - Import ``reduce_decision_point_events`` for DecisionPoint state
+              projection alongside the existing mission-audit reducer.
+            - The ``DECISION_POINT_EVENT_TYPES`` frozenset can be used to
+              filter event streams by family.
+
+        spec-kitty-saas:
+            - Pin ``spec-kitty-events>=2.6.0``.
+            - DecisionPoint schemas (decision_point_*.schema.json) are
+              available via ``spec_kitty_events.schemas.load_schema()``
+              for API contract validation.
+            - Conformance fixtures in ``spec_kitty_events.conformance``
+              include the ``"decisionpoint"`` category for integration test
+              suites (``load_fixtures("decisionpoint")``).
 """
 
-__version__ = "2.3.1"
+__version__ = "2.6.0"
 
 # Core data models
 from spec_kitty_events.models import (
@@ -210,6 +243,81 @@ from spec_kitty_events.mission_next import (
     reduce_mission_next_events,
 )
 
+# Dossier event contracts (v2.4.0)
+from spec_kitty_events.dossier import (
+    MISSION_DOSSIER_ARTIFACT_INDEXED,
+    MISSION_DOSSIER_ARTIFACT_MISSING,
+    MISSION_DOSSIER_SNAPSHOT_COMPUTED,
+    MISSION_DOSSIER_PARITY_DRIFT_DETECTED,
+    DOSSIER_EVENT_TYPES,
+    NamespaceMixedStreamError,
+    LocalNamespaceTuple,
+    ArtifactIdentity,
+    ContentHashRef,
+    ProvenanceRef,
+    MissionDossierArtifactIndexedPayload,
+    MissionDossierArtifactMissingPayload,
+    MissionDossierSnapshotComputedPayload,
+    MissionDossierParityDriftDetectedPayload,
+    ArtifactEntry,
+    AnomalyEntry,
+    SnapshotSummary,
+    DriftRecord,
+    MissionDossierState,
+    reduce_mission_dossier,
+)
+
+# Mission Audit Lifecycle Contracts (2.5.0)
+from spec_kitty_events.mission_audit import (
+    AUDIT_SCHEMA_VERSION as AUDIT_SCHEMA_VERSION,
+    MISSION_AUDIT_REQUESTED as MISSION_AUDIT_REQUESTED,
+    MISSION_AUDIT_STARTED as MISSION_AUDIT_STARTED,
+    MISSION_AUDIT_DECISION_REQUESTED as MISSION_AUDIT_DECISION_REQUESTED,
+    MISSION_AUDIT_COMPLETED as MISSION_AUDIT_COMPLETED,
+    MISSION_AUDIT_FAILED as MISSION_AUDIT_FAILED,
+    MISSION_AUDIT_EVENT_TYPES as MISSION_AUDIT_EVENT_TYPES,
+    TERMINAL_AUDIT_STATUSES as TERMINAL_AUDIT_STATUSES,
+    AuditVerdict as AuditVerdict,
+    AuditSeverity as AuditSeverity,
+    AuditStatus as AuditStatus,
+    AuditArtifactRef as AuditArtifactRef,
+    PendingDecision as PendingDecision,
+    MissionAuditAnomaly as MissionAuditAnomaly,
+    MissionAuditRequestedPayload as MissionAuditRequestedPayload,
+    MissionAuditStartedPayload as MissionAuditStartedPayload,
+    MissionAuditDecisionRequestedPayload as MissionAuditDecisionRequestedPayload,
+    MissionAuditCompletedPayload as MissionAuditCompletedPayload,
+    MissionAuditFailedPayload as MissionAuditFailedPayload,
+    ReducedMissionAuditState as ReducedMissionAuditState,
+    reduce_mission_audit_events as reduce_mission_audit_events,
+)
+
+# DecisionPoint Lifecycle Contracts (2.6.0)
+from spec_kitty_events.decisionpoint import (
+    DECISIONPOINT_SCHEMA_VERSION as DECISIONPOINT_SCHEMA_VERSION,
+    DECISION_POINT_OPENED as DECISION_POINT_OPENED,
+    DECISION_POINT_DISCUSSING as DECISION_POINT_DISCUSSING,
+    DECISION_POINT_RESOLVED as DECISION_POINT_RESOLVED,
+    DECISION_POINT_OVERRIDDEN as DECISION_POINT_OVERRIDDEN,
+    DECISION_POINT_EVENT_TYPES as DECISION_POINT_EVENT_TYPES,
+    DecisionPointState as DecisionPointState,
+    DecisionAuthorityRole as DecisionAuthorityRole,
+    DecisionPointAnomaly as DecisionPointAnomaly,
+    DecisionPointOpenedPayload as DecisionPointOpenedPayload,
+    DecisionPointDiscussingPayload as DecisionPointDiscussingPayload,
+    DecisionPointResolvedPayload as DecisionPointResolvedPayload,
+    DecisionPointOverriddenPayload as DecisionPointOverriddenPayload,
+    ReducedDecisionPointState as ReducedDecisionPointState,
+    reduce_decision_point_events as reduce_decision_point_events,
+)
+
+# Backward-compatible dossier aliases without the Payload suffix.
+# Older consumers import these names directly.
+MissionDossierArtifactIndexed = MissionDossierArtifactIndexedPayload
+MissionDossierArtifactMissing = MissionDossierArtifactMissingPayload
+MissionDossierSnapshotComputed = MissionDossierSnapshotComputedPayload
+MissionDossierParityDriftDetected = MissionDossierParityDriftDetectedPayload
+
 # Public API (controls what's exported with "from spec_kitty_events import *")
 __all__ = [
     # Version
@@ -374,4 +482,67 @@ __all__ = [
     "MissionNextAnomaly",
     "ReducedMissionRunState",
     "reduce_mission_next_events",
+    # Dossier event contracts
+    "MISSION_DOSSIER_ARTIFACT_INDEXED",
+    "MISSION_DOSSIER_ARTIFACT_MISSING",
+    "MISSION_DOSSIER_SNAPSHOT_COMPUTED",
+    "MISSION_DOSSIER_PARITY_DRIFT_DETECTED",
+    "DOSSIER_EVENT_TYPES",
+    "NamespaceMixedStreamError",
+    "LocalNamespaceTuple",
+    "ArtifactIdentity",
+    "ContentHashRef",
+    "ProvenanceRef",
+    "MissionDossierArtifactIndexedPayload",
+    "MissionDossierArtifactMissingPayload",
+    "MissionDossierSnapshotComputedPayload",
+    "MissionDossierParityDriftDetectedPayload",
+    "MissionDossierArtifactIndexed",
+    "MissionDossierArtifactMissing",
+    "MissionDossierSnapshotComputed",
+    "MissionDossierParityDriftDetected",
+    "ArtifactEntry",
+    "AnomalyEntry",
+    "SnapshotSummary",
+    "DriftRecord",
+    "MissionDossierState",
+    "reduce_mission_dossier",
+    # Mission Audit Lifecycle Contracts (2.5.0)
+    "AUDIT_SCHEMA_VERSION",
+    "MISSION_AUDIT_REQUESTED",
+    "MISSION_AUDIT_STARTED",
+    "MISSION_AUDIT_DECISION_REQUESTED",
+    "MISSION_AUDIT_COMPLETED",
+    "MISSION_AUDIT_FAILED",
+    "MISSION_AUDIT_EVENT_TYPES",
+    "TERMINAL_AUDIT_STATUSES",
+    "AuditVerdict",
+    "AuditSeverity",
+    "AuditStatus",
+    "AuditArtifactRef",
+    "PendingDecision",
+    "MissionAuditAnomaly",
+    "MissionAuditRequestedPayload",
+    "MissionAuditStartedPayload",
+    "MissionAuditDecisionRequestedPayload",
+    "MissionAuditCompletedPayload",
+    "MissionAuditFailedPayload",
+    "ReducedMissionAuditState",
+    "reduce_mission_audit_events",
+    # DecisionPoint Lifecycle Contracts (2.6.0)
+    "DECISIONPOINT_SCHEMA_VERSION",
+    "DECISION_POINT_OPENED",
+    "DECISION_POINT_DISCUSSING",
+    "DECISION_POINT_RESOLVED",
+    "DECISION_POINT_OVERRIDDEN",
+    "DECISION_POINT_EVENT_TYPES",
+    "DecisionPointState",
+    "DecisionAuthorityRole",
+    "DecisionPointAnomaly",
+    "DecisionPointOpenedPayload",
+    "DecisionPointDiscussingPayload",
+    "DecisionPointResolvedPayload",
+    "DecisionPointOverriddenPayload",
+    "ReducedDecisionPointState",
+    "reduce_decision_point_events",
 ]

@@ -3,16 +3,16 @@
 # DO NOT EDIT MANUALLY
 
 spec_kitty:
-  version: 0.15.3
+  version: 2.0.1
   initialized_at: '2026-02-07T07:46:50.090112'
-  last_upgraded_at: '2026-02-15T13:45:16.512646'
+  last_upgraded_at: '2026-02-26T13:32:24.712574'
 environment:
-  python_version: 3.14.0
+  python_version: 3.11.14
   platform: darwin
-  platform_version: macOS-15.7.3-arm64-arm-64bit-Mach-O
+  platform_version: macOS-15.7.3-arm64-arm-64bit
 migrations:
   applied:
-  - id: 0.14.0_centralized_feature_detection
-    applied_at: '2026-02-07T13:05:59.357137'
-    result: skipped
-    notes: Not applicable
+  - id: 2.0.0_historical_status_migration
+    applied_at: '2026-02-26T13:21:24.158541'
+    result: success
+    notes: '007-glossary-semantic-integrity-contracts: migrated (10 WPs, 10 events)'

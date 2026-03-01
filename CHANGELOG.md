@@ -5,6 +5,100 @@ All notable changes to spec-kitty-events will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 2.4.0 — Mission Dossier Parity Event Contracts (2026-02-21)
+
+### Added
+
+**Domain events (4 new event types)**:
+- `MissionDossierArtifactIndexedPayload` — emitted when an artifact is catalogued
+- `MissionDossierArtifactMissingPayload` — emitted when an expected artifact is absent
+- `MissionDossierSnapshotComputedPayload` — emitted when a dossier snapshot is computed
+- `MissionDossierParityDriftDetectedPayload` — emitted when drift vs baseline is detected
+
+**Provenance payload objects**:
+- `LocalNamespaceTuple` — 5-field namespace key for collision-safe parity baseline scoping
+- `ArtifactIdentity` — canonical artifact identity (path, class, run, wp scoping)
+- `ContentHashRef` — content fingerprint (hash, algorithm, size, encoding)
+- `ProvenanceRef` — source trace (event IDs, git SHA/ref, actor metadata)
+
+**Reducer**:
+- `MissionDossierState` — deterministic dossier projection output
+- `reduce_mission_dossier(events)` — pure reducer: filter → sort → dedup → namespace-check → fold
+- `NamespaceMixedStreamError` — raised when event stream spans multiple namespace tuples
+
+**Conformance infrastructure**:
+- 8 new JSON schemas in `src/spec_kitty_events/schemas/`
+- 13 fixture cases + 2 replay streams in `conformance/fixtures/dossier/`
+- `dossier` fixture category registered in `load_fixtures()`
+- 5 new conformance test categories (§7.6)
+
+### Key Invariants
+
+- `artifact_class` is exclusively in `ArtifactIdentity` — never a top-level event payload field
+- `manifest_version` is exclusively in `LocalNamespaceTuple` — never in event payloads
+- Reducer sort key: `(lamport_clock, timestamp, event_id)` — three-field total order
+- `NamespaceMixedStreamError` carries both expected and offending namespace tuples in the message
+
+### Migration: spec-kitty consumers
+
+**Version pin**: `spec-kitty-events>=2.4.0,<3.0.0`
+
+No breaking changes. All existing exports (Event envelope, WPStatusChanged,
+lifecycle, collaboration, glossary, mission-next families) are unchanged.
+
+To emit dossier events:
+
+```python
+from spec_kitty_events import (
+    MissionDossierArtifactIndexedPayload,
+    LocalNamespaceTuple, ArtifactIdentity, ContentHashRef,
+    MISSION_DOSSIER_ARTIFACT_INDEXED,
+)
+```
+
+Always include a full `LocalNamespaceTuple` with all 5 required fields.
+Use `validate_event(payload_dict, event_type)` to validate before emitting.
+
+To reduce a dossier event stream:
+
+```python
+from spec_kitty_events import reduce_mission_dossier, NamespaceMixedStreamError
+try:
+    state = reduce_mission_dossier(events)
+except NamespaceMixedStreamError:
+    # partition stream by namespace first
+    ...
+```
+
+### Migration: spec-kitty-saas consumers
+
+**Version pin**: `spec-kitty-events>=2.4.0,<3.0.0`
+
+No breaking changes. Import the four dossier payload models for ingestion-side validation:
+
+```python
+from spec_kitty_events import (
+    MissionDossierArtifactIndexedPayload,
+    MissionDossierArtifactMissingPayload,
+    MissionDossierSnapshotComputedPayload,
+    MissionDossierParityDriftDetectedPayload,
+)
+from spec_kitty_events.conformance import validate_event, load_replay_stream
+```
+
+Use fixture replay streams for integration test baselines:
+
+```python
+events = load_replay_stream("dossier-replay-happy-path")
+events = load_replay_stream("dossier-replay-drift-scenario")
+```
+
+Namespace collision prevention: always include the full `LocalNamespaceTuple` when
+keying parity baselines. The reducer rejects mixed-namespace streams; callers must
+partition by namespace before calling `reduce_mission_dossier()`.
+
+---
+
 ## [2.3.1] - 2026-02-17
 
 ### Added

@@ -1,0 +1,40 @@
+{
+  "anomalies": [],
+  "artifact_ref": {
+    "content_hash": {
+      "algorithm": "sha256",
+      "encoding": null,
+      "hash": "abcdef1234567890abcdef1234567890",
+      "size_bytes": null
+    },
+    "provenance": {
+      "actor_id": "audit-agent-1",
+      "actor_kind": "llm",
+      "git_ref": null,
+      "git_sha": "deadbeefcafe",
+      "revised_at": null,
+      "source_event_ids": null
+    },
+    "report_path": "/reports/audit-001.json"
+  },
+  "audit_scope": [
+    "src/a.py",
+    "src/b.py"
+  ],
+  "audit_scope_hash": "sha256:abc123",
+  "audit_status": "completed",
+  "enforcement_mode": "advisory",
+  "error_code": null,
+  "error_message": null,
+  "event_count": 4,
+  "feature_slug": "feature-x",
+  "findings_count": 0,
+  "mission_id": "m-001",
+  "partial_artifact_ref": null,
+  "pending_decisions": [],
+  "run_id": "run-001",
+  "severity": "info",
+  "summary": "All checks passed",
+  "trigger_mode": "manual",
+  "verdict": "pass"
+}

@@ -1,0 +1,31 @@
+{
+  "event_count": 17,
+  "feature_slug": "011-wp03-decisionpoint-lifecycle-contracts",
+  "last_event_id": "01KJFFYKWH78W27VHPPA4FV426",
+  "materialized_at": "2026-02-27T12:07:38.130145+00:00",
+  "summary": {
+    "blocked": 0,
+    "canceled": 0,
+    "claimed": 0,
+    "done": 2,
+    "for_review": 0,
+    "in_progress": 0,
+    "planned": 0
+  },
+  "work_packages": {
+    "WP01": {
+      "actor": "user",
+      "force_count": 3,
+      "lane": "done",
+      "last_event_id": "01KJFDTP23W0AK08M3CHJA3T84",
+      "last_transition_at": "2026-02-27T11:30:32.131651+00:00"
+    },
+    "WP02": {
+      "actor": "user",
+      "force_count": 6,
+      "lane": "done",
+      "last_event_id": "01KJFFYKWH78W27VHPPA4FV426",
+      "last_transition_at": "2026-02-27T12:07:38.129750+00:00"
+    }
+  }
+}

@@ -417,6 +417,445 @@
       "fixture_type": "replay_stream",
       "notes": "Full 8-event mission-next lifecycle replay stream. Each line is a complete Event envelope.",
       "min_version": "2.3.1"
+    },
+    {
+      "id": "dossier-artifact-indexed-valid",
+      "path": "dossier/valid/dossier_artifact_indexed_valid.json",
+      "event_type": "MissionDossierArtifactIndexed",
+      "expected_result": "valid",
+      "notes": "Happy-path: spec.md indexed as input artifact",
+      "min_version": "2.4.0"
+    },
+    {
+      "id": "dossier-artifact-indexed-supersedes",
+      "path": "dossier/valid/dossier_artifact_indexed_supersedes.json",
+      "event_type": "MissionDossierArtifactIndexed",
+      "expected_result": "valid",
+      "notes": "Artifact replacing prior version via supersedes field",
+      "min_version": "2.4.0"
+    },
+    {
+      "id": "dossier-artifact-indexed-with-provenance",
+      "path": "dossier/valid/dossier_artifact_indexed_with_provenance.json",
+      "event_type": "MissionDossierArtifactIndexed",
+      "expected_result": "valid",
+      "notes": "Full provenance populated with git_sha, actor_id, and step_id",
+      "min_version": "2.4.0"
+    },
+    {
+      "id": "dossier-artifact-missing-required-always",
+      "path": "dossier/valid/dossier_artifact_missing_required_always.json",
+      "event_type": "MissionDossierArtifactMissing",
+      "expected_result": "valid",
+      "notes": "required_always completeness check for plan.md workflow artifact",
+      "min_version": "2.4.0"
+    },
+    {
+      "id": "dossier-artifact-missing-required-by-step",
+      "path": "dossier/valid/dossier_artifact_missing_required_by_step.json",
+      "event_type": "MissionDossierArtifactMissing",
+      "expected_result": "valid",
+      "notes": "Step-scoped completeness check with manifest_step=plan",
+      "min_version": "2.4.0"
+    },
+    {
+      "id": "dossier-snapshot-computed-clean",
+      "path": "dossier/valid/dossier_snapshot_computed_clean.json",
+      "event_type": "MissionDossierSnapshotComputed",
+      "expected_result": "valid",
+      "notes": "Zero anomaly snapshot: 3 artifacts, 0 anomalies",
+      "min_version": "2.4.0"
+    },
+    {
+      "id": "dossier-snapshot-computed-with-anomalies",
+      "path": "dossier/valid/dossier_snapshot_computed_with_anomalies.json",
+      "event_type": "MissionDossierSnapshotComputed",
+      "expected_result": "valid",
+      "notes": "Non-zero anomaly count: 2 artifacts, 1 anomaly",
+      "min_version": "2.4.0"
+    },
+    {
+      "id": "dossier-parity-drift-artifact-added",
+      "path": "dossier/valid/dossier_parity_drift_artifact_added.json",
+      "event_type": "MissionDossierParityDriftDetected",
+      "expected_result": "valid",
+      "notes": "Drift detection with drift_kind=artifact_added",
+      "min_version": "2.4.0"
+    },
+    {
+      "id": "dossier-parity-drift-artifact-mutated",
+      "path": "dossier/valid/dossier_parity_drift_artifact_mutated.json",
+      "event_type": "MissionDossierParityDriftDetected",
+      "expected_result": "valid",
+      "notes": "Drift detection with drift_kind=artifact_mutated",
+      "min_version": "2.4.0"
+    },
+    {
+      "id": "dossier-namespace-collision-coverage",
+      "path": "dossier/valid/dossier_namespace_collision_coverage.json",
+      "event_type": "MissionDossierArtifactIndexed",
+      "expected_result": "valid",
+      "notes": "Alternate namespace (feature_slug=009-another-feature) for namespace collision tests",
+      "min_version": "2.4.0"
+    },
+    {
+      "id": "dossier-parity-drift-namespace-mismatch",
+      "path": "dossier/invalid/dossier_parity_drift_namespace_mismatch.json",
+      "event_type": "MissionDossierParityDriftDetected",
+      "expected_result": "invalid",
+      "notes": "Namespace missing required fields: target_branch, mission_key, manifest_version",
+      "min_version": "2.4.0"
+    },
+    {
+      "id": "dossier-artifact-indexed-missing-path",
+      "path": "dossier/invalid/dossier_artifact_indexed_missing_path.json",
+      "event_type": "MissionDossierArtifactIndexed",
+      "expected_result": "invalid",
+      "notes": "artifact_id.path is absent \u2014 Pydantic must reject",
+      "min_version": "2.4.0"
+    },
+    {
+      "id": "dossier-artifact-indexed-invalid-class",
+      "path": "dossier/invalid/dossier_artifact_indexed_invalid_class.json",
+      "event_type": "MissionDossierArtifactIndexed",
+      "expected_result": "invalid",
+      "notes": "artifact_id.artifact_class='INVALID_CLASS' is not a valid Literal value",
+      "min_version": "2.4.0"
+    },
+    {
+      "id": "dossier-replay-happy-path",
+      "path": "dossier/replay/dossier_happy_path.jsonl",
+      "fixture_type": "replay_stream",
+      "event_type": "mixed",
+      "expected_result": "valid",
+      "notes": "6-event happy-path stream: 3 indexed, 2 snapshots, 1 supersedes",
+      "min_version": "2.4.0"
+    },
+    {
+      "id": "dossier-replay-drift-scenario",
+      "path": "dossier/replay/dossier_drift_scenario.jsonl",
+      "fixture_type": "replay_stream",
+      "event_type": "mixed",
+      "expected_result": "valid",
+      "notes": "5-event drift scenario: 2 indexed, 1 snapshot, 1 missing, 1 drift detected",
+      "min_version": "2.4.0"
+    },
+    {
+      "id": "dossier-canonical-output-snapshot",
+      "path": "dossier/replay/canonical_output_snapshot.json",
+      "fixture_type": "reducer_output",
+      "event_type": "MissionDossierState",
+      "expected_result": "valid",
+      "notes": "Known-good reducer output from dossier_happy_path.jsonl for downstream consumer verification",
+      "min_version": "2.4.0"
+    },
+    {
+      "id": "mission-audit-requested-manual",
+      "path": "mission_audit/valid/mission_audit_requested_manual.json",
+      "event_type": "MissionAuditRequested",
+      "expected_result": "valid",
+      "notes": "Manual trigger with advisory enforcement, 3-item audit scope",
+      "min_version": "2.5.0"
+    },
+    {
+      "id": "mission-audit-requested-post-merge",
+      "path": "mission_audit/valid/mission_audit_requested_post_merge.json",
+      "event_type": "MissionAuditRequested",
+      "expected_result": "valid",
+      "notes": "Post-merge trigger with blocking enforcement, 5-item audit scope",
+      "min_version": "2.5.0"
+    },
+    {
+      "id": "mission-audit-started-valid",
+      "path": "mission_audit/valid/mission_audit_started_valid.json",
+      "event_type": "MissionAuditStarted",
+      "expected_result": "valid",
+      "notes": "Valid started event with audit_scope_hash",
+      "min_version": "2.5.0"
+    },
+    {
+      "id": "mission-audit-decision-requested-valid",
+      "path": "mission_audit/valid/mission_audit_decision_requested_valid.json",
+      "event_type": "MissionAuditDecisionRequested",
+      "expected_result": "valid",
+      "notes": "Decision checkpoint with warning severity",
+      "min_version": "2.5.0"
+    },
+    {
+      "id": "mission-audit-completed-pass",
+      "path": "mission_audit/valid/mission_audit_completed_pass.json",
+      "event_type": "MissionAuditCompleted",
+      "expected_result": "valid",
+      "notes": "Pass verdict with info severity, zero findings, artifact_ref populated",
+      "min_version": "2.5.0"
+    },
+    {
+      "id": "mission-audit-completed-fail",
+      "path": "mission_audit/valid/mission_audit_completed_fail.json",
+      "event_type": "MissionAuditCompleted",
+      "expected_result": "valid",
+      "notes": "Fail verdict with error severity, 3 findings, artifact_ref populated",
+      "min_version": "2.5.0"
+    },
+    {
+      "id": "mission-audit-failed-valid",
+      "path": "mission_audit/valid/mission_audit_failed_valid.json",
+      "event_type": "MissionAuditFailed",
+      "expected_result": "valid",
+      "notes": "Timeout failure with null partial_artifact_ref",
+      "min_version": "2.5.0"
+    },
+    {
+      "id": "mission-audit-completed-missing-verdict",
+      "path": "mission_audit/invalid/mission_audit_completed_missing_verdict.json",
+      "event_type": "MissionAuditCompleted",
+      "expected_result": "invalid",
+      "notes": "verdict field absent \u2014 Pydantic must reject with missing field violation",
+      "min_version": "2.5.0"
+    },
+    {
+      "id": "mission-audit-completed-missing-artifact-ref",
+      "path": "mission_audit/invalid/mission_audit_completed_missing_artifact_ref.json",
+      "event_type": "MissionAuditCompleted",
+      "expected_result": "invalid",
+      "notes": "artifact_ref absent \u2014 required (not Optional) per FR-006; Pydantic must reject",
+      "min_version": "2.5.0"
+    },
+    {
+      "id": "mission-audit-requested-bad-trigger",
+      "path": "mission_audit/invalid/mission_audit_requested_bad_trigger.json",
+      "event_type": "MissionAuditRequested",
+      "expected_result": "invalid",
+      "notes": "trigger_mode='scheduled' violates Literal[manual, post_merge] constraint",
+      "min_version": "2.5.0"
+    },
+    {
+      "id": "mission-audit-decision-missing-id",
+      "path": "mission_audit/invalid/mission_audit_decision_missing_id.json",
+      "event_type": "MissionAuditDecisionRequested",
+      "expected_result": "invalid",
+      "notes": "decision_id field absent \u2014 required with min_length=1",
+      "min_version": "2.5.0"
+    },
+    {
+      "id": "mission-audit-replay-pass",
+      "path": "mission_audit/replay/mission_audit_replay_pass.jsonl",
+      "fixture_type": "replay_stream",
+      "event_type": "mixed",
+      "expected_result": "valid",
+      "notes": "3-event pass lifecycle: Requested \u2192 Started \u2192 Completed(pass)",
+      "min_version": "2.5.0"
+    },
+    {
+      "id": "mission-audit-replay-fail",
+      "path": "mission_audit/replay/mission_audit_replay_fail.jsonl",
+      "fixture_type": "replay_stream",
+      "event_type": "mixed",
+      "expected_result": "valid",
+      "notes": "3-event fail lifecycle: Requested \u2192 Started \u2192 Failed(TIMEOUT)",
+      "min_version": "2.5.0"
+    },
+    {
+      "id": "mission-audit-replay-decision-checkpoint",
+      "path": "mission_audit/replay/mission_audit_replay_decision_checkpoint.jsonl",
+      "fixture_type": "replay_stream",
+      "event_type": "mixed",
+      "expected_result": "valid",
+      "notes": "4-event decision checkpoint: Requested \u2192 Started \u2192 DecisionRequested \u2192 Completed",
+      "min_version": "2.5.0"
+    },
+    {
+      "id": "mission-audit-replay-pass-output",
+      "path": "mission_audit/replay/mission_audit_replay_pass_output.json",
+      "fixture_type": "reducer_output",
+      "event_type": "MissionAuditState",
+      "expected_result": "valid",
+      "notes": "Golden reducer output for mission_audit_replay_pass.jsonl \u2014 audit_status=completed, verdict=pass",
+      "min_version": "2.5.0"
+    },
+    {
+      "id": "mission-audit-replay-fail-output",
+      "path": "mission_audit/replay/mission_audit_replay_fail_output.json",
+      "fixture_type": "reducer_output",
+      "event_type": "MissionAuditState",
+      "expected_result": "valid",
+      "notes": "Golden reducer output for mission_audit_replay_fail.jsonl \u2014 audit_status=failed",
+      "min_version": "2.5.0"
+    },
+    {
+      "id": "mission-audit-replay-decision-checkpoint-output",
+      "path": "mission_audit/replay/mission_audit_replay_decision_checkpoint_output.json",
+      "fixture_type": "reducer_output",
+      "event_type": "MissionAuditState",
+      "expected_result": "valid",
+      "notes": "Golden reducer output for mission_audit_replay_decision_checkpoint.jsonl \u2014 pending_decisions cleared on Completed",
+      "min_version": "2.5.0"
+    },
+    {
+      "id": "decisionpoint-opened-valid",
+      "path": "decisionpoint/valid/decision_point_opened.json",
+      "event_type": "DecisionPointOpened",
+      "expected_result": "valid",
+      "notes": "Valid DecisionPointOpenedPayload with human mission_owner actor",
+      "min_version": "2.6.0"
+    },
+    {
+      "id": "decisionpoint-discussing-valid",
+      "path": "decisionpoint/valid/decision_point_discussing.json",
+      "event_type": "DecisionPointDiscussing",
+      "expected_result": "valid",
+      "notes": "Valid DecisionPointDiscussingPayload with advisory human actor",
+      "min_version": "2.6.0"
+    },
+    {
+      "id": "decisionpoint-resolved-valid",
+      "path": "decisionpoint/valid/decision_point_resolved.json",
+      "event_type": "DecisionPointResolved",
+      "expected_result": "valid",
+      "notes": "Valid DecisionPointResolvedPayload with human mission_owner",
+      "min_version": "2.6.0"
+    },
+    {
+      "id": "decisionpoint-overridden-valid",
+      "path": "decisionpoint/valid/decision_point_overridden.json",
+      "event_type": "DecisionPointOverridden",
+      "expected_result": "valid",
+      "notes": "Valid DecisionPointOverriddenPayload with human mission_owner",
+      "min_version": "2.6.0"
+    },
+    {
+      "id": "decisionpoint-opened-llm-p0-valid",
+      "path": "decisionpoint/valid/decision_point_opened_llm_p0.json",
+      "event_type": "DecisionPointOpened",
+      "expected_result": "valid",
+      "notes": "Valid LLM actor in P0 phase with advisory role and no owner authority",
+      "min_version": "2.6.0"
+    },
+    {
+      "id": "decisionpoint-opened-service-valid",
+      "path": "decisionpoint/valid/decision_point_opened_service.json",
+      "event_type": "DecisionPointOpened",
+      "expected_result": "valid",
+      "notes": "Valid service actor with informed role",
+      "min_version": "2.6.0"
+    },
+    {
+      "id": "decisionpoint-discussing-llm-p0-valid",
+      "path": "decisionpoint/valid/decision_point_discussing_llm_p0.json",
+      "event_type": "DecisionPointDiscussing",
+      "expected_result": "valid",
+      "notes": "Valid LLM actor contributing to discussion in P0 phase",
+      "min_version": "2.6.0"
+    },
+    {
+      "id": "decisionpoint-resolved-multi-evidence-valid",
+      "path": "decisionpoint/valid/decision_point_resolved_with_multiple_evidence.json",
+      "event_type": "DecisionPointResolved",
+      "expected_result": "valid",
+      "notes": "Resolved with multiple alternatives and evidence refs",
+      "min_version": "2.6.0"
+    },
+    {
+      "id": "decisionpoint-missing-decision-point-id",
+      "path": "decisionpoint/invalid/decision_point_missing_decision_point_id.json",
+      "event_type": "DecisionPointOpened",
+      "expected_result": "invalid",
+      "notes": "decision_point_id field absent \u2014 required with min_length=1; Pydantic must reject",
+      "min_version": "2.6.0"
+    },
+    {
+      "id": "decisionpoint-missing-rationale",
+      "path": "decisionpoint/invalid/decision_point_missing_rationale.json",
+      "event_type": "DecisionPointOpened",
+      "expected_result": "invalid",
+      "notes": "rationale field absent \u2014 required audit field; Pydantic must reject",
+      "min_version": "2.6.0"
+    },
+    {
+      "id": "decisionpoint-invalid-actor-type",
+      "path": "decisionpoint/invalid/decision_point_invalid_actor_type.json",
+      "event_type": "DecisionPointOpened",
+      "expected_result": "invalid",
+      "notes": "actor_type='bot' violates pattern ^(human|llm|service)$ constraint",
+      "min_version": "2.6.0"
+    },
+    {
+      "id": "decisionpoint-invalid-authority-role",
+      "path": "decisionpoint/invalid/decision_point_invalid_authority_role.json",
+      "event_type": "DecisionPointOpened",
+      "expected_result": "invalid",
+      "notes": "authority_role='admin' not in DecisionAuthorityRole enum \u2014 authority-policy failure",
+      "min_version": "2.6.0"
+    },
+    {
+      "id": "decisionpoint-empty-alternatives",
+      "path": "decisionpoint/invalid/decision_point_empty_alternatives.json",
+      "event_type": "DecisionPointOpened",
+      "expected_result": "invalid",
+      "notes": "alternatives_considered is empty list \u2014 violates min_length=1 constraint",
+      "min_version": "2.6.0"
+    },
+    {
+      "id": "decisionpoint-empty-evidence-refs",
+      "path": "decisionpoint/invalid/decision_point_empty_evidence_refs.json",
+      "event_type": "DecisionPointOpened",
+      "expected_result": "invalid",
+      "notes": "evidence_refs is empty list \u2014 violates min_length=1 constraint",
+      "min_version": "2.6.0"
+    },
+    {
+      "id": "decisionpoint-replay-full-lifecycle",
+      "path": "decisionpoint/replay/decisionpoint_full_lifecycle.jsonl",
+      "fixture_type": "replay_stream",
+      "event_type": "mixed",
+      "expected_result": "valid",
+      "notes": "4-event full lifecycle: Opened \u2192 Discussing \u2192 Resolved \u2192 Overridden",
+      "min_version": "2.6.0"
+    },
+    {
+      "id": "decisionpoint-replay-open-resolved",
+      "path": "decisionpoint/replay/decisionpoint_open_resolved.jsonl",
+      "fixture_type": "replay_stream",
+      "event_type": "mixed",
+      "expected_result": "valid",
+      "notes": "2-event shortcut: Opened \u2192 Resolved (skipping Discussing)",
+      "min_version": "2.6.0"
+    },
+    {
+      "id": "decisionpoint-replay-with-anomaly",
+      "path": "decisionpoint/replay/decisionpoint_with_anomaly.jsonl",
+      "fixture_type": "replay_stream",
+      "event_type": "mixed",
+      "expected_result": "valid",
+      "notes": "4-event stream with event_after_terminal anomaly: Opened \u2192 Resolved \u2192 Overridden \u2192 Discussing(anomaly)",
+      "min_version": "2.6.0"
+    },
+    {
+      "id": "decisionpoint-replay-full-lifecycle-output",
+      "path": "decisionpoint/replay/decisionpoint_full_lifecycle_output.json",
+      "fixture_type": "reducer_output",
+      "event_type": "DecisionPointState",
+      "expected_result": "valid",
+      "notes": "Golden reducer output for decisionpoint_full_lifecycle.jsonl \u2014 state=overridden, 4 events, 0 anomalies",
+      "min_version": "2.6.0"
+    },
+    {
+      "id": "decisionpoint-replay-open-resolved-output",
+      "path": "decisionpoint/replay/decisionpoint_open_resolved_output.json",
+      "fixture_type": "reducer_output",
+      "event_type": "DecisionPointState",
+      "expected_result": "valid",
+      "notes": "Golden reducer output for decisionpoint_open_resolved.jsonl \u2014 state=resolved, 2 events, 0 anomalies",
+      "min_version": "2.6.0"
+    },
+    {
+      "id": "decisionpoint-replay-with-anomaly-output",
+      "path": "decisionpoint/replay/decisionpoint_with_anomaly_output.json",
+      "fixture_type": "reducer_output",
+      "event_type": "DecisionPointState",
+      "expected_result": "valid",
+      "notes": "Golden reducer output for decisionpoint_with_anomaly.jsonl \u2014 state=overridden, 1 anomaly (event_after_terminal)",
+      "min_version": "2.6.0"
     }
   ]
 }

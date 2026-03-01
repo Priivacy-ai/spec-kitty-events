@@ -1,12 +1,13 @@
 [project]
 name = "spec-kitty-events"
-version = "2.3.1"
+version = "2.6.0"
 description = "Event log library with Lamport clocks and systematic error tracking"
 readme = "README.md"
 requires-python = ">=3.10"
 authors = [
     {name = "Robert Douglass", email = "rob@example.com"}
 ]
+license = {file = "LICENSE"}
 
 dependencies = [
     "pydantic>=2.0.0,<3.0.0",
@@ -49,6 +50,17 @@ spec_kitty_events = [
     "conformance/fixtures/mission_next/valid/*.json",
     "conformance/fixtures/mission_next/invalid/*.json",
     "conformance/fixtures/mission_next/replay/*.jsonl",
+    "conformance/fixtures/dossier/valid/*.json",
+    "conformance/fixtures/dossier/invalid/*.json",
+    "conformance/fixtures/dossier/replay/*.jsonl",
+    "conformance/fixtures/mission_audit/valid/*.json",
+    "conformance/fixtures/mission_audit/invalid/*.json",
+    "conformance/fixtures/mission_audit/replay/*.jsonl",
+    "conformance/fixtures/mission_audit/replay/*.json",
+    "conformance/fixtures/decisionpoint/valid/*.json",
+    "conformance/fixtures/decisionpoint/invalid/*.json",
+    "conformance/fixtures/decisionpoint/replay/*.jsonl",
+    "conformance/fixtures/decisionpoint/replay/*.json",
 ]
 
 [tool.pytest.ini_options]

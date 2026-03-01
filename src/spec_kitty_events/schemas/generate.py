@@ -67,6 +67,29 @@ from spec_kitty_events.mission_next import (
     DecisionInputAnsweredPayload,
     MissionRunCompletedPayload,
 )
+from spec_kitty_events.dossier import (
+    ArtifactIdentity,
+    ContentHashRef,
+    ProvenanceRef,
+    LocalNamespaceTuple,
+    MissionDossierArtifactIndexedPayload,
+    MissionDossierArtifactMissingPayload,
+    MissionDossierSnapshotComputedPayload,
+    MissionDossierParityDriftDetectedPayload,
+)
+from spec_kitty_events.mission_audit import (
+    MissionAuditRequestedPayload,
+    MissionAuditStartedPayload,
+    MissionAuditDecisionRequestedPayload,
+    MissionAuditCompletedPayload,
+    MissionAuditFailedPayload,
+)
+from spec_kitty_events.decisionpoint import (
+    DecisionPointOpenedPayload,
+    DecisionPointDiscussingPayload,
+    DecisionPointResolvedPayload,
+    DecisionPointOverriddenPayload,
+)
 
 
 # Schema directory (same directory as this script)
@@ -120,6 +143,26 @@ PYDANTIC_MODELS: List[tuple[str, Type[BaseModel]]] = [
     ("decision_input_requested_payload", DecisionInputRequestedPayload),
     ("decision_input_answered_payload", DecisionInputAnsweredPayload),
     ("mission_run_completed_payload", MissionRunCompletedPayload),
+    # Dossier event contract models
+    ("artifact_identity", ArtifactIdentity),
+    ("content_hash_ref", ContentHashRef),
+    ("provenance_ref", ProvenanceRef),
+    ("local_namespace_tuple", LocalNamespaceTuple),
+    ("mission_dossier_artifact_indexed_payload", MissionDossierArtifactIndexedPayload),
+    ("mission_dossier_artifact_missing_payload", MissionDossierArtifactMissingPayload),
+    ("mission_dossier_snapshot_computed_payload", MissionDossierSnapshotComputedPayload),
+    ("mission_dossier_parity_drift_detected_payload", MissionDossierParityDriftDetectedPayload),
+    # Mission audit lifecycle contracts (2.5.0)
+    ("mission_audit_requested_payload", MissionAuditRequestedPayload),
+    ("mission_audit_started_payload", MissionAuditStartedPayload),
+    ("mission_audit_decision_requested_payload", MissionAuditDecisionRequestedPayload),
+    ("mission_audit_completed_payload", MissionAuditCompletedPayload),
+    ("mission_audit_failed_payload", MissionAuditFailedPayload),
+    # DecisionPoint lifecycle contracts (2.6.0)
+    ("decision_point_opened_payload", DecisionPointOpenedPayload),
+    ("decision_point_discussing_payload", DecisionPointDiscussingPayload),
+    ("decision_point_resolved_payload", DecisionPointResolvedPayload),
+    ("decision_point_overridden_payload", DecisionPointOverriddenPayload),
 ]
 
 # Enums (use TypeAdapter)

@@ -1,0 +1,26 @@
+{
+  "accept_commit": null,
+  "acceptance_history": [
+    {
+      "accepted_at": "2026-02-26T13:54:09Z",
+      "accepted_by": "claude",
+      "accepted_from_commit": "ba7d8032dad1cd8fb614e272eaf34db1944d980f",
+      "branch": "main",
+      "mode": "local"
+    }
+  ],
+  "acceptance_mode": "local",
+  "accepted_at": "2026-02-26T13:54:09Z",
+  "accepted_by": "claude",
+  "accepted_from_commit": "ba7d8032dad1cd8fb614e272eaf34db1944d980f",
+  "created_at": "2026-02-25T16:13:03.049580+00:00",
+  "feature_number": "010",
+  "feature_slug": "010-mission-audit-lifecycle-contracts",
+  "friendly_name": "Mission Audit Lifecycle Contracts",
+  "mission": "software-dev",
+  "slug": "010-mission-audit-lifecycle-contracts",
+  "source_description": "Build canonical mission-audit lifecycle event contracts and conformance fixtures for post-merge audit in Spec Kitty 2.x. Event family prefix MissionAudit*, five events (Requested, Started, DecisionRequested, Completed, Failed), payloads with mission/run/feature ids verdict severity artifact refs provenance pointers, deterministic replay fixtures for pass/warning/fail/decision-required, compatible with MissionDossier contracts, 2.x only.",
+  "target_branch": "main",
+  "vcs": "git",
+  "vcs_locked_at": "2026-02-26T12:28:53.721649+00:00"
+}
