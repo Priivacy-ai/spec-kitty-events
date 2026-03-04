@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.1] - 2026-03-04
+
+### Fixed
+
+- Added explicit MIT licensing metadata to package configuration and distribution artifacts.
+- Added publish-time metadata validation to prevent non-compliant wheel/sdist uploads.
+
 ## [0.3.0-alpha] - 2026-02-08
 
 ### Added
@@ -155,7 +162,8 @@ shared contract authority for feature/WP status lifecycle events.
 
 ---
 
-[Unreleased]: https://github.com/Priivacy-ai/spec-kitty-events/compare/v0.3.0-alpha...HEAD
+[Unreleased]: https://github.com/Priivacy-ai/spec-kitty-events/compare/v0.4.1...HEAD
+[0.4.1]: https://github.com/Priivacy-ai/spec-kitty-events/compare/v0.4.0-alpha...v0.4.1
 [0.3.0-alpha]: https://github.com/Priivacy-ai/spec-kitty-events/compare/v0.2.0-alpha...v0.3.0-alpha
 [0.2.0-alpha]: https://github.com/Priivacy-ai/spec-kitty-events/compare/v0.1.1-alpha...v0.2.0-alpha
 [0.1.1-alpha]: https://github.com/Priivacy-ai/spec-kitty-events/compare/v0.1.0-alpha...v0.1.1-alpha
