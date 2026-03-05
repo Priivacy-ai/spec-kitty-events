@@ -24,11 +24,11 @@
 **Estimated Prompt Size**: ~350 lines
 
 ### Included Subtasks
-- [ ] T001 Bump `CONNECTOR_SCHEMA_VERSION` from `"2.7.0"` to `"2.8.0"` in `src/spec_kitty_events/connector.py`
-- [ ] T002 Add `user_id: Optional[str] = None` to all 5 existing connector payload models in `src/spec_kitty_events/connector.py`
-- [ ] T003 Add `USER_CONNECTED` and `USER_DISCONNECTED` event type constants, update `CONNECTOR_EVENT_TYPES` frozenset in `src/spec_kitty_events/connector.py`
-- [ ] T004 Create `UserConnectedPayload` and `UserDisconnectedPayload` models with required `user_id` in `src/spec_kitty_events/connector.py`
-- [ ] T005 Create `UserConnectionStatus` model in `src/spec_kitty_events/connector.py`
+- [x] T001 Bump `CONNECTOR_SCHEMA_VERSION` from `"2.7.0"` to `"2.8.0"` in `src/spec_kitty_events/connector.py`
+- [x] T002 Add `user_id: Optional[str] = None` to all 5 existing connector payload models in `src/spec_kitty_events/connector.py`
+- [x] T003 Add `USER_CONNECTED` and `USER_DISCONNECTED` event type constants, update `CONNECTOR_EVENT_TYPES` frozenset in `src/spec_kitty_events/connector.py`
+- [x] T004 Create `UserConnectedPayload` and `UserDisconnectedPayload` models with required `user_id` in `src/spec_kitty_events/connector.py`
+- [x] T005 Create `UserConnectionStatus` model in `src/spec_kitty_events/connector.py`
 
 ### Implementation Notes
 - All models use `ConfigDict(frozen=True)` matching existing pattern.

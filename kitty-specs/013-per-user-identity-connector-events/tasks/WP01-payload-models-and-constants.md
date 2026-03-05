@@ -1,8 +1,11 @@
 ---
 work_package_id: WP01
 title: Payload Models & Constants
-lane: planned
+lane: "doing"
 dependencies: []
+base_branch: 2.x
+base_commit: 4dda9d5509284bd062cdfe1ebfe5e0faca37f22e
+created_at: '2026-03-05T15:49:35.816568+00:00'
 subtasks:
 - T001
 - T002
@@ -11,8 +14,8 @@ subtasks:
 - T005
 phase: Phase 1 - Foundation
 assignee: ''
-agent: ''
-shell_pid: ''
+agent: "claude-opus-4-6"
+shell_pid: "31530"
 review_status: ''
 reviewed_by: ''
 review_feedback: ''
@@ -240,3 +243,4 @@ requirement_refs:
 ## Activity Log
 
 - 2026-03-05T11:15:54Z – system – lane=planned – Prompt created.
+- 2026-03-05T15:49:36Z – claude-opus-4-6 – shell_pid=31530 – lane=doing – Assigned agent via workflow command
