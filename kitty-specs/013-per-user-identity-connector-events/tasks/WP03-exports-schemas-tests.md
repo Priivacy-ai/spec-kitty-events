@@ -1,7 +1,7 @@
 ---
 work_package_id: WP03
 title: Exports, Schemas & Tests
-lane: "doing"
+lane: "for_review"
 dependencies: [WP02]
 base_branch: 2.x
 base_commit: 777e3f958af675c41c3d9b5fb46409fc5f2691b5
@@ -14,11 +14,11 @@ subtasks:
 - T014
 phase: Phase 2 - Integration
 assignee: ''
-agent: "claude-opus-4-6"
-shell_pid: "40915"
-review_status: "has_feedback"
-reviewed_by: "Robert Douglass"
-review_feedback: "feedback://013-per-user-identity-connector-events/WP03/20260305T221933Z-627f4e2b.md"
+agent: claude-opus-4-6
+shell_pid: '40915'
+review_status: has_feedback
+reviewed_by: Robert Douglass
+review_feedback: feedback://013-per-user-identity-connector-events/WP03/20260305T221933Z-627f4e2b.md
 history:
 - timestamp: '2026-03-05T11:15:54Z'
   lane: planned
@@ -398,3 +398,4 @@ requirement_refs:
 - 2026-03-05T22:17:08Z – claude-opus-4-6 – shell_pid=40186 – lane=doing – Started review via workflow command
 - 2026-03-05T22:19:33Z – claude-opus-4-6 – shell_pid=40186 – lane=planned – Moved to planned
 - 2026-03-05T22:24:00Z – claude-opus-4-6 – shell_pid=40915 – lane=doing – Started implementation via workflow command
+- 2026-03-05T22:30:58Z – claude-opus-4-6 – shell_pid=40915 – lane=for_review – T013 reducer tests added: 8 tests covering roster backward compat, binding+roster updates, roster-only updates, multi-user sorting, unknown user anomaly, connect/disconnect lifecycle, dedup. 1481 tests pass, 97% coverage, mypy clean.
