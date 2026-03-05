@@ -1,7 +1,7 @@
 ---
 work_package_id: WP03
 title: Exports, Schemas & Tests
-lane: "doing"
+lane: "done"
 dependencies: [WP02]
 base_branch: 2.x
 base_commit: 777e3f958af675c41c3d9b5fb46409fc5f2691b5
@@ -14,10 +14,10 @@ subtasks:
 - T014
 phase: Phase 2 - Integration
 assignee: ''
-agent: "claude-opus-4-6"
-shell_pid: "42610"
-review_status: has_feedback
-reviewed_by: Robert Douglass
+agent: claude-opus-4-6
+shell_pid: '42610'
+review_status: "approved"
+reviewed_by: "Robert Douglass"
 review_feedback: feedback://013-per-user-identity-connector-events/WP03/20260305T221933Z-627f4e2b.md
 history:
 - timestamp: '2026-03-05T11:15:54Z'
@@ -400,3 +400,4 @@ requirement_refs:
 - 2026-03-05T22:24:00Z – claude-opus-4-6 – shell_pid=40915 – lane=doing – Started implementation via workflow command
 - 2026-03-05T22:30:58Z – claude-opus-4-6 – shell_pid=40915 – lane=for_review – T013 reducer tests added: 8 tests covering roster backward compat, binding+roster updates, roster-only updates, multi-user sorting, unknown user anomaly, connect/disconnect lifecycle, dedup. 1481 tests pass, 97% coverage, mypy clean.
 - 2026-03-05T22:34:58Z – claude-opus-4-6 – shell_pid=42610 – lane=doing – Started review via workflow command
+- 2026-03-05T22:37:16Z – claude-opus-4-6 – shell_pid=42610 – lane=done – Review passed: All 5 new symbols exported. 3 new JSON schemas. 8 reducer roster tests + comprehensive unit + property tests (200 examples). 1481 tests green, 97% coverage, mypy clean. Merged to 2.x.
