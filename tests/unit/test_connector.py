@@ -48,11 +48,13 @@ class TestConstants:
             "ConnectorDegraded",
             "ConnectorRevoked",
             "ConnectorReconnected",
+            "UserConnected",
+            "UserDisconnected",
         })
-        assert len(CONNECTOR_EVENT_TYPES) == 5
+        assert len(CONNECTOR_EVENT_TYPES) == 7
 
     def test_schema_version(self) -> None:
-        assert CONNECTOR_SCHEMA_VERSION == "2.7.0"
+        assert CONNECTOR_SCHEMA_VERSION == "2.8.0"
 
 
 # ── Enum tests (FR-001) ─────────────────────────────────────────────────────
