@@ -1,7 +1,7 @@
 ---
 work_package_id: WP01
 title: Payload Models & Constants
-lane: "planned"
+lane: "doing"
 dependencies: []
 base_branch: 2.x
 base_commit: 4dda9d5509284bd062cdfe1ebfe5e0faca37f22e
@@ -14,8 +14,8 @@ subtasks:
 - T005
 phase: Phase 1 - Foundation
 assignee: ''
-agent: claude-opus-4-6
-shell_pid: '32940'
+agent: "claude-opus-4-6"
+shell_pid: "34814"
 review_status: "has_feedback"
 reviewed_by: "Robert Douglass"
 review_feedback: "feedback://013-per-user-identity-connector-events/WP01/20260305T160048Z-a5333555.md"
@@ -247,3 +247,4 @@ requirement_refs:
 - 2026-03-05T15:52:51Z – claude-opus-4-6 – shell_pid=31530 – lane=for_review – Ready for review: all 5 subtasks implemented. mypy --strict passes. 55/57 tests pass (2 assertion updates deferred to WP03).
 - 2026-03-05T15:58:58Z – claude-opus-4-6 – shell_pid=32940 – lane=doing – Started review via workflow command
 - 2026-03-05T16:00:49Z – claude-opus-4-6 – shell_pid=32940 – lane=planned – Moved to planned
+- 2026-03-05T16:05:15Z – claude-opus-4-6 – shell_pid=34814 – lane=doing – Started implementation via workflow command
