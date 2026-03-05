@@ -96,11 +96,11 @@
 **Estimated Prompt Size**: ~400 lines
 
 ### Included Subtasks
-- [ ] T010 Update `__init__.py` with new exports: `USER_CONNECTED`, `USER_DISCONNECTED`, `UserConnectedPayload`, `UserDisconnectedPayload`, `UserConnectionStatus` in `src/spec_kitty_events/__init__.py`
-- [ ] T011 Regenerate JSON schemas for all modified/new connector payloads via `src/spec_kitty_events/schemas/generate.py`
-- [ ] T012 [P] Update unit tests for modified payload models (user_id field), new payloads, and constants in `tests/unit/test_connector.py`
-- [ ] T013 [P] Update reducer tests for roster functionality and backward compatibility in `tests/test_connector_reducer.py`
-- [ ] T014 [P] Extend property tests to include `UserConnected`/`UserDisconnected` in event pool in `tests/property/test_connector_determinism.py`
+- [x] T010 Update `__init__.py` with new exports: `USER_CONNECTED`, `USER_DISCONNECTED`, `UserConnectedPayload`, `UserDisconnectedPayload`, `UserConnectionStatus` in `src/spec_kitty_events/__init__.py`
+- [x] T011 Regenerate JSON schemas for all modified/new connector payloads via `src/spec_kitty_events/schemas/generate.py`
+- [x] T012 [P] Update unit tests for modified payload models (user_id field), new payloads, and constants in `tests/unit/test_connector.py`
+- [x] T013 [P] Update reducer tests for roster functionality and backward compatibility in `tests/test_connector_reducer.py`
+- [x] T014 [P] Extend property tests to include `UserConnected`/`UserDisconnected` in event pool in `tests/property/test_connector_determinism.py`
 
 ### Implementation Notes
 - `__init__.py`: Add new block "Connector Per-User Identity (2.8.0)" with re-exports. Update `__all__` list. Update docstring version notes.
