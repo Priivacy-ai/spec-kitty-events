@@ -14,7 +14,7 @@ subtasks:
 - T014
 phase: Phase 2 - Integration
 assignee: ''
-agent: ''
+agent: "claude-opus-4-6"
 shell_pid: "39632"
 review_status: ''
 reviewed_by: ''
@@ -393,3 +393,4 @@ requirement_refs:
 ## Activity Log
 
 - 2026-03-05T11:15:54Z – system – lane=planned – Prompt created.
+- 2026-03-05T22:10:47Z – claude-opus-4-6 – shell_pid=39632 – lane=doing – Assigned agent via workflow command
