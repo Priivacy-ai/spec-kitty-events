@@ -96,6 +96,9 @@ from spec_kitty_events.connector import (
     ConnectorDegradedPayload,
     ConnectorRevokedPayload,
     ConnectorReconnectedPayload,
+    UserConnectedPayload,
+    UserDisconnectedPayload,
+    UserConnectionStatus,
 )
 from spec_kitty_events.sync import (
     SyncIngestAcceptedPayload,
@@ -178,12 +181,15 @@ PYDANTIC_MODELS: List[tuple[str, Type[BaseModel]]] = [
     ("decision_point_discussing_payload", DecisionPointDiscussingPayload),
     ("decision_point_resolved_payload", DecisionPointResolvedPayload),
     ("decision_point_overridden_payload", DecisionPointOverriddenPayload),
-    # Connector lifecycle contracts (2.7.0)
+    # Connector lifecycle contracts (2.7.0) — extended in 2.8.0
     ("connector_provisioned_payload", ConnectorProvisionedPayload),
     ("connector_health_checked_payload", ConnectorHealthCheckedPayload),
     ("connector_degraded_payload", ConnectorDegradedPayload),
     ("connector_revoked_payload", ConnectorRevokedPayload),
     ("connector_reconnected_payload", ConnectorReconnectedPayload),
+    ("user_connected_payload", UserConnectedPayload),
+    ("user_disconnected_payload", UserDisconnectedPayload),
+    ("user_connection_status", UserConnectionStatus),
     # Sync lifecycle contracts (2.7.0)
     ("sync_ingest_accepted_payload", SyncIngestAcceptedPayload),
     ("sync_ingest_rejected_payload", SyncIngestRejectedPayload),
