@@ -1,8 +1,11 @@
 ---
 work_package_id: WP03
 title: Exports, Schemas & Tests
-lane: planned
+lane: "doing"
 dependencies: [WP02]
+base_branch: 2.x
+base_commit: 777e3f958af675c41c3d9b5fb46409fc5f2691b5
+created_at: '2026-03-05T22:10:46.817569+00:00'
 subtasks:
 - T010
 - T011
@@ -12,7 +15,7 @@ subtasks:
 phase: Phase 2 - Integration
 assignee: ''
 agent: ''
-shell_pid: ''
+shell_pid: "39632"
 review_status: ''
 reviewed_by: ''
 review_feedback: ''
