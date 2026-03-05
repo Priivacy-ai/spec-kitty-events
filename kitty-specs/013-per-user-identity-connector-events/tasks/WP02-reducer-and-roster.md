@@ -1,8 +1,11 @@
 ---
 work_package_id: WP02
 title: Reducer & Roster Logic
-lane: planned
+lane: "doing"
 dependencies: [WP01]
+base_branch: 2.x
+base_commit: d45029ecf6ac5ee103de06c97bb3899492e11dce
+created_at: '2026-03-05T21:57:04.912012+00:00'
 subtasks:
 - T006
 - T007
@@ -11,7 +14,7 @@ subtasks:
 phase: Phase 1 - Foundation
 assignee: ''
 agent: ''
-shell_pid: ''
+shell_pid: "38223"
 review_status: ''
 reviewed_by: ''
 review_feedback: ''
