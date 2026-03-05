@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "UserConnectionStatus",
+  "description": "Per-user connection state roster entry in ReducedConnectorState.",
+  "type": "object",
+  "required": ["user_id", "state"],
+  "properties": {
+    "user_id": { "type": "string", "minLength": 1 },
+    "state": {
+      "type": "string",
+      "enum": ["provisioned", "healthy", "degraded", "revoked", "reconnected"]
+    },
+    "last_event_at": {
+      "anyOf": [
+        { "type": "string", "format": "date-time" },
+        { "type": "null" }
+      ],
+      "default": null
+    }
+  },
+  "additionalProperties": false
+}

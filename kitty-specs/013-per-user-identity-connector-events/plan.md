@@ -1,108 +1,108 @@
-# Implementation Plan: [FEATURE]
-*Path: [templates/plan-template.md](templates/plan-template.md)*
+# Implementation Plan: Per-User Identity in Connector Events
 
-
-**Branch**: `[###-feature-name]` | **Date**: [DATE] | **Spec**: [link]
-**Input**: Feature specification from `/kitty-specs/[###-feature-name]/spec.md`
-
-**Note**: This template is filled in by the `/spec-kitty.plan` command. See `src/specify_cli/missions/software-dev/command-templates/plan.md` for the execution workflow.
-
-The planner will not begin until all planning questions have been answered—capture those answers in this document before progressing to later phases.
+**Branch**: `2.x` | **Date**: 2026-03-05 | **Spec**: [spec.md](spec.md)
+**Input**: Feature specification from `kitty-specs/013-per-user-identity-connector-events/spec.md`
 
 ## Summary
 
-[Extract from feature spec: primary requirement + technical approach from research]
+Extend the connector lifecycle event contracts to carry per-user identity. Add an optional `user_id` field to all five existing connector payload models, introduce two new event types (`UserConnected`, `UserDisconnected`) with required `user_id`, add a `UserConnectionStatus` model and `user_connections` roster to `ReducedConnectorState`, and bump `CONNECTOR_SCHEMA_VERSION` from `2.7.0` to `2.8.0`. All changes are additive-only with full backward compatibility.
 
 ## Technical Context
 
-<!--
-  ACTION REQUIRED: Replace the content in this section with the technical details
-  for the project. The structure here is presented in advisory capacity to guide
-  the iteration process.
--->
-
-**Language/Version**: [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION]  
-**Primary Dependencies**: [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION]  
-**Storage**: [if applicable, e.g., PostgreSQL, CoreData, files or N/A]  
-**Testing**: [e.g., pytest, XCTest, cargo test or NEEDS CLARIFICATION]  
-**Target Platform**: [e.g., Linux server, iOS 15+, WASM or NEEDS CLARIFICATION]
-**Project Type**: [single/web/mobile - determines source structure]  
-**Performance Goals**: [domain-specific, e.g., 1000 req/s, 10k lines/sec, 60 fps or NEEDS CLARIFICATION]  
-**Constraints**: [domain-specific, e.g., <200ms p95, <100MB memory, offline-capable or NEEDS CLARIFICATION]  
-**Scale/Scope**: [domain-specific, e.g., 10k users, 1M LOC, 50 screens or NEEDS CLARIFICATION]
+**Language/Version**: Python 3.10+ (mypy target), 3.11 for tests
+**Primary Dependencies**: Pydantic v2 (existing), Hypothesis (property tests)
+**Storage**: N/A (pure event contract library)
+**Testing**: pytest + Hypothesis, `mypy --strict`, 98%+ coverage
+**Target Platform**: Python library (pip installable)
+**Project Type**: Single Python package (`src/spec_kitty_events/`)
+**Performance Goals**: Deterministic reducer, no performance-critical paths
+**Constraints**: All models `ConfigDict(frozen=True)`, additive-only changes, no breaking exports
+**Scale/Scope**: ~6 new exports, ~2 modified models, ~100 lines of new code
 
 ## Constitution Check
 
-*GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
-
-[Gates determined based on constitution file]
+*No constitution file found. Section skipped.*
 
 ## Project Structure
 
 ### Documentation (this feature)
 
 ```
-kitty-specs/[###-feature]/
-├── plan.md              # This file (/spec-kitty.plan command output)
-├── research.md          # Phase 0 output (/spec-kitty.plan command)
-├── data-model.md        # Phase 1 output (/spec-kitty.plan command)
-├── quickstart.md        # Phase 1 output (/spec-kitty.plan command)
-├── contracts/           # Phase 1 output (/spec-kitty.plan command)
-└── tasks.md             # Phase 2 output (/spec-kitty.tasks command - NOT created by /spec-kitty.plan)
+kitty-specs/013-per-user-identity-connector-events/
+├── plan.md              # This file
+├── research.md          # Phase 0 output (minimal — no unknowns)
+├── data-model.md        # Phase 1 output
+├── contracts/           # Phase 1 output (JSON schemas)
+└── tasks.md             # Phase 2 output (/spec-kitty.tasks)
 ```
 
 ### Source Code (repository root)
-<!--
-  ACTION REQUIRED: Replace the placeholder tree below with the concrete layout
-  for this feature. Delete unused options and expand the chosen structure with
-  real paths (e.g., apps/admin, packages/something). The delivered plan must
-  not include Option labels.
--->
 
 ```
-# [REMOVE IF UNUSED] Option 1: Single project (DEFAULT)
-src/
-├── models/
-├── services/
-├── cli/
-└── lib/
+src/spec_kitty_events/
+├── connector.py          # Modified: user_id on payloads, new event types,
+│                         #   UserConnectionStatus, reducer roster logic
+├── __init__.py           # Modified: re-export new symbols
+└── schemas/
+    ├── user_connected_payload.schema.json         # New
+    ├── user_disconnected_payload.schema.json      # New
+    ├── user_connection_status.schema.json         # New
+    ├── connector_provisioned_payload.schema.json  # Regenerated (user_id added)
+    ├── connector_health_checked_payload.schema.json
+    ├── connector_degraded_payload.schema.json
+    ├── connector_revoked_payload.schema.json
+    └── connector_reconnected_payload.schema.json
 
 tests/
-├── contract/
-├── integration/
-└── unit/
-
-# [REMOVE IF UNUSED] Option 2: Web application (when "frontend" + "backend" detected)
-backend/
-├── src/
-│   ├── models/
-│   ├── services/
-│   └── api/
-└── tests/
-
-frontend/
-├── src/
-│   ├── components/
-│   ├── pages/
-│   └── services/
-└── tests/
-
-# [REMOVE IF UNUSED] Option 3: Mobile + API (when "iOS/Android" detected)
-api/
-└── [same as backend above]
-
-ios/ or android/
-└── [platform-specific structure: feature modules, UI flows, platform tests]
+├── unit/
+│   └── test_connector.py     # Extended: user_id field tests, new payloads
+├── test_connector_reducer.py # Extended: roster tests, backward compat
+└── property/
+    └── test_connector_determinism.py  # Extended: new event types in pool
 ```
 
-**Structure Decision**: [Document the selected structure and reference the real
-directories captured above]
+**Structure Decision**: Single project, existing layout. All changes in `connector.py` with schema regeneration and test extensions.
 
-## Complexity Tracking
+## Design Decisions
 
-*Fill ONLY if Constitution Check has violations that must be justified*
+### D1: user_id field placement
 
-| Violation | Why Needed | Simpler Alternative Rejected Because |
-|-----------|------------|-------------------------------------|
-| [e.g., 4th project] | [current need] | [why 3 projects insufficient] |
-| [e.g., Repository pattern] | [specific problem] | [why direct DB access insufficient] |
+`user_id: Optional[str] = None` added to all five existing payload models. `Optional` with `None` default ensures backward compatibility — pre-migration events without `user_id` validate and reduce correctly.
+
+### D2: UserConnected / UserDisconnected are connector-family events
+
+These new event types are added to `CONNECTOR_EVENT_TYPES` frozenset. They share the same reducer (`reduce_connector_events`). Inside the reducer, they update only `user_connections` — they do not participate in binding-level state transitions (`current_state`, `transition_log`).
+
+### D3: UserConnectionStatus is a simple roster entry
+
+```python
+class UserConnectionStatus(BaseModel):
+    model_config = ConfigDict(frozen=True)
+    user_id: str
+    state: ConnectorState
+    last_event_at: Optional[datetime] = None
+```
+
+The roster is `tuple[UserConnectionStatus, ...]` on `ReducedConnectorState`. One entry per distinct `user_id` seen, reflecting only the latest state. No per-user transition logs.
+
+### D4: Reducer roster update logic
+
+During the fold, when a connector event has `user_id` set (whether it's a binding-level event like `ConnectorDegraded` or a user-level event like `UserConnected`):
+- Look up or create a mutable roster entry keyed by `user_id`
+- Update `state` to the target state of the event
+- Update `last_event_at` to the event's `recorded_at` timestamp
+
+`UserDisconnected` maps to `ConnectorState.REVOKED` for roster purposes.
+`UserConnected` maps to `ConnectorState.PROVISIONED` for roster purposes.
+
+### D5: Schema version 2.8.0
+
+SemVer minor bump. Additive changes only — new optional field, new event types, new output model field. No breaking changes.
+
+## Risk Assessment
+
+| Risk | Likelihood | Impact | Mitigation |
+|------|-----------|--------|------------|
+| Existing tests break from schema version change | Low | Low | Single assertion update (`"2.7.0"` → `"2.8.0"`) |
+| Reducer determinism broken by roster | Low | High | Property tests with Hypothesis extended to include user events |
+| JSON schema drift from regeneration | Low | Medium | CI drift check already exists; regenerate all connector schemas |
