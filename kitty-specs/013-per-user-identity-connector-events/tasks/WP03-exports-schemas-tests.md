@@ -1,7 +1,7 @@
 ---
 work_package_id: WP03
 title: Exports, Schemas & Tests
-lane: "for_review"
+lane: "doing"
 dependencies: [WP02]
 base_branch: 2.x
 base_commit: 777e3f958af675c41c3d9b5fb46409fc5f2691b5
@@ -14,8 +14,8 @@ subtasks:
 - T014
 phase: Phase 2 - Integration
 assignee: ''
-agent: claude-opus-4-6
-shell_pid: '39632'
+agent: "claude-opus-4-6"
+shell_pid: "40186"
 review_status: ''
 reviewed_by: ''
 review_feedback: ''
@@ -395,3 +395,4 @@ requirement_refs:
 - 2026-03-05T11:15:54Z – system – lane=planned – Prompt created.
 - 2026-03-05T22:10:47Z – claude-opus-4-6 – shell_pid=39632 – lane=doing – Assigned agent via workflow command
 - 2026-03-05T22:16:33Z – claude-opus-4-6 – shell_pid=39632 – lane=for_review – Ready for review: exports, schemas (75 total), unit/reducer/property tests all pass (1473 passed, 97% coverage, mypy --strict clean)
+- 2026-03-05T22:17:08Z – claude-opus-4-6 – shell_pid=40186 – lane=doing – Started review via workflow command
