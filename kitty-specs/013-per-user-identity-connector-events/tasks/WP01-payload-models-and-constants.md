@@ -1,7 +1,7 @@
 ---
 work_package_id: WP01
 title: Payload Models & Constants
-lane: "for_review"
+lane: "doing"
 dependencies: []
 base_branch: 2.x
 base_commit: 4dda9d5509284bd062cdfe1ebfe5e0faca37f22e
@@ -14,8 +14,8 @@ subtasks:
 - T005
 phase: Phase 1 - Foundation
 assignee: ''
-agent: claude-opus-4-6
-shell_pid: '36004'
+agent: "claude-opus-reviewer"
+shell_pid: "37263"
 review_status: has_feedback
 reviewed_by: Robert Douglass
 review_feedback: feedback://013-per-user-identity-connector-events/WP01/20260305T161214Z-b89988d9.md
@@ -253,3 +253,4 @@ requirement_refs:
 - 2026-03-05T16:12:14Z – claude-opus-4-6 – shell_pid=35474 – lane=planned – Moved to planned
 - 2026-03-05T16:13:01Z – claude-opus-4-6 – shell_pid=36004 – lane=doing – Started implementation via workflow command
 - 2026-03-05T16:14:02Z – claude-opus-4-6 – shell_pid=36004 – lane=for_review – Fixed missing __init__.py exports for 5 new symbols. All 1438 tests pass, mypy --strict clean.
+- 2026-03-05T21:40:58Z – claude-opus-reviewer – shell_pid=37263 – lane=doing – Started review via workflow command
