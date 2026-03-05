@@ -380,6 +380,11 @@ from spec_kitty_events.connector import (
     ConnectorDegradedPayload as ConnectorDegradedPayload,
     ConnectorRevokedPayload as ConnectorRevokedPayload,
     ConnectorReconnectedPayload as ConnectorReconnectedPayload,
+    USER_CONNECTED as USER_CONNECTED,
+    USER_DISCONNECTED as USER_DISCONNECTED,
+    UserConnectedPayload as UserConnectedPayload,
+    UserDisconnectedPayload as UserDisconnectedPayload,
+    UserConnectionStatus as UserConnectionStatus,
     ReducedConnectorState as ReducedConnectorState,
     reduce_connector_events as reduce_connector_events,
 )
@@ -657,6 +662,11 @@ __all__ = [
     "ConnectorDegradedPayload",
     "ConnectorRevokedPayload",
     "ConnectorReconnectedPayload",
+    "USER_CONNECTED",
+    "USER_DISCONNECTED",
+    "UserConnectedPayload",
+    "UserDisconnectedPayload",
+    "UserConnectionStatus",
     "ReducedConnectorState",
     "reduce_connector_events",
     # Sync Lifecycle Contracts (2.7.0)
