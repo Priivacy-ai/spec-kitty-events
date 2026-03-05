@@ -62,10 +62,10 @@
 **Estimated Prompt Size**: ~300 lines
 
 ### Included Subtasks
-- [ ] T006 Add `user_connections: Tuple[UserConnectionStatus, ...] = ()` to `ReducedConnectorState` in `src/spec_kitty_events/connector.py`
-- [ ] T007 Update `reduce_connector_events()` to build per-user roster from `user_id` on binding-level events in `src/spec_kitty_events/connector.py`
-- [ ] T008 Handle `UserConnected`/`UserDisconnected` in reducer: skip binding-level state transitions, update roster only in `src/spec_kitty_events/connector.py`
-- [ ] T009 Add anomaly handling for `UserDisconnected` without prior `UserConnected` in `src/spec_kitty_events/connector.py`
+- [x] T006 Add `user_connections: Tuple[UserConnectionStatus, ...] = ()` to `ReducedConnectorState` in `src/spec_kitty_events/connector.py`
+- [x] T007 Update `reduce_connector_events()` to build per-user roster from `user_id` on binding-level events in `src/spec_kitty_events/connector.py`
+- [x] T008 Handle `UserConnected`/`UserDisconnected` in reducer: skip binding-level state transitions, update roster only in `src/spec_kitty_events/connector.py`
+- [x] T009 Add anomaly handling for `UserDisconnected` without prior `UserConnected` in `src/spec_kitty_events/connector.py`
 
 ### Implementation Notes
 - Mutable roster dict `Dict[str, Tuple[ConnectorState, Optional[datetime]]]` keyed by `user_id` during fold, frozen to `Tuple[UserConnectionStatus, ...]` at output.
