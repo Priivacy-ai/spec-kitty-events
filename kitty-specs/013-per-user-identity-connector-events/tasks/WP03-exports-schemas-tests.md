@@ -1,7 +1,7 @@
 ---
 work_package_id: WP03
 title: Exports, Schemas & Tests
-lane: "planned"
+lane: "doing"
 dependencies: [WP02]
 base_branch: 2.x
 base_commit: 777e3f958af675c41c3d9b5fb46409fc5f2691b5
@@ -14,8 +14,8 @@ subtasks:
 - T014
 phase: Phase 2 - Integration
 assignee: ''
-agent: claude-opus-4-6
-shell_pid: '40186'
+agent: "claude-opus-4-6"
+shell_pid: "40915"
 review_status: "has_feedback"
 reviewed_by: "Robert Douglass"
 review_feedback: "feedback://013-per-user-identity-connector-events/WP03/20260305T221933Z-627f4e2b.md"
@@ -397,3 +397,4 @@ requirement_refs:
 - 2026-03-05T22:16:33Z – claude-opus-4-6 – shell_pid=39632 – lane=for_review – Ready for review: exports, schemas (75 total), unit/reducer/property tests all pass (1473 passed, 97% coverage, mypy --strict clean)
 - 2026-03-05T22:17:08Z – claude-opus-4-6 – shell_pid=40186 – lane=doing – Started review via workflow command
 - 2026-03-05T22:19:33Z – claude-opus-4-6 – shell_pid=40186 – lane=planned – Moved to planned
+- 2026-03-05T22:24:00Z – claude-opus-4-6 – shell_pid=40915 – lane=doing – Started implementation via workflow command
