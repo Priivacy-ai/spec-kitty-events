@@ -76,6 +76,18 @@
       "format": "date-time",
       "title": "Recorded At",
       "type": "string"
+    },
+    "user_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "User Id"
     }
   },
   "required": [
