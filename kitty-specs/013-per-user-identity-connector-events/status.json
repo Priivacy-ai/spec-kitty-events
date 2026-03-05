@@ -1,24 +1,24 @@
 {
-  "event_count": 3,
+  "event_count": 4,
   "feature_slug": "013-per-user-identity-connector-events",
-  "last_event_id": "01KJZBJH8Z5TM2Q3YNPFKYJFQM",
-  "materialized_at": "2026-03-05T15:58:58.847290+00:00",
+  "last_event_id": "01KJZBNWS7AB5XV2KZJ2T1EREE",
+  "materialized_at": "2026-03-05T16:00:48.936138+00:00",
   "summary": {
     "blocked": 0,
     "canceled": 0,
     "claimed": 0,
     "done": 0,
     "for_review": 0,
-    "in_progress": 1,
-    "planned": 0
+    "in_progress": 0,
+    "planned": 1
   },
   "work_packages": {
     "WP01": {
-      "actor": "claude-opus-4-6",
+      "actor": "user",
       "force_count": 3,
-      "lane": "in_progress",
-      "last_event_id": "01KJZBJH8Z5TM2Q3YNPFKYJFQM",
-      "last_transition_at": "2026-03-05T15:58:58.847044+00:00"
+      "lane": "planned",
+      "last_event_id": "01KJZBNWS7AB5XV2KZJ2T1EREE",
+      "last_transition_at": "2026-03-05T16:00:48.935913+00:00"
     }
   }
 }
