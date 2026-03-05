@@ -13,7 +13,7 @@ subtasks:
 - T009
 phase: Phase 1 - Foundation
 assignee: ''
-agent: ''
+agent: "claude-opus-4-6"
 shell_pid: "38223"
 review_status: ''
 reviewed_by: ''
@@ -183,3 +183,4 @@ requirement_refs:
 ## Activity Log
 
 - 2026-03-05T11:15:54Z – system – lane=planned – Prompt created.
+- 2026-03-05T21:57:05Z – claude-opus-4-6 – shell_pid=38223 – lane=doing – Assigned agent via workflow command
