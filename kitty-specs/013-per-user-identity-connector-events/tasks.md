@@ -168,3 +168,8 @@
 | T012 | Update unit tests for payloads/constants | WP03 | P1 | Yes |
 | T013 | Update reducer tests for roster | WP03 | P1 | Yes |
 | T014 | Extend property tests with new events | WP03 | P1 | Yes |
+
+<!-- status-model:start -->
+## Canonical Status (Generated)
+- WP01: for_review
+<!-- status-model:end -->
