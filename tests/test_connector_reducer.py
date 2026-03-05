@@ -1,8 +1,8 @@
-"""Reducer unit tests for Connector lifecycle (FR-006).
+"""Reducer unit tests for Connector lifecycle (FR-006, FR-005, FR-007).
 
 Covers: empty stream, happy-path transitions, revocation path,
 invalid transition recording (anomaly, no crash), duplicate event dedup,
-and deterministic ordering.
+deterministic ordering, and per-user roster functionality.
 """
 from __future__ import annotations
 
@@ -19,6 +19,8 @@ from spec_kitty_events.connector import (
     CONNECTOR_PROVISIONED,
     CONNECTOR_RECONNECTED,
     CONNECTOR_REVOKED,
+    USER_CONNECTED,
+    USER_DISCONNECTED,
     ConnectorState,
     reduce_connector_events,
 )
@@ -299,3 +301,140 @@ def test_reducer_output_is_frozen() -> None:
     result = reduce_connector_events([_provisioned_event(1)])
     with pytest.raises(Exception):
         result.current_state = ConnectorState.HEALTHY  # type: ignore[misc]
+
+
+# ── Roster event helpers (T013) ──────────────────────────────────────────────
+
+
+def _user_connected_event(
+    user_id: str, lamport: int = 10
+) -> Event:
+    d = _base_payload(lamport)
+    d["user_id"] = user_id
+    return _event(USER_CONNECTED, d, lamport=lamport)
+
+
+def _user_disconnected_event(
+    user_id: str, lamport: int = 11, reason: str = "session_expired"
+) -> Event:
+    d = _base_payload(lamport)
+    d["user_id"] = user_id
+    d["reason"] = reason
+    return _event(USER_DISCONNECTED, d, lamport=lamport)
+
+
+def _provisioned_event_with_user(
+    user_id: str, lamport: int = 1
+) -> Event:
+    d = _base_payload(lamport)
+    d["credentials_ref"] = "vault://secrets/gh-token"
+    d["config_hash"] = "sha256:abc123"
+    d["user_id"] = user_id
+    return _event(CONNECTOR_PROVISIONED, d, lamport=lamport)
+
+
+def _health_checked_event_with_user(
+    user_id: str, lamport: int = 2
+) -> Event:
+    d = _base_payload(lamport)
+    d["health_status"] = "healthy"
+    d["latency_ms"] = 42.5
+    d["user_id"] = user_id
+    return _event(CONNECTOR_HEALTH_CHECKED, d, lamport=lamport)
+
+
+# ── Tests: Per-user roster (T013, FR-005, FR-007) ───────────────────────────
+
+
+class TestReducerUserRoster:
+    def test_pre_migration_events_empty_roster(self) -> None:
+        """Events without user_id produce empty user_connections."""
+        events = [_provisioned_event(1), _health_checked_event(2)]
+        state = reduce_connector_events(events)
+        assert state.user_connections == ()
+        assert state.current_state == ConnectorState.HEALTHY
+
+    def test_binding_event_with_user_id_updates_roster(self) -> None:
+        """Binding-level event with user_id updates both state and roster."""
+        events = [
+            _provisioned_event_with_user("user-123", lamport=1),
+            _health_checked_event_with_user("user-123", lamport=2),
+        ]
+        state = reduce_connector_events(events)
+        assert state.current_state == ConnectorState.HEALTHY
+        assert len(state.user_connections) == 1
+        assert state.user_connections[0].user_id == "user-123"
+        assert state.user_connections[0].state == ConnectorState.HEALTHY
+
+    def test_user_connected_updates_roster_only(self) -> None:
+        """UserConnected updates roster but NOT binding-level state."""
+        events = [
+            _provisioned_event(1),
+            _user_connected_event("user-456", lamport=2),
+        ]
+        state = reduce_connector_events(events)
+        assert state.current_state == ConnectorState.PROVISIONED
+        assert len(state.user_connections) == 1
+        assert state.user_connections[0].user_id == "user-456"
+        assert state.user_connections[0].state == ConnectorState.PROVISIONED
+
+    def test_multiple_users_in_roster(self) -> None:
+        """Multiple users produce sorted roster entries."""
+        events = [
+            _provisioned_event(1),
+            _user_connected_event("user-456", lamport=2),
+            _user_connected_event("user-123", lamport=3),
+        ]
+        state = reduce_connector_events(events)
+        assert len(state.user_connections) == 2
+        assert state.user_connections[0].user_id == "user-123"
+        assert state.user_connections[1].user_id == "user-456"
+
+    def test_user_disconnected_anomaly_unknown_user(self) -> None:
+        """UserDisconnected for unknown user records anomaly."""
+        events = [
+            _provisioned_event(1),
+            _user_disconnected_event("user-999", lamport=2),
+        ]
+        state = reduce_connector_events(events)
+        assert len(state.anomalies) == 1
+        assert state.anomalies[0].kind == "invalid_transition"
+        assert "user-999" in state.anomalies[0].message
+        # Roster still updated despite anomaly
+        assert len(state.user_connections) == 1
+        assert state.user_connections[0].user_id == "user-999"
+        assert state.user_connections[0].state == ConnectorState.REVOKED
+
+    def test_user_connected_then_disconnected(self) -> None:
+        """UserConnected followed by UserDisconnected updates roster state."""
+        events = [
+            _provisioned_event(1),
+            _user_connected_event("user-123", lamport=2),
+            _user_disconnected_event("user-123", lamport=3),
+        ]
+        state = reduce_connector_events(events)
+        assert len(state.user_connections) == 1
+        assert state.user_connections[0].state == ConnectorState.REVOKED
+        assert state.anomalies == ()
+
+    def test_duplicate_user_events_deduped(self) -> None:
+        """Duplicate UserConnected events (same event_id) produce single roster entry."""
+        e = _user_connected_event("user-123", lamport=2)
+        events = [_provisioned_event(1), e, e]
+        state = reduce_connector_events(events)
+        assert len(state.user_connections) == 1
+
+    def test_backward_compatibility_full_stream_no_user_id(self) -> None:
+        """Full pre-migration event stream produces identical output with empty roster."""
+        events = [
+            _provisioned_event(1),
+            _health_checked_event(2),
+            _degraded_event(3),
+            _reconnected_event(4, previous_state="degraded"),
+            _health_checked_event(5),
+        ]
+        state = reduce_connector_events(events)
+        assert state.current_state == ConnectorState.HEALTHY
+        assert state.user_connections == ()
+        assert state.anomalies == ()
+        assert state.event_count == 5
