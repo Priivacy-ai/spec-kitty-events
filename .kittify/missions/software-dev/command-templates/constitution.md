@@ -69,3 +69,14 @@ spec-kitty constitution context --action review --json
 ```
 
 Use JSON `text` as governance context. If `mode=bootstrap`, follow referenced docs as needed.
+
+
+## Branching and Pinning Governance (2026-03-07)
+
+- This repository uses a single long-lived branch: `main`.
+- `2.x` is retired for this repository and must not be recreated.
+- All implementation branches start from `main` and merge back to `main`.
+- Do not open pull requests targeting `2.x`.
+- Pin dependencies and cross-repo references to immutable commit SHAs or release tags.
+- Never use moving branch refs as release or production pins.
+- Keep temporary local pin or branch overrides uncommitted.
