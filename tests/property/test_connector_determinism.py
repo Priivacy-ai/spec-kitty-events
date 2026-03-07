@@ -17,11 +17,15 @@ from spec_kitty_events.connector import (
     CONNECTOR_PROVISIONED,
     CONNECTOR_RECONNECTED,
     CONNECTOR_REVOKED,
+    USER_CONNECTED,
+    USER_DISCONNECTED,
     ConnectorDegradedPayload,
     ConnectorHealthCheckedPayload,
     ConnectorProvisionedPayload,
     ConnectorReconnectedPayload,
     ConnectorRevokedPayload,
+    UserConnectedPayload,
+    UserDisconnectedPayload,
     reduce_connector_events,
 )
 from spec_kitty_events.models import Event
@@ -131,6 +135,39 @@ _VALID_EVENT_POOL: list[Event] = [
         ),
         lamport=5,
     ),
+    _make_event(
+        USER_CONNECTED,
+        UserConnectedPayload(
+            connector_id="conn-prop-001",
+            connector_type="github",
+            provider="github",
+            mission_id="m-prop-001",
+            project_uuid=_PROJECT_UUID,
+            actor_id="user-prop",
+            actor_type="human",
+            endpoint_url="https://api.github.com",  # type: ignore[arg-type]
+            recorded_at=datetime(2026, 1, 1, 12, 0, 6, tzinfo=timezone.utc),
+            user_id="user-prop",
+        ),
+        lamport=6,
+    ),
+    _make_event(
+        USER_DISCONNECTED,
+        UserDisconnectedPayload(
+            connector_id="conn-prop-001",
+            connector_type="github",
+            provider="github",
+            mission_id="m-prop-001",
+            project_uuid=_PROJECT_UUID,
+            actor_id="user-prop",
+            actor_type="human",
+            endpoint_url="https://api.github.com",  # type: ignore[arg-type]
+            recorded_at=datetime(2026, 1, 1, 12, 0, 7, tzinfo=timezone.utc),
+            user_id="user-prop",
+            reason="testing",
+        ),
+        lamport=7,
+    ),
 ]
 
 # Subset used for order-independence tests: use only Provisioned + HealthChecked
@@ -165,3 +202,24 @@ def test_idempotent_dedup(original: list[Event]) -> None:
     result_original = reduce_connector_events(original)
     result_doubled = reduce_connector_events(doubled)
     assert result_original == result_doubled
+
+
+# -- Property 3: Roster determinism with user events -------------------------
+
+# Pool with user-level events for roster-specific property testing.
+_USER_EVENT_POOL = [e for e in _VALID_EVENT_POOL if e.event_type in {
+    USER_CONNECTED, USER_DISCONNECTED,
+}]
+
+
+@given(st.lists(st.sampled_from(_VALID_EVENT_POOL), min_size=1, max_size=7))
+@settings(max_examples=200, deadline=None)
+def test_roster_determinism_with_user_events(events: list[Event]) -> None:
+    """Reducer produces identical user_connections regardless of input ordering."""
+    from spec_kitty_events.status import status_event_sort_key
+
+    result = reduce_connector_events(events)
+    canonical = reduce_connector_events(
+        sorted(events, key=status_event_sort_key)
+    )
+    assert result == canonical

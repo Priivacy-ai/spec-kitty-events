@@ -46,6 +46,9 @@ jobs:
           python -m build
           twine check dist/*
 
+      - name: Validate distribution metadata
+        run: python scripts/release/validate_distribution_metadata.py --package spec-kitty-events
+
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:

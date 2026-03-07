@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "UserDisconnectedPayload",
+  "description": "Payload for UserDisconnected events — user disconnected from a binding.",
+  "type": "object",
+  "required": [
+    "connector_id",
+    "connector_type",
+    "provider",
+    "mission_id",
+    "project_uuid",
+    "actor_id",
+    "actor_type",
+    "endpoint_url",
+    "recorded_at",
+    "user_id"
+  ],
+  "properties": {
+    "connector_id": { "type": "string", "minLength": 1 },
+    "connector_type": { "type": "string", "minLength": 1 },
+    "provider": { "type": "string", "minLength": 1 },
+    "mission_id": { "type": "string", "minLength": 1 },
+    "project_uuid": { "type": "string", "format": "uuid" },
+    "actor_id": { "type": "string", "minLength": 1 },
+    "actor_type": { "type": "string", "pattern": "^(human|service|system)$" },
+    "endpoint_url": { "type": "string", "format": "uri" },
+    "recorded_at": { "type": "string", "format": "date-time" },
+    "user_id": { "type": "string", "minLength": 1 },
+    "reason": { "type": "string", "default": "" }
+  },
+  "additionalProperties": false
+}

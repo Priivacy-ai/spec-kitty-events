@@ -52,6 +52,35 @@ Versioning and Export Notes (2.7.0 -- Connector and Sync Lifecycle Contracts):
     listed under the "Connector Lifecycle Contracts (2.7.0)" and "Sync
     Lifecycle Contracts (2.7.0)" blocks in ``__all__``.
 
+Versioning and Export Notes (2.8.0 -- Per-User Identity in Connector Events):
+    The Connector domain (CONNECTOR_SCHEMA_VERSION = "2.8.0") adds per-user
+    identity tracking.  All changes are **additive-only**.  Existing symbols
+    are unchanged.  New symbols are added to the "Connector Lifecycle
+    Contracts" block in ``__all__``.
+
+    New exported symbols (5 total):
+        Constants: USER_CONNECTED, USER_DISCONNECTED
+        Models: UserConnectedPayload, UserDisconnectedPayload,
+            UserConnectionStatus
+
+    Modified models:
+        ConnectorProvisionedPayload, ConnectorHealthCheckedPayload,
+        ConnectorDegradedPayload, ConnectorRevokedPayload,
+        ConnectorReconnectedPayload: added optional ``user_id`` field.
+        ReducedConnectorState: added ``user_connections`` field.
+
+    Downstream Impact Notes:
+        spec-kitty-saas:
+            - Pin ``spec-kitty-events>=2.8.0``.
+            - Use ``user_id`` field on connector event payloads to attribute
+              connection state changes to specific users.
+            - Emit ``UserConnected`` / ``UserDisconnected`` events for
+              per-user OAuth connection lifecycle.
+
+        spec-kitty-tracker:
+            - Pin ``spec-kitty-events>=2.8.0``.
+            - No immediate changes required — ``user_id`` is optional.
+
     Exported symbols -- Connector (11 total):
         Constants: CONNECTOR_SCHEMA_VERSION, CONNECTOR_PROVISIONED,
             CONNECTOR_HEALTH_CHECKED, CONNECTOR_DEGRADED, CONNECTOR_REVOKED,
@@ -97,7 +126,7 @@ Versioning and Export Notes (2.7.0 -- Connector and Sync Lifecycle Contracts):
               ``load_fixtures("sync")``).
 """
 
-__version__ = "2.7.0"
+__version__ = "2.8.0"
 
 # Core data models
 from spec_kitty_events.models import (
@@ -362,7 +391,7 @@ from spec_kitty_events.decisionpoint import (
     reduce_decision_point_events as reduce_decision_point_events,
 )
 
-# Connector Lifecycle Contracts (2.7.0)
+# Connector Lifecycle Contracts (2.7.0) — extended in 2.8.0
 from spec_kitty_events.connector import (
     CONNECTOR_SCHEMA_VERSION as CONNECTOR_SCHEMA_VERSION,
     CONNECTOR_PROVISIONED as CONNECTOR_PROVISIONED,
@@ -380,6 +409,11 @@ from spec_kitty_events.connector import (
     ConnectorDegradedPayload as ConnectorDegradedPayload,
     ConnectorRevokedPayload as ConnectorRevokedPayload,
     ConnectorReconnectedPayload as ConnectorReconnectedPayload,
+    USER_CONNECTED as USER_CONNECTED,
+    USER_DISCONNECTED as USER_DISCONNECTED,
+    UserConnectedPayload as UserConnectedPayload,
+    UserDisconnectedPayload as UserDisconnectedPayload,
+    UserConnectionStatus as UserConnectionStatus,
     ReducedConnectorState as ReducedConnectorState,
     reduce_connector_events as reduce_connector_events,
 )
@@ -657,6 +691,11 @@ __all__ = [
     "ConnectorDegradedPayload",
     "ConnectorRevokedPayload",
     "ConnectorReconnectedPayload",
+    "USER_CONNECTED",
+    "USER_DISCONNECTED",
+    "UserConnectedPayload",
+    "UserDisconnectedPayload",
+    "UserConnectionStatus",
     "ReducedConnectorState",
     "reduce_connector_events",
     # Sync Lifecycle Contracts (2.7.0)

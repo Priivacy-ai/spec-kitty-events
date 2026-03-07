@@ -1,6 +1,6 @@
 [project]
 name = "spec-kitty-events"
-version = "2.7.0"
+version = "2.8.0"
 description = "Event log library with Lamport clocks and systematic error tracking"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -8,6 +8,10 @@ authors = [
     {name = "Robert Douglass", email = "rob@example.com"}
 ]
 license = {file = "LICENSE"}
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+]
 
 dependencies = [
     "pydantic>=2.0.0,<3.0.0",
@@ -31,6 +35,9 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools]
+license-files = ["LICENSE"]
 
 [tool.setuptools.package-data]
 spec_kitty_events = [
@@ -98,4 +105,9 @@ exclude_lines = [
     "raise AssertionError",
     "raise NotImplementedError",
     "if __name__ == .__main__.:",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.2",
 ]

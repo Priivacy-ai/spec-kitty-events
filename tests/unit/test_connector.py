@@ -19,6 +19,8 @@ from spec_kitty_events.connector import (
     CONNECTOR_RECONNECTED,
     CONNECTOR_REVOKED,
     CONNECTOR_SCHEMA_VERSION,
+    USER_CONNECTED,
+    USER_DISCONNECTED,
     ConnectorDegradedPayload,
     ConnectorHealthCheckedPayload,
     ConnectorProvisionedPayload,
@@ -27,6 +29,9 @@ from spec_kitty_events.connector import (
     ConnectorState,
     HealthStatus,
     ReconnectStrategy,
+    UserConnectedPayload,
+    UserConnectionStatus,
+    UserDisconnectedPayload,
 )
 
 # ── Constants tests (FR-001) ────────────────────────────────────────────────
@@ -40,6 +45,10 @@ class TestConstants:
         assert CONNECTOR_REVOKED == "ConnectorRevoked"
         assert CONNECTOR_RECONNECTED == "ConnectorReconnected"
 
+    def test_user_event_type_values(self) -> None:
+        assert USER_CONNECTED == "UserConnected"
+        assert USER_DISCONNECTED == "UserDisconnected"
+
     def test_event_types_frozenset(self) -> None:
         assert isinstance(CONNECTOR_EVENT_TYPES, frozenset)
         assert CONNECTOR_EVENT_TYPES == frozenset({
@@ -48,11 +57,13 @@ class TestConstants:
             "ConnectorDegraded",
             "ConnectorRevoked",
             "ConnectorReconnected",
+            "UserConnected",
+            "UserDisconnected",
         })
-        assert len(CONNECTOR_EVENT_TYPES) == 5
+        assert len(CONNECTOR_EVENT_TYPES) == 7
 
     def test_schema_version(self) -> None:
-        assert CONNECTOR_SCHEMA_VERSION == "2.7.0"
+        assert CONNECTOR_SCHEMA_VERSION == "2.8.0"
 
 
 # ── Enum tests (FR-001) ─────────────────────────────────────────────────────
@@ -255,3 +266,151 @@ class TestFrozenModels:
         for cls, data in payloads:
             payload = cls.model_validate(data)
             assert payload.model_config.get("frozen") is True
+
+
+# ── user_id on existing payloads (FR-003) ─────────────────────────────────
+
+
+class TestExistingPayloadsUserIdField:
+    def test_provisioned_user_id_default_none(self) -> None:
+        p = ConnectorProvisionedPayload.model_validate(_provisioned_payload())
+        assert p.user_id is None
+
+    def test_provisioned_user_id_set(self) -> None:
+        data = _provisioned_payload()
+        data["user_id"] = "user-123"
+        p = ConnectorProvisionedPayload.model_validate(data)
+        assert p.user_id == "user-123"
+
+    def test_health_checked_user_id_default_none(self) -> None:
+        p = ConnectorHealthCheckedPayload.model_validate(_health_checked_payload())
+        assert p.user_id is None
+
+    def test_health_checked_user_id_set(self) -> None:
+        data = _health_checked_payload()
+        data["user_id"] = "user-456"
+        p = ConnectorHealthCheckedPayload.model_validate(data)
+        assert p.user_id == "user-456"
+
+    def test_degraded_user_id_default_none(self) -> None:
+        p = ConnectorDegradedPayload.model_validate(_degraded_payload())
+        assert p.user_id is None
+
+    def test_degraded_user_id_set(self) -> None:
+        data = _degraded_payload()
+        data["user_id"] = "user-789"
+        p = ConnectorDegradedPayload.model_validate(data)
+        assert p.user_id == "user-789"
+
+    def test_revoked_user_id_default_none(self) -> None:
+        p = ConnectorRevokedPayload.model_validate(_revoked_payload())
+        assert p.user_id is None
+
+    def test_revoked_user_id_set(self) -> None:
+        data = _revoked_payload()
+        data["user_id"] = "user-abc"
+        p = ConnectorRevokedPayload.model_validate(data)
+        assert p.user_id == "user-abc"
+
+    def test_reconnected_user_id_default_none(self) -> None:
+        p = ConnectorReconnectedPayload.model_validate(_reconnected_payload())
+        assert p.user_id is None
+
+    def test_reconnected_user_id_set(self) -> None:
+        data = _reconnected_payload()
+        data["user_id"] = "user-def"
+        p = ConnectorReconnectedPayload.model_validate(data)
+        assert p.user_id == "user-def"
+
+
+# ── UserConnectedPayload tests ────────────────────────────────────────────
+
+
+def _user_connected_payload() -> dict:
+    d = _base_fields()
+    d["user_id"] = "user-123"
+    return d
+
+
+def _user_disconnected_payload() -> dict:
+    d = _base_fields()
+    d["user_id"] = "user-123"
+    d["reason"] = "session_expired"
+    return d
+
+
+class TestUserConnectedPayload:
+    def test_valid_payload(self) -> None:
+        p = UserConnectedPayload.model_validate(_user_connected_payload())
+        assert p.user_id == "user-123"
+        assert p.connector_id == "conn-001"
+
+    def test_user_id_required(self) -> None:
+        data = _user_connected_payload()
+        del data["user_id"]
+        with pytest.raises(ValidationError):
+            UserConnectedPayload.model_validate(data)
+
+    def test_user_id_empty_raises(self) -> None:
+        data = _user_connected_payload()
+        data["user_id"] = ""
+        with pytest.raises(ValidationError):
+            UserConnectedPayload.model_validate(data)
+
+    def test_frozen(self) -> None:
+        p = UserConnectedPayload.model_validate(_user_connected_payload())
+        with pytest.raises(ValidationError):
+            p.user_id = "other"  # type: ignore[misc]
+
+
+class TestUserDisconnectedPayload:
+    def test_valid_payload(self) -> None:
+        p = UserDisconnectedPayload.model_validate(_user_disconnected_payload())
+        assert p.user_id == "user-123"
+        assert p.reason == "session_expired"
+
+    def test_reason_default_empty(self) -> None:
+        data = _user_connected_payload()  # no reason field
+        p = UserDisconnectedPayload.model_validate(data)
+        assert p.reason == ""
+
+    def test_user_id_required(self) -> None:
+        data = _user_disconnected_payload()
+        del data["user_id"]
+        with pytest.raises(ValidationError):
+            UserDisconnectedPayload.model_validate(data)
+
+    def test_frozen(self) -> None:
+        p = UserDisconnectedPayload.model_validate(_user_disconnected_payload())
+        with pytest.raises(ValidationError):
+            p.user_id = "other"  # type: ignore[misc]
+
+
+# ── UserConnectionStatus tests ────────────────────────────────────────────
+
+
+class TestUserConnectionStatus:
+    def test_valid(self) -> None:
+        status = UserConnectionStatus(
+            user_id="user-123",
+            state=ConnectorState.PROVISIONED,
+        )
+        assert status.user_id == "user-123"
+        assert status.state == ConnectorState.PROVISIONED
+        assert status.last_event_at is None
+
+    def test_with_timestamp(self) -> None:
+        status = UserConnectionStatus(
+            user_id="user-123",
+            state=ConnectorState.HEALTHY,
+            last_event_at=_NOW,
+        )
+        assert status.last_event_at == _NOW
+
+    def test_frozen(self) -> None:
+        status = UserConnectionStatus(
+            user_id="user-123",
+            state=ConnectorState.PROVISIONED,
+        )
+        with pytest.raises(ValidationError):
+            status.user_id = "other"  # type: ignore[misc]

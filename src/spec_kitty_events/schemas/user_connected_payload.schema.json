@@ -1,7 +1,7 @@
 {
-  "$id": "spec-kitty-events/connector_provisioned_payload",
+  "$id": "spec-kitty-events/user_connected_payload",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "description": "Payload for ConnectorProvisioned events.",
+  "description": "Payload for UserConnected events.",
   "properties": {
     "actor_id": {
       "minLength": 1,
@@ -13,11 +13,6 @@
       "title": "Actor Type",
       "type": "string"
     },
-    "config_hash": {
-      "minLength": 1,
-      "title": "Config Hash",
-      "type": "string"
-    },
     "connector_id": {
       "minLength": 1,
       "title": "Connector Id",
@@ -26,11 +21,6 @@
     "connector_type": {
       "minLength": 1,
       "title": "Connector Type",
-      "type": "string"
-    },
-    "credentials_ref": {
-      "minLength": 1,
-      "title": "Credentials Ref",
       "type": "string"
     },
     "endpoint_url": {
@@ -60,16 +50,9 @@
       "type": "string"
     },
     "user_id": {
-      "anyOf": [
-        {
-          "type": "string"
-        },
-        {
-          "type": "null"
-        }
-      ],
-      "default": null,
-      "title": "User Id"
+      "minLength": 1,
+      "title": "User Id",
+      "type": "string"
     }
   },
   "required": [
@@ -82,9 +65,8 @@
     "actor_type",
     "endpoint_url",
     "recorded_at",
-    "credentials_ref",
-    "config_hash"
+    "user_id"
   ],
-  "title": "ConnectorProvisionedPayload",
+  "title": "UserConnectedPayload",
   "type": "object"
 }

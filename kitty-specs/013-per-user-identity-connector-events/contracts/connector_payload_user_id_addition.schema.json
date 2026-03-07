@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ConnectorPayloadUserIdAddition",
+  "description": "Contract for the user_id field added to all five existing connector payload models. This schema documents the addition only; the canonical schemas are regenerated from Pydantic models at build time.",
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "anyOf": [
+        { "type": "string", "minLength": 1 },
+        { "type": "null" }
+      ],
+      "default": null,
+      "description": "Identifies whose connection is affected. Distinct from actor_id (who triggered the event). Optional for backward compatibility with pre-migration events."
+    }
+  },
+  "additionalProperties": true
+}
