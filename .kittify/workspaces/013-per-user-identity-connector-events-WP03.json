@@ -1,0 +1,14 @@
+{
+  "wp_id": "WP03",
+  "feature_slug": "013-per-user-identity-connector-events",
+  "worktree_path": ".worktrees/013-per-user-identity-connector-events-WP03",
+  "branch_name": "013-per-user-identity-connector-events-WP03",
+  "base_branch": "2.x",
+  "base_commit": "777e3f958af675c41c3d9b5fb46409fc5f2691b5",
+  "dependencies": [
+    "WP02"
+  ],
+  "created_at": "2026-03-05T22:10:46.817569+00:00",
+  "created_by": "implement-command",
+  "vcs_backend": "git"
+}
