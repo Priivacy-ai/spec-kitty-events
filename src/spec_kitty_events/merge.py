@@ -52,9 +52,9 @@ def state_machine_merge(
                 f"Events have different aggregate_ids: {event.aggregate_id} != {first_event.aggregate_id}"
             )
 
-    def _get_state(event: Event) -> object:
+    def _get_state(event: Event) -> str | None:
         """Extract state value from event payload with fallback logic."""
-        value = event.payload.get(state_key)
+        value: str | None = event.payload.get(state_key)
         if value is None and state_key == "state":
             value = event.payload.get("status")
         return value
