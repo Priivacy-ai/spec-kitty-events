@@ -117,9 +117,6 @@ _CONCLUSION_MAP: dict[str, Optional[str]] = {
     "stale": None,
 }
 
-_IGNORED_CONCLUSIONS = frozenset({"neutral", "skipped", "stale"})
-
-
 def map_check_run_conclusion(
     conclusion: str,
     on_ignored: Optional[Callable[[str, str], None]] = None,
@@ -146,7 +143,7 @@ def map_check_run_conclusion(
 
     event_type = _CONCLUSION_MAP[conclusion]
 
-    if conclusion in _IGNORED_CONCLUSIONS:
+    if event_type is None:
         logger.info(
             "Ignored non-blocking check_run conclusion: %s", conclusion
         )

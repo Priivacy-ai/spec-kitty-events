@@ -52,13 +52,17 @@ def state_machine_merge(
                 f"Events have different aggregate_ids: {event.aggregate_id} != {first_event.aggregate_id}"
             )
 
+    def _get_state(event: Event) -> object:
+        """Extract state value from event payload with fallback logic."""
+        value = event.payload.get(state_key)
+        if value is None and state_key == "state":
+            value = event.payload.get("status")
+        return value
+
     # Extract state values and validate against priority_map
     event_priorities: List[tuple[int, str, Event]] = []
     for event in events:
-        state_value = event.payload.get(state_key)
-        # Fallback to "status" if using default "state" key and "state" not found
-        if state_value is None and state_key == "state":
-            state_value = event.payload.get("status")
+        state_value = _get_state(event)
         if state_value is None:
             keys_tried = f"'{state_key}' or 'status'" if state_key == "state" else f"'{state_key}'"
             raise ValidationError(f"Event {event.event_id} missing {keys_tried} in payload")
@@ -75,21 +79,13 @@ def state_machine_merge(
 
     # Winner is first event after sorting
     winner_priority, winner_node_id, winner_event = event_priorities[0]
-    winner_state = winner_event.payload.get(state_key)
-    if winner_state is None and state_key == "state":
-        winner_state = winner_event.payload.get("status")
+    winner_state = _get_state(winner_event)
 
     # Build resolution note
     if len(events) == 1:
         resolution_note = f"Single event, no conflict: state={winner_state}"
     else:
-        # Extract states with same fallback logic
-        all_states = []
-        for e in events:
-            s = e.payload.get(state_key)
-            if s is None and state_key == "state":
-                s = e.payload.get("status")
-            all_states.append(s)
+        all_states = [_get_state(e) for e in events]
         unique_states = set(all_states)
         if len(unique_states) == 1:
             resolution_note = f"All events have same state: {winner_state} (tiebroken by node '{winner_node_id}')"
