@@ -257,15 +257,6 @@ def reduce_mission_audit_events(events: Sequence[Event]) -> ReducedMissionAuditS
         event_id = event.event_id
         payload_dict = event.payload if isinstance(event.payload, dict) else {}
 
-        # Anomaly: unrecognized event type (within family — defensive)
-        if event_type not in MISSION_AUDIT_EVENT_TYPES:
-            anomalies_list.append(MissionAuditAnomaly(
-                kind="unrecognized_event_type",
-                event_id=event_id,
-                message=f"Unrecognized event type in audit family: {event_type!r}",
-            ))
-            continue
-
         # Anomaly: event after terminal
         if terminal_seen:
             anomalies_list.append(MissionAuditAnomaly(
