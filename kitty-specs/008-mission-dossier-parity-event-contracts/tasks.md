@@ -228,3 +228,12 @@ WP01 (dossier.py)
 | T028 | mypy --strict src/ (zero errors) | WP05 | P1 | No |
 | T029 | Schema drift check exits 0 | WP05 | P1 | No |
 | T030 | Export count + version bump to 2.4.0 | WP05 | P1 | No |
+
+<!-- status-model:start -->
+## Canonical Status (Generated)
+- WP01: done
+- WP02: done
+- WP03: done
+- WP04: done
+- WP05: done
+<!-- status-model:end -->

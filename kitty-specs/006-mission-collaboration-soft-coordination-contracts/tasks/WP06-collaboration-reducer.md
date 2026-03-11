@@ -1,7 +1,7 @@
 ---
 work_package_id: WP06
 title: Collaboration Reducer
-lane: "done"
+lane: done
 dependencies:
 - WP01
 - WP02
@@ -21,10 +21,10 @@ subtasks:
 - T037
 phase: Phase 2 - Reducer
 assignee: ''
-agent: "claude-coordinator"
-shell_pid: "83786"
-review_status: "approved"
-reviewed_by: "Robert Douglass"
+agent: claude-coordinator
+shell_pid: '83786'
+review_status: approved
+reviewed_by: Robert Douglass
 history:
 - timestamp: '2026-02-15T10:35:14Z'
   lane: planned

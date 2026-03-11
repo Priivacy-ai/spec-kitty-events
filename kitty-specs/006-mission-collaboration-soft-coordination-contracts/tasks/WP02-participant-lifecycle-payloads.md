@@ -1,7 +1,7 @@
 ---
 work_package_id: WP02
 title: Participant Lifecycle Payloads
-lane: "done"
+lane: done
 dependencies: [WP01]
 base_branch: 006-mission-collaboration-soft-coordination-contracts-WP01
 base_commit: f058d167abbbbbd8460757676b7e12ee4fb0ed3b
@@ -14,10 +14,10 @@ subtasks:
 - T012
 phase: Phase 1 - Payload Models
 assignee: ''
-agent: "codex"
-shell_pid: "58785"
-review_status: "approved"
-reviewed_by: "Robert Douglass"
+agent: codex
+shell_pid: '58785'
+review_status: approved
+reviewed_by: Robert Douglass
 history:
 - timestamp: '2026-02-15T10:35:14Z'
   lane: planned

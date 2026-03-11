@@ -1,7 +1,7 @@
 ---
 work_package_id: WP01
 title: Constants and Identity Models
-lane: "done"
+lane: done
 dependencies: []
 base_branch: main
 base_commit: 0697f26d3beaaf8cadb3eb68e938f31c4d05e71d
@@ -16,10 +16,10 @@ subtasks:
 - T007
 phase: Phase 0 - Foundation
 assignee: ''
-agent: "codex"
-shell_pid: "49799"
-review_status: "approved"
-reviewed_by: "Robert Douglass"
+agent: codex
+shell_pid: '49799'
+review_status: approved
+reviewed_by: Robert Douglass
 history:
 - timestamp: '2026-02-15T10:35:14Z'
   lane: planned

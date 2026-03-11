@@ -1,7 +1,7 @@
 ---
 work_package_id: WP01
 title: Core Domain Module (dossier.py)
-lane: "done"
+lane: done
 dependencies: []
 base_branch: main
 base_commit: 3a7bc8bb5c9aa0e4a33d99e89bf59e2a7cf37bc0
@@ -15,10 +15,10 @@ subtasks:
 - T006
 phase: Phase 1 - Foundation
 assignee: ''
-agent: "codex"
-shell_pid: "2429"
-review_status: "approved"
-reviewed_by: "Robert Douglass"
+agent: codex
+shell_pid: '2429'
+review_status: approved
+reviewed_by: Robert Douglass
 history:
 - timestamp: '2026-02-21T14:00:00Z'
   lane: planned

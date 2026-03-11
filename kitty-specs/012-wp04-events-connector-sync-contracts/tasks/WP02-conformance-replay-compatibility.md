@@ -1,7 +1,7 @@
 ---
 work_package_id: WP02
 title: Conformance Fixtures, Replay Scenarios, Compatibility Notes, Tests
-lane: "done"
+lane: done
 dependencies:
 - WP01
 base_branch: codex/wp04-events-connector-sync-contracts

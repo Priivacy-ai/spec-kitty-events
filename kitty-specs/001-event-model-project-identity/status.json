@@ -2,8 +2,9 @@
   "event_count": 3,
   "feature_slug": "001-event-model-project-identity",
   "last_event_id": "01KJ5V2V72K40G8XSW5BZBJZ4G",
-  "materialized_at": "2026-02-23T18:09:46.723033+00:00",
+  "materialized_at": "2026-03-11T07:08:26.836496+00:00",
   "summary": {
+    "approved": 0,
     "blocked": 0,
     "canceled": 0,
     "claimed": 0,

@@ -1,16 +1,16 @@
 ---
 work_package_id: WP07
 title: Compatibility Table, Changelog, and Migration Notes
-lane: "done"
+lane: done
 dependencies: [WP06]
 base_branch: 005-event-contract-conformance-suite-WP06
 base_commit: 65a647b9980d95fd0de21cefef3a99b43b9e520a
 created_at: '2026-02-12T11:35:12.699714+00:00'
 subtasks: [T040, T041, T042, T043, T044]
-shell_pid: "29143"
-agent: "codex"
-review_status: "has_feedback"
-reviewed_by: "Robert Douglass"
+agent: codex
+shell_pid: '29143'
+review_status: has_feedback
+reviewed_by: Robert Douglass
 history:
 - date: '2026-02-12'
   action: created

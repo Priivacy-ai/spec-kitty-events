@@ -1,16 +1,16 @@
 ---
 work_package_id: WP02
 title: Schema Subpackage and Generation Script
-lane: "done"
+lane: done
 dependencies: [WP01]
 base_branch: 005-event-contract-conformance-suite-WP01
 base_commit: 1c16bd2a704cc44184e768fda496a645fe9356b1
 created_at: '2026-02-12T10:25:26.669407+00:00'
 subtasks: [T007, T008, T009, T010, T011, T012, T013]
-shell_pid: "76117"
-agent: "codex"
-review_status: "has_feedback"
-reviewed_by: "Robert Douglass"
+agent: codex
+shell_pid: '76117'
+review_status: has_feedback
+reviewed_by: Robert Douglass
 history:
 - date: '2026-02-12'
   action: created

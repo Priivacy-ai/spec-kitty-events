@@ -1,7 +1,7 @@
 ---
 work_package_id: WP08
 title: Conformance Fixtures and Tests
-lane: "done"
+lane: done
 dependencies: [WP07]
 base_branch: 006-mission-collaboration-soft-coordination-contracts-WP07
 base_commit: 3a4f5aea7b57215afe836762312c639af5903d81
@@ -14,10 +14,10 @@ subtasks:
 - T047
 phase: Phase 3 - Integration
 assignee: ''
-agent: "claude-coordinator"
-shell_pid: "88847"
-review_status: "approved"
-reviewed_by: "Robert Douglass"
+agent: claude-coordinator
+shell_pid: '88847'
+review_status: approved
+reviewed_by: Robert Douglass
 history:
 - timestamp: '2026-02-15T10:35:14Z'
   lane: planned

@@ -1,7 +1,7 @@
 ---
 work_package_id: WP02
 title: Reducer Implementation + Unit Tests
-lane: "done"
+lane: done
 dependencies:
 - WP01
 base_branch: main
@@ -19,8 +19,8 @@ phase: Phase 2 - Reducer
 assignee: ''
 agent: claude-sonnet
 shell_pid: '45969'
-review_status: "approved"
-reviewed_by: "Robert Douglass"
+review_status: approved
+reviewed_by: Robert Douglass
 history:
 - timestamp: '2026-02-25T00:00:00Z'
   lane: planned

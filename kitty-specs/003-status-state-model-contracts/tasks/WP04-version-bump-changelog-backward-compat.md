@@ -1,7 +1,7 @@
 ---
 work_package_id: WP04
 title: Version Bump, Changelog, and Backward Compat
-lane: "done"
+lane: done
 dependencies: []
 base_branch: main
 base_commit: 56ea49aeff0253fceb680ac0111f8a65f4c8cb63
@@ -14,10 +14,10 @@ subtasks:
 - T023
 phase: Phase 3 - Polish and Release
 assignee: ''
-agent: "claude-opus"
-shell_pid: "42939"
-review_status: "approved"
-reviewed_by: "Robert Douglass"
+agent: claude-opus
+shell_pid: '42939'
+review_status: approved
+reviewed_by: Robert Douglass
 history:
 - timestamp: '2026-02-08T00:00:00Z'
   lane: planned

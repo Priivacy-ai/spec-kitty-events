@@ -2,8 +2,9 @@
   "event_count": 5,
   "feature_slug": "008-mission-dossier-parity-event-contracts",
   "last_event_id": "01KJ5V2VA1JX1XFR6ZBJFE0CBR",
-  "materialized_at": "2026-02-23T18:09:46.818439+00:00",
+  "materialized_at": "2026-03-11T07:08:27.501352+00:00",
   "summary": {
+    "approved": 0,
     "blocked": 0,
     "canceled": 0,
     "claimed": 0,

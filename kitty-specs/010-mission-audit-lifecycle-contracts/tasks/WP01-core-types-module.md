@@ -1,7 +1,7 @@
 ---
 work_package_id: WP01
 title: Core Types Module
-lane: "done"
+lane: done
 dependencies: []
 base_branch: main
 base_commit: a7ba75c9d083900f32eaf9c041d9657e316c0dd2
@@ -15,8 +15,8 @@ phase: Phase 1 - Core Types
 assignee: ''
 agent: claude-sonnet-reviewer
 shell_pid: '31909'
-review_status: "approved"
-reviewed_by: "Robert Douglass"
+review_status: approved
+reviewed_by: Robert Douglass
 history:
 - timestamp: '2026-02-25T00:00:00Z'
   lane: planned

@@ -1,7 +1,7 @@
 ---
 work_package_id: WP04
 title: Conformance Tests + Public API + Release
-lane: "done"
+lane: done
 dependencies:
 - WP02
 - WP03

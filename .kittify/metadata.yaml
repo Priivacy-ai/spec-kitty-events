@@ -3,9 +3,9 @@
 # DO NOT EDIT MANUALLY
 
 spec_kitty:
-  version: 2.0.5
+  version: 2.0.7
   initialized_at: '2026-02-07T07:46:50.090112'
-  last_upgraded_at: '2026-03-10T10:31:50.638215'
+  last_upgraded_at: '2026-03-11T08:08:27.842411'
 environment:
   python_version: 3.11.14
   platform: darwin
@@ -16,3 +16,28 @@ migrations:
     applied_at: '2026-02-26T13:21:24.158541'
     result: success
     notes: '007-glossary-semantic-integrity-contracts: migrated (10 WPs, 10 events)'
+  - id: 2.0.6_consistency_sweep
+    applied_at: '2026-03-11T08:08:27.838621'
+    result: success
+    notes: 'migrated 0 identical and 79 customized legacy runtime asset(s); 001-event-model-project-identity:
+      wrote baseline meta.json; 001-event-model-project-identity: normalized 3 work
+      package files; 002-github-gate-observability-contracts: wrote baseline meta.json;
+      002-github-gate-observability-contracts: normalized 3 work package files; 003-status-state-model-contracts:
+      wrote baseline meta.json; 003-status-state-model-contracts: normalized 4 work
+      package files; 004-canonical-event-contract: wrote baseline meta.json; 004-canonical-event-contract:
+      normalized 4 work package files; 005-event-contract-conformance-suite: wrote
+      baseline meta.json; 005-event-contract-conformance-suite: normalized 7 work
+      package files; 006-mission-collaboration-soft-coordination-contracts: wrote
+      baseline meta.json; 006-mission-collaboration-soft-coordination-contracts: normalized
+      9 work package files; 007-glossary-semantic-integrity-contracts: wrote baseline
+      meta.json; 007-glossary-semantic-integrity-contracts: normalized 10 work package
+      files; 008-mission-dossier-parity-event-contracts: normalized 5 work package
+      files; 009-dossier-contracts-remote-baseline-release: normalized 3 work package
+      files; 010-mission-audit-lifecycle-contracts: normalized 4 work package files;
+      011-wp03-decisionpoint-lifecycle-contracts: normalized 2 work package files;
+      012-wp04-events-connector-sync-contracts: normalized 2 work package files; 013-per-user-identity-connector-events:
+      normalized 3 work package files'
+  - id: 2.0.7_fix_stale_overrides
+    applied_at: '2026-03-11T08:08:27.842394'
+    result: skipped
+    notes: Not applicable

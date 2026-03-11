@@ -1,7 +1,7 @@
 ---
 work_package_id: WP01
 title: Branch Setup & Module Scaffold
-lane: "done"
+lane: done
 dependencies: []
 base_branch: 2.x
 base_commit: 1ffeb090612a59c7864871c8bfb0aad41b9db81c
@@ -13,10 +13,10 @@ subtasks:
 - T004
 phase: Phase 0 - Setup
 assignee: ''
-agent: "claude-opus"
-shell_pid: "18339"
-review_status: "approved"
-reviewed_by: "Robert Douglass"
+agent: claude-opus
+shell_pid: '18339'
+review_status: approved
+reviewed_by: Robert Douglass
 history:
 - timestamp: '2026-02-16T12:00:00Z'
   lane: planned

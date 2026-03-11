@@ -1,7 +1,7 @@
 ---
 work_package_id: WP03
 title: Exports, Schemas & Tests
-lane: "done"
+lane: done
 dependencies: [WP02]
 base_branch: 2.x
 base_commit: 777e3f958af675c41c3d9b5fb46409fc5f2691b5
@@ -16,8 +16,8 @@ phase: Phase 2 - Integration
 assignee: ''
 agent: claude-opus-4-6
 shell_pid: '42610'
-review_status: "approved"
-reviewed_by: "Robert Douglass"
+review_status: approved
+reviewed_by: Robert Douglass
 review_feedback: feedback://013-per-user-identity-connector-events/WP03/20260305T221933Z-627f4e2b.md
 history:
 - timestamp: '2026-03-05T11:15:54Z'

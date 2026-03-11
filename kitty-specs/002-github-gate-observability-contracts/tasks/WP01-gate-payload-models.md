@@ -1,7 +1,7 @@
 ---
 work_package_id: WP01
 title: Gate Payload Models & Public API
-lane: "done"
+lane: done
 dependencies: []
 base_branch: main
 base_commit: c817180e5bf8c3f5416f7ec6f4a7bcbb64851ae5
@@ -15,9 +15,9 @@ subtasks:
 phase: Phase 1 - Foundation
 assignee: ''
 agent: ''
-shell_pid: "50177"
-review_status: "approved"
-reviewed_by: "Robert Douglass"
+shell_pid: '50177'
+review_status: approved
+reviewed_by: Robert Douglass
 history:
 - timestamp: '2026-02-07T00:00:00Z'
   lane: planned

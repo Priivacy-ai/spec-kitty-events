@@ -1,7 +1,7 @@
 ---
 work_package_id: WP04
 title: Tests (Conformance + Reducer)
-lane: "done"
+lane: done
 dependencies:
 - WP02
 - WP03
@@ -17,10 +17,10 @@ subtasks:
 - T025
 phase: Phase 2 - Validation
 assignee: ''
-agent: "coordinator"
-shell_pid: "31414"
-review_status: "approved"
-reviewed_by: "Robert Douglass"
+agent: coordinator
+shell_pid: '31414'
+review_status: approved
+reviewed_by: Robert Douglass
 history:
 - timestamp: '2026-02-21T14:00:00Z'
   lane: planned

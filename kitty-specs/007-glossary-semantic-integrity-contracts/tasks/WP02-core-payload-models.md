@@ -1,7 +1,7 @@
 ---
 work_package_id: WP02
 title: Core Payload Models — Scope, Term, Sense, Strictness
-lane: "done"
+lane: done
 dependencies: [WP01]
 base_branch: 007-glossary-semantic-integrity-contracts-WP01
 base_commit: b784a988a468e02443875607213646fa89a9a4bc
@@ -14,10 +14,10 @@ subtasks:
 - T009
 phase: Phase 1 - Payload Models
 assignee: ''
-agent: "claude-opus"
-shell_pid: "19899"
-review_status: "approved"
-reviewed_by: "Robert Douglass"
+agent: claude-opus
+shell_pid: '19899'
+review_status: approved
+reviewed_by: Robert Douglass
 history:
 - timestamp: '2026-02-16T12:00:00Z'
   lane: planned

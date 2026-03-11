@@ -1,7 +1,7 @@
 ---
 work_package_id: WP01
 title: Event Envelope Extension + Test Migration
-lane: "done"
+lane: done
 dependencies: []
 base_branch: main
 base_commit: 3de3d25be62a16aa64f308cd90983ff668b81ae6
@@ -9,8 +9,8 @@ created_at: '2026-02-09T11:37:20.985808+00:00'
 subtasks: [T001, T002, T003, T004, T005, T006, T007]
 agent: claude-opus
 shell_pid: '8128'
-reviewed_by: "Robert Douglass"
-review_status: "approved"
+review_status: approved
+reviewed_by: Robert Douglass
 history:
 - date: '2026-02-09'
   agent: claude-opus

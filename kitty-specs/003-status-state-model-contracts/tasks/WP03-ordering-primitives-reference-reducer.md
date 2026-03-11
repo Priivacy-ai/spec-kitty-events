@@ -1,7 +1,7 @@
 ---
 work_package_id: WP03
 title: Ordering Primitives and Reference Reducer
-lane: "done"
+lane: done
 dependencies: []
 base_branch: main
 base_commit: 20112f62248c9c9a7a0203b735453fb08a7faba6
@@ -15,10 +15,10 @@ subtasks:
 - T018
 phase: Phase 2 - Ordering and Reduction
 assignee: ''
-agent: "claude-opus"
-shell_pid: "41460"
-review_status: "approved"
-reviewed_by: "Robert Douglass"
+agent: claude-opus
+shell_pid: '41460'
+review_status: approved
+reviewed_by: Robert Douglass
 history:
 - timestamp: '2026-02-08T00:00:00Z'
   lane: planned

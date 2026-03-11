@@ -1,7 +1,7 @@
 ---
 work_package_id: WP03
 title: Gate & Clarification Payload Models
-lane: "done"
+lane: done
 dependencies: [WP02]
 base_branch: 007-glossary-semantic-integrity-contracts-WP02
 base_commit: 421824f411e5452ce78bc91a713e6960e4a0a4ab
@@ -13,10 +13,10 @@ subtasks:
 - T013
 phase: Phase 1 - Payload Models
 assignee: ''
-agent: "claude-opus"
-shell_pid: "21232"
-review_status: "approved"
-reviewed_by: "Robert Douglass"
+agent: claude-opus
+shell_pid: '21232'
+review_status: approved
+reviewed_by: Robert Douglass
 history:
 - timestamp: '2026-02-16T12:00:00Z'
   lane: planned

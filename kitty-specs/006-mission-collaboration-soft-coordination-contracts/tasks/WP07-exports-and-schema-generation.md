@@ -1,7 +1,7 @@
 ---
 work_package_id: WP07
 title: Exports and Schema Generation
-lane: "done"
+lane: done
 dependencies: [WP06]
 base_branch: 006-mission-collaboration-soft-coordination-contracts-WP06
 base_commit: dc1e5a5c78a3af8ec033970101289c108f0989ab
@@ -14,10 +14,10 @@ subtasks:
 - T042
 phase: Phase 3 - Integration
 assignee: ''
-agent: "claude-coordinator"
-shell_pid: "86895"
-review_status: "approved"
-reviewed_by: "Robert Douglass"
+agent: claude-coordinator
+shell_pid: '86895'
+review_status: approved
+reviewed_by: Robert Douglass
 history:
 - timestamp: '2026-02-15T10:35:14Z'
   lane: planned

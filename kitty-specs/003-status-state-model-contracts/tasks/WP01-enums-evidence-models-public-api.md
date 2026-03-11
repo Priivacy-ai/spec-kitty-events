@@ -1,7 +1,7 @@
 ---
 work_package_id: WP01
 title: Enums, Evidence Models, and Public API
-lane: "done"
+lane: done
 dependencies: []
 base_branch: main
 base_commit: 6d27fb7938b32b7b9f004ccb5bf29c82f80030d0
@@ -16,10 +16,10 @@ subtasks:
 - T007
 phase: Phase 1 - Foundation
 assignee: ''
-agent: "claude-opus-reviewer"
-shell_pid: "40473"
-review_status: "approved"
-reviewed_by: "Robert Douglass"
+agent: claude-opus-reviewer
+shell_pid: '40473'
+review_status: approved
+reviewed_by: Robert Douglass
 history:
 - timestamp: '2026-02-08T00:00:00Z'
   lane: planned

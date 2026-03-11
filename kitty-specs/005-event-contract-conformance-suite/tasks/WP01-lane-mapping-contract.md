@@ -1,16 +1,16 @@
 ---
 work_package_id: WP01
 title: Lane Mapping Contract
-lane: "done"
+lane: done
 dependencies: []
 base_branch: main
 base_commit: 1c16bd2a704cc44184e768fda496a645fe9356b1
 created_at: '2026-02-12T10:21:10.782442+00:00'
 subtasks: [T001, T002, T003, T004, T005, T006]
-shell_pid: "55462"
-agent: "codex"
-reviewed_by: "Robert Douglass"
-review_status: "approved"
+agent: codex
+shell_pid: '55462'
+review_status: approved
+reviewed_by: Robert Douglass
 history:
 - date: '2026-02-12'
   action: created

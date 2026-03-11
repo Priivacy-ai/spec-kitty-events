@@ -1,7 +1,7 @@
 ---
 work_package_id: WP05
 title: Final Verification & Changelog
-lane: "done"
+lane: done
 dependencies: [WP04]
 base_branch: 008-mission-dossier-parity-event-contracts-WP04
 base_commit: e445fb7bb2c1dabe66f12ede35b99932ad7d8a7e
@@ -14,10 +14,10 @@ subtasks:
 - T030
 phase: Phase 2 - Release Gate
 assignee: ''
-agent: "coordinator"
-shell_pid: "41748"
-review_status: "approved"
-reviewed_by: "Robert Douglass"
+agent: coordinator
+shell_pid: '41748'
+review_status: approved
+reviewed_by: Robert Douglass
 history:
 - timestamp: '2026-02-21T14:00:00Z'
   lane: planned

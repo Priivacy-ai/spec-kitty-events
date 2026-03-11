@@ -1,7 +1,7 @@
 ---
 work_package_id: WP01
 title: Core Model & Version Bump
-lane: "done"
+lane: done
 dependencies: []
 base_branch: main
 base_commit: 26692accdfc21c2cb56ff84a728e8c1e87d45e46
@@ -14,10 +14,10 @@ subtasks:
 - T005
 phase: Phase 0 - Foundation
 assignee: ''
-agent: "claude-opus"
-shell_pid: "19446"
-review_status: "approved"
-reviewed_by: "Robert Douglass"
+agent: claude-opus
+shell_pid: '19446'
+review_status: approved
+reviewed_by: Robert Douglass
 history:
 - timestamp: '2026-02-07T00:00:00Z'
   lane: planned

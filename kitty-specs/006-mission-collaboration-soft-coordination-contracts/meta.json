@@ -6,5 +6,6 @@
   "source_description": "Add 14 typed event payloads, schemas, exports, and reducer semantics for N-participant mission collaboration with advisory (soft) coordination. Contract authority for CLI and SaaS consumers. Sprint S1/M1 Step 1.",
   "created_at": "2026-02-15T00:00:00Z",
   "target_branch": "main",
-  "vcs": "git"
+  "vcs": "git",
+  "feature_slug": "006-mission-collaboration-soft-coordination-contracts"
 }

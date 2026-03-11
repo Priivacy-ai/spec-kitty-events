@@ -1,7 +1,7 @@
 ---
 work_package_id: WP02
 title: Update All Tests
-lane: "done"
+lane: done
 dependencies: [WP01]
 base_branch: 001-event-model-project-identity-WP01
 base_commit: 517c99c138c27cc72fe7e59ad175e59524de0344
@@ -16,10 +16,10 @@ subtasks:
 - T012
 phase: Phase 1 - Implementation
 assignee: ''
-agent: "claude-opus"
-shell_pid: "27795"
-review_status: "approved"
-reviewed_by: "Robert Douglass"
+agent: claude-opus
+shell_pid: '27795'
+review_status: approved
+reviewed_by: Robert Douglass
 history:
 - timestamp: '2026-02-07T00:00:00Z'
   lane: planned

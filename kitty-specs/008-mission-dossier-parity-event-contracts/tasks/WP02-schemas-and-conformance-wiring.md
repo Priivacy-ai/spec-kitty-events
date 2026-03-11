@@ -1,7 +1,7 @@
 ---
 work_package_id: WP02
 title: Schemas & Conformance Wiring
-lane: "done"
+lane: done
 dependencies: [WP01]
 base_branch: 008-mission-dossier-parity-event-contracts-WP01
 base_commit: e635a19b1f84dda242d2261804d43ba36359fcd0
@@ -16,10 +16,10 @@ subtasks:
 - T013
 phase: Phase 1 - Foundation
 assignee: ''
-agent: "coordinator"
-shell_pid: "16446"
-review_status: "approved"
-reviewed_by: "Robert Douglass"
+agent: coordinator
+shell_pid: '16446'
+review_status: approved
+reviewed_by: Robert Douglass
 history:
 - timestamp: '2026-02-21T14:00:00Z'
   lane: planned

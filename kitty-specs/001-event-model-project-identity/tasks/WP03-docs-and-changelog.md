@@ -1,7 +1,7 @@
 ---
 work_package_id: WP03
 title: Documentation & Changelog
-lane: "done"
+lane: done
 dependencies: [WP01]
 base_branch: 001-event-model-project-identity-WP01
 base_commit: 517c99c138c27cc72fe7e59ad175e59524de0344
@@ -13,10 +13,10 @@ subtasks:
 - T016
 phase: Phase 2 - Polish
 assignee: ''
-agent: "claude-opus"
-shell_pid: "28647"
-review_status: "approved"
-reviewed_by: "Robert Douglass"
+agent: claude-opus
+shell_pid: '28647'
+review_status: approved
+reviewed_by: Robert Douglass
 history:
 - timestamp: '2026-02-07T00:00:00Z'
   lane: planned

@@ -2,8 +2,9 @@
   "event_count": 16,
   "feature_slug": "012-wp04-events-connector-sync-contracts",
   "last_event_id": "01KJFMAP03A1NFPH584Y3TKBV3",
-  "materialized_at": "2026-02-27T13:24:07.811432+00:00",
+  "materialized_at": "2026-03-11T07:08:27.745896+00:00",
   "summary": {
+    "approved": 0,
     "blocked": 0,
     "canceled": 0,
     "claimed": 0,

@@ -1,7 +1,7 @@
 ---
 work_package_id: WP03
 title: Version Bump & Changelog
-lane: "done"
+lane: done
 dependencies:
 - WP01
 base_branch: main
@@ -14,9 +14,9 @@ subtasks:
 phase: Phase 2 - Release Prep
 assignee: ''
 agent: ''
-shell_pid: "52812"
-review_status: "approved"
-reviewed_by: "Robert Douglass"
+shell_pid: '52812'
+review_status: approved
+reviewed_by: Robert Douglass
 history:
 - timestamp: '2026-02-07T00:00:00Z'
   lane: planned

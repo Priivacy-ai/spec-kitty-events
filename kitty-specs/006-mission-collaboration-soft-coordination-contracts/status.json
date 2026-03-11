@@ -2,8 +2,9 @@
   "event_count": 9,
   "feature_slug": "006-mission-collaboration-soft-coordination-contracts",
   "last_event_id": "01KJ5V2V8T1RAT6E7ZZ1PE6B2Q",
-  "materialized_at": "2026-02-23T18:09:46.778848+00:00",
+  "materialized_at": "2026-03-11T07:08:27.312878+00:00",
   "summary": {
+    "approved": 0,
     "blocked": 0,
     "canceled": 0,
     "claimed": 0,

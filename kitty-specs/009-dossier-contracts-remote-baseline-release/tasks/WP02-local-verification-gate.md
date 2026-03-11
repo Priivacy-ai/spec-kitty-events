@@ -1,7 +1,7 @@
 ---
 work_package_id: WP02
 title: Local Verification Gate
-lane: "done"
+lane: done
 dependencies:
 - WP01
 base_branch: 2.x

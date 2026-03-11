@@ -1,7 +1,7 @@
 ---
 work_package_id: WP01
 title: Connector and Sync Models, Constants, Schemas, Validators, Reducers
-lane: "done"
+lane: done
 dependencies: []
 base_branch: codex/wp04-events-connector-sync-contracts
 base_commit: b208aad4aaa4fdce08c1fdca1681134b54331d6c

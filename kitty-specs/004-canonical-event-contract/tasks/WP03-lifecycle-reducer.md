@@ -1,7 +1,7 @@
 ---
 work_package_id: WP03
 title: Lifecycle Reducer + Precedence Rules
-lane: "done"
+lane: done
 dependencies: []
 base_branch: 004-canonical-event-contract-WP02
 base_commit: 2cbbcb8e80e7d85853b0e984ad8d29f0a32ce61f
@@ -9,8 +9,8 @@ created_at: '2026-02-09T11:46:09.591389+00:00'
 subtasks: [T014, T015, T016, T017, T018, T019, T020]
 agent: claude-opus
 shell_pid: '18661'
-reviewed_by: "Robert Douglass"
-review_status: "approved"
+review_status: approved
+reviewed_by: Robert Douglass
 history:
 - date: '2026-02-09'
   agent: claude-opus

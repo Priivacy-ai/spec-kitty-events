@@ -1,7 +1,7 @@
 ---
 work_package_id: WP06
 title: Reducer — Checks, Clarifications, Blocks & Assembly
-lane: "done"
+lane: done
 dependencies: [WP05]
 base_branch: 007-glossary-semantic-integrity-contracts-WP05
 base_commit: 7126c08de30c59ad7421e93d1b514aabd77cd2ab
@@ -15,10 +15,10 @@ subtasks:
 - T030
 phase: Phase 2 - Reducer Implementation
 assignee: ''
-agent: "claude-opus"
-shell_pid: "24697"
-review_status: "approved"
-reviewed_by: "Robert Douglass"
+agent: claude-opus
+shell_pid: '24697'
+review_status: approved
+reviewed_by: Robert Douglass
 history:
 - timestamp: '2026-02-16T12:00:00Z'
   lane: planned

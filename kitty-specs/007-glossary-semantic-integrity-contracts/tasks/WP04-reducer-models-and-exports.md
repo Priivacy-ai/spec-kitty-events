@@ -1,7 +1,7 @@
 ---
 work_package_id: WP04
 title: Reducer Output Models & Exports
-lane: "done"
+lane: done
 dependencies: [WP03]
 base_branch: 007-glossary-semantic-integrity-contracts-WP03
 base_commit: b16d591b8f032989376528aa0ed974102c513e36
@@ -14,10 +14,10 @@ subtasks:
 - T018
 phase: Phase 1 - Payload Models
 assignee: ''
-agent: "claude-opus"
-shell_pid: "22012"
-review_status: "approved"
-reviewed_by: "Robert Douglass"
+agent: claude-opus
+shell_pid: '22012'
+review_status: approved
+reviewed_by: Robert Douglass
 history:
 - timestamp: '2026-02-16T12:00:00Z'
   lane: planned

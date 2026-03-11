@@ -140,3 +140,10 @@
 | T011       | Bump version to 0.2.0-alpha                                 | WP03        | P3       | Yes       |
 | T012       | Update CHANGELOG.md                                         | WP03        | P3       | Yes       |
 | T013       | Validate quickstart.md examples                             | WP03        | P3       | No        |
+
+<!-- status-model:start -->
+## Canonical Status (Generated)
+- WP01: done
+- WP02: done
+- WP03: done
+<!-- status-model:end -->

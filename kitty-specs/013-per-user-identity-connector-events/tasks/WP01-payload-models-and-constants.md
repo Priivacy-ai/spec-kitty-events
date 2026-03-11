@@ -1,7 +1,7 @@
 ---
 work_package_id: WP01
 title: Payload Models & Constants
-lane: "done"
+lane: done
 dependencies: []
 base_branch: 2.x
 base_commit: 4dda9d5509284bd062cdfe1ebfe5e0faca37f22e
@@ -16,8 +16,8 @@ phase: Phase 1 - Foundation
 assignee: ''
 agent: claude-opus-reviewer
 shell_pid: '37263'
-review_status: "approved"
-reviewed_by: "Robert Douglass"
+review_status: approved
+reviewed_by: Robert Douglass
 review_feedback: feedback://013-per-user-identity-connector-events/WP01/20260305T161214Z-b89988d9.md
 history:
 - timestamp: '2026-03-05T11:15:54Z'

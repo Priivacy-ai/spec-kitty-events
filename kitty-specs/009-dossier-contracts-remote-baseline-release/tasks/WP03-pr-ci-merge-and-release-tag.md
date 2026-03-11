@@ -1,7 +1,7 @@
 ---
 work_package_id: WP03
 title: PR, CI Gate, Merge & Release Tag
-lane: "done"
+lane: done
 dependencies:
 - WP02
 base_branch: 2.x

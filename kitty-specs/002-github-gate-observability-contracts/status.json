@@ -2,8 +2,9 @@
   "event_count": 3,
   "feature_slug": "002-github-gate-observability-contracts",
   "last_event_id": "01KJ5V2V7ANZ7A0AKP3Y2526MK",
-  "materialized_at": "2026-02-23T18:09:46.731002+00:00",
+  "materialized_at": "2026-03-11T07:08:26.903502+00:00",
   "summary": {
+    "approved": 0,
     "blocked": 0,
     "canceled": 0,
     "claimed": 0,

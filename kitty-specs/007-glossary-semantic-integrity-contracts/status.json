@@ -2,8 +2,9 @@
   "event_count": 10,
   "feature_slug": "007-glossary-semantic-integrity-contracts",
   "last_event_id": "01KJCYB3HM8PC902TZV1CVZZPH",
-  "materialized_at": "2026-02-26T12:21:24.149238+00:00",
+  "materialized_at": "2026-03-11T07:08:27.410234+00:00",
   "summary": {
+    "approved": 0,
     "blocked": 0,
     "canceled": 0,
     "claimed": 0,

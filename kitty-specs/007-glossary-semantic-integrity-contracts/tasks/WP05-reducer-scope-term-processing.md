@@ -1,7 +1,7 @@
 ---
 work_package_id: WP05
 title: Reducer — Scope, Strictness & Term Processing
-lane: "done"
+lane: done
 dependencies: [WP04]
 base_branch: 007-glossary-semantic-integrity-contracts-WP04
 base_commit: 1cc294fbe6cea88e0fcd6f32bc53645a7db5cb4d
@@ -15,10 +15,10 @@ subtasks:
 - T024
 phase: Phase 2 - Reducer Implementation
 assignee: ''
-agent: "claude-opus"
-shell_pid: "22994"
-review_status: "approved"
-reviewed_by: "Robert Douglass"
+agent: claude-opus
+shell_pid: '22994'
+review_status: approved
+reviewed_by: Robert Douglass
 history:
 - timestamp: '2026-02-16T12:00:00Z'
   lane: planned
