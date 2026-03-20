@@ -3,9 +3,9 @@
 # DO NOT EDIT MANUALLY
 
 spec_kitty:
-  version: 2.0.9
+  version: 2.0.11
   initialized_at: '2026-02-07T07:46:50.090112'
-  last_upgraded_at: '2026-03-15T11:38:52.583882'
+  last_upgraded_at: '2026-03-20T22:43:55.034786'
 environment:
   python_version: 3.11.14
   platform: darwin
@@ -41,3 +41,8 @@ migrations:
     applied_at: '2026-03-11T08:08:27.842394'
     result: skipped
     notes: Not applicable
+  - id: 2.0.9_state_gitignore
+    applied_at: '2026-03-20T22:43:55.032152'
+    result: success
+    notes: 'Added runtime state entries to .gitignore: .kittify/runtime/, .kittify/merge-state.json,
+      .kittify/events/, .kittify/dossiers/, kitty-specs/**/.kittify/dossiers/'
