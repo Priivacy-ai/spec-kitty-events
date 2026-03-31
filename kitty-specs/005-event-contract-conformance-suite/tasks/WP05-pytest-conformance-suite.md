@@ -1,20 +1,22 @@
 ---
 work_package_id: WP05
 title: Pytest Conformance Entry Point
-lane: done
 dependencies: [WP04]
 base_branch: 005-event-contract-conformance-suite-WP04
 base_commit: 4d24abae1e2bbc4607685370ae08d4a0714efbae
 created_at: '2026-02-12T11:10:00.164040+00:00'
 subtasks: [T029, T030, T031, T032, T033]
-agent: codex
-shell_pid: '11015'
-review_status: approved
-reviewed_by: Robert Douglass
 history:
 - date: '2026-02-12'
   action: created
   by: spec-kitty.tasks
+authoritative_surface: ''
+execution_mode: code_change
+mission_id: 01KN233MAZ48PRQRGCNZQJRTQY
+owned_files:
+- src/spec_kitty_events/**
+- tests/*/**
+wp_code: WP05
 ---
 
 # WP05 — Pytest Conformance Entry Point

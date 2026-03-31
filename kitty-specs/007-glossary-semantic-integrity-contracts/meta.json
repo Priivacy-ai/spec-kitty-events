@@ -7,5 +7,6 @@
   "created_at": "2026-02-16T00:00:00Z",
   "target_branch": "2.x",
   "vcs": "git",
-  "feature_slug": "007-glossary-semantic-integrity-contracts"
+  "feature_slug": "007-glossary-semantic-integrity-contracts",
+  "mission_id": "01KN233MAZ48PRQRGCNZQJRTR0"
 }

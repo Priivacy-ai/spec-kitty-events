@@ -1,7 +1,6 @@
 ---
 work_package_id: WP01
 title: Gate Payload Models & Public API
-lane: done
 dependencies: []
 base_branch: main
 base_commit: c817180e5bf8c3f5416f7ec6f4a7bcbb64851ae5
@@ -13,17 +12,24 @@ subtasks:
 - T004
 - T005
 phase: Phase 1 - Foundation
-assignee: ''
-agent: ''
-shell_pid: '50177'
-review_status: approved
-reviewed_by: Robert Douglass
 history:
 - timestamp: '2026-02-07T00:00:00Z'
   lane: planned
   agent: system
   shell_pid: ''
   action: Prompt generated via /spec-kitty.tasks
+authoritative_surface: ''
+execution_mode: code_change
+mission_id: 01KN233MAYW3KW9RDF2XACZQJZ
+owned_files:
+- kitty-specs/002-github-gate-observability-contracts/contracts/gates-api.md
+- kitty-specs/002-github-gate-observability-contracts/data-model.md
+- kitty-specs/002-github-gate-observability-contracts/plan.md
+- kitty-specs/002-github-gate-observability-contracts/spec.md
+- src/spec_kitty_events/__init__.py
+- src/spec_kitty_events/gates.py
+- src/spec_kitty_events/models.py
+wp_code: WP01
 ---
 
 # Work Package Prompt: WP01 – Gate Payload Models & Public API

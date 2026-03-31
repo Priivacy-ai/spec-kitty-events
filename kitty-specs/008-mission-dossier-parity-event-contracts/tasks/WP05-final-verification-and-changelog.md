@@ -1,7 +1,6 @@
 ---
 work_package_id: WP05
 title: Final Verification & Changelog
-lane: done
 dependencies: [WP04]
 base_branch: 008-mission-dossier-parity-event-contracts-WP04
 base_commit: e445fb7bb2c1dabe66f12ede35b99932ad7d8a7e
@@ -13,17 +12,20 @@ subtasks:
 - T029
 - T030
 phase: Phase 2 - Release Gate
-assignee: ''
-agent: coordinator
-shell_pid: '41748'
-review_status: approved
-reviewed_by: Robert Douglass
 history:
 - timestamp: '2026-02-21T14:00:00Z'
   lane: planned
   agent: system
   shell_pid: ''
   action: Prompt generated via /spec-kitty.tasks
+authoritative_surface: ''
+execution_mode: code_change
+mission_id: 01KN233MAZ48PRQRGCNZQJRTR1
+owned_files:
+- src/spec_kitty_events/**
+- tests/test_dossier_conformance.py
+- tests/test_dossier_reducer.py
+wp_code: WP05
 ---
 
 # Work Package Prompt: WP05 – Final Verification & Changelog

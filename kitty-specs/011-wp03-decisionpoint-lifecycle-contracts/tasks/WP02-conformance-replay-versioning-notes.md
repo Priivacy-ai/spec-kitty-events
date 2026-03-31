@@ -1,21 +1,30 @@
 ---
 work_package_id: WP02
 title: DecisionPoint Conformance, Replay Determinism, Versioning, and Downstream Notes
-lane: done
 dependencies:
 - WP01
-base_branch: 011-wp03-decisionpoint-lifecycle-contracts-WP01
-base_commit: 28c480c2203b1e73db29db8502f3dd3a85b2360e
-created_at: '2026-02-27T11:31:10.629612+00:00'
-agent: codex
-shell_pid: '54810'
-review_status: has_feedback
-reviewed_by: Robert Douglass
 requirement_refs:
 - FR-004
 - FR-005
 - FR-006
+base_branch: 011-wp03-decisionpoint-lifecycle-contracts-WP01
+base_commit: 28c480c2203b1e73db29db8502f3dd3a85b2360e
+created_at: '2026-02-27T11:31:10.629612+00:00'
+authoritative_surface: ''
+execution_mode: code_change
+mission_id: 01KN233MB1GVMCSS9KCNPN6P28
+owned_files:
+- src/spec_kitty_events/__init__.py
+- src/spec_kitty_events/conformance/fixtures/decisionpoint/**/**
+- src/spec_kitty_events/conformance/fixtures/decisionpoint/{valid,invalid,replay}/**
+- src/spec_kitty_events/conformance/fixtures/manifest.json
+- src/spec_kitty_events/conformance/loader.py
+- src/spec_kitty_events/conformance/validators.py
+- src/spec_kitty_events/schemas/generate.py
+- tests/property/test_decisionpoint_determinism.py
+- tests/test_decisionpoint_conformance.py
 review_feedback_file: /private/var/folders/gj/bxx0438j003b20kn5b6s7bsh0000gn/T/spec-kitty-review-feedback-WP02.md
+wp_code: WP02
 ---
 
 # Work Package Prompt: WP02 - DecisionPoint Conformance, Replay Determinism, Versioning, and Downstream Notes

@@ -1,7 +1,6 @@
 ---
 work_package_id: WP03
 title: Ordering Primitives and Reference Reducer
-lane: done
 dependencies: []
 base_branch: main
 base_commit: 20112f62248c9c9a7a0203b735453fb08a7faba6
@@ -14,17 +13,27 @@ subtasks:
 - T017
 - T018
 phase: Phase 2 - Ordering and Reduction
-assignee: ''
-agent: claude-opus
-shell_pid: '41460'
-review_status: approved
-reviewed_by: Robert Douglass
 history:
 - timestamp: '2026-02-08T00:00:00Z'
   lane: planned
   agent: system
   shell_pid: ''
   action: Prompt generated via /spec-kitty.tasks
+authoritative_surface: ''
+execution_mode: code_change
+mission_id: 01KN233MAYW3KW9RDF2XACZQK0
+owned_files:
+- kitty-specs/003-status-state-model-contracts/contracts/status-api.md
+- kitty-specs/003-status-state-model-contracts/data-model.md
+- kitty-specs/003-status-state-model-contracts/plan.md
+- kitty-specs/003-status-state-model-contracts/research.md
+- src/spec_kitty_events/__init__.py
+- src/spec_kitty_events/status.py
+- tests/property/test_determinism.py
+- tests/property/test_gates_determinism.py
+- tests/property/test_status_determinism.py
+- tests/unit/test_status.py
+wp_code: WP03
 ---
 
 # Work Package Prompt: WP03 – Ordering Primitives and Reference Reducer

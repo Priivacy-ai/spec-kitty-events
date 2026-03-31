@@ -1,21 +1,32 @@
 ---
 work_package_id: WP02
 title: Conformance Fixtures, Replay Scenarios, Compatibility Notes, Tests
-lane: done
 dependencies:
 - WP01
-base_branch: codex/wp04-events-connector-sync-contracts
-base_commit: 87248791e64edefcdc7512e459c2f14efa76e675
-created_at: '2026-02-27T12:53:08.624785+00:00'
-agent: claude
-shell_pid: '54810'
-review_status: has_feedback
-reviewed_by: Robert Douglass
 requirement_refs:
 - FR-008
 - FR-009
 - FR-010
+base_branch: codex/wp04-events-connector-sync-contracts
+base_commit: 87248791e64edefcdc7512e459c2f14efa76e675
+created_at: '2026-02-27T12:53:08.624785+00:00'
+authoritative_surface: ''
+execution_mode: code_change
+mission_id: 01KN233MB1GVMCSS9KCNPN6P29
+owned_files:
+- src/spec_kitty_events/__init__.py
+- src/spec_kitty_events/conformance/fixtures/connector/**
+- src/spec_kitty_events/conformance/fixtures/manifest.json
+- src/spec_kitty_events/conformance/fixtures/sync/**
+- src/spec_kitty_events/conformance/loader.py
+- src/spec_kitty_events/conformance/validators.py
+- src/spec_kitty_events/schemas/generate.py
+- tests/property/test_connector_determinism.py
+- tests/property/test_sync_determinism.py
+- tests/test_connector_conformance.py
+- tests/test_sync_conformance.py
 review_feedback_file: /Users/robert/ClaudeCowork/Spec-Kitty-Cowork/spec-kitty-events/.worktrees/012-wp04-events-connector-sync-contracts-WP02/WP02_review_feedback.md
+wp_code: WP02
 ---
 
 # Work Package Prompt: WP02 - Conformance Fixtures, Replay Scenarios, Compatibility Notes, Tests

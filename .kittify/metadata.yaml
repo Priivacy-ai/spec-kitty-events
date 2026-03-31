@@ -5,7 +5,14 @@
 spec_kitty:
   version: 2.1.4
   initialized_at: '2026-02-07T07:46:50.090112'
-  last_upgraded_at: '2026-03-30T17:50:01.952551'
+  last_upgraded_at: '2026-03-31T14:00:10.497076+00:00'
+  project_uuid: 01KN233MARVT54HH1MD1A10CNV
+  schema_version: 3
+  schema_capabilities:
+  - canonical_context
+  - event_log_authority
+  - ownership_manifest
+  - thin_shims
 environment:
   python_version: 3.11.14
   platform: darwin
@@ -19,24 +26,7 @@ migrations:
   - id: 2.0.6_consistency_sweep
     applied_at: '2026-03-11T08:08:27.838621'
     result: success
-    notes: 'migrated 0 identical and 79 customized legacy runtime asset(s); 001-event-model-project-identity:
-      wrote baseline meta.json; 001-event-model-project-identity: normalized 3 work
-      package files; 002-github-gate-observability-contracts: wrote baseline meta.json;
-      002-github-gate-observability-contracts: normalized 3 work package files; 003-status-state-model-contracts:
-      wrote baseline meta.json; 003-status-state-model-contracts: normalized 4 work
-      package files; 004-canonical-event-contract: wrote baseline meta.json; 004-canonical-event-contract:
-      normalized 4 work package files; 005-event-contract-conformance-suite: wrote
-      baseline meta.json; 005-event-contract-conformance-suite: normalized 7 work
-      package files; 006-mission-collaboration-soft-coordination-contracts: wrote
-      baseline meta.json; 006-mission-collaboration-soft-coordination-contracts: normalized
-      9 work package files; 007-glossary-semantic-integrity-contracts: wrote baseline
-      meta.json; 007-glossary-semantic-integrity-contracts: normalized 10 work package
-      files; 008-mission-dossier-parity-event-contracts: normalized 5 work package
-      files; 009-dossier-contracts-remote-baseline-release: normalized 3 work package
-      files; 010-mission-audit-lifecycle-contracts: normalized 4 work package files;
-      011-wp03-decisionpoint-lifecycle-contracts: normalized 2 work package files;
-      012-wp04-events-connector-sync-contracts: normalized 2 work package files; 013-per-user-identity-connector-events:
-      normalized 3 work package files'
+    notes: 'migrated 0 identical and 79 customized legacy runtime asset(s); 001-event-model-project-identity: wrote baseline meta.json; 001-event-model-project-identity: normalized 3 work package files; 002-github-gate-observability-contracts: wrote baseline meta.json; 002-github-gate-observability-contracts: normalized 3 work package files; 003-status-state-model-contracts: wrote baseline meta.json; 003-status-state-model-contracts: normalized 4 work package files; 004-canonical-event-contract: wrote baseline meta.json; 004-canonical-event-contract: normalized 4 work package files; 005-event-contract-conformance-suite: wrote baseline meta.json; 005-event-contract-conformance-suite: normalized 7 work package files; 006-mission-collaboration-soft-coordination-contracts: wrote baseline meta.json; 006-mission-collaboration-soft-coordination-contracts: normalized 9 work package files; 007-glossary-semantic-integrity-contracts: wrote baseline meta.json; 007-glossary-semantic-integrity-contracts: normalized 10 work package files; 008-mission-dossier-parity-event-contracts: normalized 5 work package files; 009-dossier-contracts-remote-baseline-release: normalized 3 work package files; 010-mission-audit-lifecycle-contracts: normalized 4 work package files; 011-wp03-decisionpoint-lifecycle-contracts: normalized 2 work package files; 012-wp04-events-connector-sync-contracts: normalized 2 work package files; 013-per-user-identity-connector-events: normalized 3 work package files'
   - id: 2.0.7_fix_stale_overrides
     applied_at: '2026-03-11T08:08:27.842394'
     result: skipped
@@ -44,17 +34,15 @@ migrations:
   - id: 2.0.9_state_gitignore
     applied_at: '2026-03-20T22:43:55.032152'
     result: success
-    notes: 'Added runtime state entries to .gitignore: .kittify/runtime/, .kittify/merge-state.json,
-      .kittify/events/, .kittify/dossiers/, kitty-specs/**/.kittify/dossiers/'
+    notes: 'Added runtime state entries to .gitignore: .kittify/runtime/, .kittify/merge-state.json, .kittify/events/, .kittify/dossiers/, kitty-specs/**/.kittify/dossiers/'
   - id: 2.0.11_install_skills
     applied_at: '2026-03-21T14:01:33.776013'
     result: success
-    notes: null
+    notes:
   - id: 2.0.11_remove_clarify_command
     applied_at: '2026-03-21T14:01:33.779307'
     result: success
-    notes: 'Removed: .claude/commands/spec-kitty.clarify.md; Removed: .codex/prompts/spec-kitty.clarify.md;
-      Removed 2 clarify command artifacts'
+    notes: 'Removed: .claude/commands/spec-kitty.clarify.md; Removed: .codex/prompts/spec-kitty.clarify.md; Removed 2 clarify command artifacts'
   - id: 2.1.1_repair_skill_pack
     applied_at: '2026-03-21T15:02:29.723675'
     result: success
@@ -78,16 +66,11 @@ migrations:
   - id: 2.1.2_install_git_workflow_skill
     applied_at: '2026-03-27T14:33:04.084173'
     result: success
-    notes: Installed .claude/skills/spec-kitty-git-workflow/SKILL.md; Installed .claude/skills/spec-kitty-git-workflow/references/git-operations-matrix.md;
-      Installed .agents/skills/spec-kitty-git-workflow/SKILL.md; Installed .agents/skills/spec-kitty-git-workflow/references/git-operations-matrix.md;
-      Installed .codex/skills/spec-kitty-git-workflow/SKILL.md; Installed .codex/skills/spec-kitty-git-workflow/references/git-operations-matrix.md
+    notes: Installed .claude/skills/spec-kitty-git-workflow/SKILL.md; Installed .claude/skills/spec-kitty-git-workflow/references/git-operations-matrix.md; Installed .agents/skills/spec-kitty-git-workflow/SKILL.md; Installed .agents/skills/spec-kitty-git-workflow/references/git-operations-matrix.md; Installed .codex/skills/spec-kitty-git-workflow/SKILL.md; Installed .codex/skills/spec-kitty-git-workflow/references/git-operations-matrix.md
   - id: 2.1.2_install_mission_system_skill
     applied_at: '2026-03-27T14:33:04.088517'
     result: success
-    notes: Installed .claude/skills/spec-kitty-mission-system/SKILL.md; Installed
-      .claude/skills/spec-kitty-mission-system/references/mission-comparison-matrix.md;
-      Installed .agents/skills/spec-kitty-mission-system/SKILL.md; Installed .agents/skills/spec-kitty-mission-system/references/mission-comparison-matrix.md;
-      Installed .codex/skills/spec-kitty-mission-system/SKILL.md; Installed .codex/skills/spec-kitty-mission-system/references/mission-comparison-matrix.md
+    notes: Installed .claude/skills/spec-kitty-mission-system/SKILL.md; Installed .claude/skills/spec-kitty-mission-system/references/mission-comparison-matrix.md; Installed .agents/skills/spec-kitty-mission-system/SKILL.md; Installed .agents/skills/spec-kitty-mission-system/references/mission-comparison-matrix.md; Installed .codex/skills/spec-kitty-mission-system/SKILL.md; Installed .codex/skills/spec-kitty-mission-system/references/mission-comparison-matrix.md
   - id: 2.1.2_remove_release_skill
     applied_at: '2026-03-27T14:33:04.091833'
     result: skipped
@@ -96,3 +79,7 @@ migrations:
     applied_at: '2026-03-30T17:50:01.948733'
     result: skipped
     notes: Not applicable
+  - id: 2.1.4_enforce_command_file_state
+    applied_at: '2026-03-31T16:00:08.666744'
+    result: success
+    notes: 'Wrote prompt: .claude/commands/spec-kitty.analyze.md; Wrote prompt: .claude/commands/spec-kitty.checklist.md; Wrote prompt: .claude/commands/spec-kitty.constitution.md; Wrote prompt: .claude/commands/spec-kitty.plan.md; Wrote prompt: .claude/commands/spec-kitty.research.md; Wrote prompt: .claude/commands/spec-kitty.specify.md; Wrote prompt: .claude/commands/spec-kitty.tasks.md; Wrote prompt: .claude/commands/spec-kitty.tasks-outline.md; Wrote prompt: .claude/commands/spec-kitty.tasks-packages.md; Wrote shim: .claude/commands/spec-kitty.accept.md; Wrote shim: .claude/commands/spec-kitty.dashboard.md; Wrote shim: .claude/commands/spec-kitty.implement.md; Wrote shim: .claude/commands/spec-kitty.merge.md; Wrote shim: .claude/commands/spec-kitty.review.md; Wrote shim: .claude/commands/spec-kitty.status.md; Wrote shim: .claude/commands/spec-kitty.tasks-finalize.md'

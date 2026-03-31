@@ -1,7 +1,6 @@
 ---
 work_package_id: WP08
 title: Conformance Fixtures and Tests
-lane: done
 dependencies: [WP07]
 base_branch: 006-mission-collaboration-soft-coordination-contracts-WP07
 base_commit: 3a4f5aea7b57215afe836762312c639af5903d81
@@ -13,17 +12,24 @@ subtasks:
 - T046
 - T047
 phase: Phase 3 - Integration
-assignee: ''
-agent: claude-coordinator
-shell_pid: '88847'
-review_status: approved
-reviewed_by: Robert Douglass
 history:
 - timestamp: '2026-02-15T10:35:14Z'
   lane: planned
   agent: system
   shell_pid: ''
   action: Prompt generated via /spec-kitty.tasks
+authoritative_surface: ''
+execution_mode: code_change
+mission_id: 01KN233MAZ48PRQRGCNZQJRTQZ
+owned_files:
+- kitty-specs/006-.../research.md
+- src/spec_kitty_events/conformance/fixtures/collaboration/invalid/**
+- src/spec_kitty_events/conformance/fixtures/collaboration/valid/**
+- src/spec_kitty_events/conformance/fixtures/manifest.json
+- tests/benchmark/**
+- tests/fixtures/**
+- tests/property/**
+wp_code: WP08
 ---
 
 # Work Package Prompt: WP08 – Conformance Fixtures and Tests

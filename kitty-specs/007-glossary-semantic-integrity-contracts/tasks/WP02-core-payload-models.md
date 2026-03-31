@@ -1,7 +1,6 @@
 ---
 work_package_id: WP02
 title: Core Payload Models — Scope, Term, Sense, Strictness
-lane: done
 dependencies: [WP01]
 base_branch: 007-glossary-semantic-integrity-contracts-WP01
 base_commit: b784a988a468e02443875607213646fa89a9a4bc
@@ -13,17 +12,20 @@ subtasks:
 - T008
 - T009
 phase: Phase 1 - Payload Models
-assignee: ''
-agent: claude-opus
-shell_pid: '19899'
-review_status: approved
-reviewed_by: Robert Douglass
 history:
 - timestamp: '2026-02-16T12:00:00Z'
   lane: planned
   agent: system
   shell_pid: ''
   action: Prompt generated via /spec-kitty.tasks
+authoritative_surface: ''
+execution_mode: code_change
+mission_id: 01KN233MAZ48PRQRGCNZQJRTR0
+owned_files:
+- kitty-specs/007-glossary-semantic-integrity-contracts/contracts/glossary-events.md
+- kitty-specs/007-glossary-semantic-integrity-contracts/data-model.md
+- src/spec_kitty_events/glossary.py
+wp_code: WP02
 ---
 
 # Work Package Prompt: WP02 – Core Payload Models — Scope, Term, Sense, Strictness

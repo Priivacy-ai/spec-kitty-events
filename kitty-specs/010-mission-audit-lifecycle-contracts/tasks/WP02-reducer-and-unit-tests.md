@@ -1,7 +1,6 @@
 ---
 work_package_id: WP02
 title: Reducer Implementation + Unit Tests
-lane: done
 dependencies:
 - WP01
 base_branch: main
@@ -16,16 +15,21 @@ subtasks:
 - T010
 - T011
 phase: Phase 2 - Reducer
-assignee: ''
-agent: claude-sonnet
-shell_pid: '45969'
-review_status: approved
-reviewed_by: Robert Douglass
 history:
 - timestamp: '2026-02-25T00:00:00Z'
   lane: planned
   agent: system
   action: Prompt generated via /spec-kitty.tasks
+authoritative_surface: ''
+execution_mode: code_change
+mission_id: 01KN233MB0ZCTRZHRD4KP8A8DJ
+owned_files:
+- src/spec_kitty_events/mission_audit.py
+- tests/fixtures/mission_audit_golden/**
+- tests/property/test_mission_audit_determinism.py
+- tests/test_mission_audit_reducer.py
+- tests/unit/test_mission_audit.py
+wp_code: WP02
 ---
 
 # Work Package Prompt: WP02 – Reducer Implementation + Unit Tests

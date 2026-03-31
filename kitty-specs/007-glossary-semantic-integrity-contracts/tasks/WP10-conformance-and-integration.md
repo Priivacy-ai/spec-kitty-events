@@ -1,7 +1,6 @@
 ---
 work_package_id: WP10
 title: Conformance Fixtures & Integration Verification
-lane: done
 dependencies:
 - WP06
 base_branch: 007-glossary-semantic-integrity-contracts-WP06
@@ -15,17 +14,20 @@ subtasks:
 - T053
 - T054
 phase: Phase 4 - Conformance & Polish
-assignee: ''
-agent: claude-opus
-shell_pid: '29932'
-review_status: approved
-reviewed_by: Robert Douglass
 history:
 - timestamp: '2026-02-16T12:00:00Z'
   lane: planned
   agent: system
   shell_pid: ''
   action: Prompt generated via /spec-kitty.tasks
+authoritative_surface: ''
+execution_mode: code_change
+mission_id: 01KN233MAZ48PRQRGCNZQJRTR0
+owned_files:
+- kitty-specs/007-glossary-semantic-integrity-contracts/contracts/glossary-events.md
+- src/spec_kitty_events/**
+- tests/test_glossary_conformance.py
+wp_code: WP10
 ---
 
 # Work Package Prompt: WP10 – Conformance Fixtures & Integration Verification

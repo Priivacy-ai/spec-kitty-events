@@ -1,7 +1,6 @@
 ---
 work_package_id: WP02
 title: Transition Validation
-lane: done
 dependencies: []
 base_branch: main
 base_commit: 8f0de9b196da64a17261c5a050b82dfeea1d91fc
@@ -13,17 +12,24 @@ subtasks:
 - T011
 - T012
 phase: Phase 1 - Foundation
-assignee: ''
-agent: claude-opus
-shell_pid: '40774'
-review_status: approved
-reviewed_by: Robert Douglass
 history:
 - timestamp: '2026-02-08T00:00:00Z'
   lane: planned
   agent: system
   shell_pid: ''
   action: Prompt generated via /spec-kitty.tasks
+authoritative_surface: ''
+execution_mode: code_change
+mission_id: 01KN233MAYW3KW9RDF2XACZQK0
+owned_files:
+- kitty-specs/003-status-state-model-contracts/contracts/status-api.md
+- kitty-specs/003-status-state-model-contracts/data-model.md
+- kitty-specs/003-status-state-model-contracts/plan.md
+- kitty-specs/003-status-state-model-contracts/research.md
+- src/spec_kitty_events/__init__.py
+- src/spec_kitty_events/status.py
+- tests/unit/test_status.py
+wp_code: WP02
 ---
 
 # Work Package Prompt: WP02 – Transition Validation

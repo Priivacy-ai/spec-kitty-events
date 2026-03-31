@@ -1,30 +1,7 @@
 ---
 work_package_id: WP01
 title: Payload Models & Constants
-lane: done
 dependencies: []
-base_branch: 2.x
-base_commit: 4dda9d5509284bd062cdfe1ebfe5e0faca37f22e
-created_at: '2026-03-05T15:49:35.816568+00:00'
-subtasks:
-- T001
-- T002
-- T003
-- T004
-- T005
-phase: Phase 1 - Foundation
-assignee: ''
-agent: claude-opus-reviewer
-shell_pid: '37263'
-review_status: approved
-reviewed_by: Robert Douglass
-review_feedback: feedback://013-per-user-identity-connector-events/WP01/20260305T161214Z-b89988d9.md
-history:
-- timestamp: '2026-03-05T11:15:54Z'
-  lane: planned
-  agent: system
-  shell_pid: ''
-  action: Prompt generated via /spec-kitty.tasks
 requirement_refs:
 - FR-001
 - FR-002
@@ -35,6 +12,31 @@ requirement_refs:
 - C-002
 - C-003
 - C-004
+base_branch: 2.x
+base_commit: 4dda9d5509284bd062cdfe1ebfe5e0faca37f22e
+created_at: '2026-03-05T15:49:35.816568+00:00'
+subtasks:
+- T001
+- T002
+- T003
+- T004
+- T005
+phase: Phase 1 - Foundation
+history:
+- timestamp: '2026-03-05T11:15:54Z'
+  lane: planned
+  agent: system
+  shell_pid: ''
+  action: Prompt generated via /spec-kitty.tasks
+authoritative_surface: ''
+execution_mode: code_change
+mission_id: 01KN233MB1GVMCSS9KCNPN6P2A
+owned_files:
+- kitty-specs/013-per-user-identity-connector-events/data-model.md
+- kitty-specs/013-per-user-identity-connector-events/plan.md
+- kitty-specs/013-per-user-identity-connector-events/spec.md
+- src/spec_kitty_events/connector.py
+wp_code: WP01
 ---
 
 # Work Package Prompt: WP01 – Payload Models & Constants

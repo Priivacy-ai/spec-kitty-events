@@ -1,7 +1,6 @@
 ---
 work_package_id: WP07
 title: Payload Model Tests
-lane: done
 dependencies: [WP04]
 base_branch: 007-glossary-semantic-integrity-contracts-WP04
 base_commit: 1cc294fbe6cea88e0fcd6f32bc53645a7db5cb4d
@@ -14,17 +13,19 @@ subtasks:
 - T035
 - T036
 phase: Phase 3 - Testing
-assignee: ''
-agent: claude-opus
-shell_pid: '25971'
-review_status: approved
-reviewed_by: Robert Douglass
 history:
 - timestamp: '2026-02-16T12:00:00Z'
   lane: planned
   agent: system
   shell_pid: ''
   action: Prompt generated via /spec-kitty.tasks
+authoritative_surface: tests/
+execution_mode: code_change
+mission_id: 01KN233MAZ48PRQRGCNZQJRTR0
+owned_files:
+- tests/test_collaboration.py
+- tests/test_glossary.py
+wp_code: WP07
 ---
 
 # Work Package Prompt: WP07 – Payload Model Tests

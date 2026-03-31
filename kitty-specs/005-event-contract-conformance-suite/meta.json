@@ -7,5 +7,6 @@
   "created_at": "2026-02-12T00:00:00Z",
   "target_branch": "main",
   "vcs": "git",
-  "feature_slug": "005-event-contract-conformance-suite"
+  "feature_slug": "005-event-contract-conformance-suite",
+  "mission_id": "01KN233MAZ48PRQRGCNZQJRTQY"
 }

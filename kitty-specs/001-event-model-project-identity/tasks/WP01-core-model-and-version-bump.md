@@ -1,7 +1,6 @@
 ---
 work_package_id: WP01
 title: Core Model & Version Bump
-lane: done
 dependencies: []
 base_branch: main
 base_commit: 26692accdfc21c2cb56ff84a728e8c1e87d45e46
@@ -13,17 +12,22 @@ subtasks:
 - T004
 - T005
 phase: Phase 0 - Foundation
-assignee: ''
-agent: claude-opus
-shell_pid: '19446'
-review_status: approved
-reviewed_by: Robert Douglass
 history:
 - timestamp: '2026-02-07T00:00:00Z'
   lane: planned
   agent: system
   shell_pid: ''
   action: Prompt generated via /spec-kitty.tasks
+authoritative_surface: ''
+execution_mode: code_change
+mission_id: 01KN233MAYW3KW9RDF2XACZQJY
+owned_files:
+- kitty-specs/001-event-model-project-identity/data-model.md
+- kitty-specs/001-event-model-project-identity/plan.md
+- kitty-specs/001-event-model-project-identity/research.md
+- kitty-specs/001-event-model-project-identity/spec.md
+- src/spec_kitty_events/**
+wp_code: WP01
 ---
 
 # Work Package Prompt: WP01 – Core Model & Version Bump

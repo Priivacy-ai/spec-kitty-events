@@ -7,5 +7,6 @@
   "created_at": "2026-02-08T00:00:00Z",
   "target_branch": "main",
   "vcs": "git",
-  "feature_slug": "003-status-state-model-contracts"
+  "feature_slug": "003-status-state-model-contracts",
+  "mission_id": "01KN233MAYW3KW9RDF2XACZQK0"
 }

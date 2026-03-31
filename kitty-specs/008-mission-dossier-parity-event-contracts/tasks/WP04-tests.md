@@ -1,7 +1,6 @@
 ---
 work_package_id: WP04
 title: Tests (Conformance + Reducer)
-lane: done
 dependencies:
 - WP02
 - WP03
@@ -16,17 +15,27 @@ subtasks:
 - T024
 - T025
 phase: Phase 2 - Validation
-assignee: ''
-agent: coordinator
-shell_pid: '31414'
-review_status: approved
-reviewed_by: Robert Douglass
 history:
 - timestamp: '2026-02-21T14:00:00Z'
   lane: planned
   agent: system
   shell_pid: ''
   action: Prompt generated via /spec-kitty.tasks
+authoritative_surface: ''
+execution_mode: code_change
+mission_id: 01KN233MAZ48PRQRGCNZQJRTR1
+owned_files:
+- kitty-specs/008-mission-dossier-parity-event-contracts/spec.md
+- src/spec_kitty_events/conformance/fixtures/**
+- src/spec_kitty_events/dossier/**
+- src/spec_kitty_events/dossier.py
+- tests/test_dossier_*.py
+- tests/test_dossier_conformance.py
+- tests/test_dossier_reducer.py
+- tests/test_dossier_reducer.py::test_reducer_determinism_across_permutations
+- tests/test_mission_next_conformance.py
+- tests/test_mission_next_reducer.py
+wp_code: WP04
 ---
 
 # Work Package Prompt: WP04 – Tests (Conformance + Reducer)

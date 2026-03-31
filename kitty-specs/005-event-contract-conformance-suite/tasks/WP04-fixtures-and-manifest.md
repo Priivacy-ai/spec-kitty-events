@@ -1,20 +1,22 @@
 ---
 work_package_id: WP04
 title: Canonical Fixtures and Manifest
-lane: done
 dependencies: [WP03]
 base_branch: 005-event-contract-conformance-suite-WP03
 base_commit: 57c9ad089e6fb61d491586822a2e55354179f1e7
 created_at: '2026-02-12T10:54:01.027042+00:00'
 subtasks: [T021, T022, T023, T024, T025, T026, T027, T028]
-agent: codex
-shell_pid: '4562'
-review_status: has_feedback
-reviewed_by: Robert Douglass
 history:
 - date: '2026-02-12'
   action: created
   by: spec-kitty.tasks
+authoritative_surface: src/spec_kitty_events/conformance/
+execution_mode: code_change
+mission_id: 01KN233MAZ48PRQRGCNZQJRTQY
+owned_files:
+- src/spec_kitty_events/conformance/__init__.py
+- src/spec_kitty_events/conformance/fixtures/**
+wp_code: WP04
 ---
 
 # WP04 — Canonical Fixtures and Manifest

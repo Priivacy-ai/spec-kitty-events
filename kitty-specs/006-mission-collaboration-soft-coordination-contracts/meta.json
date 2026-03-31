@@ -7,5 +7,6 @@
   "created_at": "2026-02-15T00:00:00Z",
   "target_branch": "main",
   "vcs": "git",
-  "feature_slug": "006-mission-collaboration-soft-coordination-contracts"
+  "feature_slug": "006-mission-collaboration-soft-coordination-contracts",
+  "mission_id": "01KN233MAZ48PRQRGCNZQJRTQZ"
 }

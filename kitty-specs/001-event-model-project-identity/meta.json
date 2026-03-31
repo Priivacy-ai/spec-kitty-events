@@ -7,5 +7,6 @@
   "created_at": "2026-02-07T00:00:00Z",
   "target_branch": "main",
   "vcs": "git",
-  "feature_slug": "001-event-model-project-identity"
+  "feature_slug": "001-event-model-project-identity",
+  "mission_id": "01KN233MAYW3KW9RDF2XACZQJY"
 }

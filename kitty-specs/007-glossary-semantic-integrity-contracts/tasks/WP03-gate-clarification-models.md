@@ -1,7 +1,6 @@
 ---
 work_package_id: WP03
 title: Gate & Clarification Payload Models
-lane: done
 dependencies: [WP02]
 base_branch: 007-glossary-semantic-integrity-contracts-WP02
 base_commit: 421824f411e5452ce78bc91a713e6960e4a0a4ab
@@ -12,17 +11,20 @@ subtasks:
 - T012
 - T013
 phase: Phase 1 - Payload Models
-assignee: ''
-agent: claude-opus
-shell_pid: '21232'
-review_status: approved
-reviewed_by: Robert Douglass
 history:
 - timestamp: '2026-02-16T12:00:00Z'
   lane: planned
   agent: system
   shell_pid: ''
   action: Prompt generated via /spec-kitty.tasks
+authoritative_surface: ''
+execution_mode: code_change
+mission_id: 01KN233MAZ48PRQRGCNZQJRTR0
+owned_files:
+- kitty-specs/007-glossary-semantic-integrity-contracts/contracts/glossary-events.md
+- kitty-specs/007-glossary-semantic-integrity-contracts/data-model.md
+- src/spec_kitty_events/glossary.py
+wp_code: WP03
 ---
 
 # Work Package Prompt: WP03 – Gate & Clarification Payload Models

@@ -1,7 +1,6 @@
 ---
 work_package_id: WP05
 title: Reducer — Scope, Strictness & Term Processing
-lane: done
 dependencies: [WP04]
 base_branch: 007-glossary-semantic-integrity-contracts-WP04
 base_commit: 1cc294fbe6cea88e0fcd6f32bc53645a7db5cb4d
@@ -14,17 +13,20 @@ subtasks:
 - T023
 - T024
 phase: Phase 2 - Reducer Implementation
-assignee: ''
-agent: claude-opus
-shell_pid: '22994'
-review_status: approved
-reviewed_by: Robert Douglass
 history:
 - timestamp: '2026-02-16T12:00:00Z'
   lane: planned
   agent: system
   shell_pid: ''
   action: Prompt generated via /spec-kitty.tasks
+authoritative_surface: ''
+execution_mode: code_change
+mission_id: 01KN233MAZ48PRQRGCNZQJRTR0
+owned_files:
+- kitty-specs/007-glossary-semantic-integrity-contracts/research.md
+- src/spec_kitty_events/collaboration.py:539-600
+- src/spec_kitty_events/glossary.py
+wp_code: WP05
 ---
 
 # Work Package Prompt: WP05 – Reducer — Scope, Strictness & Term Processing

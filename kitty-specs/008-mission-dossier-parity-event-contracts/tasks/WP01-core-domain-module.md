@@ -1,7 +1,6 @@
 ---
 work_package_id: WP01
 title: Core Domain Module (dossier.py)
-lane: done
 dependencies: []
 base_branch: main
 base_commit: 3a7bc8bb5c9aa0e4a33d99e89bf59e2a7cf37bc0
@@ -14,17 +13,24 @@ subtasks:
 - T005
 - T006
 phase: Phase 1 - Foundation
-assignee: ''
-agent: codex
-shell_pid: '2429'
-review_status: approved
-reviewed_by: Robert Douglass
 history:
 - timestamp: '2026-02-21T14:00:00Z'
   lane: planned
   agent: system
   shell_pid: ''
   action: Prompt generated via /spec-kitty.tasks
+authoritative_surface: ''
+execution_mode: code_change
+mission_id: 01KN233MAZ48PRQRGCNZQJRTR1
+owned_files:
+- kitty-specs/008-mission-dossier-parity-event-contracts/contracts/dossier_types.py
+- kitty-specs/008-mission-dossier-parity-event-contracts/data-model.md
+- kitty-specs/008-mission-dossier-parity-event-contracts/plan.md
+- kitty-specs/008-mission-dossier-parity-event-contracts/spec.md
+- src/spec_kitty_events/dossier.py
+- src/spec_kitty_events/mission_next.py
+- tests/test_dossier_reducer.py
+wp_code: WP01
 ---
 
 # Work Package Prompt: WP01 – Core Domain Module (dossier.py)

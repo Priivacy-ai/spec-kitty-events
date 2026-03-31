@@ -1,7 +1,6 @@
 ---
 work_package_id: WP01
 title: Integration Branch Setup & Recovery
-lane: done
 dependencies: []
 base_branch: main
 base_commit: 5a24a93249042fe1abba402a2768d4471ed93d33
@@ -14,17 +13,18 @@ subtasks:
 - T005
 - T006
 phase: Phase 1 - Recovery
-assignee: ''
-agent: codex
-shell_pid: '24900'
-review_status: approved
-reviewed_by: Robert Douglass
 history:
 - timestamp: '2026-02-23T00:00:00Z'
   lane: planned
   agent: system
   shell_pid: ''
   action: Prompt generated from tasks.md
+authoritative_surface: src/
+execution_mode: code_change
+mission_id: 01KN233MB0ZCTRZHRD4KP8A8DH
+owned_files:
+- src/**
+wp_code: WP01
 ---
 
 # Work Package Prompt: WP01 – Integration Branch Setup & Recovery

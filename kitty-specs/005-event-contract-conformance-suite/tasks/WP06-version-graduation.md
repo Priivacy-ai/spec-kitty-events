@@ -1,20 +1,21 @@
 ---
 work_package_id: WP06
 title: Version Graduation and Package Finalization
-lane: done
 dependencies: [WP05]
 base_branch: 005-event-contract-conformance-suite-WP05
 base_commit: 7cf19ad7b4184c546e82d1f17e92ce82f9be7211
 created_at: '2026-02-12T11:20:40.207106+00:00'
 subtasks: [T034, T035, T036, T037, T038, T039]
-agent: codex
-shell_pid: '21096'
-review_status: has_feedback
-reviewed_by: Robert Douglass
 history:
 - date: '2026-02-12'
   action: created
   by: spec-kitty.tasks
+authoritative_surface: src/spec_kitty_events/
+execution_mode: code_change
+mission_id: 01KN233MAZ48PRQRGCNZQJRTQY
+owned_files:
+- src/spec_kitty_events/**
+wp_code: WP06
 ---
 
 # WP06 — Version Graduation and Package Finalization

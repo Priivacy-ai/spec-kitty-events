@@ -1,7 +1,6 @@
 ---
 work_package_id: WP01
 title: Constants and Identity Models
-lane: done
 dependencies: []
 base_branch: main
 base_commit: 0697f26d3beaaf8cadb3eb68e938f31c4d05e71d
@@ -15,17 +14,22 @@ subtasks:
 - T006
 - T007
 phase: Phase 0 - Foundation
-assignee: ''
-agent: codex
-shell_pid: '49799'
-review_status: approved
-reviewed_by: Robert Douglass
 history:
 - timestamp: '2026-02-15T10:35:14Z'
   lane: planned
   agent: system
   shell_pid: ''
   action: Prompt generated via /spec-kitty.tasks
+authoritative_surface: ''
+execution_mode: code_change
+mission_id: 01KN233MAZ48PRQRGCNZQJRTQZ
+owned_files:
+- kitty-specs/006-mission-collaboration-soft-coordination-contracts/contracts/collaboration-api.md
+- kitty-specs/006-mission-collaboration-soft-coordination-contracts/data-model.md
+- kitty-specs/006-mission-collaboration-soft-coordination-contracts/research.md
+- src/spec_kitty_events/collaboration.py
+- tests/unit/test_collaboration_models.py
+wp_code: WP01
 ---
 
 # Work Package Prompt: WP01 – Constants and Identity Models

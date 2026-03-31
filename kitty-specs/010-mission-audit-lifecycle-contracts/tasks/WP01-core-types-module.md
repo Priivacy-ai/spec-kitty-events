@@ -1,7 +1,6 @@
 ---
 work_package_id: WP01
 title: Core Types Module
-lane: done
 dependencies: []
 base_branch: main
 base_commit: a7ba75c9d083900f32eaf9c041d9657e316c0dd2
@@ -12,16 +11,17 @@ subtasks:
 - T003
 - T004
 phase: Phase 1 - Core Types
-assignee: ''
-agent: claude-sonnet-reviewer
-shell_pid: '31909'
-review_status: approved
-reviewed_by: Robert Douglass
 history:
 - timestamp: '2026-02-25T00:00:00Z'
   lane: planned
   agent: system
   action: Prompt generated via /spec-kitty.tasks
+authoritative_surface: src/spec_kitty_events/mission_audit.py/
+execution_mode: code_change
+mission_id: 01KN233MB0ZCTRZHRD4KP8A8DJ
+owned_files:
+- src/spec_kitty_events/mission_audit.py
+wp_code: WP01
 ---
 
 # Work Package Prompt: WP01 – Core Types Module

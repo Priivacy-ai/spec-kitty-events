@@ -1,7 +1,6 @@
 ---
 work_package_id: WP09
 title: Documentation and Version Update
-lane: done
 dependencies: [WP08]
 base_branch: 006-mission-collaboration-soft-coordination-contracts-WP08
 base_commit: dee0a8d815da6da9407f58baf20e276410f9638b
@@ -13,17 +12,20 @@ subtasks:
 - T051
 - T052
 phase: Phase 4 - Polish
-assignee: ''
-agent: claude-coordinator
-shell_pid: '92983'
-review_status: approved
-reviewed_by: Robert Douglass
 history:
 - timestamp: '2026-02-15T10:35:14Z'
   lane: planned
   agent: system
   shell_pid: ''
   action: Prompt generated via /spec-kitty.tasks
+authoritative_surface: ''
+execution_mode: code_change
+mission_id: 01KN233MAZ48PRQRGCNZQJRTQZ
+owned_files:
+- kitty-specs/006-.../contracts/collaboration-api.md
+- kitty-specs/006-.../quickstart.md
+- src/spec_kitty_events/**
+wp_code: WP09
 ---
 
 # Work Package Prompt: WP09 – Documentation and Version Update

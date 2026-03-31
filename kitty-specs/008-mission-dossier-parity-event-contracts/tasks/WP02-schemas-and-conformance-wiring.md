@@ -1,7 +1,6 @@
 ---
 work_package_id: WP02
 title: Schemas & Conformance Wiring
-lane: done
 dependencies: [WP01]
 base_branch: 008-mission-dossier-parity-event-contracts-WP01
 base_commit: e635a19b1f84dda242d2261804d43ba36359fcd0
@@ -15,17 +14,21 @@ subtasks:
 - T012
 - T013
 phase: Phase 1 - Foundation
-assignee: ''
-agent: coordinator
-shell_pid: '16446'
-review_status: approved
-reviewed_by: Robert Douglass
 history:
 - timestamp: '2026-02-21T14:00:00Z'
   lane: planned
   agent: system
   shell_pid: ''
   action: Prompt generated via /spec-kitty.tasks
+authoritative_surface: src/spec_kitty_events/
+execution_mode: code_change
+mission_id: 01KN233MAZ48PRQRGCNZQJRTR1
+owned_files:
+- src/spec_kitty_events/__init__.py
+- src/spec_kitty_events/conformance/loader.py
+- src/spec_kitty_events/conformance/validators.py
+- src/spec_kitty_events/schemas/**
+wp_code: WP02
 ---
 
 # Work Package Prompt: WP02 – Schemas & Conformance Wiring
