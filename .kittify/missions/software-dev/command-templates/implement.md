@@ -2,12 +2,12 @@
 description: Create an isolated workspace (worktree) for implementing a specific work package.
 ---
 
-## Constitution Context Bootstrap (required)
+## Charter Context Bootstrap (required)
 
-Before running workflow implement, load constitution context for this action:
+Before running workflow implement, load charter context for this action:
 
 ```bash
-spec-kitty constitution context --action implement --json
+spec-kitty charter context --action implement --json
 ```
 
 Use JSON `text` as governance context. On first load (`mode=bootstrap`), follow referenced docs as needed.
