@@ -7,6 +7,7 @@
     "claimed",
     "in_progress",
     "for_review",
+    "approved",
     "done",
     "blocked",
     "canceled"

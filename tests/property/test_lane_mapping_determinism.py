@@ -5,9 +5,12 @@ from hypothesis import strategies as st
 
 from spec_kitty_events.status import (
     CANONICAL_TO_SYNC_V1,
+    CANONICAL_TO_SYNC_V2,
     Lane,
     SyncLaneV1,
+    SyncLaneV2,
     canonical_to_sync_v1,
+    canonical_to_sync_v2,
 )
 
 
@@ -33,3 +36,18 @@ def test_all_sync_lane_values_reachable() -> None:
     reachable = set(CANONICAL_TO_SYNC_V1.values())
     for sync_lane in SyncLaneV1:
         assert sync_lane in reachable, f"SyncLaneV1.{sync_lane.name} is unreachable"
+
+
+@settings(max_examples=200)
+@given(lane=st.sampled_from(list(Lane)))
+def test_canonical_to_sync_v2_is_total(lane: Lane) -> None:
+    """For any Lane member, canonical_to_sync_v2 returns a SyncLaneV2."""
+    result = canonical_to_sync_v2(lane)
+    assert isinstance(result, SyncLaneV2)
+
+
+def test_all_sync_lane_v2_values_reachable() -> None:
+    """At least one canonical lane maps to each SyncLaneV2 member."""
+    reachable = set(CANONICAL_TO_SYNC_V2.values())
+    for sync_lane in SyncLaneV2:
+        assert sync_lane in reachable, f"SyncLaneV2.{sync_lane.name} is unreachable"

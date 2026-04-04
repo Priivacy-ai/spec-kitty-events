@@ -15,6 +15,7 @@ from spec_kitty_events.models import Event
 from spec_kitty_events.status import (
     Lane,
     SyncLaneV1,
+    SyncLaneV2,
     StatusTransitionPayload,
 )
 from spec_kitty_events.lifecycle import (
@@ -203,6 +204,7 @@ PYDANTIC_MODELS: List[tuple[str, Type[BaseModel]]] = [
 ENUM_TYPES: List[tuple[str, type]] = [
     ("lane", Lane),
     ("sync_lane_v1", SyncLaneV1),
+    ("sync_lane_v2", SyncLaneV2),
 ]
 
 

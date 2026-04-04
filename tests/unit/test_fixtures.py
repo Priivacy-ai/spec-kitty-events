@@ -168,7 +168,7 @@ class TestInvalidEventFixtures:
 
 
 class TestLaneMappingFixtures:
-    """Verify lane mapping fixtures cover all 7 canonical lanes."""
+    """Verify lane mapping fixtures cover all 8 canonical lanes."""
 
     def test_valid_mapping_has_seven_entries(self) -> None:
         full = _FIXTURES_DIR / "lane_mapping/valid/all_canonical_to_sync_v1.json"

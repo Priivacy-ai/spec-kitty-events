@@ -5,6 +5,32 @@ All notable changes to spec-kitty-events will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 2.9.0 — Approved Lane Contract (2026-04-04)
+
+### Added
+
+- Added canonical `Lane.APPROVED` to the status state model.
+- Added `SyncLaneV2`, `CANONICAL_TO_SYNC_V2`, and `canonical_to_sync_v2()` for
+  consumers that need an explicit `approved` board column.
+- Added committed `sync_lane_v2.schema.json`.
+
+### Changed
+
+- `SyncLaneV1` remains locked for existing inputs, and now maps the additive
+  `approved` canonical lane to legacy `done`.
+- Expanded status transition validation to cover the full 8-lane workflow used
+  by current Spec Kitty runtimes:
+  `in_progress -> approved`, `for_review -> approved`, `approved -> done`,
+  `for_review -> planned`, `approved -> in_progress`, and `approved -> planned`.
+- `approved` transitions now require evidence, matching runtime emission.
+
+### Migration
+
+- Consumers that only need the legacy 4-lane sync model can stay on
+  `canonical_to_sync_v1()`.
+- Consumers that need to distinguish `approved` from `done` should move to
+  `canonical_to_sync_v2()` or consume canonical `Lane` values directly.
+
 ## 2.4.0 — Mission Dossier Parity Event Contracts (2026-02-21)
 
 ### Added

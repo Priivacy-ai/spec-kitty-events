@@ -126,7 +126,7 @@ Versioning and Export Notes (2.8.0 -- Per-User Identity in Connector Events):
               ``load_fixtures("sync")``).
 """
 
-__version__ = "2.8.0"
+__version__ = "2.9.0"
 
 # Core data models
 from spec_kitty_events.models import (
@@ -208,8 +208,11 @@ from spec_kitty_events.lifecycle import (
 from spec_kitty_events.status import (
     Lane,
     SyncLaneV1,
+    SyncLaneV2,
     CANONICAL_TO_SYNC_V1,
+    CANONICAL_TO_SYNC_V2,
     canonical_to_sync_v1,
+    canonical_to_sync_v2,
     ExecutionMode,
     RepoEvidence,
     VerificationEntry,
@@ -507,8 +510,11 @@ __all__ = [
     # Status state model
     "Lane",
     "SyncLaneV1",
+    "SyncLaneV2",
     "CANONICAL_TO_SYNC_V1",
+    "CANONICAL_TO_SYNC_V2",
     "canonical_to_sync_v1",
+    "canonical_to_sync_v2",
     "ExecutionMode",
     "RepoEvidence",
     "VerificationEntry",
