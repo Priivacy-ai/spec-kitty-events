@@ -98,3 +98,11 @@
 **Parallel opportunities**: T019+T020 are independent edits. T021+T022 are independent verification steps.
 **Dependencies**: WP01-WP03 must all be merged to main first.
 **Risks**: Low — mostly verification and documentation. Only risk is a missed backward compat issue surfacing during T021.
+
+<!-- status-model:start -->
+## Canonical Status (Generated)
+- WP01: done
+- WP02: done
+- WP03: done
+- WP04: done
+<!-- status-model:end -->

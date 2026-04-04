@@ -1,7 +1,6 @@
 ---
 work_package_id: WP05
 title: Reducer Output Models
-lane: "done"
 dependencies: [WP01]
 base_branch: 006-mission-collaboration-soft-coordination-contracts-WP01
 base_commit: f058d167abbbbbd8460757676b7e12ee4fb0ed3b
@@ -14,17 +13,20 @@ subtasks:
 - T029
 - T030
 phase: Phase 1 - Payload Models
-assignee: ''
-agent: "claude-coordinator"
-shell_pid: "80547"
-review_status: "approved"
-reviewed_by: "Robert Douglass"
 history:
 - timestamp: '2026-02-15T10:35:14Z'
   lane: planned
   agent: system
   shell_pid: ''
   action: Prompt generated via /spec-kitty.tasks
+authoritative_surface: ''
+execution_mode: code_change
+mission_id: 01KN233MAZ48PRQRGCNZQJRTQZ
+owned_files:
+- kitty-specs/006-.../data-model.md
+- src/spec_kitty_events/collaboration.py
+- tests/unit/**
+wp_code: WP05
 ---
 
 # Work Package Prompt: WP05 – Reducer Output Models

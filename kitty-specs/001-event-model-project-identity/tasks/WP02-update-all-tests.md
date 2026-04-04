@@ -1,7 +1,6 @@
 ---
 work_package_id: WP02
 title: Update All Tests
-lane: "done"
 dependencies: [WP01]
 base_branch: 001-event-model-project-identity-WP01
 base_commit: 517c99c138c27cc72fe7e59ad175e59524de0344
@@ -15,17 +14,30 @@ subtasks:
 - T011
 - T012
 phase: Phase 1 - Implementation
-assignee: ''
-agent: "claude-opus"
-shell_pid: "27795"
-review_status: "approved"
-reviewed_by: "Robert Douglass"
 history:
 - timestamp: '2026-02-07T00:00:00Z'
   lane: planned
   agent: system
   shell_pid: ''
   action: Prompt generated via /spec-kitty.tasks
+authoritative_surface: ''
+execution_mode: code_change
+mission_id: 01KN233MAYW3KW9RDF2XACZQJY
+owned_files:
+- kitty-specs/001-event-model-project-identity/plan.md
+- src/spec_kitty_events/**
+- tests/integration/test_adapters.py
+- tests/integration/test_conflict_resolution.py
+- tests/integration/test_event_emission.py
+- tests/integration/test_quickstart.py
+- tests/property/test_crdt_laws.py
+- tests/property/test_determinism.py
+- tests/unit/test_conflict.py
+- tests/unit/test_crdt.py
+- tests/unit/test_merge.py
+- tests/unit/test_models.py
+- tests/unit/test_storage.py
+wp_code: WP02
 ---
 
 # Work Package Prompt: WP02 – Update All Tests

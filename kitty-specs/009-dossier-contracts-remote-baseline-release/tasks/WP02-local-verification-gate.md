@@ -1,7 +1,6 @@
 ---
 work_package_id: WP02
 title: Local Verification Gate
-lane: "done"
 dependencies:
 - WP01
 base_branch: 2.x
@@ -16,18 +15,21 @@ subtasks:
 - T012
 - T013
 phase: Phase 2 - Verification
-assignee: ''
-agent: codex
-shell_pid: '24900'
-review_status: has_feedback
-reviewed_by: Robert Douglass
 history:
 - timestamp: '2026-02-23T00:00:00Z'
   lane: planned
   agent: system
   shell_pid: ''
   action: Prompt generated from tasks.md
+authoritative_surface: tests/
+execution_mode: code_change
+mission_id: 01KN233MB0ZCTRZHRD4KP8A8DH
+owned_files:
+- tests/0/**
+- tests/test_dossier_conformance.py
+- tests/test_dossier_reducer.py
 review_feedback_file: /private/var/folders/gj/bxx0438j003b20kn5b6s7bsh0000gn/T/spec-kitty-review-feedback-WP02.md
+wp_code: WP02
 ---
 
 # Work Package Prompt: WP02 – Local Verification Gate

@@ -1,7 +1,6 @@
 ---
 work_package_id: WP03
 title: Version Bump & Changelog
-lane: "done"
 dependencies:
 - WP01
 base_branch: main
@@ -12,17 +11,21 @@ subtasks:
 - T012
 - T013
 phase: Phase 2 - Release Prep
-assignee: ''
-agent: ''
-shell_pid: "52812"
-review_status: "approved"
-reviewed_by: "Robert Douglass"
 history:
 - timestamp: '2026-02-07T00:00:00Z'
   lane: planned
   agent: system
   shell_pid: ''
   action: Prompt generated via /spec-kitty.tasks
+authoritative_surface: ''
+execution_mode: code_change
+mission_id: 01KN233MAYW3KW9RDF2XACZQJZ
+owned_files:
+- kitty-specs/002-github-gate-observability-contracts/plan.md
+- kitty-specs/002-github-gate-observability-contracts/quickstart.md
+- kitty-specs/002-github-gate-observability-contracts/spec.md
+- src/spec_kitty_events/__init__.py
+wp_code: WP03
 ---
 
 # Work Package Prompt: WP03 – Version Bump & Changelog

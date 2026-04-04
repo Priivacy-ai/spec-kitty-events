@@ -1,7 +1,6 @@
 ---
 work_package_id: WP06
 title: Reducer — Checks, Clarifications, Blocks & Assembly
-lane: "done"
 dependencies: [WP05]
 base_branch: 007-glossary-semantic-integrity-contracts-WP05
 base_commit: 7126c08de30c59ad7421e93d1b514aabd77cd2ab
@@ -14,17 +13,20 @@ subtasks:
 - T029
 - T030
 phase: Phase 2 - Reducer Implementation
-assignee: ''
-agent: "claude-opus"
-shell_pid: "24697"
-review_status: "approved"
-reviewed_by: "Robert Douglass"
 history:
 - timestamp: '2026-02-16T12:00:00Z'
   lane: planned
   agent: system
   shell_pid: ''
   action: Prompt generated via /spec-kitty.tasks
+authoritative_surface: ''
+execution_mode: code_change
+mission_id: 01KN233MAZ48PRQRGCNZQJRTR0
+owned_files:
+- kitty-specs/007-glossary-semantic-integrity-contracts/data-model.md
+- src/spec_kitty_events/collaboration.py:599-end
+- src/spec_kitty_events/glossary.py
+wp_code: WP06
 ---
 
 # Work Package Prompt: WP06 – Reducer — Checks, Clarifications, Blocks & Assembly

@@ -160,3 +160,14 @@ WP01 (Lane Mapping)
 ## MVP Scope
 
 **Minimum viable contract**: WP01 + WP02 + WP03 deliver the lane mapping, JSON schemas, and validator. This is sufficient for consumers to import and validate against the contract. WP04–WP07 add fixtures, pytest entry point, and release polish.
+
+<!-- status-model:start -->
+## Canonical Status (Generated)
+- WP01: done
+- WP02: done
+- WP03: done
+- WP04: done
+- WP05: done
+- WP06: done
+- WP07: done
+<!-- status-model:end -->

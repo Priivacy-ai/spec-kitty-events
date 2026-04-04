@@ -1,7 +1,6 @@
 ---
 work_package_id: WP04
 title: Reducer Output Models & Exports
-lane: "done"
 dependencies: [WP03]
 base_branch: 007-glossary-semantic-integrity-contracts-WP03
 base_commit: b16d591b8f032989376528aa0ed974102c513e36
@@ -13,17 +12,20 @@ subtasks:
 - T017
 - T018
 phase: Phase 1 - Payload Models
-assignee: ''
-agent: "claude-opus"
-shell_pid: "22012"
-review_status: "approved"
-reviewed_by: "Robert Douglass"
 history:
 - timestamp: '2026-02-16T12:00:00Z'
   lane: planned
   agent: system
   shell_pid: ''
   action: Prompt generated via /spec-kitty.tasks
+authoritative_surface: ''
+execution_mode: code_change
+mission_id: 01KN233MAZ48PRQRGCNZQJRTR0
+owned_files:
+- kitty-specs/007-glossary-semantic-integrity-contracts/data-model.md
+- src/spec_kitty_events/__init__.py
+- src/spec_kitty_events/glossary.py
+wp_code: WP04
 ---
 
 # Work Package Prompt: WP04 – Reducer Output Models & Exports

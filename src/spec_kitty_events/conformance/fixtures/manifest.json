@@ -7,7 +7,7 @@
       "expected_result": "valid",
       "event_type": "Event",
       "notes": "Complete Event with all required fields",
-      "min_version": "2.0.0"
+      "min_version": "2.9.0"
     },
     {
       "id": "wp-status-changed-valid",
@@ -118,7 +118,7 @@
       "path": "lane_mapping/valid/all_canonical_to_sync_v1.json",
       "expected_result": "valid",
       "event_type": "LaneMapping",
-      "notes": "All 7 canonical lanes mapped to SyncLaneV1",
+      "notes": "All 8 canonical lanes mapped to SyncLaneV1",
       "min_version": "2.0.0"
     },
     {

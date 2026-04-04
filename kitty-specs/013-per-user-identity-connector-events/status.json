@@ -2,8 +2,9 @@
   "event_count": 24,
   "feature_slug": "013-per-user-identity-connector-events",
   "last_event_id": "01KK02BTD9ME7AK8XJSHPRFZ6Q",
-  "materialized_at": "2026-03-05T22:37:16.074012+00:00",
+  "materialized_at": "2026-03-11T07:08:27.802365+00:00",
   "summary": {
+    "approved": 0,
     "blocked": 0,
     "canceled": 0,
     "claimed": 0,

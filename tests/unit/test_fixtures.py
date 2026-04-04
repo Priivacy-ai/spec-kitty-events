@@ -168,13 +168,13 @@ class TestInvalidEventFixtures:
 
 
 class TestLaneMappingFixtures:
-    """Verify lane mapping fixtures cover all 7 canonical lanes."""
+    """Verify lane mapping fixtures cover all 8 canonical lanes."""
 
-    def test_valid_mapping_has_seven_entries(self) -> None:
+    def test_valid_mapping_has_eight_entries(self) -> None:
         full = _FIXTURES_DIR / "lane_mapping/valid/all_canonical_to_sync_v1.json"
         with open(full, encoding="utf-8") as f:
             entries: List[Dict[str, str]] = json.load(f)
-        assert len(entries) == 7
+        assert len(entries) == 8
 
     def test_valid_mapping_covers_all_lanes(self) -> None:
         full = _FIXTURES_DIR / "lane_mapping/valid/all_canonical_to_sync_v1.json"

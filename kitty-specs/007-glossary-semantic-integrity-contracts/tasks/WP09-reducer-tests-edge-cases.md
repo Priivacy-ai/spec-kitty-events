@@ -1,7 +1,6 @@
 ---
 work_package_id: WP09
 title: Reducer Tests — Edge Cases & Dual-Mode
-lane: "done"
 dependencies: [WP06]
 base_branch: 007-glossary-semantic-integrity-contracts-WP06
 base_commit: 36b0cdc3f4066d989ad8ab413208b3854c24a655
@@ -14,17 +13,19 @@ subtasks:
 - T047
 - T048
 phase: Phase 3 - Testing
-assignee: ''
-agent: "claude-opus"
-shell_pid: "28797"
-review_status: "approved"
-reviewed_by: "Robert Douglass"
 history:
 - timestamp: '2026-02-16T12:00:00Z'
   lane: planned
   agent: system
   shell_pid: ''
   action: Prompt generated via /spec-kitty.tasks
+authoritative_surface: tests/
+execution_mode: code_change
+mission_id: 01KN233MAZ48PRQRGCNZQJRTR0
+owned_files:
+- tests/test_collaboration.py
+- tests/test_glossary_reducer.py
+wp_code: WP09
 ---
 
 # Work Package Prompt: WP09 – Reducer Tests — Edge Cases & Dual-Mode

@@ -1,21 +1,42 @@
 ---
 work_package_id: WP01
 title: Event Envelope Extension + Test Migration
-lane: "done"
 dependencies: []
 base_branch: main
 base_commit: 3de3d25be62a16aa64f308cd90983ff668b81ae6
 created_at: '2026-02-09T11:37:20.985808+00:00'
 subtasks: [T001, T002, T003, T004, T005, T006, T007]
-agent: claude-opus
-shell_pid: '8128'
-reviewed_by: "Robert Douglass"
-review_status: "approved"
 history:
 - date: '2026-02-09'
   agent: claude-opus
   action: created
   note: Generated from /spec-kitty.tasks
+authoritative_surface: ''
+execution_mode: code_change
+mission_id: 01KN233MAZ48PRQRGCNZQJRTQX
+owned_files:
+- src/spec_kitty_events/conflict.py
+- src/spec_kitty_events/crdt.py
+- src/spec_kitty_events/merge.py
+- src/spec_kitty_events/models.py
+- src/spec_kitty_events/topology.py
+- tests/conftest.py
+- tests/integration/test_adapters.py
+- tests/integration/test_conflict_resolution.py
+- tests/integration/test_event_emission.py
+- tests/integration/test_quickstart.py
+- tests/property/test_crdt_laws.py
+- tests/property/test_determinism.py
+- tests/property/test_status_determinism.py
+- tests/unit/<file/**
+- tests/unit/test_conflict.py
+- tests/unit/test_crdt.py
+- tests/unit/test_gates.py
+- tests/unit/test_merge.py
+- tests/unit/test_models.py
+- tests/unit/test_status.py
+- tests/unit/test_storage.py
+wp_code: WP01
 ---
 
 # WP01: Event Envelope Extension + Test Migration

@@ -407,3 +407,17 @@ WP10 (conformance + integration) ← waits for WP07, WP08, WP09
 | T052 | Conformance test: high-severity block | WP10 | P2 | Yes |
 | T053 | Conformance test: warn + burst cap | WP10 | P2 | Yes |
 | T054 | Integration verification (mypy, coverage, exports) | WP10 | P2 | No |
+
+<!-- status-model:start -->
+## Canonical Status (Generated)
+- WP01: done
+- WP02: done
+- WP03: done
+- WP04: done
+- WP05: done
+- WP06: done
+- WP07: done
+- WP08: done
+- WP09: done
+- WP10: done
+<!-- status-model:end -->

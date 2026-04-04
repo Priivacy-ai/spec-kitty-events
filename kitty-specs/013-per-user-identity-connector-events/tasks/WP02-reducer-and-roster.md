@@ -1,8 +1,12 @@
 ---
 work_package_id: WP02
 title: Reducer & Roster Logic
-lane: "done"
 dependencies: [WP01]
+requirement_refs:
+- FR-005
+- FR-007
+- NFR-001
+- C-002
 base_branch: 2.x
 base_commit: d45029ecf6ac5ee103de06c97bb3899492e11dce
 created_at: '2026-03-05T21:57:04.912012+00:00'
@@ -12,23 +16,21 @@ subtasks:
 - T008
 - T009
 phase: Phase 1 - Foundation
-assignee: ''
-agent: claude-opus-4-6
-shell_pid: '38903'
-review_status: "approved"
-reviewed_by: "Robert Douglass"
-review_feedback: ''
 history:
 - timestamp: '2026-03-05T11:15:54Z'
   lane: planned
   agent: system
   shell_pid: ''
   action: Prompt generated via /spec-kitty.tasks
-requirement_refs:
-- FR-005
-- FR-007
-- NFR-001
-- C-002
+authoritative_surface: ''
+execution_mode: code_change
+mission_id: 01KN233MB1GVMCSS9KCNPN6P2A
+owned_files:
+- kitty-specs/013-per-user-identity-connector-events/data-model.md
+- kitty-specs/013-per-user-identity-connector-events/plan.md
+- kitty-specs/013-per-user-identity-connector-events/spec.md
+- src/spec_kitty_events/connector.py
+wp_code: WP02
 ---
 
 # Work Package Prompt: WP02 – Reducer & Roster Logic

@@ -1,7 +1,6 @@
 ---
 work_package_id: WP03
 title: Intent, Focus, and Execution Payloads
-lane: "done"
 dependencies: [WP01]
 base_branch: 006-mission-collaboration-soft-coordination-contracts-WP01
 base_commit: f058d167abbbbbd8460757676b7e12ee4fb0ed3b
@@ -13,17 +12,21 @@ subtasks:
 - T016
 - T017
 phase: Phase 1 - Payload Models
-assignee: ''
-agent: "codex"
-shell_pid: "66941"
-review_status: "approved"
-reviewed_by: "Robert Douglass"
 history:
 - timestamp: '2026-02-15T10:35:14Z'
   lane: planned
   agent: system
   shell_pid: ''
   action: Prompt generated via /spec-kitty.tasks
+authoritative_surface: ''
+execution_mode: code_change
+mission_id: 01KN233MAZ48PRQRGCNZQJRTQZ
+owned_files:
+- kitty-specs/006-.../data-model.md
+- kitty-specs/006-.../research.md
+- src/spec_kitty_events/collaboration.py
+- tests/unit/**
+wp_code: WP03
 ---
 
 # Work Package Prompt: WP03 – Intent, Focus, and Execution Payloads

@@ -1,7 +1,6 @@
 ---
 work_package_id: WP04
 title: Conformance Tests + Public API + Release
-lane: "done"
 dependencies:
 - WP02
 - WP03
@@ -14,16 +13,24 @@ subtasks:
 - T021
 - T022
 phase: Phase 4 - Public API + Release
-assignee: ''
-agent: claude-reviewer-sonnet
-shell_pid: '76055'
-review_status: approved
-reviewed_by: Robert Douglass
 history:
 - timestamp: '2026-02-25T00:00:00Z'
   lane: planned
   agent: system
   action: Prompt generated via /spec-kitty.tasks
+authoritative_surface: ''
+execution_mode: code_change
+mission_id: 01KN233MB0ZCTRZHRD4KP8A8DJ
+owned_files:
+- src/spec_kitty_events/**
+- tests/test_dossier_conformance.py
+- tests/test_dossier_reducer.py
+- tests/test_glossary_conformance.py
+- tests/test_glossary_reducer.py
+- tests/test_mission_audit_conformance.py
+- tests/test_mission_next_conformance.py
+- tests/test_mission_next_reducer.py
+wp_code: WP04
 ---
 
 # Work Package Prompt: WP04 – Conformance Tests + Public API + Release

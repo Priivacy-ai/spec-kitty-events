@@ -1,7 +1,6 @@
 ---
 work_package_id: WP08
 title: Reducer Tests — Happy Path & Determinism
-lane: "done"
 dependencies: [WP06]
 base_branch: 007-glossary-semantic-integrity-contracts-WP06
 base_commit: 36b0cdc3f4066d989ad8ab413208b3854c24a655
@@ -14,17 +13,18 @@ subtasks:
 - T041
 - T042
 phase: Phase 3 - Testing
-assignee: ''
-agent: "claude-opus"
-shell_pid: "27558"
-review_status: "approved"
-reviewed_by: "Robert Douglass"
 history:
 - timestamp: '2026-02-16T12:00:00Z'
   lane: planned
   agent: system
   shell_pid: ''
   action: Prompt generated via /spec-kitty.tasks
+authoritative_surface: tests/test_glossary_reducer.py/
+execution_mode: code_change
+mission_id: 01KN233MAZ48PRQRGCNZQJRTR0
+owned_files:
+- tests/test_glossary_reducer.py
+wp_code: WP08
 ---
 
 # Work Package Prompt: WP08 – Reducer Tests — Happy Path & Determinism

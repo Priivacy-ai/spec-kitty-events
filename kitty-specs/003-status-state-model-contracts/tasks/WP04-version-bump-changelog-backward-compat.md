@@ -1,7 +1,6 @@
 ---
 work_package_id: WP04
 title: Version Bump, Changelog, and Backward Compat
-lane: "done"
 dependencies: []
 base_branch: main
 base_commit: 56ea49aeff0253fceb680ac0111f8a65f4c8cb63
@@ -13,17 +12,20 @@ subtasks:
 - T022
 - T023
 phase: Phase 3 - Polish and Release
-assignee: ''
-agent: "claude-opus"
-shell_pid: "42939"
-review_status: "approved"
-reviewed_by: "Robert Douglass"
 history:
 - timestamp: '2026-02-08T00:00:00Z'
   lane: planned
   agent: system
   shell_pid: ''
   action: Prompt generated via /spec-kitty.tasks
+authoritative_surface: ''
+execution_mode: code_change
+mission_id: 01KN233MAYW3KW9RDF2XACZQK0
+owned_files:
+- kitty-specs/003-status-state-model-contracts/contracts/status-api.md
+- kitty-specs/003-status-state-model-contracts/plan.md
+- src/spec_kitty_events/**
+wp_code: WP04
 ---
 
 # Work Package Prompt: WP04 – Version Bump, Changelog, and Backward Compat

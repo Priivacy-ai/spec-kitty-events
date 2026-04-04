@@ -2,8 +2,9 @@
   "event_count": 32,
   "feature_slug": "010-mission-audit-lifecycle-contracts",
   "last_event_id": "01KJD3JV9DJKB5GCZZKRZMNJ2Q",
-  "materialized_at": "2026-02-26T13:53:00.717626+00:00",
+  "materialized_at": "2026-03-11T07:08:27.638483+00:00",
   "summary": {
+    "approved": 0,
     "blocked": 0,
     "canceled": 0,
     "claimed": 0,

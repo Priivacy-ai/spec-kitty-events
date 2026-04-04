@@ -1,7 +1,6 @@
 ---
 work_package_id: WP03
 title: PR, CI Gate, Merge & Release Tag
-lane: "done"
 dependencies:
 - WP02
 base_branch: 2.x
@@ -16,18 +15,19 @@ subtasks:
 - T019
 - T020
 phase: Phase 3 - Release
-assignee: ''
-agent: codex
-shell_pid: '24900'
-review_status: has_feedback
-reviewed_by: Robert Douglass
 history:
 - timestamp: '2026-02-23T00:00:00Z'
   lane: planned
   agent: system
   shell_pid: ''
   action: Prompt generated from tasks.md
+authoritative_surface: src/
+execution_mode: code_change
+mission_id: 01KN233MB0ZCTRZHRD4KP8A8DH
+owned_files:
+- src/**
 review_feedback_file: /private/var/folders/gj/bxx0438j003b20kn5b6s7bsh0000gn/T/spec-kitty-review-feedback-WP03.md
+wp_code: WP03
 ---
 
 # Work Package Prompt: WP03 – PR, CI Gate, Merge & Release Tag

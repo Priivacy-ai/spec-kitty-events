@@ -1,7 +1,6 @@
 ---
 work_package_id: WP06
 title: Collaboration Reducer
-lane: "done"
 dependencies:
 - WP01
 - WP02
@@ -20,17 +19,22 @@ subtasks:
 - T036
 - T037
 phase: Phase 2 - Reducer
-assignee: ''
-agent: "claude-coordinator"
-shell_pid: "83786"
-review_status: "approved"
-reviewed_by: "Robert Douglass"
 history:
 - timestamp: '2026-02-15T10:35:14Z'
   lane: planned
   agent: system
   shell_pid: ''
   action: Prompt generated via /spec-kitty.tasks
+authoritative_surface: ''
+execution_mode: code_change
+mission_id: 01KN233MAZ48PRQRGCNZQJRTQZ
+owned_files:
+- kitty-specs/006-.../contracts/collaboration-api.md
+- kitty-specs/006-.../data-model.md
+- kitty-specs/006-.../research.md
+- src/spec_kitty_events/collaboration.py
+- tests/unit/test_collaboration_reducer.py
+wp_code: WP06
 ---
 
 # Work Package Prompt: WP06 – Collaboration Reducer

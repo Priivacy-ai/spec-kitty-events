@@ -137,3 +137,10 @@
 | T014 | Update README API overview | WP03 | P2 | No |
 | T015 | Update README version references | WP03 | P2 | No |
 | T016 | Add CHANGELOG 0.1.1-alpha entry | WP03 | P2 | Yes |
+
+<!-- status-model:start -->
+## Canonical Status (Generated)
+- WP01: done
+- WP02: done
+- WP03: done
+<!-- status-model:end -->

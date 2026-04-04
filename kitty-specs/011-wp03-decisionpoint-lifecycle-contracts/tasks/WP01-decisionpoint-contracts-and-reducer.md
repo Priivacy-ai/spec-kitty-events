@@ -1,19 +1,22 @@
 ---
 work_package_id: WP01
 title: DecisionPoint Event Constants, Payload Models, and Reducer Transitions
-lane: "done"
 dependencies: []
-base_branch: codex/wp03-events-decisionpoint-contracts
-base_commit: d31fce18b5f215e0f12eddf2c5b051891e9207ba
-created_at: '2026-02-27T11:06:48.227189+00:00'
-agent: codex
-shell_pid: '54810'
 requirement_refs:
 - FR-001
 - FR-002
 - FR-003
-reviewed_by: "Robert Douglass"
-review_status: "approved"
+base_branch: codex/wp03-events-decisionpoint-contracts
+base_commit: d31fce18b5f215e0f12eddf2c5b051891e9207ba
+created_at: '2026-02-27T11:06:48.227189+00:00'
+authoritative_surface: ''
+execution_mode: code_change
+mission_id: 01KN233MB1GVMCSS9KCNPN6P28
+owned_files:
+- src/spec_kitty_events/decisionpoint.py
+- tests/test_decisionpoint_reducer.py
+- tests/unit/test_decisionpoint.py
+wp_code: WP01
 ---
 
 # Work Package Prompt: WP01 - DecisionPoint Event Constants, Payload Models, and Reducer Transitions

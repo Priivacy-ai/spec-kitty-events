@@ -1,8 +1,15 @@
 ---
 work_package_id: WP03
 title: Exports, Schemas & Tests
-lane: "done"
 dependencies: [WP02]
+requirement_refs:
+- FR-001
+- FR-007
+- NFR-001
+- NFR-002
+- NFR-003
+- C-001
+- C-004
 base_branch: 2.x
 base_commit: 777e3f958af675c41c3d9b5fb46409fc5f2691b5
 created_at: '2026-03-05T22:10:46.817569+00:00'
@@ -13,26 +20,25 @@ subtasks:
 - T013
 - T014
 phase: Phase 2 - Integration
-assignee: ''
-agent: claude-opus-4-6
-shell_pid: '42610'
-review_status: "approved"
-reviewed_by: "Robert Douglass"
-review_feedback: feedback://013-per-user-identity-connector-events/WP03/20260305T221933Z-627f4e2b.md
 history:
 - timestamp: '2026-03-05T11:15:54Z'
   lane: planned
   agent: system
   shell_pid: ''
   action: Prompt generated via /spec-kitty.tasks
-requirement_refs:
-- FR-001
-- FR-007
-- NFR-001
-- NFR-002
-- NFR-003
-- C-001
-- C-004
+authoritative_surface: ''
+execution_mode: code_change
+mission_id: 01KN233MB1GVMCSS9KCNPN6P2A
+owned_files:
+- kitty-specs/013-per-user-identity-connector-events/contracts/**
+- kitty-specs/013-per-user-identity-connector-events/data-model.md
+- kitty-specs/013-per-user-identity-connector-events/plan.md
+- kitty-specs/013-per-user-identity-connector-events/spec.md
+- src/spec_kitty_events/**
+- tests/property/test_connector_determinism.py
+- tests/test_connector_reducer.py
+- tests/unit/test_connector.py
+wp_code: WP03
 ---
 
 # Work Package Prompt: WP03 – Exports, Schemas & Tests

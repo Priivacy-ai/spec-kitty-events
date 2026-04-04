@@ -1,21 +1,25 @@
 ---
 work_package_id: WP02
 title: Lifecycle Payload Models
-lane: "done"
 dependencies: []
 base_branch: 004-canonical-event-contract-WP01
 base_commit: 9ad0795ce86fc43e76608f4aa0bf1c80b7dbe183
 created_at: '2026-02-09T11:43:55.157119+00:00'
 subtasks: [T008, T009, T010, T011, T012, T013]
-agent: claude-opus
-shell_pid: '11768'
-reviewed_by: "Robert Douglass"
-review_status: "approved"
 history:
 - date: '2026-02-09'
   agent: claude-opus
   action: created
   note: Generated from /spec-kitty.tasks
+authoritative_surface: ''
+execution_mode: code_change
+mission_id: 01KN233MAZ48PRQRGCNZQJRTQX
+owned_files:
+- src/spec_kitty_events/gates.py
+- src/spec_kitty_events/lifecycle.py
+- src/spec_kitty_events/status.py
+- tests/unit/test_lifecycle.py
+wp_code: WP02
 ---
 
 # WP02: Lifecycle Payload Models

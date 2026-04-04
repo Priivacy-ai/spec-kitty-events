@@ -3,7 +3,7 @@
 Event log library with Lamport clocks, CRDT merge, and canonical event contracts for distributed
 systems.
 
-**Version**: 2.3.1 | **SCHEMA_VERSION**: 2.0.0 | **Python**: >= 3.10
+**Version**: 2.9.0 | **SCHEMA_VERSION**: 2.0.0 | **Python**: >= 3.10
 
 ## Features
 
@@ -12,8 +12,8 @@ systems.
 - **Conflict Detection**: Detect concurrent events with `is_concurrent()`
 - **CRDT Merge Rules**: Merge grow-only sets and counters with CRDT semantics
 - **State-Machine Merge**: Resolve state conflicts with priority-based selection
-- **Status State Model**: 7-lane canonical lifecycle (`Lane`) with transition validation and reducer
-- **Lane Mapping Contract**: `SyncLaneV1` maps 7 canonical lanes to 4 consumer-facing sync lanes
+- **Status State Model**: 8-lane canonical lifecycle (`Lane`) with transition validation and reducer
+- **Lane Mapping Contract**: `SyncLaneV1` preserves the legacy 4-lane consumer view, while `SyncLaneV2` exposes the explicit `approved` lane
 - **Gate Observability**: Typed payloads for GitHub `check_run` gate events
 - **Lifecycle Events**: Mission lifecycle contracts with typed payloads and reducer
 - **Collaboration Events**: N-participant mission collaboration with advisory coordination (soft
@@ -60,14 +60,18 @@ pip install -e ".[dev,conformance]"
 ### Lane Mapping (New in 2.0.0)
 
 ```python
-from spec_kitty_events import Lane, SyncLaneV1, canonical_to_sync_v1
+from spec_kitty_events import Lane, SyncLaneV1, SyncLaneV2, canonical_to_sync_v1, canonical_to_sync_v2
 
-# Convert canonical 7-lane model to consumer-facing 4-lane model
+# Convert canonical 8-lane model to the legacy 4-lane consumer view
 sync_lane = canonical_to_sync_v1(Lane.IN_PROGRESS)
 assert sync_lane == SyncLaneV1.DOING
 
 sync_lane = canonical_to_sync_v1(Lane.BLOCKED)
 assert sync_lane == SyncLaneV1.DOING  # blocked collapses to doing
+
+# Preserve explicit review approval in the V2 sync view
+sync_lane = canonical_to_sync_v2(Lane.APPROVED)
+assert sync_lane == SyncLaneV2.APPROVED
 ```
 
 ### Event Emission

@@ -18,6 +18,7 @@ class Lane(str, Enum):
     CLAIMED = "claimed"
     IN_PROGRESS = "in_progress"
     FOR_REVIEW = "for_review"
+    APPROVED = "approved"
     DONE = "done"
     BLOCKED = "blocked"
     CANCELED = "canceled"
@@ -32,14 +33,37 @@ class SyncLaneV1(str, Enum):
     DONE = "done"
 
 
+class SyncLaneV2(str, Enum):
+    """V2 sync lanes preserving the explicit approved review outcome."""
+
+    PLANNED = "planned"
+    DOING = "doing"
+    FOR_REVIEW = "for_review"
+    APPROVED = "approved"
+    DONE = "done"
+
+
 CANONICAL_TO_SYNC_V1: Mapping[Lane, SyncLaneV1] = MappingProxyType({
     Lane.PLANNED: SyncLaneV1.PLANNED,
     Lane.CLAIMED: SyncLaneV1.PLANNED,
     Lane.IN_PROGRESS: SyncLaneV1.DOING,
     Lane.FOR_REVIEW: SyncLaneV1.FOR_REVIEW,
+    Lane.APPROVED: SyncLaneV1.DONE,
     Lane.DONE: SyncLaneV1.DONE,
     Lane.BLOCKED: SyncLaneV1.DOING,
     Lane.CANCELED: SyncLaneV1.PLANNED,
+})
+
+
+CANONICAL_TO_SYNC_V2: Mapping[Lane, SyncLaneV2] = MappingProxyType({
+    Lane.PLANNED: SyncLaneV2.PLANNED,
+    Lane.CLAIMED: SyncLaneV2.PLANNED,
+    Lane.IN_PROGRESS: SyncLaneV2.DOING,
+    Lane.FOR_REVIEW: SyncLaneV2.FOR_REVIEW,
+    Lane.APPROVED: SyncLaneV2.APPROVED,
+    Lane.DONE: SyncLaneV2.DONE,
+    Lane.BLOCKED: SyncLaneV2.DOING,
+    Lane.CANCELED: SyncLaneV2.PLANNED,
 })
 
 
@@ -56,6 +80,11 @@ def canonical_to_sync_v1(lane: Lane) -> SyncLaneV1:
         KeyError: If lane is not in the V1 mapping.
     """
     return CANONICAL_TO_SYNC_V1[lane]
+
+
+def canonical_to_sync_v2(lane: Lane) -> SyncLaneV2:
+    """Apply the V2 canonical-to-sync lane mapping."""
+    return CANONICAL_TO_SYNC_V2[lane]
 
 
 class ExecutionMode(str, Enum):
@@ -213,9 +242,9 @@ class StatusTransitionPayload(BaseModel):
             raise ValueError(
                 "force=True requires a non-empty reason"
             )
-        if self.to_lane == Lane.DONE and self.evidence is None:
+        if self.to_lane in {Lane.APPROVED, Lane.DONE} and self.evidence is None:
             raise ValueError(
-                "to_lane='done' requires evidence"
+                "to_lane in {'approved', 'done'} requires evidence"
             )
         return self
 
@@ -239,9 +268,15 @@ _ALLOWED_TRANSITIONS: FrozenSet[Tuple[Optional[Lane], Lane]] = frozenset({
     (Lane.PLANNED, Lane.CLAIMED),
     (Lane.CLAIMED, Lane.IN_PROGRESS),
     (Lane.IN_PROGRESS, Lane.FOR_REVIEW),
+    (Lane.IN_PROGRESS, Lane.APPROVED),
+    (Lane.FOR_REVIEW, Lane.APPROVED),
     (Lane.FOR_REVIEW, Lane.DONE),
+    (Lane.APPROVED, Lane.DONE),
     # Review rollback
     (Lane.FOR_REVIEW, Lane.IN_PROGRESS),
+    (Lane.FOR_REVIEW, Lane.PLANNED),
+    (Lane.APPROVED, Lane.IN_PROGRESS),
+    (Lane.APPROVED, Lane.PLANNED),
     # Abandon/reassign
     (Lane.IN_PROGRESS, Lane.PLANNED),
     # Unblock
@@ -300,11 +335,13 @@ def validate_transition(payload: StatusTransitionPayload) -> TransitionValidatio
 
     # Guard conditions (checked regardless of force)
     if (
-        payload.from_lane is Lane.FOR_REVIEW
-        and payload.to_lane is Lane.IN_PROGRESS
+        payload.from_lane in {Lane.FOR_REVIEW, Lane.APPROVED}
+        and payload.to_lane in {Lane.IN_PROGRESS, Lane.PLANNED}
         and (payload.review_ref is None or payload.review_ref.strip() == "")
     ):
-        violations.append("for_review -> in_progress requires review_ref")
+        violations.append(
+            f"{payload.from_lane.value} -> {payload.to_lane.value} requires review_ref"
+        )
 
     if (
         payload.from_lane is Lane.IN_PROGRESS

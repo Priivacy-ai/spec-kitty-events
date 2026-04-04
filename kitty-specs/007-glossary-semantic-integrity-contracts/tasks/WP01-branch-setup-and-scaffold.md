@@ -1,7 +1,6 @@
 ---
 work_package_id: WP01
 title: Branch Setup & Module Scaffold
-lane: "done"
 dependencies: []
 base_branch: 2.x
 base_commit: 1ffeb090612a59c7864871c8bfb0aad41b9db81c
@@ -12,17 +11,20 @@ subtasks:
 - T003
 - T004
 phase: Phase 0 - Setup
-assignee: ''
-agent: "claude-opus"
-shell_pid: "18339"
-review_status: "approved"
-reviewed_by: "Robert Douglass"
 history:
 - timestamp: '2026-02-16T12:00:00Z'
   lane: planned
   agent: system
   shell_pid: ''
   action: Prompt generated via /spec-kitty.tasks
+authoritative_surface: ''
+execution_mode: code_change
+mission_id: 01KN233MAZ48PRQRGCNZQJRTR0
+owned_files:
+- kitty-specs/007-glossary-semantic-integrity-contracts/data-model.md
+- kitty-specs/007-glossary-semantic-integrity-contracts/plan.md
+- src/spec_kitty_events/**
+wp_code: WP01
 ---
 
 # Work Package Prompt: WP01 – Branch Setup & Module Scaffold

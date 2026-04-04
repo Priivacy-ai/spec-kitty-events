@@ -1,20 +1,22 @@
 ---
 work_package_id: WP03
 title: Conformance Validator API
-lane: "done"
 dependencies: [WP02]
 base_branch: 005-event-contract-conformance-suite-WP02
 base_commit: 1382e91bdfa19cefd94d3943317aa2591f2a9351
 created_at: '2026-02-12T10:39:25.027797+00:00'
 subtasks: [T014, T015, T016, T017, T018, T019, T020]
-shell_pid: "91425"
-agent: "codex"
-review_status: "has_feedback"
-reviewed_by: "Robert Douglass"
 history:
 - date: '2026-02-12'
   action: created
   by: spec-kitty.tasks
+authoritative_surface: ''
+execution_mode: code_change
+mission_id: 01KN233MAZ48PRQRGCNZQJRTQY
+owned_files:
+- src/spec_kitty_events/conformance/**
+- tests/unit/test_conformance.py
+wp_code: WP03
 ---
 
 # WP03 — Conformance Validator API

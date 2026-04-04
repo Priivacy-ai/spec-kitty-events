@@ -20,7 +20,7 @@ per event type, versioning policy, and CI integration steps.
 
 ## Lane Mapping Contract
 
-The `SyncLaneV1` mapping collapses the 7 canonical `Lane` values into 4 consumer-facing sync
+The `SyncLaneV1` mapping collapses the 8 canonical `Lane` values into 4 consumer-facing sync
 lanes. This mapping is **locked** for the entire 2.x series. Changing any output for a given
 input constitutes a breaking change requiring a `3.0.0` release.
 
@@ -32,6 +32,7 @@ input constitutes a breaking change requiring a `3.0.0` release.
 | `claimed` | `planned` | Pre-work state, collapses to planned |
 | `in_progress` | `doing` | Consumer-facing alias for active work |
 | `for_review` | `for_review` | Direct mapping |
+| `approved` | `done` | Legacy 4-lane consumers collapse post-review approval into done |
 | `done` | `done` | Direct mapping |
 | `blocked` | `doing` | Mid-work state, collapses to doing |
 | `canceled` | `planned` | Resets to planned in sync model |
@@ -39,7 +40,7 @@ input constitutes a breaking change requiring a `3.0.0` release.
 ### Usage
 
 ```python
-from spec_kitty_events import Lane, SyncLaneV1, canonical_to_sync_v1
+from spec_kitty_events import Lane, SyncLaneV1, SyncLaneV2, canonical_to_sync_v1, canonical_to_sync_v2
 
 # Function API (recommended)
 sync_lane = canonical_to_sync_v1(Lane.IN_PROGRESS)
@@ -48,6 +49,10 @@ assert sync_lane == SyncLaneV1.DOING
 # Direct mapping access
 from spec_kitty_events import CANONICAL_TO_SYNC_V1
 assert CANONICAL_TO_SYNC_V1[Lane.BLOCKED] == SyncLaneV1.DOING
+
+# V2 keeps approved explicit for consumers that need a 5-lane board
+sync_lane_v2 = canonical_to_sync_v2(Lane.APPROVED)
+assert sync_lane_v2 == SyncLaneV2.APPROVED
 ```
 
 ### Mapping Guarantees
@@ -55,6 +60,8 @@ assert CANONICAL_TO_SYNC_V1[Lane.BLOCKED] == SyncLaneV1.DOING
 - The `CANONICAL_TO_SYNC_V1` mapping is an **immutable** `MappingProxyType`. It cannot be
   modified at runtime.
 - Every `Lane` member has exactly one `SyncLaneV1` target. There are no unmapped lanes.
+- `SyncLaneV2` is the recommended mapping for consumers that need to distinguish `approved`
+  from `done`.
 - The mapping is exercised by conformance fixtures in the `lane_mapping` category.
 
 ---
@@ -446,6 +453,7 @@ LANE_MAP = {
     "claimed": "planned",
     "in_progress": "doing",
     "for_review": "for_review",
+    "approved": "done",
     "done": "done",
     "blocked": "doing",
     "canceled": "planned",
@@ -469,9 +477,11 @@ class SyncStatus(str, Enum):
     DONE = "done"
 
 # After (2.0.0):
-from spec_kitty_events import SyncLaneV1
+from spec_kitty_events import SyncLaneV1, SyncLaneV2
 
 # SyncLaneV1.PLANNED, SyncLaneV1.DOING, SyncLaneV1.FOR_REVIEW, SyncLaneV1.DONE
+# SyncLaneV2.PLANNED, SyncLaneV2.DOING, SyncLaneV2.FOR_REVIEW,
+# SyncLaneV2.APPROVED, SyncLaneV2.DONE
 ```
 
 ### Step 4: Update Event Constructors
@@ -576,6 +586,7 @@ def test_my_payload_conforms():
 
 def test_lane_mapping_contract():
     assert_lane_mapping("in_progress", "doing")
+    assert_lane_mapping("approved", "done")
     assert_lane_mapping("blocked", "doing")
     assert_lane_mapping("canceled", "planned")
 ```
@@ -631,7 +642,7 @@ addressed across WP01-WP07:
 | FR-001 | `SyncLaneV1` enum with 4 values | WP01 (`status.py`) |
 | FR-002 | `CANONICAL_TO_SYNC_V1` immutable mapping | WP01 (`status.py`) |
 | FR-003 | `canonical_to_sync_v1()` function | WP01 (`status.py`) |
-| FR-004 | All 7 `Lane` values mapped | WP01 (`status.py`) |
+| FR-004 | All 8 `Lane` values mapped | WP01 (`status.py`) |
 | FR-005 | Mapping is frozen (`MappingProxyType`) | WP01 (`status.py`) |
 | FR-006 | JSON Schema per Pydantic model | WP02 (`schemas/`) |
 | FR-007 | Build-time generation script | WP02 (`schemas/generate.py`) |

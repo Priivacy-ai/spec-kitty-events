@@ -86,6 +86,9 @@ class TestLane:
     def test_for_review_value(self) -> None:
         assert Lane.FOR_REVIEW.value == "for_review"
 
+    def test_approved_value(self) -> None:
+        assert Lane.APPROVED.value == "approved"
+
     def test_done_value(self) -> None:
         assert Lane.DONE.value == "done"
 
@@ -95,8 +98,8 @@ class TestLane:
     def test_canceled_value(self) -> None:
         assert Lane.CANCELED.value == "canceled"
 
-    def test_all_seven_members(self) -> None:
-        assert len(Lane) == 7
+    def test_all_eight_members(self) -> None:
+        assert len(Lane) == 8
 
     def test_string_equality(self) -> None:
         assert Lane.PLANNED == "planned"
@@ -104,9 +107,10 @@ class TestLane:
 
     def test_iteration_yields_all(self) -> None:
         values = [m.value for m in Lane]
+        assert "approved" in values
         assert "planned" in values
         assert "canceled" in values
-        assert len(values) == 7
+        assert len(values) == 8
 
     def test_from_value(self) -> None:
         assert Lane("planned") is Lane.PLANNED
@@ -172,7 +176,7 @@ class TestNormalizeLane:
     """Test normalize_lane function."""
 
     @pytest.mark.parametrize("value", [
-        "planned", "claimed", "in_progress", "for_review",
+        "planned", "claimed", "in_progress", "for_review", "approved",
         "done", "blocked", "canceled",
     ])
     def test_canonical_values(self, value: str) -> None:
@@ -454,6 +458,21 @@ class TestStatusTransitionPayload:
         with pytest.raises(pydantic.ValidationError, match="requires evidence"):
             StatusTransitionPayload(**data)
 
+    def test_approved_requires_evidence(self) -> None:
+        data = {**VALID_TRANSITION_DATA, "to_lane": "approved"}
+        with pytest.raises(pydantic.ValidationError, match="requires evidence"):
+            StatusTransitionPayload(**data)
+
+    def test_approved_with_evidence_valid(self) -> None:
+        data = {
+            **VALID_TRANSITION_DATA,
+            "to_lane": "approved",
+            "evidence": VALID_DONE_EVIDENCE,
+        }
+        p = StatusTransitionPayload(**data)
+        assert p.to_lane is Lane.APPROVED
+        assert p.evidence is not None
+
     def test_done_with_evidence_valid(self) -> None:
         data = {
             **VALID_TRANSITION_DATA,
@@ -619,14 +638,44 @@ class TestTransitionMatrix:
             (Lane.CLAIMED, Lane.IN_PROGRESS, {}),
             (Lane.IN_PROGRESS, Lane.FOR_REVIEW, {}),
             (
+                Lane.IN_PROGRESS,
+                Lane.APPROVED,
+                {"evidence": None},
+            ),
+            (
+                Lane.FOR_REVIEW,
+                Lane.APPROVED,
+                {"evidence": None},
+            ),
+            (
                 Lane.FOR_REVIEW,
                 Lane.DONE,
                 {"evidence": None},  # placeholder, replaced below
             ),
             (
+                Lane.APPROVED,
+                Lane.DONE,
+                {"evidence": None},
+            ),
+            (
                 Lane.FOR_REVIEW,
                 Lane.IN_PROGRESS,
                 {"review_ref": "PR#42"},
+            ),
+            (
+                Lane.FOR_REVIEW,
+                Lane.PLANNED,
+                {"review_ref": "feedback://WP01"},
+            ),
+            (
+                Lane.APPROVED,
+                Lane.IN_PROGRESS,
+                {"review_ref": "feedback://WP01"},
+            ),
+            (
+                Lane.APPROVED,
+                Lane.PLANNED,
+                {"review_ref": "feedback://WP01"},
             ),
             (
                 Lane.IN_PROGRESS,
@@ -642,8 +691,14 @@ class TestTransitionMatrix:
             "claim",
             "start",
             "submit",
+            "approve-direct",
+            "approve-from-review",
             "approve",
+            "merge-approved",
             "rollback",
+            "reject-from-review",
+            "reopen-approved",
+            "reject-approved",
             "abandon",
             "unblock",
             "block",
@@ -657,7 +712,7 @@ class TestTransitionMatrix:
         kwargs: dict,  # type: ignore[type-arg]
     ) -> None:
         # Special handling for DONE which needs real evidence
-        if to_lane is Lane.DONE:
+        if to_lane in {Lane.APPROVED, Lane.DONE}:
             kwargs["evidence"] = _make_evidence()
         payload = _make_payload(from_lane=from_lane, to_lane=to_lane, **kwargs)
         result = validate_transition(payload)
@@ -697,7 +752,7 @@ class TestIllegalTransitions:
                     "from_lane": src,
                     "to_lane": dst,
                 }
-                if dst is Lane.DONE:
+                if dst in {Lane.APPROVED, Lane.DONE}:
                     kwargs["evidence"] = _make_evidence()
                 payload = _make_payload(**kwargs)  # type: ignore[arg-type]
                 result = validate_transition(payload)
@@ -753,6 +808,24 @@ class TestGuardConditions:
         result = validate_transition(payload)
         assert result.valid is False
         assert any("reason" in v for v in result.violations)
+
+    def test_approved_to_planned_without_review_ref(self) -> None:
+        payload = _make_payload(
+            from_lane=Lane.APPROVED,
+            to_lane=Lane.PLANNED,
+        )
+        result = validate_transition(payload)
+        assert result.valid is False
+        assert any("review_ref" in v for v in result.violations)
+
+    def test_approved_to_in_progress_with_review_ref(self) -> None:
+        payload = _make_payload(
+            from_lane=Lane.APPROVED,
+            to_lane=Lane.IN_PROGRESS,
+            review_ref="feedback://WP01",
+        )
+        result = validate_transition(payload)
+        assert result.valid is True
 
     def test_in_progress_to_planned_with_reason(self) -> None:
         payload = _make_payload(
@@ -936,7 +1009,7 @@ class TestReduceStatusEvents:
     """Test reduce_status_events function."""
 
     def test_happy_path_full_lifecycle(self) -> None:
-        """planned -> claimed -> in_progress -> for_review -> done."""
+        """planned -> claimed -> in_progress -> for_review -> approved -> done."""
         base_t = datetime(2026, 1, 1, tzinfo=timezone.utc)
         evidence = DoneEvidence(
             repos=[RepoEvidence(repo="test", branch="main", commit="abc123")],
@@ -949,8 +1022,13 @@ class TestReduceStatusEvents:
             _make_event("01HV0000000000000000000003", "WP01", Lane.CLAIMED, Lane.IN_PROGRESS, 3, timestamp=base_t + timedelta(seconds=2)),
             _make_event("01HV0000000000000000000004", "WP01", Lane.IN_PROGRESS, Lane.FOR_REVIEW, 4, timestamp=base_t + timedelta(seconds=3)),
             _make_event(
-                "01HV0000000000000000000005", "WP01", Lane.FOR_REVIEW, Lane.DONE, 5,
+                "01HV0000000000000000000005", "WP01", Lane.FOR_REVIEW, Lane.APPROVED, 5,
                 timestamp=base_t + timedelta(seconds=4),
+                evidence=evidence,
+            ),
+            _make_event(
+                "01HV0000000000000000000006", "WP01", Lane.APPROVED, Lane.DONE, 6,
+                timestamp=base_t + timedelta(seconds=5),
                 evidence=evidence,
             ),
         ]
@@ -958,10 +1036,22 @@ class TestReduceStatusEvents:
         assert "WP01" in result.wp_states
         state = result.wp_states["WP01"]
         assert state.current_lane == Lane.DONE
-        assert state.last_event_id == "01HV0000000000000000000005"
+        assert state.last_event_id == "01HV0000000000000000000006"
         assert state.evidence is not None
         assert result.anomalies == []
-        assert result.event_count == 5
+        assert result.event_count == 6
+
+    def test_reducer_preserves_approved_without_done(self) -> None:
+        base_t = datetime(2026, 1, 1, tzinfo=timezone.utc)
+        evidence = _make_evidence()
+        events = [
+            _make_event("01HV0000000000000000000101", "WP01", None, Lane.PLANNED, 1, timestamp=base_t),
+            _make_event("01HV0000000000000000000102", "WP01", Lane.PLANNED, Lane.CLAIMED, 2, timestamp=base_t + timedelta(seconds=1)),
+            _make_event("01HV0000000000000000000103", "WP01", Lane.CLAIMED, Lane.IN_PROGRESS, 3, timestamp=base_t + timedelta(seconds=2)),
+            _make_event("01HV0000000000000000000104", "WP01", Lane.IN_PROGRESS, Lane.APPROVED, 4, timestamp=base_t + timedelta(seconds=3), evidence=evidence),
+        ]
+        result = reduce_status_events(events)
+        assert result.wp_states["WP01"].current_lane == Lane.APPROVED
 
     def test_multiple_wps(self) -> None:
         """Interleaved events for WP01 and WP02."""
