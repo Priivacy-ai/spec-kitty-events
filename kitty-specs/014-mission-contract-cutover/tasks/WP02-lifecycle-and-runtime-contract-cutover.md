@@ -19,6 +19,8 @@ subtasks:
 - T006
 - T007
 - T008
+agent: "opencode"
+shell_pid: "84881"
 history:
 - timestamp: '2026-04-05T12:40:33Z'
   lane: planned
@@ -172,3 +174,7 @@ owned_files:
 - Reviewers should reject any leftover runtime alias compatibility path, even if hidden behind a helper or warning.
 - Reviewers should inspect reducer output field names, not just payload classes.
 - Reviewers should confirm this WP does not attempt fixture or schema rewrites that belong to WP05.
+
+## Activity Log
+
+- 2026-04-05T13:27:24Z – opencode – shell_pid=84881 – Started implementation via action command
