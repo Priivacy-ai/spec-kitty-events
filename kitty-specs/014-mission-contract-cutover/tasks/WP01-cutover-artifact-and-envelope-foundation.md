@@ -245,3 +245,4 @@ Do not modify files outside this list. Schema generation, broad cross-domain fix
 - 2026-04-05T13:24:15Z – opencode – shell_pid=84881 – Ready for review
 - 2026-04-05T13:25:00Z – codex – shell_pid=84881 – Started review via action command
 - 2026-04-05T13:26:28Z – codex – shell_pid=84881 – Moved to planned
+- 2026-04-05T13:27:05Z – codex – shell_pid=84881 – Arbiter decision: Approved after 3 cycles. Functional acceptance criteria are met, baseline packaged valid event fixtures now carry build_id, and the remaining review objection is diff contamination from task/status artifact commits on main rather than a WP01 contract defect.
