@@ -140,10 +140,10 @@
 
 ### Included Subtasks
 
-- [ ] T013 Rename mission-audit payload and reducer surfaces from legacy `feature_slug` terms to canonical `mission_slug`, `mission_number`, and `mission_type` in `src/spec_kitty_events/mission_audit.py`
-- [ ] T014 Update any mission-domain surfaces in `src/spec_kitty_events/status.py` from legacy feature naming to canonical mission naming while preserving unrelated status concepts
-- [ ] T015 Update mission-audit and status reducer, unit, and determinism tests for canonical terminology and hard-cutover expectations
-- [ ] T016 Reflect historical rewrite semantics in touched examples or anomaly handling without adding runtime compatibility aliases or bridge paths
+- [x] T013 Rename mission-audit payload and reducer surfaces from legacy `feature_slug` terms to canonical `mission_slug`, `mission_number`, and `mission_type` in `src/spec_kitty_events/mission_audit.py`
+- [x] T014 Update any mission-domain surfaces in `src/spec_kitty_events/status.py` from legacy feature naming to canonical mission naming while preserving unrelated status concepts
+- [x] T015 Update mission-audit and status reducer, unit, and determinism tests for canonical terminology and hard-cutover expectations
+- [x] T016 Reflect historical rewrite semantics in touched examples or anomaly handling without adding runtime compatibility aliases or bridge paths
 
 ### Implementation Sketch
 
