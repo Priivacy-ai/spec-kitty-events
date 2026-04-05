@@ -178,11 +178,11 @@
 
 ### Included Subtasks
 
-- [ ] T017 Update `src/spec_kitty_events/schemas/generate.py` and schema loader surfaces for the cutover artifact, envelope changes, and renamed mission-domain payloads
-- [ ] T018 Regenerate committed JSON schemas, including event envelope, lifecycle/runtime, projection, and cutover artifact schemas in `src/spec_kitty_events/schemas/`
-- [ ] T019 Wire `src/spec_kitty_events/conformance/validators.py` and `loader.py` to enforce the artifact’s exact signal, `accepted_major`, and forbidden legacy surfaces
-- [ ] T020 Rewrite `src/spec_kitty_events/conformance/fixtures/` and `manifest.json` so valid, invalid, and replay cases all use canonical mission/build terminology and explicit fail-closed cases
-- [ ] T021 Update conformance, fixture, and schema-drift tests so the release bar proves artifact-driven validation and replay correctness end to end
+- [x] T017 Update `src/spec_kitty_events/schemas/generate.py` and schema loader surfaces for the cutover artifact, envelope changes, and renamed mission-domain payloads
+- [x] T018 Regenerate committed JSON schemas, including event envelope, lifecycle/runtime, projection, and cutover artifact schemas in `src/spec_kitty_events/schemas/`
+- [x] T019 Wire `src/spec_kitty_events/conformance/validators.py` and `loader.py` to enforce the artifact’s exact signal, `accepted_major`, and forbidden legacy surfaces
+- [x] T020 Rewrite `src/spec_kitty_events/conformance/fixtures/` and `manifest.json` so valid, invalid, and replay cases all use canonical mission/build terminology and explicit fail-closed cases
+- [x] T021 Update conformance, fixture, and schema-drift tests so the release bar proves artifact-driven validation and replay correctness end to end
 
 ### Implementation Sketch
 
