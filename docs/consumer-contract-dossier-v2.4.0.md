@@ -1,6 +1,16 @@
 # Consumer Contract: Mission Dossier Events — v2.4.0
 
-**Status**: Payload shape FROZEN for this release wave.
+> Archived historical document.
+>
+> This page describes the pre-cutover `2.4.0` dossier contract and is not
+> current consumer guidance for `spec-kitty-events` `3.0.0`.
+>
+> The canonical live contract now uses the `3.0.0` cutover artifact, fail-closed
+> validation, and canonical mission taxonomy. In particular, public live
+> contracts should not treat `feature_slug` or `mission_key` as canonical
+> mission-domain fields.
+
+**Status**: Archived historical reference only.
 **Package**: `spec-kitty-events==2.4.0`
 
 ---

@@ -94,10 +94,10 @@ class TestValidEventFixtures:
             f"Conformance failure for {path}: {result.model_violations}"
         )
 
-    def test_eleven_valid_event_fixtures_exist(self) -> None:
+    def test_thirteen_valid_event_fixtures_exist(self) -> None:
         valid_dir = _FIXTURES_DIR / "events" / "valid"
         files = sorted(valid_dir.glob("*.json"))
-        assert len(files) == 11, f"Expected 11 valid event fixtures, got {len(files)}"
+        assert len(files) == 13, f"Expected 13 valid event fixtures, got {len(files)}"
 
 
 # ---------------------------------------------------------------------------
@@ -330,7 +330,7 @@ class TestManifest:
     def test_manifest_has_version(self) -> None:
         with open(_MANIFEST_PATH, encoding="utf-8") as f:
             manifest = json.load(f)
-        assert manifest["version"] == "2.0.0"
+        assert manifest["version"] == "3.0.0"
 
     def test_every_fixture_file_has_manifest_entry(self) -> None:
         """Every .json fixture file in the tree has a manifest entry."""
@@ -410,7 +410,7 @@ class TestLoadFixtures:
     def test_events_valid_cases_expected_valid_true(self) -> None:
         cases = load_fixtures("events")
         valid_cases = [c for c in cases if c.expected_valid]
-        assert len(valid_cases) == 11
+        assert len(valid_cases) == 13
 
     def test_events_invalid_cases_expected_valid_false(self) -> None:
         cases = load_fixtures("events")

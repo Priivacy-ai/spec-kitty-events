@@ -91,7 +91,7 @@ class TestConstants:
     """Tests for event type constants."""
 
     def test_schema_version(self) -> None:
-        assert SCHEMA_VERSION == "2.0.0"
+        assert SCHEMA_VERSION == "3.0.0"
 
     def test_mission_started(self) -> None:
         assert MISSION_STARTED == "MissionStarted"

@@ -18,8 +18,10 @@ from spec_kitty_events.cutover import assert_canonical_cutover_signal
 
 from spec_kitty_events.gates import GateFailedPayload, GatePassedPayload
 from spec_kitty_events.lifecycle import (
+    MissionClosedPayload,
     MissionCancelledPayload,
     MissionCompletedPayload,
+    MissionCreatedPayload,
     MissionStartedPayload,
     PhaseEnteredPayload,
     ReviewRollbackPayload,
@@ -134,6 +136,8 @@ _EVENT_TYPE_TO_MODEL: Dict[str, Type[Any]] = {
     "WPStatusChanged": StatusTransitionPayload,
     "GatePassed": GatePassedPayload,
     "GateFailed": GateFailedPayload,
+    "MissionCreated": MissionCreatedPayload,
+    "MissionClosed": MissionClosedPayload,
     "MissionStarted": MissionStartedPayload,
     "MissionCompleted": MissionCompletedPayload,
     "MissionCancelled": MissionCancelledPayload,
@@ -207,6 +211,8 @@ _EVENT_TYPE_TO_SCHEMA: Dict[str, str] = {
     "WPStatusChanged": "status_transition_payload",
     "GatePassed": "gate_passed_payload",
     "GateFailed": "gate_failed_payload",
+    "MissionCreated": "mission_created_payload",
+    "MissionClosed": "mission_closed_payload",
     "MissionStarted": "mission_started_payload",
     "MissionCompleted": "mission_completed_payload",
     "MissionCancelled": "mission_cancelled_payload",

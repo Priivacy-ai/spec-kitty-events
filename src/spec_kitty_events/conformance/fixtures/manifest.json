@@ -1,5 +1,5 @@
 {
-  "version": "2.0.0",
+  "version": "3.0.0",
   "fixtures": [
     {
       "id": "event-valid",
@@ -34,12 +34,28 @@
       "min_version": "2.0.0"
     },
     {
+      "id": "mission-created-valid",
+      "path": "events/valid/mission_created.json",
+      "expected_result": "valid",
+      "event_type": "MissionCreated",
+      "notes": "Valid MissionCreatedPayload with canonical mission taxonomy",
+      "min_version": "3.0.0"
+    },
+    {
+      "id": "mission-closed-valid",
+      "path": "events/valid/mission_closed.json",
+      "expected_result": "valid",
+      "event_type": "MissionClosed",
+      "notes": "Valid MissionClosedPayload with canonical mission taxonomy",
+      "min_version": "3.0.0"
+    },
+    {
       "id": "mission-started-valid",
       "path": "events/valid/mission_started.json",
       "expected_result": "valid",
       "event_type": "MissionStarted",
       "notes": "Valid MissionStartedPayload with all required fields",
-      "min_version": "2.0.0"
+      "min_version": "3.0.0"
     },
     {
       "id": "mission-completed-valid",
@@ -47,7 +63,7 @@
       "expected_result": "valid",
       "event_type": "MissionCompleted",
       "notes": "Valid MissionCompletedPayload with all required fields",
-      "min_version": "2.0.0"
+      "min_version": "3.0.0"
     },
     {
       "id": "mission-cancelled-valid",
@@ -55,7 +71,7 @@
       "expected_result": "valid",
       "event_type": "MissionCancelled",
       "notes": "Valid MissionCancelledPayload with reason",
-      "min_version": "2.0.0"
+      "min_version": "3.0.0"
     },
     {
       "id": "phase-entered-valid",
@@ -63,7 +79,7 @@
       "expected_result": "valid",
       "event_type": "PhaseEntered",
       "notes": "Valid PhaseEnteredPayload with required fields",
-      "min_version": "2.0.0"
+      "min_version": "3.0.0"
     },
     {
       "id": "review-rollback-valid",
@@ -71,7 +87,7 @@
       "expected_result": "valid",
       "event_type": "ReviewRollback",
       "notes": "Valid ReviewRollbackPayload with review reference",
-      "min_version": "2.0.0"
+      "min_version": "3.0.0"
     },
     {
       "id": "event-missing-correlation-id",

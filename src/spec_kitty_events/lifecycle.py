@@ -21,7 +21,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 # ── Section 1: Constants ─────────────────────────────────────────────────────
 
-SCHEMA_VERSION: str = "2.0.0"
+SCHEMA_VERSION: str = "3.0.0"
 
 # Event type string constants
 MISSION_CREATED: str = "MissionCreated"
