@@ -19,7 +19,7 @@ subtasks:
 - T006
 - T007
 - T008
-agent: "codex"
+agent: "opencode"
 shell_pid: "84881"
 history:
 - timestamp: '2026-04-05T12:40:33Z'
@@ -190,3 +190,4 @@ owned_files:
 - 2026-04-05T13:44:54Z – opencode – shell_pid=84881 – Ready for review
 - 2026-04-05T13:45:51Z – codex – shell_pid=84881 – Started review via action command
 - 2026-04-05T13:47:44Z – codex – shell_pid=84881 – Moved to planned
+- 2026-04-05T13:49:44Z – opencode – shell_pid=84881 – Started implementation via action command
