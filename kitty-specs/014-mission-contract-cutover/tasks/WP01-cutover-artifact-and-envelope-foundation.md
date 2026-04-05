@@ -222,3 +222,4 @@ Do not modify files outside this list. Schema generation, broad fixture rewrites
 - 2026-04-05T13:09:25Z – codex – shell_pid=84881 – Started review via action command
 - 2026-04-05T13:11:44Z – codex – shell_pid=84881 – Moved to planned
 - 2026-04-05T13:12:25Z – opencode – shell_pid=84881 – Started implementation via action command
+- 2026-04-05T13:15:35Z – opencode – shell_pid=84881 – Ready for review
