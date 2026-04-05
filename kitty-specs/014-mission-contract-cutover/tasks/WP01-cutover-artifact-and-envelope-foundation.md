@@ -20,7 +20,8 @@ subtasks:
 - T002
 - T003
 - T004
-shell_pid: '84881'
+shell_pid: "84881"
+agent: "opencode"
 history:
 - timestamp: '2026-04-05T12:40:33Z'
   lane: planned
@@ -213,3 +214,7 @@ Do not modify files outside this list. Schema generation, broad fixture rewrites
 - Reviewers should reject any solution that duplicates gate policy in helper constants when the artifact can express it.
 - Reviewers should reject any implementation that adds a compatibility bridge or soft-failure path.
 - Reviewers should verify that `build_id` and `node_id` are described and enforced as distinct concepts.
+
+## Activity Log
+
+- 2026-04-05T13:00:59Z – opencode – shell_pid=84881 – Started implementation via action command
