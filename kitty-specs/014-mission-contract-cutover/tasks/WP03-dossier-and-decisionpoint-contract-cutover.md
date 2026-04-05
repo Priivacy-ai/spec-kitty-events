@@ -19,6 +19,8 @@ subtasks:
 - T010
 - T011
 - T012
+agent: "opencode"
+shell_pid: "84881"
 history:
 - timestamp: '2026-04-05T12:40:33Z'
   lane: planned
@@ -159,3 +161,7 @@ owned_files:
 - Reviewers should inspect nested output structures, not just top-level payload fields.
 - Reviewers should reject any leftover `feature_slug`/`mission_key` usage on public surfaces.
 - Reviewers should verify that this WP stays inside its owned files and leaves fixture/schema work to WP05.
+
+## Activity Log
+
+- 2026-04-05T14:02:26Z – opencode – shell_pid=84881 – Started implementation via action command
