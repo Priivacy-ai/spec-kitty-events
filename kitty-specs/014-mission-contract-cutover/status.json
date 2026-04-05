@@ -1,8 +1,8 @@
 {
-  "event_count": 18,
+  "event_count": 19,
   "feature_slug": "014-mission-contract-cutover",
-  "last_event_id": "01KNEWT4CKQ2NK1VFZAYAVGSH6",
-  "materialized_at": "2026-04-05T13:20:13.715590+00:00",
+  "last_event_id": "01KNEX1GJ2H02CHCNG6PYT3NX6",
+  "materialized_at": "2026-04-05T13:24:15.555175+00:00",
   "mission_slug": "014-mission-contract-cutover",
   "summary": {
     "approved": 0,
@@ -10,17 +10,17 @@
     "canceled": 0,
     "claimed": 0,
     "done": 0,
-    "for_review": 0,
-    "in_progress": 1,
+    "for_review": 1,
+    "in_progress": 0,
     "planned": 5
   },
   "work_packages": {
     "WP01": {
-      "actor": "opencode",
+      "actor": "user",
       "force_count": 5,
-      "lane": "in_progress",
-      "last_event_id": "01KNEWT4CKQ2NK1VFZAYAVGSH6",
-      "last_transition_at": "2026-04-05T13:20:13.715266+00:00"
+      "lane": "for_review",
+      "last_event_id": "01KNEX1GJ2H02CHCNG6PYT3NX6",
+      "last_transition_at": "2026-04-05T13:24:15.554700+00:00"
     },
     "WP02": {
       "actor": "finalize-tasks",
