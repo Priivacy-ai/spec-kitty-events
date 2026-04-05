@@ -2,11 +2,12 @@ vcs:
   type: git
 agents:
   available:
-  - opencode
   - claude
+  - opencode
+  - codex
   selection:
-    preferred_implementer:
-    preferred_reviewer:
+    preferred_implementer: opencode
+    preferred_reviewer: claude
   auto_commit: true
 project:
   uuid: bebf8d60-7c5d-4459-94b6-e0f3e4ad83f9
