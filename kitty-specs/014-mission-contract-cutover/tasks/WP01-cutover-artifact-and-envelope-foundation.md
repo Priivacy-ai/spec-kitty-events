@@ -23,11 +23,12 @@ history:
   agent: system
   shell_pid: ''
   action: Prompt generated via /spec-kitty.tasks
-authoritative_surface: src/spec_kitty_events/models.py
+authoritative_surface: src/spec_kitty_events/
 execution_mode: code_change
 owned_files:
 - src/spec_kitty_events/models.py
 - src/spec_kitty_events/cutover.py
+- src/spec_kitty_events/conformance/fixtures/manifest.json
 - tests/unit/test_models.py
 - tests/unit/test_cutover.py
 - tests/integration/test_event_emission.py
@@ -67,11 +68,12 @@ owned_files:
 
 - `src/spec_kitty_events/models.py`
 - `src/spec_kitty_events/cutover.py` (new if needed)
+- `src/spec_kitty_events/conformance/fixtures/manifest.json` (only if this existing packaged manifest is promoted to the authoritative artifact)
 - `tests/unit/test_models.py`
 - `tests/unit/test_cutover.py` (new if needed)
 - `tests/integration/test_event_emission.py`
 
-Do not modify files outside this list. Schema generation, fixture rewrites, public exports, and docs belong to later WPs.
+Do not modify files outside this list. Schema generation, broad fixture rewrites, public exports, and docs belong to later WPs. If the existing packaged manifest is chosen as the authoritative artifact, structural changes needed to promote it belong here.
 
 ## Subtasks & Detailed Guidance
 
@@ -97,6 +99,7 @@ Do not modify files outside this list. Schema generation, fixture rewrites, publ
 **Files**:
 
 - `src/spec_kitty_events/cutover.py` or equivalent packaged artifact location
+- `src/spec_kitty_events/conformance/fixtures/manifest.json` if that manifest is promoted to release-authority status
 - `src/spec_kitty_events/models.py` only if the chosen location requires a typed wrapper or loader reference there
 
 **Validation**:

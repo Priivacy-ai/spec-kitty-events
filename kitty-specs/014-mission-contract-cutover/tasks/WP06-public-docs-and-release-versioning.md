@@ -75,18 +75,19 @@ owned_files:
 
 ### Subtask T022 - Update public exports and version notes
 
-**Purpose**: Make the top-level package surface reflect the breaking cutover and any new helper or contract exports that should be public.
+**Purpose**: Make the top-level package surface reflect the breaking cutover while exporting only deliberate public artifact or contract surfaces.
 
 **Steps**:
 
 1. Update `src/spec_kitty_events/__init__.py` version notes for the cutover release.
-2. Export any new public helper or artifact-facing symbol that downstream users are expected to import from the top level.
-3. Remove or rewrite export comments that still imply additive-only `2.x` semantics where the release is now a breaking cutover.
+2. Export only deliberate public artifact or contract types that downstream users are expected to import from the top level.
+3. Keep repo-local helper implementation reference-only unless there is a clear, explicit public-consumer need already established by the approved contract.
+4. Remove or rewrite export comments that still imply additive-only `2.x` semantics where the release is now a breaking cutover.
 
 **Validation**:
 
 - [ ] Export notes describe the breaking release accurately.
-- [ ] Public exports match the final code surface.
+- [ ] Public exports match the deliberate contract surface and do not accidentally promote repo-local helper code into a runtime dependency.
 
 ### Subtask T023 - Rewrite README.md with canonical taxonomy and gate semantics
 

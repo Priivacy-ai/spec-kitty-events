@@ -20,7 +20,19 @@
         "README.md",
         "pyproject.toml",
         "src/spec_kitty_events/__init__.py",
-        "src/spec_kitty_events/conformance/fixtures/**",
+        "src/spec_kitty_events/conformance/fixtures/collaboration/**",
+        "src/spec_kitty_events/conformance/fixtures/connector/**",
+        "src/spec_kitty_events/conformance/fixtures/decisionpoint/**",
+        "src/spec_kitty_events/conformance/fixtures/dossier/**",
+        "src/spec_kitty_events/conformance/fixtures/edge_cases/**",
+        "src/spec_kitty_events/conformance/fixtures/events/**",
+        "src/spec_kitty_events/conformance/fixtures/glossary/**",
+        "src/spec_kitty_events/conformance/fixtures/lane_mapping/**",
+        "src/spec_kitty_events/conformance/fixtures/manifest.json",
+        "src/spec_kitty_events/conformance/fixtures/mission_audit/**",
+        "src/spec_kitty_events/conformance/fixtures/mission_next/**",
+        "src/spec_kitty_events/conformance/fixtures/replay/**",
+        "src/spec_kitty_events/conformance/fixtures/sync/**",
         "src/spec_kitty_events/conformance/loader.py",
         "src/spec_kitty_events/conformance/validators.py",
         "src/spec_kitty_events/cutover.py",
@@ -78,6 +90,6 @@
       "parallel_group": 0
     }
   ],
-  "computed_at": "2026-04-05T12:50:11.614793+00:00",
+  "computed_at": "2026-04-05T12:58:42.205569+00:00",
   "computed_from": "dependency_graph+ownership"
 }
