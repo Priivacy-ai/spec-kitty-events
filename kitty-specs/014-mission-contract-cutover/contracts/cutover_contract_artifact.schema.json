@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CutoverContractArtifact",
+  "description": "Planning contract for the single authoritative machine-readable artifact that defines cutover compatibility gating for the mission/build terminology release.",
+  "type": "object",
+  "required": [
+    "artifact_version",
+    "release_version",
+    "signal_field_name",
+    "signal_location",
+    "cutover_contract_version",
+    "accepted_major",
+    "forbidden_legacy_keys",
+    "forbidden_legacy_event_names",
+    "forbidden_legacy_aggregate_names"
+  ],
+  "properties": {
+    "artifact_version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Version of the artifact schema."
+    },
+    "release_version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "spec-kitty-events release that ships this cutover policy."
+    },
+    "signal_field_name": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Exact on-wire field name that live consumers must read for compatibility gating."
+    },
+    "signal_location": {
+      "type": "string",
+      "enum": ["event_envelope", "payload", "artifact_only"],
+      "description": "Where the compatibility signal appears on wire. Downstream repos must not invent alternate locations."
+    },
+    "cutover_contract_version": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Required machine-checkable compatibility signal that live consumers must enforce."
+    },
+    "accepted_major": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Major version that live consumers must accept for this cutover."
+    },
+    "forbidden_legacy_keys": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "minItems": 1,
+      "uniqueItems": true,
+      "description": "Legacy public keys whose presence classifies a payload as pre-cutover."
+    },
+    "forbidden_legacy_event_names": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "minItems": 1,
+      "uniqueItems": true,
+      "description": "Legacy event names forbidden on live ingestion paths for this release."
+    },
+    "forbidden_legacy_aggregate_names": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "minItems": 1,
+      "uniqueItems": true,
+      "description": "Legacy aggregate names forbidden on live ingestion paths for this release."
+    },
+    "forbidden_legacy_contract_surfaces": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true,
+      "description": "Optional extra forbidden surfaces beyond keys and event names."
+    }
+  },
+  "additionalProperties": false
+}

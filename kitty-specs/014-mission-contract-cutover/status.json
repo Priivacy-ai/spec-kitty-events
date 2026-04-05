@@ -1,0 +1,61 @@
+{
+  "event_count": 6,
+  "feature_slug": "014-mission-contract-cutover",
+  "last_event_id": "01KNEV1QXCX5D9MN2KQY330EYD",
+  "materialized_at": "2026-04-05T12:49:25.938551+00:00",
+  "mission_slug": "014-mission-contract-cutover",
+  "summary": {
+    "approved": 0,
+    "blocked": 0,
+    "canceled": 0,
+    "claimed": 0,
+    "done": 0,
+    "for_review": 0,
+    "in_progress": 0,
+    "planned": 6
+  },
+  "work_packages": {
+    "WP01": {
+      "actor": "finalize-tasks",
+      "force_count": 1,
+      "lane": "planned",
+      "last_event_id": "01KNEV1QT23NQES0XD0XTSP942",
+      "last_transition_at": "2026-04-05T12:49:25.826709+00:00"
+    },
+    "WP02": {
+      "actor": "finalize-tasks",
+      "force_count": 1,
+      "lane": "planned",
+      "last_event_id": "01KNEV1QWQVABD7EV2ACJQ5CGY",
+      "last_transition_at": "2026-04-05T12:49:25.911618+00:00"
+    },
+    "WP03": {
+      "actor": "finalize-tasks",
+      "force_count": 1,
+      "lane": "planned",
+      "last_event_id": "01KNEV1QWXHA7QAF4TNAP6FZV1",
+      "last_transition_at": "2026-04-05T12:49:25.917099+00:00"
+    },
+    "WP04": {
+      "actor": "finalize-tasks",
+      "force_count": 1,
+      "lane": "planned",
+      "last_event_id": "01KNEV1QX2E6CZ35JKDCWPX9EM",
+      "last_transition_at": "2026-04-05T12:49:25.922753+00:00"
+    },
+    "WP05": {
+      "actor": "finalize-tasks",
+      "force_count": 1,
+      "lane": "planned",
+      "last_event_id": "01KNEV1QX72W546YN410BDJ592",
+      "last_transition_at": "2026-04-05T12:49:25.927783+00:00"
+    },
+    "WP06": {
+      "actor": "finalize-tasks",
+      "force_count": 1,
+      "lane": "planned",
+      "last_event_id": "01KNEV1QXCX5D9MN2KQY330EYD",
+      "last_transition_at": "2026-04-05T12:49:25.932875+00:00"
+    }
+  }
+}

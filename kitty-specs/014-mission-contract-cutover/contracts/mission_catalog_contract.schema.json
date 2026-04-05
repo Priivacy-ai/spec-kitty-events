@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "MissionCatalogContract",
+  "description": "Planning contract for canonical mission catalog events and mission-domain payload fields after the cutover.",
+  "type": "object",
+  "required": [
+    "event_type",
+    "mission_slug",
+    "mission_number",
+    "mission_type"
+  ],
+  "properties": {
+    "event_type": {
+      "type": "string",
+      "enum": ["MissionCreated", "MissionClosed"],
+      "description": "Canonical catalog event names. MissionCompleted is not valid here."
+    },
+    "mission_slug": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Canonical mission instance identifier."
+    },
+    "mission_number": {
+      "type": "string",
+      "pattern": "^\\d+$",
+      "description": "Canonical mission numeric identifier."
+    },
+    "mission_type": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Canonical mission workflow or template identifier."
+    }
+  },
+  "allOf": [
+    {
+      "not": {
+        "anyOf": [
+          { "required": ["feature_slug"] },
+          { "required": ["feature_number"] },
+          { "required": ["mission_key"] }
+        ]
+      }
+    }
+  ],
+  "additionalProperties": true
+}
