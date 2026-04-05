@@ -20,6 +20,8 @@ subtasks:
 - T024
 - T025
 - T026
+agent: "opencode"
+shell_pid: "84881"
 history:
 - timestamp: '2026-04-05T12:40:33Z'
   lane: planned
@@ -169,3 +171,7 @@ owned_files:
 - Reviewers should compare docs directly against the finalized artifact semantics from WP05.
 - Reviewers should reject any leftover wording that suggests compatibility aliases, local/dev exceptions, or mixed-version rollout.
 - Reviewers should verify the version bump does not land without corresponding public documentation updates.
+
+## Activity Log
+
+- 2026-04-05T14:42:19Z – opencode – shell_pid=84881 – Started implementation via action command
