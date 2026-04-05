@@ -180,3 +180,4 @@ owned_files:
 - 2026-04-05T13:27:24Z – opencode – shell_pid=84881 – Started implementation via action command
 - 2026-04-05T13:38:21Z – opencode – shell_pid=84881 – Ready for review
 - 2026-04-05T13:39:00Z – codex – shell_pid=84881 – Started review via action command
+- 2026-04-05T13:40:38Z – codex – shell_pid=84881 – Moved to planned
