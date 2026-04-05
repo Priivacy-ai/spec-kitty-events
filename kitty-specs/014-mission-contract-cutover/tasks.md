@@ -219,11 +219,11 @@
 
 ### Included Subtasks
 
-- [ ] T022 Update `src/spec_kitty_events/__init__.py` exports and version notes for the breaking mission/build cutover surfaces
-- [ ] T023 Rewrite `README.md` with canonical mission terminology, the exact on-wire signal semantics, and the `build_id` versus `node_id` distinction
-- [ ] T024 Rewrite `COMPATIBILITY.md` with fail-closed runtime policy, downstream release gates, and the offline migration-only carve-out
-- [ ] T025 Bump `pyproject.toml` and `src/spec_kitty_events/__init__.py` from `2.9.0` to `3.0.0`
-- [ ] T026 Update doc-driven or quickstart-oriented integration coverage for the new public release contract and messaging
+- [x] T022 Update `src/spec_kitty_events/__init__.py` exports and version notes for the breaking mission/build cutover surfaces
+- [x] T023 Rewrite `README.md` with canonical mission terminology, the exact on-wire signal semantics, and the `build_id` versus `node_id` distinction
+- [x] T024 Rewrite `COMPATIBILITY.md` with fail-closed runtime policy, downstream release gates, and the offline migration-only carve-out
+- [x] T025 Bump `pyproject.toml` and `src/spec_kitty_events/__init__.py` from `2.9.0` to `3.0.0`
+- [x] T026 Update doc-driven or quickstart-oriented integration coverage for the new public release contract and messaging
 
 ### Implementation Sketch
 
