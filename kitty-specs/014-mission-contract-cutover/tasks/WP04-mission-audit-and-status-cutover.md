@@ -19,6 +19,8 @@ subtasks:
 - T014
 - T015
 - T016
+agent: "opencode"
+shell_pid: "84881"
 history:
 - timestamp: '2026-04-05T12:40:33Z'
   lane: planned
@@ -160,3 +162,7 @@ owned_files:
 - Reviewers should confirm only mission-domain public surfaces were renamed in `status.py`.
 - Reviewers should inspect validation and anomaly text for hidden bridge behavior.
 - Reviewers should ensure fixture and schema work is deferred to WP05.
+
+## Activity Log
+
+- 2026-04-05T14:19:27Z – opencode – shell_pid=84881 – Started implementation via action command
