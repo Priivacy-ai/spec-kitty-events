@@ -29,7 +29,6 @@ history:
 authoritative_surface: README.md
 execution_mode: code_change
 owned_files:
-- src/spec_kitty_events/__init__.py
 - README.md
 - COMPATIBILITY.md
 - pyproject.toml
@@ -61,11 +60,10 @@ owned_files:
 - **Plan**: `kitty-specs/014-mission-contract-cutover/plan.md`
 - **Quickstart**: `kitty-specs/014-mission-contract-cutover/quickstart.md`
 - Public docs must describe the exact artifact-driven gate semantics. Do not document approximate or repo-local alternatives.
-- This WP owns release messaging and version metadata, not source-model or schema internals.
+- This WP owns release messaging and version metadata, not source-model or schema internals. Package-surface alias cleanup needed to keep imports working belongs to the earlier owning WP.
 
 ## Owned Files
 
-- `src/spec_kitty_events/__init__.py`
 - `README.md`
 - `COMPATIBILITY.md`
 - `pyproject.toml`
@@ -73,21 +71,20 @@ owned_files:
 
 ## Subtasks & Detailed Guidance
 
-### Subtask T022 - Update public exports and version notes
+### Subtask T022 - Update public release notes and package metadata messaging
 
-**Purpose**: Make the top-level package surface reflect the breaking cutover while exporting only deliberate public artifact or contract surfaces.
+**Purpose**: Make the published release messaging reflect the breaking cutover without promoting repo-local helper code into a public runtime dependency.
 
 **Steps**:
 
-1. Update `src/spec_kitty_events/__init__.py` version notes for the cutover release.
-2. Export only deliberate public artifact or contract types that downstream users are expected to import from the top level.
-3. Keep repo-local helper implementation reference-only unless there is a clear, explicit public-consumer need already established by the approved contract.
-4. Remove or rewrite export comments that still imply additive-only `2.x` semantics where the release is now a breaking cutover.
+1. Update release-facing notes in the owned documentation files to describe the breaking cutover accurately.
+2. Keep repo-local helper implementation reference-only unless there is a clear, explicit public-consumer need already established by the approved contract.
+3. Remove or rewrite release messaging that still implies additive-only `2.x` semantics where the release is now a breaking cutover.
 
 **Validation**:
 
-- [ ] Export notes describe the breaking release accurately.
-- [ ] Public exports match the deliberate contract surface and do not accidentally promote repo-local helper code into a runtime dependency.
+- [ ] Release-facing notes describe the breaking release accurately.
+- [ ] The owned release messaging does not accidentally promote repo-local helper code into a runtime dependency.
 
 ### Subtask T023 - Rewrite README.md with canonical taxonomy and gate semantics
 
@@ -128,8 +125,7 @@ owned_files:
 **Steps**:
 
 1. Update `pyproject.toml` from `2.9.0` to `3.0.0`.
-2. Update `src/spec_kitty_events/__init__.py` `__version__` to `3.0.0`.
-3. Check version references in touched release notes or package metadata comments.
+2. Check version references in touched release notes or package metadata comments.
 
 **Validation**:
 

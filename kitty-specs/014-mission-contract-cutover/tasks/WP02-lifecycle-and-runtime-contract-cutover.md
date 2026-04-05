@@ -32,6 +32,7 @@ execution_mode: code_change
 owned_files:
 - src/spec_kitty_events/lifecycle.py
 - src/spec_kitty_events/mission_next.py
+- src/spec_kitty_events/__init__.py
 - tests/unit/test_lifecycle.py
 - tests/unit/test_mission_next.py
 - tests/test_mission_next_reducer.py
@@ -65,12 +66,13 @@ owned_files:
 - **Spec**: `kitty-specs/014-mission-contract-cutover/spec.md`
 - **Plan**: `kitty-specs/014-mission-contract-cutover/plan.md`
 - Mission catalog events and runtime mission-run events must have one meaning each. Reject solutions that preserve ambiguous aliasing.
-- Do not rewrite conformance fixtures or JSON schemas here; source models and direct tests only.
+- Do not rewrite conformance fixtures or JSON schemas here; source models, package-surface cleanup directly required by those model changes, and direct tests only.
 
 ## Owned Files
 
 - `src/spec_kitty_events/lifecycle.py`
 - `src/spec_kitty_events/mission_next.py`
+- `src/spec_kitty_events/__init__.py` (only for public package-surface cleanup directly required by removing the runtime alias)
 - `tests/unit/test_lifecycle.py`
 - `tests/unit/test_mission_next.py`
 - `tests/test_mission_next_reducer.py`
@@ -140,12 +142,14 @@ owned_files:
 1. Remove `_COMPLETION_ALIAS` and any alias event-family registration in `mission_next.py`.
 2. Remove normalization logic that previously reinterpreted `MissionCompleted` as `MissionRunCompleted`.
 3. Update reducer, replay, and determinism tests so runtime completion only accepts `MissionRunCompleted`.
-4. Add a negative test path showing that `MissionCompleted` is not treated as a runtime alias anymore.
+4. Remove any stale import or export in `src/spec_kitty_events/__init__.py` that would keep the deleted runtime alias publicly visible or importable.
+5. Add a negative test path showing that `MissionCompleted` is not treated as a runtime alias anymore.
 
 **Validation**:
 
 - [ ] `MISSION_NEXT_EVENT_TYPES` contains only canonical runtime event names.
 - [ ] Replay/reducer tests no longer normalize or silently ignore the alias path.
+- [ ] The top-level package surface no longer imports or exports removed runtime alias symbols.
 - [ ] Runtime completion semantics are unambiguous.
 
 ## Implementation Sequence
@@ -166,6 +170,7 @@ owned_files:
 - `MissionCreated` and `MissionClosed` are first-class lifecycle catalog events.
 - `MissionCompleted` is lifecycle-only.
 - `MissionRunCompleted` is runtime-only.
+- `src/spec_kitty_events/__init__.py` no longer exposes the removed runtime alias.
 - `mission_key` is removed from mission-next public contract surfaces and replaced with `mission_type`.
 - Direct tests for the owned files pass.
 
