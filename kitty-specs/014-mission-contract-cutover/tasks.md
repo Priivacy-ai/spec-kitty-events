@@ -26,10 +26,10 @@
 
 ### Included Subtasks
 
-- [ ] T001 Evaluate the existing release-authority surfaces and place the single authoritative cutover artifact under packaged source control in `src/spec_kitty_events/`
-- [ ] T002 Implement the artifact interpreter/helper logic that enforces `signal_field_name`, `signal_location`, `cutover_contract_version`, `accepted_major`, and forbidden legacy surface semantics
-- [ ] T003 Extend `src/spec_kitty_events/models.py` so canonical events require `build_id` and clearly preserve `node_id` as causal ordering identity only
-- [ ] T004 Add or update unit and integration tests for artifact-driven fail-closed evaluation and the `build_id`/`node_id` envelope split
+- [x] T001 Evaluate the existing release-authority surfaces and place the single authoritative cutover artifact under packaged source control in `src/spec_kitty_events/`
+- [x] T002 Implement the artifact interpreter/helper logic that enforces `signal_field_name`, `signal_location`, `cutover_contract_version`, `accepted_major`, and forbidden legacy surface semantics
+- [x] T003 Extend `src/spec_kitty_events/models.py` so canonical events require `build_id` and clearly preserve `node_id` as causal ordering identity only
+- [x] T004 Add or update unit and integration tests for artifact-driven fail-closed evaluation and the `build_id`/`node_id` envelope split
 
 ### Implementation Sketch
 
