@@ -64,10 +64,10 @@
 
 ### Included Subtasks
 
-- [ ] T005 Add canonical lifecycle catalog event constants and typed payloads for `MissionCreated` and `MissionClosed` in `src/spec_kitty_events/lifecycle.py`
-- [ ] T006 Keep `MissionCompleted` lifecycle-only by removing any catalog overloading and updating lifecycle reducer invariants and tests
-- [ ] T007 Rename runtime mission workflow/template fields from `mission_key` to `mission_type` in `src/spec_kitty_events/mission_next.py` and its output models
-- [ ] T008 Remove the `MissionCompleted` to `MissionRunCompleted` alias normalization path from `mission_next` and update reducer, replay, and determinism expectations
+- [x] T005 Add canonical lifecycle catalog event constants and typed payloads for `MissionCreated` and `MissionClosed` in `src/spec_kitty_events/lifecycle.py`
+- [x] T006 Keep `MissionCompleted` lifecycle-only by removing any catalog overloading and updating lifecycle reducer invariants and tests
+- [x] T007 Rename runtime mission workflow/template fields from `mission_key` to `mission_type` in `src/spec_kitty_events/mission_next.py` and its output models
+- [x] T008 Remove the `MissionCompleted` to `MissionRunCompleted` alias normalization path from `mission_next` and update reducer, replay, and determinism expectations
 
 ### Implementation Sketch
 
