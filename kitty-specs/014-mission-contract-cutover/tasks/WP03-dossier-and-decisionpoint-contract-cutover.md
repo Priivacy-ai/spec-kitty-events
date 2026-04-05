@@ -171,3 +171,4 @@ owned_files:
 - 2026-04-05T14:16:02Z – opencode – shell_pid=84881 – Started implementation via action command
 - 2026-04-05T14:18:25Z – opencode – shell_pid=84881 – Ready for review
 - 2026-04-05T14:18:45Z – opencode – shell_pid=84881 – Started review via action command
+- 2026-04-05T14:19:09Z – opencode – shell_pid=84881 – Review passed: dossier and decisionpoint contracts use canonical mission fields with owned test coverage
