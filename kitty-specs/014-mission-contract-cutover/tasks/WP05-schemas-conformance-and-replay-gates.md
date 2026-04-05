@@ -2,9 +2,10 @@
 work_package_id: WP05
 title: Schemas, Conformance & Replay Gates
 dependencies:
-- WP01
-- WP02
-- WP03
+  - WP01
+  - WP02
+  - WP03
+  - WP04
 requirement_refs:
 - FR-003
 - FR-005

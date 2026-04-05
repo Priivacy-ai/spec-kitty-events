@@ -200,7 +200,7 @@
 
 ### Dependencies
 
-- Depends on WP01, WP02, WP03, and WP04 because schemas and fixtures must reflect the final canonical source models across all touched domains.
+- Depends on WP01, WP02, WP03, WP04 because schemas and fixtures must reflect the final canonical source models across all touched domains.
 
 ### Risks & Mitigations
 
