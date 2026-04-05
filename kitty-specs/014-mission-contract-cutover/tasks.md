@@ -102,10 +102,10 @@
 
 ### Included Subtasks
 
-- [ ] T009 Rename dossier payload, namespace, and reducer surfaces from `feature_slug` and `mission_key` to `mission_slug` and `mission_type` in `src/spec_kitty_events/dossier.py`
-- [ ] T010 [P] Rename decisionpoint payload and reducer surfaces from `feature_slug` and mission-domain `mission_key` to canonical mission terminology in `src/spec_kitty_events/decisionpoint.py`
-- [ ] T011 Update dossier and decisionpoint reducer, unit, and determinism tests for the canonical mission taxonomy
-- [ ] T012 Preserve team-scoped `Project` semantics as documented contract meaning only and ensure these modules do not introduce runtime compatibility bridges
+- [x] T009 Rename dossier payload, namespace, and reducer surfaces from `feature_slug` and `mission_key` to `mission_slug` and `mission_type` in `src/spec_kitty_events/dossier.py`
+- [x] T010 [P] Rename decisionpoint payload and reducer surfaces from `feature_slug` and mission-domain `mission_key` to canonical mission terminology in `src/spec_kitty_events/decisionpoint.py`
+- [x] T011 Update dossier and decisionpoint reducer, unit, and determinism tests for the canonical mission taxonomy
+- [x] T012 Preserve team-scoped `Project` semantics as documented contract meaning only and ensure these modules do not introduce runtime compatibility bridges
 
 ### Implementation Sketch
 
