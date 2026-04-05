@@ -29,6 +29,8 @@ subtasks:
 - T019
 - T020
 - T021
+agent: "opencode"
+shell_pid: "84881"
 history:
 - timestamp: '2026-04-05T12:40:33Z'
   lane: planned
@@ -248,3 +250,7 @@ owned_files:
 - Reviewers should inspect whether tests re-state forbidden surface lists instead of consuming the artifact.
 - Reviewers should verify negative coverage exists for missing signal, wrong major, forbidden keys, forbidden event names, and forbidden aggregate names.
 - Reviewers should reject any leftover legacy fixture examples that imply mixed-version support.
+
+## Activity Log
+
+- 2026-04-05T14:25:19Z – opencode – shell_pid=84881 – Started implementation via action command
