@@ -21,7 +21,7 @@ subtasks:
 - T003
 - T004
 shell_pid: "84881"
-agent: "codex"
+agent: "opencode"
 history:
 - timestamp: '2026-04-05T12:40:33Z'
   lane: planned
@@ -221,3 +221,4 @@ Do not modify files outside this list. Schema generation, broad fixture rewrites
 - 2026-04-05T13:08:42Z – opencode – shell_pid=84881 – Ready for review
 - 2026-04-05T13:09:25Z – codex – shell_pid=84881 – Started review via action command
 - 2026-04-05T13:11:44Z – codex – shell_pid=84881 – Moved to planned
+- 2026-04-05T13:12:25Z – opencode – shell_pid=84881 – Started implementation via action command
