@@ -177,6 +177,7 @@
   },
   "$id": "spec-kitty-events/status_transition_payload",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
   "description": "Payload for a WPStatusChanged event describing a lane transition.",
   "properties": {
     "actor": {
@@ -201,12 +202,6 @@
       "$ref": "#/$defs/ExecutionMode",
       "description": "How the work-package is being executed"
     },
-    "feature_slug": {
-      "description": "Feature identifier",
-      "minLength": 1,
-      "title": "Feature Slug",
-      "type": "string"
-    },
     "force": {
       "default": false,
       "description": "Whether this is a forced transition",
@@ -224,6 +219,12 @@
       ],
       "default": null,
       "description": "Lane the WP is transitioning from (None for initial)"
+    },
+    "mission_slug": {
+      "description": "Mission identifier",
+      "minLength": 1,
+      "title": "Mission Slug",
+      "type": "string"
     },
     "reason": {
       "anyOf": [
@@ -263,7 +264,7 @@
     }
   },
   "required": [
-    "feature_slug",
+    "mission_slug",
     "wp_id",
     "to_lane",
     "actor",

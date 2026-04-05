@@ -8,9 +8,9 @@ from spec_kitty_events.schemas import list_schemas, load_schema, schema_path
 
 
 def test_list_schemas_returns_all_names() -> None:
-    """Test that list_schemas returns all 76 schema names."""
+    """Test that list_schemas returns all 79 schema names."""
     names = list_schemas()
-    assert len(names) == 76
+    assert len(names) == 79
     expected = [
         "artifact_identity",
         "auth_principal_binding",
@@ -22,6 +22,7 @@ def test_list_schemas_returns_all_names() -> None:
         "connector_reconnected_payload",
         "connector_revoked_payload",
         "content_hash_ref",
+        "cutover_artifact",
         "decision_captured_payload",
         "decision_input_answered_payload",
         "decision_input_requested_payload",
@@ -50,7 +51,9 @@ def test_list_schemas_returns_all_names() -> None:
         "mission_audit_requested_payload",
         "mission_audit_started_payload",
         "mission_cancelled_payload",
+        "mission_closed_payload",
         "mission_completed_payload",
+        "mission_created_payload",
         "mission_dossier_artifact_indexed_payload",
         "mission_dossier_artifact_missing_payload",
         "mission_dossier_parity_drift_detected_payload",

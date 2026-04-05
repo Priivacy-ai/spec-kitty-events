@@ -90,6 +90,46 @@
       "min_version": "2.0.0"
     },
     {
+      "id": "event-missing-schema-version",
+      "path": "events/invalid/event_missing_schema_version.json",
+      "expected_result": "invalid",
+      "event_type": "Event",
+      "notes": "Event envelope missing the canonical cutover signal schema_version",
+      "min_version": "3.0.0"
+    },
+    {
+      "id": "event-wrong-cutover-major",
+      "path": "events/invalid/event_wrong_cutover_major.json",
+      "expected_result": "invalid",
+      "event_type": "Event",
+      "notes": "Event envelope uses unsupported cutover major version 2.x",
+      "min_version": "3.0.0"
+    },
+    {
+      "id": "event-forbidden-legacy-key",
+      "path": "events/invalid/event_forbidden_legacy_key.json",
+      "expected_result": "invalid",
+      "event_type": "Event",
+      "notes": "Event envelope payload contains forbidden legacy mission-domain key feature_slug",
+      "min_version": "3.0.0"
+    },
+    {
+      "id": "event-forbidden-legacy-event-name",
+      "path": "events/invalid/event_forbidden_legacy_event_name.json",
+      "expected_result": "invalid",
+      "event_type": "Event",
+      "notes": "Event envelope uses forbidden legacy event name FeatureCreated",
+      "min_version": "3.0.0"
+    },
+    {
+      "id": "event-forbidden-legacy-aggregate-name",
+      "path": "events/invalid/event_forbidden_legacy_aggregate_name.json",
+      "expected_result": "invalid",
+      "event_type": "Event",
+      "notes": "Event envelope uses forbidden legacy aggregate prefix feature/",
+      "min_version": "3.0.0"
+    },
+    {
       "id": "wp-status-changed-invalid-lane",
       "path": "events/invalid/wp_status_changed_invalid_lane.json",
       "expected_result": "invalid",
@@ -495,7 +535,7 @@
       "path": "dossier/valid/dossier_namespace_collision_coverage.json",
       "event_type": "MissionDossierArtifactIndexed",
       "expected_result": "valid",
-      "notes": "Alternate namespace (feature_slug=009-another-feature) for namespace collision tests",
+      "notes": "Alternate namespace (mission_slug=009-another-feature) for namespace collision tests",
       "min_version": "2.4.0"
     },
     {
@@ -503,7 +543,7 @@
       "path": "dossier/invalid/dossier_parity_drift_namespace_mismatch.json",
       "event_type": "MissionDossierParityDriftDetected",
       "expected_result": "invalid",
-      "notes": "Namespace missing required fields: target_branch, mission_key, manifest_version",
+      "notes": "Namespace missing required fields: target_branch, mission_type, manifest_version",
       "min_version": "2.4.0"
     },
     {

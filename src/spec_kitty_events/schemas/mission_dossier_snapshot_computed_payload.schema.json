@@ -1,21 +1,22 @@
 {
   "$defs": {
     "LocalNamespaceTuple": {
+      "additionalProperties": false,
       "description": "Minimum collision-safe key for parity baseline scoping.\n\nmanifest_version is defined HERE ONLY \u2014 event payloads must NOT duplicate it.",
       "properties": {
-        "feature_slug": {
-          "minLength": 1,
-          "title": "Feature Slug",
-          "type": "string"
-        },
         "manifest_version": {
           "minLength": 1,
           "title": "Manifest Version",
           "type": "string"
         },
-        "mission_key": {
+        "mission_slug": {
           "minLength": 1,
-          "title": "Mission Key",
+          "title": "Mission Slug",
+          "type": "string"
+        },
+        "mission_type": {
+          "minLength": 1,
+          "title": "Mission Type",
           "type": "string"
         },
         "project_uuid": {
@@ -43,9 +44,9 @@
       },
       "required": [
         "project_uuid",
-        "feature_slug",
+        "mission_slug",
         "target_branch",
-        "mission_key",
+        "mission_type",
         "manifest_version"
       ],
       "title": "LocalNamespaceTuple",
@@ -54,6 +55,7 @@
   },
   "$id": "spec-kitty-events/mission_dossier_snapshot_computed_payload",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
   "description": "Payload for MissionDossierSnapshotComputed events.\n\nmanifest_version NOT duplicated here \u2014 use namespace.manifest_version.",
   "properties": {
     "algorithm": {

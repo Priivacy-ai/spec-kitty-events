@@ -53,7 +53,8 @@ def _base_payload(
         "decision_point_id": "dp-001",
         "mission_id": "m-001",
         "run_id": "run-001",
-        "feature_slug": "feature-x",
+        "mission_slug": "mission-x",
+        "mission_type": "software-dev",
         "phase": phase,
         "actor_id": "human-1",
         "actor_type": actor_type,
@@ -82,6 +83,7 @@ def _event(
         aggregate_id="dp/dp-001",
         payload=payload_dict,
         timestamp=datetime(2026, 2, 27, 12, 0, lamport, tzinfo=timezone.utc),
+        build_id="test-build",
         node_id="node-1",
         lamport_clock=lamport,
         project_uuid=_PROJECT_UUID,
@@ -192,6 +194,8 @@ def test_happy_path_open_discussing_resolved() -> None:
     assert result.state == DecisionPointState.RESOLVED
     assert result.decision_point_id == "dp-001"
     assert result.mission_id == "m-001"
+    assert result.mission_slug == "mission-x"
+    assert result.mission_type == "software-dev"
     assert result.anomalies == ()
     assert result.event_count == 3
 
@@ -532,6 +536,7 @@ def test_non_dp_events_filtered_silently() -> None:
         aggregate_id="dp/dp-001",
         payload={"some": "data"},
         timestamp=_NOW,
+        build_id="test-build",
         node_id="node-1",
         lamport_clock=1,
         project_uuid=_PROJECT_UUID,
@@ -581,8 +586,24 @@ def _load_events_from_jsonl(path: Path) -> list[Event]:
     events = []
     for line in path.read_text().strip().split("\n"):
         if line.strip():
-            events.append(Event.model_validate(json.loads(line)))
+            raw = json.loads(line)
+            payload = raw.get("payload")
+            if isinstance(payload, dict):
+                if "feature_slug" in payload and "mission_slug" not in payload:
+                    payload["mission_slug"] = payload.pop("feature_slug")
+                if "mission_type" not in payload:
+                    payload["mission_type"] = "software-dev"
+            raw.setdefault("build_id", "test-build")
+            events.append(Event.model_validate(raw))
     return events
+
+
+def _canonicalize_output(data: dict[str, Any]) -> dict[str, Any]:
+    canonical = dict(data)
+    if "feature_slug" in canonical and "mission_slug" not in canonical:
+        canonical["mission_slug"] = canonical.pop("feature_slug")
+    canonical.setdefault("mission_type", "software-dev")
+    return canonical
 
 
 def _golden_replay(
@@ -610,11 +631,20 @@ def _golden_replay(
     loaded_events = _load_events_from_jsonl(input_path)
     result = reduce_decision_point_events(loaded_events)
     actual = result.model_dump(mode="json")
-    expected = json.loads(output_path.read_text())
+    expected = _canonicalize_output(json.loads(output_path.read_text()))
     assert actual == expected, (
         f"Golden replay mismatch for {name!r}. "
         f"Re-run with golden files deleted to regenerate."
     )
+
+
+def test_legacy_feature_slug_payload_is_rejected() -> None:
+    payload = _base_payload()
+    payload["feature_slug"] = "legacy-feature"
+    result = reduce_decision_point_events([_event(DECISION_POINT_OPENED, payload, lamport=1)])
+    assert result.state is None
+    assert len(result.anomalies) == 1
+    assert result.anomalies[0].kind == "malformed_payload"
 
 
 def test_golden_replay_full_lifecycle() -> None:

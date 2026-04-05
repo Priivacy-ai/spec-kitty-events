@@ -52,9 +52,10 @@ def _build_test_run_sequence() -> List[Event]:
         event_id=str(ULID()), event_type=MISSION_RUN_STARTED,
         aggregate_id="run/run-1",
         payload=MissionRunStartedPayload(
-            run_id="run-1", mission_key="feat-login", actor=actor,
+            run_id="run-1", mission_type="software-dev", actor=actor,
         ).model_dump(),
         timestamp=base_time + timedelta(seconds=1),
+        build_id="build-test",
         node_id="node-1", lamport_clock=1,
         project_uuid=_PROJECT_UUID, correlation_id=corr_id,
     ))
@@ -66,6 +67,7 @@ def _build_test_run_sequence() -> List[Event]:
             run_id="run-1", step_id="S1", agent_id="a1", actor=actor,
         ).model_dump(),
         timestamp=base_time + timedelta(seconds=2),
+        build_id="build-test",
         node_id="node-1", lamport_clock=2,
         project_uuid=_PROJECT_UUID, correlation_id=corr_id,
     ))
@@ -78,6 +80,7 @@ def _build_test_run_sequence() -> List[Event]:
             result="success", actor=actor,
         ).model_dump(),
         timestamp=base_time + timedelta(seconds=3),
+        build_id="build-test",
         node_id="node-1", lamport_clock=3,
         project_uuid=_PROJECT_UUID, correlation_id=corr_id,
     ))
@@ -89,6 +92,7 @@ def _build_test_run_sequence() -> List[Event]:
             run_id="run-1", step_id="S2", agent_id="a1", actor=actor,
         ).model_dump(),
         timestamp=base_time + timedelta(seconds=4),
+        build_id="build-test",
         node_id="node-1", lamport_clock=4,
         project_uuid=_PROJECT_UUID, correlation_id=corr_id,
     ))
@@ -101,6 +105,7 @@ def _build_test_run_sequence() -> List[Event]:
             question="Which DB?", options=("pg",), actor=actor,
         ).model_dump(),
         timestamp=base_time + timedelta(seconds=5),
+        build_id="build-test",
         node_id="node-1", lamport_clock=5,
         project_uuid=_PROJECT_UUID, correlation_id=corr_id,
     ))
@@ -113,6 +118,7 @@ def _build_test_run_sequence() -> List[Event]:
             run_id="run-1", decision_id="d1", answer="pg", actor=human,
         ).model_dump(),
         timestamp=base_time + timedelta(seconds=6),
+        build_id="build-test",
         node_id="node-1", lamport_clock=6,
         project_uuid=_PROJECT_UUID, correlation_id=corr_id,
     ))
@@ -125,6 +131,7 @@ def _build_test_run_sequence() -> List[Event]:
             result="success", actor=actor,
         ).model_dump(),
         timestamp=base_time + timedelta(seconds=7),
+        build_id="build-test",
         node_id="node-1", lamport_clock=7,
         project_uuid=_PROJECT_UUID, correlation_id=corr_id,
     ))
@@ -133,9 +140,10 @@ def _build_test_run_sequence() -> List[Event]:
         event_id=str(ULID()), event_type=MISSION_RUN_COMPLETED,
         aggregate_id="run/run-1",
         payload=MissionRunCompletedPayload(
-            run_id="run-1", mission_key="feat-login", actor=actor,
+            run_id="run-1", mission_type="software-dev", actor=actor,
         ).model_dump(),
         timestamp=base_time + timedelta(seconds=8),
+        build_id="build-test",
         node_id="node-1", lamport_clock=8,
         project_uuid=_PROJECT_UUID, correlation_id=corr_id,
     ))
@@ -161,7 +169,7 @@ class TestMissionNextDeterminism:
         result = reduce_mission_next_events(shuffled)
 
         assert result.run_id == canonical.run_id
-        assert result.mission_key == canonical.mission_key
+        assert result.mission_type == canonical.mission_type
         assert result.run_status == canonical.run_status
         assert result.completed_steps == canonical.completed_steps
         assert len(result.anomalies) == len(canonical.anomalies)

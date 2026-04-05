@@ -1,6 +1,7 @@
 {
   "$defs": {
     "ArtifactIdentity": {
+      "additionalProperties": false,
       "description": "Canonical identity for one artifact instance.\n\nartifact_class is the SINGLE source of truth for artifact taxonomy.\nEvent payloads MUST NOT duplicate this field at the top level.",
       "properties": {
         "artifact_class": {
@@ -15,9 +16,9 @@
           "title": "Artifact Class",
           "type": "string"
         },
-        "mission_key": {
+        "mission_type": {
           "minLength": 1,
-          "title": "Mission Key",
+          "title": "Mission Type",
           "type": "string"
         },
         "path": {
@@ -52,7 +53,7 @@
         }
       },
       "required": [
-        "mission_key",
+        "mission_type",
         "path",
         "artifact_class"
       ],
@@ -60,21 +61,22 @@
       "type": "object"
     },
     "LocalNamespaceTuple": {
+      "additionalProperties": false,
       "description": "Minimum collision-safe key for parity baseline scoping.\n\nmanifest_version is defined HERE ONLY \u2014 event payloads must NOT duplicate it.",
       "properties": {
-        "feature_slug": {
-          "minLength": 1,
-          "title": "Feature Slug",
-          "type": "string"
-        },
         "manifest_version": {
           "minLength": 1,
           "title": "Manifest Version",
           "type": "string"
         },
-        "mission_key": {
+        "mission_slug": {
           "minLength": 1,
-          "title": "Mission Key",
+          "title": "Mission Slug",
+          "type": "string"
+        },
+        "mission_type": {
+          "minLength": 1,
+          "title": "Mission Type",
           "type": "string"
         },
         "project_uuid": {
@@ -102,9 +104,9 @@
       },
       "required": [
         "project_uuid",
-        "feature_slug",
+        "mission_slug",
         "target_branch",
-        "mission_key",
+        "mission_type",
         "manifest_version"
       ],
       "title": "LocalNamespaceTuple",
@@ -113,6 +115,7 @@
   },
   "$id": "spec-kitty-events/mission_dossier_parity_drift_detected_payload",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
   "description": "Payload for MissionDossierParityDriftDetected events.",
   "properties": {
     "actual_hash": {

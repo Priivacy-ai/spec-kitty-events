@@ -12,6 +12,7 @@
   },
   "$id": "spec-kitty-events/decision_point_resolved_payload",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
   "description": "Payload for DecisionPointResolved events.",
   "properties": {
     "actor_id": {
@@ -48,11 +49,6 @@
       "title": "Evidence Refs",
       "type": "array"
     },
-    "feature_slug": {
-      "minLength": 1,
-      "title": "Feature Slug",
-      "type": "string"
-    },
     "mission_id": {
       "minLength": 1,
       "title": "Mission Id",
@@ -64,6 +60,16 @@
     },
     "mission_owner_authority_path": {
       "title": "Mission Owner Authority Path",
+      "type": "string"
+    },
+    "mission_slug": {
+      "minLength": 1,
+      "title": "Mission Slug",
+      "type": "string"
+    },
+    "mission_type": {
+      "minLength": 1,
+      "title": "Mission Type",
       "type": "string"
     },
     "phase": {
@@ -96,7 +102,8 @@
     "decision_point_id",
     "mission_id",
     "run_id",
-    "feature_slug",
+    "mission_slug",
+    "mission_type",
     "phase",
     "actor_id",
     "actor_type",

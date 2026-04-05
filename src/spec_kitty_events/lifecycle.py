@@ -24,6 +24,8 @@ from pydantic import BaseModel, ConfigDict, Field
 SCHEMA_VERSION: str = "2.0.0"
 
 # Event type string constants
+MISSION_CREATED: str = "MissionCreated"
+MISSION_CLOSED: str = "MissionClosed"
 MISSION_STARTED: str = "MissionStarted"
 MISSION_COMPLETED: str = "MissionCompleted"
 MISSION_CANCELLED: str = "MissionCancelled"
@@ -31,6 +33,8 @@ PHASE_ENTERED: str = "PhaseEntered"
 REVIEW_ROLLBACK: str = "ReviewRollback"
 
 MISSION_EVENT_TYPES: FrozenSet[str] = frozenset({
+    MISSION_CREATED,
+    MISSION_CLOSED,
     MISSION_STARTED,
     MISSION_COMPLETED,
     MISSION_CANCELLED,
@@ -75,6 +79,38 @@ class MissionStartedPayload(BaseModel):
     )
     actor: str = Field(
         ..., min_length=1, description="Actor who started the mission"
+    )
+
+
+class MissionCreatedPayload(BaseModel):
+    """Typed payload for MissionCreated catalog events."""
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    mission_slug: str = Field(
+        ..., min_length=1, description="Canonical mission slug"
+    )
+    mission_number: int = Field(
+        ..., ge=1, description="Canonical mission number"
+    )
+    mission_type: str = Field(
+        ..., min_length=1, description="Canonical mission workflow/template type"
+    )
+
+
+class MissionClosedPayload(BaseModel):
+    """Typed payload for MissionClosed catalog events."""
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    mission_slug: str = Field(
+        ..., min_length=1, description="Canonical mission slug"
+    )
+    mission_number: int = Field(
+        ..., ge=1, description="Canonical mission number"
+    )
+    mission_type: str = Field(
+        ..., min_length=1, description="Canonical mission workflow/template type"
     )
 
 
@@ -236,6 +272,32 @@ def _process_mission_event(
 
     Returns (mission_id, mission_status, mission_type, current_phase).
     """
+    if event.event_type == MISSION_CREATED:
+        try:
+            MissionCreatedPayload(**event.payload)
+        except Exception:
+            anomalies.append(
+                LifecycleAnomaly(
+                    event_id=event.event_id,
+                    event_type=event.event_type,
+                    reason="Invalid MissionCreated payload",
+                )
+            )
+        return mission_id, mission_status, mission_type, current_phase
+
+    if event.event_type == MISSION_CLOSED:
+        try:
+            MissionClosedPayload(**event.payload)
+        except Exception:
+            anomalies.append(
+                LifecycleAnomaly(
+                    event_id=event.event_id,
+                    event_type=event.event_type,
+                    reason="Invalid MissionClosed payload",
+                )
+            )
+        return mission_id, mission_status, mission_type, current_phase
+
     # Check: event after terminal state
     if mission_status in TERMINAL_MISSION_STATUSES:
         anomalies.append(

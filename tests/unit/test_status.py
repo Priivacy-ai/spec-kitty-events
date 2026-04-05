@@ -57,7 +57,7 @@ VALID_DONE_EVIDENCE: dict = {
 }
 
 VALID_TRANSITION_DATA: dict = {
-    "feature_slug": "003-status",
+    "mission_slug": "003-status",
     "wp_id": "WP01",
     "from_lane": "planned",
     "to_lane": "claimed",
@@ -403,7 +403,7 @@ class TestStatusTransitionPayload:
 
     def test_basic_construction(self) -> None:
         p = StatusTransitionPayload(**VALID_TRANSITION_DATA)
-        assert p.feature_slug == "003-status"
+        assert p.mission_slug == "003-status"
         assert p.wp_id == "WP01"
         assert p.from_lane is Lane.PLANNED
         assert p.to_lane is Lane.CLAIMED
@@ -522,8 +522,8 @@ class TestStatusTransitionPayload:
         with pytest.raises(pydantic.ValidationError):
             p.actor = "changed"  # type: ignore[misc]
 
-    def test_empty_feature_slug_rejected(self) -> None:
-        data = {**VALID_TRANSITION_DATA, "feature_slug": ""}
+    def test_empty_mission_slug_rejected(self) -> None:
+        data = {**VALID_TRANSITION_DATA, "mission_slug": ""}
         with pytest.raises(pydantic.ValidationError):
             StatusTransitionPayload(**data)
 
@@ -577,7 +577,7 @@ def _make_payload(
     evidence: DoneEvidence | None = None,
 ) -> StatusTransitionPayload:
     return StatusTransitionPayload(
-        feature_slug="test-feature",
+        mission_slug="test-feature",
         wp_id="WP01",
         from_lane=from_lane,
         to_lane=to_lane,
@@ -922,7 +922,7 @@ def _make_event(
 ) -> Event:
     """Helper to create status events for testing."""
     payload = StatusTransitionPayload(
-        feature_slug="test-feature",
+        mission_slug="test-feature",
         wp_id=wp_id,
         from_lane=from_lane,
         to_lane=to_lane,
@@ -936,6 +936,7 @@ def _make_event(
         aggregate_id=f"test-feature/{wp_id}",
         payload=payload.model_dump(),
         timestamp=timestamp or datetime.now(timezone.utc),
+        build_id="test-build",
         node_id="test-node",
         lamport_clock=lamport_clock,
         project_uuid=_PROJECT_UUID,
@@ -1082,6 +1083,7 @@ class TestReduceStatusEvents:
             aggregate_id="test/WP01",
             payload={},
             timestamp=datetime.now(timezone.utc),
+            build_id="test-build",
             node_id="test",
             lamport_clock=1,
             project_uuid=_PROJECT_UUID,
@@ -1109,13 +1111,14 @@ class TestReduceStatusEvents:
             event_type=WP_STATUS_CHANGED,
             aggregate_id="test-feature/WP01",
             payload={
-                "feature_slug": "test-feature",
+                "mission_slug": "test-feature",
                 "wp_id": "WP01",
                 "from_lane": None,
                 "to_lane": "planned",
                 # Missing required fields like actor/execution_mode
             },
             timestamp=datetime.now(timezone.utc),
+            build_id="test-build",
             node_id="test-node",
             lamport_clock=1,
             project_uuid=_PROJECT_UUID,

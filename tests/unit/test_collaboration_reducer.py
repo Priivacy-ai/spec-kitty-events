@@ -52,6 +52,7 @@ def _make_event(
         aggregate_id="mission/M001",
         payload=payload,
         timestamp=timestamp or datetime.now(timezone.utc),
+        build_id="test-build",
         node_id="node-1",
         lamport_clock=clock,
         project_uuid=_PROJECT_UUID,

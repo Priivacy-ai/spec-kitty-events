@@ -1,132 +1,30 @@
-"""
-spec-kitty-events: Event log library with Lamport clocks and systematic error tracking.
+"""Public package exports for the canonical 3.0.0 mission contract release.
 
-This library provides primitives for building distributed event-sourced systems
-with causal metadata (Lamport clocks), conflict detection, and CRDT/state-machine
-merge rules.
+This release publishes the fail-closed cutover surface for:
 
-Example:
-    >>> from spec_kitty_events import Event, LamportClock, InMemoryClockStorage
-    >>> storage = InMemoryClockStorage()
-    >>> clock = LamportClock(node_id="alice", storage=storage)
-    >>> clock.tick()
-    1
-
-Versioning and Export Notes (2.6.0 -- DecisionPoint Lifecycle Contracts):
-    The DecisionPoint domain (DECISIONPOINT_SCHEMA_VERSION = "2.6.0") is an
-    **additive-only** extension.  No existing symbols, models, or schemas
-    were modified.  All new symbols are listed under the "DecisionPoint
-    Lifecycle Contracts (2.6.0)" block in ``__all__``.
-
-    Exported symbols (15 total):
-        Constants: DECISIONPOINT_SCHEMA_VERSION, DECISION_POINT_OPENED,
-            DECISION_POINT_DISCUSSING, DECISION_POINT_RESOLVED,
-            DECISION_POINT_OVERRIDDEN, DECISION_POINT_EVENT_TYPES
-        Enums: DecisionPointState, DecisionAuthorityRole
-        Models: DecisionPointAnomaly, DecisionPointOpenedPayload,
-            DecisionPointDiscussingPayload, DecisionPointResolvedPayload,
-            DecisionPointOverriddenPayload, ReducedDecisionPointState
-        Reducer: reduce_decision_point_events
-
-    Downstream Impact Notes:
-        spec-kitty runtime:
-            - Pin ``spec-kitty-events>=2.6.0`` once this version is published.
-            - Import ``reduce_decision_point_events`` for DecisionPoint state
-              projection alongside the existing mission-audit reducer.
-            - The ``DECISION_POINT_EVENT_TYPES`` frozenset can be used to
-              filter event streams by family.
-
-        spec-kitty-saas:
-            - Pin ``spec-kitty-events>=2.6.0``.
-            - DecisionPoint schemas (decision_point_*.schema.json) are
-              available via ``spec_kitty_events.schemas.load_schema()``
-              for API contract validation.
-            - Conformance fixtures in ``spec_kitty_events.conformance``
-              include the ``"decisionpoint"`` category for integration test
-              suites (``load_fixtures("decisionpoint")``).
-
-Versioning and Export Notes (2.7.0 -- Connector and Sync Lifecycle Contracts):
-    The Connector and Sync domains (CONNECTOR_SCHEMA_VERSION = "2.7.0",
-    SYNC_SCHEMA_VERSION = "2.7.0") are **additive-only** extensions.  No
-    existing symbols, models, or schemas were modified.  All new symbols are
-    listed under the "Connector Lifecycle Contracts (2.7.0)" and "Sync
-    Lifecycle Contracts (2.7.0)" blocks in ``__all__``.
-
-Versioning and Export Notes (2.8.0 -- Per-User Identity in Connector Events):
-    The Connector domain (CONNECTOR_SCHEMA_VERSION = "2.8.0") adds per-user
-    identity tracking.  All changes are **additive-only**.  Existing symbols
-    are unchanged.  New symbols are added to the "Connector Lifecycle
-    Contracts" block in ``__all__``.
-
-    New exported symbols (5 total):
-        Constants: USER_CONNECTED, USER_DISCONNECTED
-        Models: UserConnectedPayload, UserDisconnectedPayload,
-            UserConnectionStatus
-
-    Modified models:
-        ConnectorProvisionedPayload, ConnectorHealthCheckedPayload,
-        ConnectorDegradedPayload, ConnectorRevokedPayload,
-        ConnectorReconnectedPayload: added optional ``user_id`` field.
-        ReducedConnectorState: added ``user_connections`` field.
-
-    Downstream Impact Notes:
-        spec-kitty-saas:
-            - Pin ``spec-kitty-events>=2.8.0``.
-            - Use ``user_id`` field on connector event payloads to attribute
-              connection state changes to specific users.
-            - Emit ``UserConnected`` / ``UserDisconnected`` events for
-              per-user OAuth connection lifecycle.
-
-        spec-kitty-tracker:
-            - Pin ``spec-kitty-events>=2.8.0``.
-            - No immediate changes required — ``user_id`` is optional.
-
-    Exported symbols -- Connector (11 total):
-        Constants: CONNECTOR_SCHEMA_VERSION, CONNECTOR_PROVISIONED,
-            CONNECTOR_HEALTH_CHECKED, CONNECTOR_DEGRADED, CONNECTOR_REVOKED,
-            CONNECTOR_RECONNECTED, CONNECTOR_EVENT_TYPES
-        Enums: ConnectorState, HealthStatus, ReconnectStrategy
-        Models: ConnectorAnomaly, ConnectorProvisionedPayload,
-            ConnectorHealthCheckedPayload, ConnectorDegradedPayload,
-            ConnectorRevokedPayload, ConnectorReconnectedPayload,
-            ReducedConnectorState
-        Reducer: reduce_connector_events
-
-    Exported symbols -- Sync (12 total):
-        Constants: SYNC_SCHEMA_VERSION, SYNC_INGEST_ACCEPTED,
-            SYNC_INGEST_REJECTED, SYNC_RETRY_SCHEDULED, SYNC_DEAD_LETTERED,
-            SYNC_REPLAY_COMPLETED, SYNC_EVENT_TYPES, EXTERNAL_REFERENCE_LINKED
-        Enums: SyncOutcome
-        Models: SyncAnomaly, SyncIngestAcceptedPayload,
-            SyncIngestRejectedPayload, SyncRetryScheduledPayload,
-            SyncDeadLetteredPayload, SyncReplayCompletedPayload,
-            ExternalReferenceLinkedPayload, ReducedSyncState
-        Reducer: reduce_sync_events
-
-    Downstream Impact Notes:
-        spec-kitty-tracker:
-            - Pin ``spec-kitty-events>=2.7.0`` once this version is published.
-            - Import ``reduce_connector_events`` for Connector state projection
-              (provisioned -> health-checked -> degraded -> reconnected ->
-              revoked lifecycle).
-            - Import ``reduce_sync_events`` for Sync ingest/retry/dead-letter/
-              replay state projection.
-            - Use ``CONNECTOR_EVENT_TYPES`` and ``SYNC_EVENT_TYPES``
-              frozensets to filter event streams by family.
-
-        spec-kitty-saas:
-            - Pin ``spec-kitty-events>=2.7.0``.
-            - Connector schemas (connector_*.schema.json) and Sync schemas
-              (sync_*.schema.json) are available via
-              ``spec_kitty_events.schemas.load_schema()`` for API contract
-              validation.
-            - Conformance fixtures in ``spec_kitty_events.conformance``
-              include the ``"connector"`` and ``"sync"`` categories for
-              integration test suites (``load_fixtures("connector")``,
-              ``load_fixtures("sync")``).
+- canonical mission taxonomy: ``mission_slug``, ``mission_number``, ``mission_type``
+- canonical catalog events: ``MissionCreated`` and ``MissionClosed``
+- explicit envelope identity split: ``build_id`` versus ``node_id``
+- authoritative artifact-driven compatibility gating via ``spec_kitty_events.cutover``
 """
 
-__version__ = "2.9.0"
+__version__ = "3.0.0"
+
+from spec_kitty_events.cutover import (
+    CUTOVER_ARTIFACT,
+    CutoverArtifact,
+    accepted_major_matches,
+    assert_canonical_cutover_signal,
+    canonical_signal_field_name,
+    canonical_signal_location,
+    forbidden_legacy_aggregate_names,
+    forbidden_legacy_event_names,
+    forbidden_legacy_keys,
+    is_pre_cutover_payload,
+    load_cutover_artifact,
+    read_cutover_signal,
+    required_cutover_value_matches,
+)
 
 # Core data models
 from spec_kitty_events.models import (
@@ -186,6 +84,8 @@ from spec_kitty_events.gates import (
 # Lifecycle event contracts
 from spec_kitty_events.lifecycle import (
     SCHEMA_VERSION,
+    MISSION_CREATED,
+    MISSION_CLOSED,
     MISSION_STARTED,
     MISSION_COMPLETED,
     MISSION_CANCELLED,
@@ -194,6 +94,8 @@ from spec_kitty_events.lifecycle import (
     MISSION_EVENT_TYPES,
     TERMINAL_MISSION_STATUSES,
     MissionStatus,
+    MissionCreatedPayload,
+    MissionClosedPayload,
     MissionStartedPayload,
     MissionCompletedPayload,
     MissionCancelledPayload,
@@ -310,7 +212,6 @@ from spec_kitty_events.mission_next import (
     DECISION_INPUT_REQUESTED,
     DECISION_INPUT_ANSWERED,
     MISSION_RUN_COMPLETED,
-    _COMPLETION_ALIAS,
     MISSION_NEXT_EVENT_TYPES,
     MissionRunStatus,
     TERMINAL_RUN_STATUSES,
@@ -454,6 +355,20 @@ MissionDossierParityDriftDetected = MissionDossierParityDriftDetectedPayload
 __all__ = [
     # Version
     "__version__",
+    # Cutover artifact
+    "CUTOVER_ARTIFACT",
+    "CutoverArtifact",
+    "load_cutover_artifact",
+    "canonical_signal_field_name",
+    "canonical_signal_location",
+    "read_cutover_signal",
+    "accepted_major_matches",
+    "required_cutover_value_matches",
+    "forbidden_legacy_keys",
+    "forbidden_legacy_event_names",
+    "forbidden_legacy_aggregate_names",
+    "is_pre_cutover_payload",
+    "assert_canonical_cutover_signal",
     # Models
     "Event",
     "ErrorEntry",
@@ -491,6 +406,8 @@ __all__ = [
     "map_check_run_conclusion",
     # Lifecycle event contracts
     "SCHEMA_VERSION",
+    "MISSION_CREATED",
+    "MISSION_CLOSED",
     "MISSION_STARTED",
     "MISSION_COMPLETED",
     "MISSION_CANCELLED",
@@ -499,6 +416,8 @@ __all__ = [
     "MISSION_EVENT_TYPES",
     "TERMINAL_MISSION_STATUSES",
     "MissionStatus",
+    "MissionCreatedPayload",
+    "MissionClosedPayload",
     "MissionStartedPayload",
     "MissionCompletedPayload",
     "MissionCancelledPayload",
@@ -603,7 +522,6 @@ __all__ = [
     "DECISION_INPUT_REQUESTED",
     "DECISION_INPUT_ANSWERED",
     "MISSION_RUN_COMPLETED",
-    "_COMPLETION_ALIAS",
     "MISSION_NEXT_EVENT_TYPES",
     "MissionRunStatus",
     "TERMINAL_RUN_STATUSES",

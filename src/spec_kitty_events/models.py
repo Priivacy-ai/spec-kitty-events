@@ -87,10 +87,15 @@ class Event(BaseModel):
         ...,
         description="Wall-clock timestamp (human-readable, not used for ordering)"
     )
+    build_id: str = Field(
+        ...,
+        min_length=1,
+        description="Canonical checkout or worktree identity that produced this event"
+    )
     node_id: str = Field(
         ...,
         min_length=1,
-        description="Identifier of the node that emitted this event"
+        description="Required causal emitter identity used for Lamport ordering and deterministic tie-breaking"
     )
     lamport_clock: int = Field(
         ...,
@@ -120,7 +125,7 @@ class Event(BaseModel):
         json_schema_extra={"pattern": _EVENT_ID_PATTERN},
     )
     schema_version: str = Field(
-        default="1.0.0",
+        default="3.0.0",
         pattern=r"^\d+\.\d+\.\d+$",
         description="Envelope schema version (semver)"
     )
@@ -144,6 +149,7 @@ class Event(BaseModel):
             f"Event(event_id={self.event_id[:8]}..., "
             f"type={self.event_type}, "
             f"aggregate={self.aggregate_id}, "
+            f"build={self.build_id}, "
             f"project={str(self.project_uuid)[:8]}..., "
             f"lamport={self.lamport_clock})"
         )

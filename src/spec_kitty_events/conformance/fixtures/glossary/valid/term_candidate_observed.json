@@ -5,5 +5,7 @@
   "term_surface": "dashboard",
   "confidence": 0.7,
   "actor": "agent-001",
-  "step_metadata": {"primitive": "specify"}
+  "step_metadata": {
+    "primitive": "specify"
+  }
 }

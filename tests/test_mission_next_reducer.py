@@ -1,4 +1,4 @@
-"""Tests for mission-next reducer — happy path, anomalies, alias, and edge cases."""
+"""Tests for mission-next reducer — happy path, anomalies, and edge cases."""
 
 from __future__ import annotations
 
@@ -23,7 +23,6 @@ from spec_kitty_events.mission_next import (
     NEXT_STEP_AUTO_COMPLETED,
     NEXT_STEP_ISSUED,
     NEXT_STEP_PLANNED,
-    _COMPLETION_ALIAS,
     MissionRunStatus,
 )
 
@@ -67,6 +66,7 @@ def make_event(
         aggregate_id=aggregate_id,
         payload=payload,
         timestamp=datetime(2024, 1, 1, 0, 0, lamport_clock % 60, tzinfo=UTC).isoformat(),
+        build_id="build-test",
         node_id="test-node",
         lamport_clock=lamport_clock,
         correlation_id=corr_id,
@@ -106,7 +106,7 @@ class TestReducerHappyPath:
         actor = _make_actor_dict()
         events = [
             make_event(MISSION_RUN_STARTED, {
-                "run_id": "run-1", "mission_key": "feat-login", "actor": actor,
+                "run_id": "run-1", "mission_type": "software-dev", "actor": actor,
             }, lamport_clock=1),
             make_event(NEXT_STEP_ISSUED, {
                 "run_id": "run-1", "step_id": "S1", "agent_id": "a1", "actor": actor,
@@ -131,14 +131,14 @@ class TestReducerHappyPath:
                 "result": "success", "actor": actor,
             }, lamport_clock=7),
             make_event(MISSION_RUN_COMPLETED, {
-                "run_id": "run-1", "mission_key": "feat-login", "actor": actor,
+                "run_id": "run-1", "mission_type": "software-dev", "actor": actor,
             }, lamport_clock=8),
         ]
 
         state = reduce_mission_next_events(events)
 
         assert state.run_id == "run-1"
-        assert state.mission_key == "feat-login"
+        assert state.mission_type == "software-dev"
         assert state.run_status == MissionRunStatus.COMPLETED
         assert state.current_step_id is None
         assert state.completed_steps == ("S1", "S2")
@@ -159,15 +159,15 @@ class TestDuplicateStart:
         actor = _make_actor_dict()
         events = [
             make_event(MISSION_RUN_STARTED, {
-                "run_id": "run-1", "mission_key": "mk1", "actor": actor,
+                "run_id": "run-1", "mission_type": "software-dev", "actor": actor,
             }, lamport_clock=1),
             make_event(MISSION_RUN_STARTED, {
-                "run_id": "run-2", "mission_key": "mk2", "actor": actor,
+                "run_id": "run-2", "mission_type": "research", "actor": actor,
             }, lamport_clock=2),
         ]
         state = reduce_mission_next_events(events)
         assert state.run_id == "run-1"
-        assert state.mission_key == "mk1"
+        assert state.mission_type == "software-dev"
         assert len(state.anomalies) == 1
         assert "Duplicate" in state.anomalies[0].reason
 
@@ -182,10 +182,10 @@ class TestEventAfterTerminal:
         actor = _make_actor_dict()
         events = [
             make_event(MISSION_RUN_STARTED, {
-                "run_id": "run-1", "mission_key": "mk1", "actor": actor,
+                "run_id": "run-1", "mission_type": "software-dev", "actor": actor,
             }, lamport_clock=1),
             make_event(MISSION_RUN_COMPLETED, {
-                "run_id": "run-1", "mission_key": "mk1", "actor": actor,
+                "run_id": "run-1", "mission_type": "software-dev", "actor": actor,
             }, lamport_clock=2),
             make_event(NEXT_STEP_ISSUED, {
                 "run_id": "run-1", "step_id": "S1", "agent_id": "a1", "actor": actor,
@@ -210,7 +210,7 @@ class TestEventBeforeStart:
                 "run_id": "run-1", "step_id": "S1", "agent_id": "a1", "actor": actor,
             }, lamport_clock=1),
             make_event(MISSION_RUN_STARTED, {
-                "run_id": "run-1", "mission_key": "mk1", "actor": actor,
+                "run_id": "run-1", "mission_type": "software-dev", "actor": actor,
             }, lamport_clock=2),
         ]
         state = reduce_mission_next_events(events)
@@ -229,7 +229,7 @@ class TestDuplicateDecisionRequest:
         actor = _make_actor_dict()
         events = [
             make_event(MISSION_RUN_STARTED, {
-                "run_id": "run-1", "mission_key": "mk1", "actor": actor,
+                "run_id": "run-1", "mission_type": "software-dev", "actor": actor,
             }, lamport_clock=1),
             make_event(DECISION_INPUT_REQUESTED, {
                 "run_id": "run-1", "decision_id": "d1", "step_id": "S1",
@@ -255,7 +255,7 @@ class TestDecisionLifecycle:
         actor = _make_actor_dict()
         events = [
             make_event(MISSION_RUN_STARTED, {
-                "run_id": "run-1", "mission_key": "mk1", "actor": actor,
+                "run_id": "run-1", "mission_type": "software-dev", "actor": actor,
             }, lamport_clock=1),
             make_event(DECISION_INPUT_REQUESTED, {
                 "run_id": "run-1", "decision_id": "d1", "step_id": "S1",
@@ -286,13 +286,13 @@ class TestTerminalIdempotency:
         actor = _make_actor_dict()
         events = [
             make_event(MISSION_RUN_STARTED, {
-                "run_id": "run-1", "mission_key": "mk1", "actor": actor,
+                "run_id": "run-1", "mission_type": "software-dev", "actor": actor,
             }, lamport_clock=1),
             make_event(MISSION_RUN_COMPLETED, {
-                "run_id": "run-1", "mission_key": "mk1", "actor": actor,
+                "run_id": "run-1", "mission_type": "software-dev", "actor": actor,
             }, lamport_clock=2),
             make_event(MISSION_RUN_COMPLETED, {
-                "run_id": "run-1", "mission_key": "mk1", "actor": actor,
+                "run_id": "run-1", "mission_type": "software-dev", "actor": actor,
             }, lamport_clock=3),
         ]
         state = reduce_mission_next_events(events)
@@ -311,7 +311,7 @@ class TestStepTracking:
         actor = _make_actor_dict()
         events = [
             make_event(MISSION_RUN_STARTED, {
-                "run_id": "run-1", "mission_key": "mk1", "actor": actor,
+                "run_id": "run-1", "mission_type": "software-dev", "actor": actor,
             }, lamport_clock=1),
             make_event(NEXT_STEP_ISSUED, {
                 "run_id": "run-1", "step_id": "S1", "agent_id": "a1", "actor": actor,
@@ -325,7 +325,7 @@ class TestStepTracking:
         actor = _make_actor_dict()
         events = [
             make_event(MISSION_RUN_STARTED, {
-                "run_id": "run-1", "mission_key": "mk1", "actor": actor,
+                "run_id": "run-1", "mission_type": "software-dev", "actor": actor,
             }, lamport_clock=1),
             make_event(NEXT_STEP_ISSUED, {
                 "run_id": "run-1", "step_id": "S1", "agent_id": "a1", "actor": actor,
@@ -351,10 +351,10 @@ class TestEventDedup:
         eid = "01HX0000000000000000000001"
         events = [
             make_event(MISSION_RUN_STARTED, {
-                "run_id": "run-1", "mission_key": "mk1", "actor": actor,
+                "run_id": "run-1", "mission_type": "software-dev", "actor": actor,
             }, event_id=eid, lamport_clock=1),
             make_event(MISSION_RUN_STARTED, {
-                "run_id": "run-1", "mission_key": "mk1", "actor": actor,
+                "run_id": "run-1", "mission_type": "software-dev", "actor": actor,
             }, event_id=eid, lamport_clock=1),
         ]
         state = reduce_mission_next_events(events)
@@ -363,25 +363,26 @@ class TestEventDedup:
         assert state.event_count == 1
 
 
-# ── Completion Alias ─────────────────────────────────────────────────────────
+# ── Lifecycle MissionCompleted Rejection ─────────────────────────────────────
 
 
-class TestCompletionAlias:
-    """Tests that 'MissionCompleted' event_type is accepted as MissionRunCompleted."""
+class TestLifecycleMissionCompletedRejection:
+    """Tests that MissionCompleted remains outside the runtime reducer contract."""
 
-    def test_mission_completed_alias_accepted(self) -> None:
+    def test_mission_completed_is_filtered_out_of_runtime_reduction(self) -> None:
         actor = _make_actor_dict()
         events = [
             make_event(MISSION_RUN_STARTED, {
-                "run_id": "run-1", "mission_key": "mk1", "actor": actor,
+                "run_id": "run-1", "mission_type": "software-dev", "actor": actor,
             }, lamport_clock=1),
-            make_event(_COMPLETION_ALIAS, {
-                "run_id": "run-1", "mission_key": "mk1", "actor": actor,
+            make_event("MissionCompleted", {
+                "run_id": "run-1", "mission_type": "software-dev", "actor": actor,
             }, lamport_clock=2),
         ]
         state = reduce_mission_next_events(events)
-        assert state.run_status == MissionRunStatus.COMPLETED
+        assert state.run_status == MissionRunStatus.RUNNING
         assert state.anomalies == ()
+        assert state.event_count == 1
 
 
 # ── NextStepPlanned Ignored ──────────────────────────────────────────────────
@@ -394,13 +395,13 @@ class TestNextStepPlannedIgnored:
         actor = _make_actor_dict()
         events = [
             make_event(MISSION_RUN_STARTED, {
-                "run_id": "run-1", "mission_key": "mk1", "actor": actor,
+                "run_id": "run-1", "mission_type": "software-dev", "actor": actor,
             }, lamport_clock=1),
             make_event(NEXT_STEP_PLANNED, {
                 "some": "data",
             }, lamport_clock=2),
             make_event(MISSION_RUN_COMPLETED, {
-                "run_id": "run-1", "mission_key": "mk1", "actor": actor,
+                "run_id": "run-1", "mission_type": "software-dev", "actor": actor,
             }, lamport_clock=3),
         ]
         state = reduce_mission_next_events(events)
@@ -409,80 +410,28 @@ class TestNextStepPlannedIgnored:
         assert state.event_count == 3
 
 
-# ── P0: Lifecycle MissionCompleted Must Not Terminate Run ─────────────────────
-
-
-class TestLifecycleMissionCompletedDoesNotTerminateRun:
-    """P0 fix: lifecycle MissionCompleted payload must not falsely terminate a run."""
-
-    def test_lifecycle_payload_rejected_as_alias(self) -> None:
-        """A MissionCompleted event with lifecycle-shaped payload (mission_id,
-        mission_type, final_phase, actor=str) should be rejected by the alias
-        gate and recorded as an anomaly — not terminate the run."""
+    def test_lifecycle_payload_does_not_terminate_run(self) -> None:
         actor = _make_actor_dict()
         events = [
             make_event(MISSION_RUN_STARTED, {
-                "run_id": "run-1", "mission_key": "mk1", "actor": actor,
+                "run_id": "run-1", "mission_type": "software-dev", "actor": actor,
             }, lamport_clock=1),
-            # Lifecycle-shaped MissionCompleted — no run_id, no RuntimeActorIdentity
-            make_event(_COMPLETION_ALIAS, {
+            make_event("MissionCompleted", {
                 "mission_id": "M001",
                 "mission_type": "software-dev",
                 "final_phase": "deliver",
                 "actor": "user-1",
             }, lamport_clock=2),
-        ]
-        state = reduce_mission_next_events(events)
-        # Run should still be RUNNING, not COMPLETED
-        assert state.run_status == MissionRunStatus.RUNNING
-        assert len(state.anomalies) == 1
-        assert "alias ignored" in state.anomalies[0].reason.lower()
-        assert "lifecycle" in state.anomalies[0].reason.lower()
-
-    def test_run_scoped_alias_still_accepted(self) -> None:
-        """A MissionCompleted event with run-scoped payload (run_id, mission_key,
-        actor=RuntimeActorIdentity) should still terminate the run."""
-        actor = _make_actor_dict()
-        events = [
-            make_event(MISSION_RUN_STARTED, {
-                "run_id": "run-1", "mission_key": "mk1", "actor": actor,
-            }, lamport_clock=1),
-            make_event(_COMPLETION_ALIAS, {
-                "run_id": "run-1", "mission_key": "mk1", "actor": actor,
-            }, lamport_clock=2),
-        ]
-        state = reduce_mission_next_events(events)
-        assert state.run_status == MissionRunStatus.COMPLETED
-        assert state.anomalies == ()
-
-    def test_mixed_stream_lifecycle_and_run_events(self) -> None:
-        """When lifecycle and mission-next events coexist in a stream,
-        lifecycle MissionCompleted must not corrupt the run projection."""
-        actor = _make_actor_dict()
-        events = [
-            make_event(MISSION_RUN_STARTED, {
-                "run_id": "run-1", "mission_key": "mk1", "actor": actor,
-            }, lamport_clock=1),
-            make_event(NEXT_STEP_ISSUED, {
-                "run_id": "run-1", "step_id": "S1", "agent_id": "a1", "actor": actor,
-            }, lamport_clock=2),
-            # Lifecycle completion for the mission — should be anomaly, not terminal
-            make_event(_COMPLETION_ALIAS, {
-                "mission_id": "M001",
-                "mission_type": "software-dev",
-                "final_phase": "deliver",
-                "actor": "user-1",
-            }, lamport_clock=3),
-            # Run continues
             make_event(NEXT_STEP_AUTO_COMPLETED, {
                 "run_id": "run-1", "step_id": "S1", "agent_id": "a1",
                 "result": "success", "actor": actor,
-            }, lamport_clock=4),
+            }, lamport_clock=3),
         ]
         state = reduce_mission_next_events(events)
         assert state.run_status == MissionRunStatus.RUNNING
         assert state.completed_steps == ("S1",)
-        assert len(state.anomalies) == 1
+        assert state.anomalies == ()
+        assert state.event_count == 2
 
 
 # ── P1: Run-ID Consistency Guard ─────────────────────────────────────────────
@@ -495,7 +444,7 @@ class TestRunIdConsistency:
         actor = _make_actor_dict()
         events = [
             make_event(MISSION_RUN_STARTED, {
-                "run_id": "run-1", "mission_key": "mk1", "actor": actor,
+                "run_id": "run-1", "mission_type": "software-dev", "actor": actor,
             }, lamport_clock=1),
             make_event(NEXT_STEP_ISSUED, {
                 "run_id": "run-OTHER", "step_id": "S1", "agent_id": "a1", "actor": actor,
@@ -510,7 +459,7 @@ class TestRunIdConsistency:
         actor = _make_actor_dict()
         events = [
             make_event(MISSION_RUN_STARTED, {
-                "run_id": "run-1", "mission_key": "mk1", "actor": actor,
+                "run_id": "run-1", "mission_type": "software-dev", "actor": actor,
             }, lamport_clock=1),
             make_event(NEXT_STEP_ISSUED, {
                 "run_id": "run-1", "step_id": "S1", "agent_id": "a1", "actor": actor,
@@ -529,7 +478,7 @@ class TestRunIdConsistency:
         actor = _make_actor_dict()
         events = [
             make_event(MISSION_RUN_STARTED, {
-                "run_id": "run-1", "mission_key": "mk1", "actor": actor,
+                "run_id": "run-1", "mission_type": "software-dev", "actor": actor,
             }, lamport_clock=1),
             make_event(DECISION_INPUT_REQUESTED, {
                 "run_id": "run-OTHER", "decision_id": "d1", "step_id": "S1",
@@ -544,7 +493,7 @@ class TestRunIdConsistency:
         actor = _make_actor_dict()
         events = [
             make_event(MISSION_RUN_STARTED, {
-                "run_id": "run-1", "mission_key": "mk1", "actor": actor,
+                "run_id": "run-1", "mission_type": "software-dev", "actor": actor,
             }, lamport_clock=1),
             make_event(DECISION_INPUT_REQUESTED, {
                 "run_id": "run-1", "decision_id": "d1", "step_id": "S1",
@@ -564,10 +513,10 @@ class TestRunIdConsistency:
         actor = _make_actor_dict()
         events = [
             make_event(MISSION_RUN_STARTED, {
-                "run_id": "run-1", "mission_key": "mk1", "actor": actor,
+                "run_id": "run-1", "mission_type": "software-dev", "actor": actor,
             }, lamport_clock=1),
             make_event(MISSION_RUN_COMPLETED, {
-                "run_id": "run-OTHER", "mission_key": "mk1", "actor": actor,
+                "run_id": "run-OTHER", "mission_type": "software-dev", "actor": actor,
             }, lamport_clock=2),
         ]
         state = reduce_mission_next_events(events)
@@ -597,7 +546,7 @@ class TestMalformedPayloadResilience:
         actor = _make_actor_dict()
         events = [
             make_event(MISSION_RUN_STARTED, {
-                "run_id": "run-1", "mission_key": "mk1", "actor": actor,
+                "run_id": "run-1", "mission_type": "software-dev", "actor": actor,
             }, lamport_clock=1),
             make_event(NEXT_STEP_ISSUED, {
                 "garbage": True,
@@ -612,7 +561,7 @@ class TestMalformedPayloadResilience:
         actor = _make_actor_dict()
         events = [
             make_event(MISSION_RUN_STARTED, {
-                "run_id": "run-1", "mission_key": "mk1", "actor": actor,
+                "run_id": "run-1", "mission_type": "software-dev", "actor": actor,
             }, lamport_clock=1),
             make_event(NEXT_STEP_AUTO_COMPLETED, {
                 "nope": 42,
@@ -626,7 +575,7 @@ class TestMalformedPayloadResilience:
         actor = _make_actor_dict()
         events = [
             make_event(MISSION_RUN_STARTED, {
-                "run_id": "run-1", "mission_key": "mk1", "actor": actor,
+                "run_id": "run-1", "mission_type": "software-dev", "actor": actor,
             }, lamport_clock=1),
             make_event(DECISION_INPUT_REQUESTED, {}, lamport_clock=2),
         ]
@@ -638,7 +587,7 @@ class TestMalformedPayloadResilience:
         actor = _make_actor_dict()
         events = [
             make_event(MISSION_RUN_STARTED, {
-                "run_id": "run-1", "mission_key": "mk1", "actor": actor,
+                "run_id": "run-1", "mission_type": "software-dev", "actor": actor,
             }, lamport_clock=1),
             make_event(DECISION_INPUT_ANSWERED, {
                 "only_partial": "data",
@@ -652,7 +601,7 @@ class TestMalformedPayloadResilience:
         actor = _make_actor_dict()
         events = [
             make_event(MISSION_RUN_STARTED, {
-                "run_id": "run-1", "mission_key": "mk1", "actor": actor,
+                "run_id": "run-1", "mission_type": "software-dev", "actor": actor,
             }, lamport_clock=1),
             make_event(MISSION_RUN_COMPLETED, {
                 "invalid": True,
@@ -668,14 +617,14 @@ class TestMalformedPayloadResilience:
         actor = _make_actor_dict()
         events = [
             make_event(MISSION_RUN_STARTED, {
-                "run_id": "run-1", "mission_key": "mk1", "actor": actor,
+                "run_id": "run-1", "mission_type": "software-dev", "actor": actor,
             }, lamport_clock=1),
             make_event(NEXT_STEP_ISSUED, {"garbage": True}, lamport_clock=2),
             make_event(NEXT_STEP_ISSUED, {
                 "run_id": "run-1", "step_id": "S1", "agent_id": "a1", "actor": actor,
             }, lamport_clock=3),
             make_event(MISSION_RUN_COMPLETED, {
-                "run_id": "run-1", "mission_key": "mk1", "actor": actor,
+                "run_id": "run-1", "mission_type": "software-dev", "actor": actor,
             }, lamport_clock=4),
         ]
         state = reduce_mission_next_events(events)
@@ -699,7 +648,7 @@ class TestDeterminism:
         actor = _make_actor_dict()
         events = [
             make_event(MISSION_RUN_STARTED, {
-                "run_id": "run-1", "mission_key": "mk1", "actor": actor,
+                "run_id": "run-1", "mission_type": "software-dev", "actor": actor,
             }, lamport_clock=10),
             make_event(NEXT_STEP_ISSUED, {
                 "run_id": "run-1", "step_id": "S1", "agent_id": "a1", "actor": actor,
@@ -709,7 +658,7 @@ class TestDeterminism:
                 "result": "success", "actor": actor,
             }, lamport_clock=30),
             make_event(MISSION_RUN_COMPLETED, {
-                "run_id": "run-1", "mission_key": "mk1", "actor": actor,
+                "run_id": "run-1", "mission_type": "software-dev", "actor": actor,
             }, lamport_clock=40),
         ]
 

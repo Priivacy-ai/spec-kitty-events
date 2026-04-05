@@ -15,6 +15,7 @@ from spec_kitty_events.storage import (
 from spec_kitty_events.models import Event, ErrorEntry
 
 TEST_PROJECT_UUID = uuid.UUID("12345678-1234-5678-1234-567812345678")
+TEST_BUILD_ID = "test-build"
 
 
 class TestEventStore:
@@ -32,6 +33,7 @@ class TestEventStore:
             event_type="TestEvent",
             aggregate_id="AGG001",
             timestamp=datetime.now(),
+            build_id=TEST_BUILD_ID,
             node_id="node1",
             lamport_clock=5,
             project_uuid=TEST_PROJECT_UUID,
@@ -50,6 +52,7 @@ class TestEventStore:
             event_type="TestEvent",
             aggregate_id="AGG001",
             timestamp=datetime.now(),
+            build_id=TEST_BUILD_ID,
             node_id="node1",
             lamport_clock=5,
             project_uuid=TEST_PROJECT_UUID,
@@ -60,6 +63,7 @@ class TestEventStore:
             event_type="UpdatedEvent",
             aggregate_id="AGG001",
             timestamp=datetime.now(),
+            build_id=TEST_BUILD_ID,
             node_id="node1",
             lamport_clock=6,
             project_uuid=TEST_PROJECT_UUID,
@@ -79,6 +83,7 @@ class TestEventStore:
             event_type="E1",
             aggregate_id="AGG001",
             timestamp=datetime.now(),
+            build_id=TEST_BUILD_ID,
             node_id="node2",
             lamport_clock=5,
             project_uuid=TEST_PROJECT_UUID,
@@ -89,6 +94,7 @@ class TestEventStore:
             event_type="E2",
             aggregate_id="AGG001",
             timestamp=datetime.now(),
+            build_id=TEST_BUILD_ID,
             node_id="node1",
             lamport_clock=5,
             project_uuid=TEST_PROJECT_UUID,
@@ -99,6 +105,7 @@ class TestEventStore:
             event_type="E3",
             aggregate_id="AGG001",
             timestamp=datetime.now(),
+            build_id=TEST_BUILD_ID,
             node_id="node1",
             lamport_clock=3,
             project_uuid=TEST_PROJECT_UUID,

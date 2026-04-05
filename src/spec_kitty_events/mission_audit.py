@@ -71,7 +71,7 @@ TERMINAL_AUDIT_STATUSES: FrozenSet[AuditStatus] = frozenset({
 class AuditArtifactRef(BaseModel):
     """Links an audit report to its content hash and provenance."""
 
-    model_config = ConfigDict(frozen=True)
+    model_config = ConfigDict(frozen=True, extra="forbid")
 
     report_path: str = Field(..., min_length=1)
     content_hash: ContentHashRef
@@ -81,7 +81,7 @@ class AuditArtifactRef(BaseModel):
 class PendingDecision(BaseModel):
     """Tracks an unresolved decision checkpoint within the reducer."""
 
-    model_config = ConfigDict(frozen=True)
+    model_config = ConfigDict(frozen=True, extra="forbid")
 
     decision_id: str = Field(..., min_length=1)
     question: str
@@ -96,7 +96,7 @@ class MissionAuditAnomaly(BaseModel):
     "duplicate_decision_id", "unrecognized_event_type".
     """
 
-    model_config = ConfigDict(frozen=True)
+    model_config = ConfigDict(frozen=True, extra="forbid")
 
     kind: str
     event_id: str
@@ -109,11 +109,13 @@ class MissionAuditAnomaly(BaseModel):
 class MissionAuditRequestedPayload(BaseModel):
     """Payload for MissionAuditRequested events (FR-003)."""
 
-    model_config = ConfigDict(frozen=True)
+    model_config = ConfigDict(frozen=True, extra="forbid")
 
     mission_id: str = Field(..., min_length=1)
     run_id: str = Field(..., min_length=1)
-    feature_slug: str = Field(..., min_length=1)
+    mission_slug: str = Field(..., min_length=1)
+    mission_number: int = Field(..., ge=1)
+    mission_type: str = Field(..., min_length=1)
     actor: str = Field(..., min_length=1)
     trigger_mode: Literal["manual", "post_merge"]
     audit_scope: List[str] = Field(..., min_length=1)
@@ -123,11 +125,13 @@ class MissionAuditRequestedPayload(BaseModel):
 class MissionAuditStartedPayload(BaseModel):
     """Payload for MissionAuditStarted events (FR-004)."""
 
-    model_config = ConfigDict(frozen=True)
+    model_config = ConfigDict(frozen=True, extra="forbid")
 
     mission_id: str = Field(..., min_length=1)
     run_id: str = Field(..., min_length=1)
-    feature_slug: str = Field(..., min_length=1)
+    mission_slug: str = Field(..., min_length=1)
+    mission_number: int = Field(..., ge=1)
+    mission_type: str = Field(..., min_length=1)
     actor: str = Field(..., min_length=1)
     audit_scope_hash: str = Field(..., min_length=1)
 
@@ -135,11 +139,13 @@ class MissionAuditStartedPayload(BaseModel):
 class MissionAuditDecisionRequestedPayload(BaseModel):
     """Payload for MissionAuditDecisionRequested events (FR-005)."""
 
-    model_config = ConfigDict(frozen=True)
+    model_config = ConfigDict(frozen=True, extra="forbid")
 
     mission_id: str = Field(..., min_length=1)
     run_id: str = Field(..., min_length=1)
-    feature_slug: str = Field(..., min_length=1)
+    mission_slug: str = Field(..., min_length=1)
+    mission_number: int = Field(..., ge=1)
+    mission_type: str = Field(..., min_length=1)
     actor: str = Field(..., min_length=1)
     decision_id: str = Field(..., min_length=1)
     question: str
@@ -154,11 +160,13 @@ class MissionAuditCompletedPayload(BaseModel):
     the emitter MUST emit MissionAuditFailed instead.
     """
 
-    model_config = ConfigDict(frozen=True)
+    model_config = ConfigDict(frozen=True, extra="forbid")
 
     mission_id: str = Field(..., min_length=1)
     run_id: str = Field(..., min_length=1)
-    feature_slug: str = Field(..., min_length=1)
+    mission_slug: str = Field(..., min_length=1)
+    mission_number: int = Field(..., ge=1)
+    mission_type: str = Field(..., min_length=1)
     actor: str = Field(..., min_length=1)
     verdict: AuditVerdict
     severity: AuditSeverity
@@ -170,11 +178,13 @@ class MissionAuditCompletedPayload(BaseModel):
 class MissionAuditFailedPayload(BaseModel):
     """Payload for MissionAuditFailed events (FR-007)."""
 
-    model_config = ConfigDict(frozen=True)
+    model_config = ConfigDict(frozen=True, extra="forbid")
 
     mission_id: str = Field(..., min_length=1)
     run_id: str = Field(..., min_length=1)
-    feature_slug: str = Field(..., min_length=1)
+    mission_slug: str = Field(..., min_length=1)
+    mission_number: int = Field(..., ge=1)
+    mission_type: str = Field(..., min_length=1)
     actor: str = Field(..., min_length=1)
     error_code: str = Field(..., min_length=1)
     error_message: str
@@ -187,7 +197,7 @@ class MissionAuditFailedPayload(BaseModel):
 class ReducedMissionAuditState(BaseModel):
     """Deterministic projection output of reduce_mission_audit_events() (FR-012–FR-014, R-005)."""
 
-    model_config = ConfigDict(frozen=True)
+    model_config = ConfigDict(frozen=True, extra="forbid")
 
     audit_status: AuditStatus = AuditStatus.PENDING
     verdict: Optional[AuditVerdict] = None
@@ -201,7 +211,9 @@ class ReducedMissionAuditState(BaseModel):
     pending_decisions: Tuple[PendingDecision, ...] = ()
     mission_id: Optional[str] = None
     run_id: Optional[str] = None
-    feature_slug: Optional[str] = None
+    mission_slug: Optional[str] = None
+    mission_number: Optional[int] = None
+    mission_type: Optional[str] = None
     trigger_mode: Optional[str] = None
     enforcement_mode: Optional[str] = None
     audit_scope: Optional[Tuple[str, ...]] = None
@@ -244,7 +256,9 @@ def reduce_mission_audit_events(events: Sequence[Event]) -> ReducedMissionAuditS
     error_message: Optional[str] = None
     mission_id: Optional[str] = None
     run_id: Optional[str] = None
-    feature_slug: Optional[str] = None
+    mission_slug: Optional[str] = None
+    mission_number: Optional[int] = None
+    mission_type: Optional[str] = None
     trigger_mode: Optional[str] = None
     enforcement_mode: Optional[str] = None
     audit_scope: Optional[Tuple[str, ...]] = None
@@ -280,7 +294,9 @@ def reduce_mission_audit_events(events: Sequence[Event]) -> ReducedMissionAuditS
             req_payload: MissionAuditRequestedPayload = MissionAuditRequestedPayload.model_validate(payload_dict)
             mission_id = req_payload.mission_id
             run_id = req_payload.run_id
-            feature_slug = req_payload.feature_slug
+            mission_slug = req_payload.mission_slug
+            mission_number = req_payload.mission_number
+            mission_type = req_payload.mission_type
             trigger_mode = req_payload.trigger_mode
             enforcement_mode = req_payload.enforcement_mode
             audit_scope = tuple(req_payload.audit_scope)
@@ -292,7 +308,9 @@ def reduce_mission_audit_events(events: Sequence[Event]) -> ReducedMissionAuditS
             if not mission_id:
                 mission_id = started_payload.mission_id
                 run_id = started_payload.run_id
-                feature_slug = started_payload.feature_slug
+                mission_slug = started_payload.mission_slug
+                mission_number = started_payload.mission_number
+                mission_type = started_payload.mission_type
             audit_status = AuditStatus.RUNNING
 
         elif event_type == MISSION_AUDIT_DECISION_REQUESTED:
@@ -312,6 +330,12 @@ def reduce_mission_audit_events(events: Sequence[Event]) -> ReducedMissionAuditS
                     context_summary=dec_payload.context_summary,
                     severity=dec_payload.severity,
                 ))
+            if mission_id is None:
+                mission_id = dec_payload.mission_id
+                run_id = dec_payload.run_id
+                mission_slug = dec_payload.mission_slug
+                mission_number = dec_payload.mission_number
+                mission_type = dec_payload.mission_type
             audit_status = AuditStatus.AWAITING_DECISION
 
         elif event_type == MISSION_AUDIT_COMPLETED:
@@ -321,6 +345,12 @@ def reduce_mission_audit_events(events: Sequence[Event]) -> ReducedMissionAuditS
             findings_count = comp_payload.findings_count
             artifact_ref = comp_payload.artifact_ref
             summary = comp_payload.summary
+            if mission_id is None:
+                mission_id = comp_payload.mission_id
+                run_id = comp_payload.run_id
+                mission_slug = comp_payload.mission_slug
+                mission_number = comp_payload.mission_number
+                mission_type = comp_payload.mission_type
             pending_decisions_list = []  # implicit resolution on terminal
             audit_status = AuditStatus.COMPLETED
             terminal_seen = True
@@ -330,6 +360,12 @@ def reduce_mission_audit_events(events: Sequence[Event]) -> ReducedMissionAuditS
             error_code = fail_payload.error_code
             error_message = fail_payload.error_message
             partial_artifact_ref = fail_payload.partial_artifact_ref
+            if mission_id is None:
+                mission_id = fail_payload.mission_id
+                run_id = fail_payload.run_id
+                mission_slug = fail_payload.mission_slug
+                mission_number = fail_payload.mission_number
+                mission_type = fail_payload.mission_type
             pending_decisions_list = []  # implicit resolution on terminal
             audit_status = AuditStatus.FAILED
             terminal_seen = True
@@ -348,7 +384,9 @@ def reduce_mission_audit_events(events: Sequence[Event]) -> ReducedMissionAuditS
         pending_decisions=tuple(pending_decisions_list),
         mission_id=mission_id,
         run_id=run_id,
-        feature_slug=feature_slug,
+        mission_slug=mission_slug,
+        mission_number=mission_number,
+        mission_type=mission_type,
         trigger_mode=trigger_mode,
         enforcement_mode=enforcement_mode,
         audit_scope=audit_scope,

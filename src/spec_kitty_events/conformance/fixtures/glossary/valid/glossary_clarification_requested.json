@@ -5,7 +5,11 @@
   "semantic_check_event_id": "01HTESTCHECK00000000000001",
   "term": "dashboard",
   "question": "Which meaning of 'dashboard' is intended here?",
-  "options": ["Analytics overview panel", "Vehicle instrument panel", "Admin control panel"],
+  "options": [
+    "Analytics overview panel",
+    "Vehicle instrument panel",
+    "Admin control panel"
+  ],
   "urgency": "high",
   "actor": "agent-001"
 }

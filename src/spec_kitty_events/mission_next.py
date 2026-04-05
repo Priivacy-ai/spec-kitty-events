@@ -24,10 +24,6 @@ DECISION_INPUT_REQUESTED: str = "DecisionInputRequested"
 DECISION_INPUT_ANSWERED: str = "DecisionInputAnswered"
 MISSION_RUN_COMPLETED: str = "MissionRunCompleted"
 
-# Migration alias: runtime currently emits "MissionCompleted" for run completion.
-# Accept during compatibility window; canonical form is MissionRunCompleted.
-_COMPLETION_ALIAS: str = "MissionCompleted"
-
 MISSION_NEXT_EVENT_TYPES: FrozenSet[str] = frozenset({
     MISSION_RUN_STARTED,
     NEXT_STEP_PLANNED,
@@ -36,7 +32,6 @@ MISSION_NEXT_EVENT_TYPES: FrozenSet[str] = frozenset({
     DECISION_INPUT_REQUESTED,
     DECISION_INPUT_ANSWERED,
     MISSION_RUN_COMPLETED,
-    _COMPLETION_ALIAS,
 })
 
 # ── Section 2: Value Objects ─────────────────────────────────────────────────
@@ -91,8 +86,8 @@ class MissionRunStartedPayload(BaseModel):
     model_config = ConfigDict(frozen=True)
 
     run_id: str = Field(..., min_length=1, description="Unique run identifier")
-    mission_key: str = Field(
-        ..., min_length=1, description="Mission key being executed"
+    mission_type: str = Field(
+        ..., min_length=1, description="Mission workflow/template type being executed"
     )
     actor: RuntimeActorIdentity = Field(
         ..., description="Actor who started the run"
@@ -181,8 +176,8 @@ class MissionRunCompletedPayload(BaseModel):
     model_config = ConfigDict(frozen=True)
 
     run_id: str = Field(..., min_length=1, description="Run identifier")
-    mission_key: str = Field(
-        ..., min_length=1, description="Mission key that completed"
+    mission_type: str = Field(
+        ..., min_length=1, description="Mission workflow/template type that completed"
     )
     actor: RuntimeActorIdentity = Field(
         ..., description="Actor context for the completion"
@@ -210,8 +205,8 @@ class ReducedMissionRunState(BaseModel):
     run_id: Optional[str] = Field(
         default=None, description="Run ID from MissionRunStarted"
     )
-    mission_key: Optional[str] = Field(
-        default=None, description="Mission key from MissionRunStarted"
+    mission_type: Optional[str] = Field(
+        default=None, description="Mission workflow/template type from MissionRunStarted"
     )
     run_status: Optional[MissionRunStatus] = Field(
         default=None, description="Current run status"
@@ -248,10 +243,10 @@ def reduce_mission_next_events(
     """Fold mission-next events into projected run state.
 
     Pipeline:
-    1. Filter to mission-next event types (including _COMPLETION_ALIAS)
+    1. Filter to canonical mission-next event types
     2. Sort by (lamport_clock, timestamp, event_id)
     3. Deduplicate by event_id
-    4. Process each event, normalizing MissionCompleted → MissionRunCompleted
+    4. Process each event
     5. Assemble frozen ReducedMissionRunState
 
     Pure function. No I/O. Deterministic for any causal-order-preserving
@@ -263,7 +258,11 @@ def reduce_mission_next_events(
         return ReducedMissionRunState()
 
     # 1. Filter
-    next_events = [e for e in events if e.event_type in MISSION_NEXT_EVENT_TYPES]
+    next_events = [
+        e
+        for e in events
+        if e.event_type in MISSION_NEXT_EVENT_TYPES
+    ]
 
     if not next_events:
         return ReducedMissionRunState()
@@ -276,7 +275,7 @@ def reduce_mission_next_events(
 
     # 4. Process (mutable intermediates)
     run_id: Optional[str] = None
-    mission_key: Optional[str] = None
+    mission_type: Optional[str] = None
     run_status: Optional[MissionRunStatus] = None
     current_step_id: Optional[str] = None
     completed_steps: List[str] = []
@@ -290,25 +289,6 @@ def reduce_mission_next_events(
         # Skip reserved event type (no payload, no anomaly)
         if etype == NEXT_STEP_PLANNED:
             continue
-
-        # Normalize completion alias only when payload validates as run-scoped.
-        # A lifecycle MissionCompleted (mission_id, mission_type, final_phase)
-        # must NOT falsely terminate a mission-next run.
-        if etype == _COMPLETION_ALIAS:
-            try:
-                MissionRunCompletedPayload(**event.payload)
-            except Exception:
-                anomalies.append(MissionNextAnomaly(
-                    event_id=event.event_id,
-                    event_type=event.event_type,
-                    reason=(
-                        "MissionCompleted alias ignored: payload does not "
-                        "conform to MissionRunCompletedPayload (likely a "
-                        "lifecycle MissionCompleted event)"
-                    ),
-                ))
-                continue
-            etype = MISSION_RUN_COMPLETED
 
         # Check: event after terminal state
         if run_status in TERMINAL_RUN_STATUSES:
@@ -346,7 +326,7 @@ def reduce_mission_next_events(
                 ))
                 continue
             run_id = payload_started.run_id
-            mission_key = payload_started.mission_key
+            mission_type = payload_started.mission_type
             run_status = MissionRunStatus.RUNNING
             continue
 
@@ -472,7 +452,7 @@ def reduce_mission_next_events(
 
     return ReducedMissionRunState(
         run_id=run_id,
-        mission_key=mission_key,
+        mission_type=mission_type,
         run_status=run_status,
         current_step_id=current_step_id,
         completed_steps=tuple(completed_steps),

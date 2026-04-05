@@ -44,6 +44,7 @@ def _make_event(
         "aggregate_id": "WP-001",
         "payload": {},
         "timestamp": datetime(2026, 1, 15, 10, 0, 0),
+        "build_id": "test-build",
         "node_id": "test-node",
         "lamport_clock": lamport_clock,
         "project_uuid": TEST_PROJECT_UUID,
@@ -58,7 +59,7 @@ def _status_payload(
     to_lane: Lane,
 ) -> dict[str, object]:
     return StatusTransitionPayload(
-        feature_slug="feat-001",
+        mission_slug="mission-001",
         wp_id="WP-001",
         from_lane=from_lane,
         to_lane=to_lane,
@@ -195,12 +196,13 @@ class TestValidateEventUUIDBothLayers:
             "aggregate_id": "test-aggregate",
             "payload": {},
             "timestamp": "2026-01-15T10:00:00Z",
+            "build_id": "test-build",
             "node_id": "test-node",
             "lamport_clock": 1,
             "causation_id": None,
             "project_uuid": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
             "correlation_id": "01JMYYYYYYYYYYYYYYYYYYYYYY",
-            "schema_version": "1.0.0",
+            "schema_version": "3.0.0",
             "data_tier": 0,
         }
         result = validate_event(payload, "Event")
@@ -217,12 +219,13 @@ class TestValidateEventUUIDBothLayers:
             "aggregate_id": "test-aggregate",
             "payload": {},
             "timestamp": "2026-01-15T10:00:00Z",
+            "build_id": "test-build",
             "node_id": "test-node",
             "lamport_clock": 1,
             "causation_id": None,
             "project_uuid": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
             "correlation_id": "01JMYYYYYYYYYYYYYYYYYYYYYY",
-            "schema_version": "1.0.0",
+            "schema_version": "3.0.0",
             "data_tier": 0,
         }
         result = validate_event(payload, "Event")

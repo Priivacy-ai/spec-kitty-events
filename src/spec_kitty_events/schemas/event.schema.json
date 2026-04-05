@@ -9,6 +9,12 @@
       "title": "Aggregate Id",
       "type": "string"
     },
+    "build_id": {
+      "description": "Canonical checkout or worktree identity that produced this event",
+      "minLength": 1,
+      "title": "Build Id",
+      "type": "string"
+    },
     "causation_id": {
       "anyOf": [
         {
@@ -62,7 +68,7 @@
       "type": "integer"
     },
     "node_id": {
-      "description": "Identifier of the node that emitted this event",
+      "description": "Required causal emitter identity used for Lamport ordering and deterministic tie-breaking",
       "minLength": 1,
       "title": "Node Id",
       "type": "string"
@@ -93,7 +99,7 @@
       "type": "string"
     },
     "schema_version": {
-      "default": "1.0.0",
+      "default": "3.0.0",
       "description": "Envelope schema version (semver)",
       "pattern": "^\\d+\\.\\d+\\.\\d+$",
       "title": "Schema Version",
@@ -111,6 +117,7 @@
     "event_type",
     "aggregate_id",
     "timestamp",
+    "build_id",
     "node_id",
     "lamport_clock",
     "project_uuid",

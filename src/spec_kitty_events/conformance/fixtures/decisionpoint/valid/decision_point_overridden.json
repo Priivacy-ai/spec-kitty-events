@@ -2,7 +2,6 @@
   "decision_point_id": "dp-004",
   "mission_id": "m-003",
   "run_id": "run-003",
-  "feature_slug": "feature-w",
   "phase": "P3",
   "actor_id": "human-4",
   "actor_type": "human",
@@ -10,8 +9,15 @@
   "mission_owner_authority_flag": true,
   "mission_owner_authority_path": "/missions/m-003/owner",
   "rationale": "Overriding previous resolution due to new information",
-  "alternatives_considered": ["Revert", "Patch forward"],
-  "evidence_refs": ["ref-006"],
+  "alternatives_considered": [
+    "Revert",
+    "Patch forward"
+  ],
+  "evidence_refs": [
+    "ref-006"
+  ],
   "state_entered_at": "2026-02-27T15:00:00+00:00",
-  "recorded_at": "2026-02-27T15:00:01+00:00"
+  "recorded_at": "2026-02-27T15:00:01+00:00",
+  "mission_slug": "mission-x",
+  "mission_type": "software-dev"
 }

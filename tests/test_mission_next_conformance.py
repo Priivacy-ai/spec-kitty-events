@@ -93,7 +93,7 @@ class TestMissionCompletedAliasConformance:
         """MissionRunCompleted event type validates against run payload."""
         payload = {
             "run_id": "run-1",
-            "mission_key": "feat-login",
+            "mission_type": "software-dev",
             "actor": {
                 "actor_id": "agent-claude",
                 "actor_type": "llm",
@@ -113,7 +113,7 @@ class TestMissionNextReplayFixture:
         state = reduce_mission_next_events(events)
 
         assert state.run_id == "replay-run-001"
-        assert state.mission_key == "replay-mission"
+        assert state.mission_type == "software-dev"
         assert state.run_status == MissionRunStatus.COMPLETED
         assert state.completed_steps == ("step-setup-env", "step-configure-db")
         assert state.anomalies == ()

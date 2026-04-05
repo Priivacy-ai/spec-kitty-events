@@ -49,6 +49,7 @@ def _make_event(event_type: str, payload_obj: object, lamport: int) -> Event:
         aggregate_id="audit/prop-run-001",
         payload=payload_obj.model_dump(),  # type: ignore[union-attr]
         timestamp=datetime(2026, 1, 1, 12, 0, lamport, tzinfo=timezone.utc),
+        build_id="test-build",
         node_id="node-prop",
         lamport_clock=lamport,
         project_uuid=_PROJECT_UUID,
@@ -66,7 +67,9 @@ _VALID_EVENT_POOL: list[Event] = [
         MissionAuditRequestedPayload(
             mission_id="m-prop-001",
             run_id="run-prop-001",
-            feature_slug="prop-feature",
+            mission_slug="prop-mission",
+            mission_number=14,
+            mission_type="software-dev",
             actor="prop-agent",
             trigger_mode="manual",
             audit_scope=["src/a.py"],
@@ -79,7 +82,9 @@ _VALID_EVENT_POOL: list[Event] = [
         MissionAuditStartedPayload(
             mission_id="m-prop-001",
             run_id="run-prop-001",
-            feature_slug="prop-feature",
+            mission_slug="prop-mission",
+            mission_number=14,
+            mission_type="software-dev",
             actor="prop-agent",
             audit_scope_hash="sha256:proptest",
         ),
@@ -90,7 +95,9 @@ _VALID_EVENT_POOL: list[Event] = [
         MissionAuditDecisionRequestedPayload(
             mission_id="m-prop-001",
             run_id="run-prop-001",
-            feature_slug="prop-feature",
+            mission_slug="prop-mission",
+            mission_number=14,
+            mission_type="software-dev",
             actor="prop-agent",
             decision_id="prop-dec-001",
             question="Proceed?",
@@ -104,7 +111,9 @@ _VALID_EVENT_POOL: list[Event] = [
         MissionAuditCompletedPayload(
             mission_id="m-prop-001",
             run_id="run-prop-001",
-            feature_slug="prop-feature",
+            mission_slug="prop-mission",
+            mission_number=14,
+            mission_type="software-dev",
             actor="prop-agent",
             verdict=AuditVerdict.PASS,
             severity=AuditSeverity.INFO,
@@ -119,7 +128,9 @@ _VALID_EVENT_POOL: list[Event] = [
         MissionAuditFailedPayload(
             mission_id="m-prop-001",
             run_id="run-prop-001",
-            feature_slug="prop-feature",
+            mission_slug="prop-mission",
+            mission_number=14,
+            mission_type="software-dev",
             actor="prop-agent",
             error_code="PROP_ERROR",
             error_message="property test failure",

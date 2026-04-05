@@ -129,8 +129,7 @@ def test_replay_stream_validates_and_matches_golden(
     # Validate each event's payload
     for event_dict in raw:
         event_type = event_dict["event_type"]
-        payload = event_dict["payload"]
-        result = validate_event(payload, event_type, strict=True)
+        result = validate_event(event_dict, event_type, strict=True)
         assert result.valid, (
             f"Event {event_dict['event_id']!r} in stream {stream_id!r} "
             f"failed validation: {result.model_violations}"

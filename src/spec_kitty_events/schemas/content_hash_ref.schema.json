@@ -1,6 +1,7 @@
 {
   "$id": "spec-kitty-events/content_hash_ref",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
   "description": "Content fingerprint with optional size and encoding metadata.",
   "properties": {
     "algorithm": {

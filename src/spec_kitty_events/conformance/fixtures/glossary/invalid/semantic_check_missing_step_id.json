@@ -13,5 +13,7 @@
   "confidence": 0.9,
   "recommended_action": "block",
   "effective_strictness": "max",
-  "step_metadata": {"primitive": "generate"}
+  "step_metadata": {
+    "primitive": "generate"
+  }
 }

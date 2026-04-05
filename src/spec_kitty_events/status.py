@@ -202,9 +202,9 @@ class ForceMetadata(BaseModel):
 class StatusTransitionPayload(BaseModel):
     """Payload for a WPStatusChanged event describing a lane transition."""
 
-    model_config = ConfigDict(frozen=True)
+    model_config = ConfigDict(frozen=True, extra="forbid")
 
-    feature_slug: str = Field(..., min_length=1, description="Feature identifier")
+    mission_slug: str = Field(..., min_length=1, description="Mission identifier")
     wp_id: str = Field(..., min_length=1, description="Work-package identifier")
     from_lane: Optional[Lane] = Field(
         None, description="Lane the WP is transitioning from (None for initial)"

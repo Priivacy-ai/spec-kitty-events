@@ -12,6 +12,7 @@ from spec_kitty_events.models import (
 )
 
 TEST_PROJECT_UUID = uuid.UUID("12345678-1234-5678-1234-567812345678")
+BUILD_ID = "build-001"
 
 
 class TestEvent:
@@ -25,6 +26,7 @@ class TestEvent:
             aggregate_id="AGG001",
             payload={"key": "value"},
             timestamp=datetime.now(),
+            build_id=BUILD_ID,
             node_id="test-node",
             lamport_clock=5,
             causation_id=None,
@@ -32,6 +34,8 @@ class TestEvent:
             correlation_id=str(ULID()),
         )
         assert event.event_id == "01ARZ3NDEKTSV4RRFFQ69G5FAV"
+        assert event.build_id == BUILD_ID
+        assert event.node_id == "test-node"
         assert event.lamport_clock == 5
 
     def test_event_validation_empty_event_type(self):
@@ -42,6 +46,7 @@ class TestEvent:
                 event_type="",  # Invalid: empty string
                 aggregate_id="AGG001",
                 timestamp=datetime.now(),
+                build_id=BUILD_ID,
                 node_id="test-node",
                 lamport_clock=0,
                 project_uuid=TEST_PROJECT_UUID,
@@ -56,6 +61,7 @@ class TestEvent:
                 event_type="TestEvent",
                 aggregate_id="AGG001",
                 timestamp=datetime.now(),
+                build_id=BUILD_ID,
                 node_id="test-node",
                 lamport_clock=-1,  # Invalid: negative
                 project_uuid=TEST_PROJECT_UUID,
@@ -69,6 +75,7 @@ class TestEvent:
             event_type="TestEvent",
             aggregate_id="AGG001",
             timestamp=datetime.now(),
+            build_id=BUILD_ID,
             node_id="test-node",
             lamport_clock=0,
             project_uuid=TEST_PROJECT_UUID,
@@ -84,6 +91,7 @@ class TestEvent:
             event_type="TestEvent",
             aggregate_id="AGG001",
             timestamp=datetime(2026, 1, 26, 10, 0, 0),
+            build_id=BUILD_ID,
             node_id="test-node",
             lamport_clock=5,
             project_uuid=TEST_PROJECT_UUID,
@@ -91,6 +99,7 @@ class TestEvent:
         )
         data = event.to_dict()
         assert data["event_id"] == "01ARZ3NDEKTSV4RRFFQ69G5FAV"
+        assert data["build_id"] == BUILD_ID
         assert data["lamport_clock"] == 5
 
     def test_event_deserialization(self):
@@ -101,6 +110,7 @@ class TestEvent:
             "aggregate_id": "AGG001",
             "payload": {},
             "timestamp": datetime(2026, 1, 26, 10, 0, 0),
+            "build_id": BUILD_ID,
             "node_id": "test-node",
             "lamport_clock": 5,
             "causation_id": None,
@@ -109,6 +119,29 @@ class TestEvent:
         }
         event = Event.from_dict(data)
         assert event.event_id == "01ARZ3NDEKTSV4RRFFQ69G5FAV"
+        assert event.build_id == BUILD_ID
+
+    def test_event_requires_build_id(self):
+        """Test event creation fails without build_id."""
+        with pytest.raises(PydanticValidationError):
+            Event(
+                event_id="01ARZ3NDEKTSV4RRFFQ69G5FAV",
+                event_type="TestEvent",
+                aggregate_id="AGG001",
+                timestamp=datetime.now(),
+                node_id="test-node",
+                lamport_clock=0,
+                project_uuid=TEST_PROJECT_UUID,
+                correlation_id=str(ULID()),
+            )
+
+    def test_event_identity_field_descriptions_distinguish_build_and_node(self):
+        """Public field descriptions distinguish checkout identity from causal identity."""
+        build_description = Event.model_fields["build_id"].description
+        node_description = Event.model_fields["node_id"].description
+
+        assert build_description is not None and "checkout or worktree identity" in build_description
+        assert node_description is not None and "causal emitter identity" in node_description
 
     def test_event_project_uuid_required(self):
         """Test event creation fails without project_uuid."""
@@ -118,6 +151,7 @@ class TestEvent:
                 event_type="TestEvent",
                 aggregate_id="AGG001",
                 timestamp=datetime.now(),
+                build_id=BUILD_ID,
                 node_id="test-node",
                 lamport_clock=0,
                 # project_uuid missing
@@ -130,6 +164,7 @@ class TestEvent:
             event_type="TestEvent",
             aggregate_id="AGG001",
             timestamp=datetime.now(),
+            build_id=BUILD_ID,
             node_id="test-node",
             lamport_clock=0,
             project_uuid="12345678-1234-5678-1234-567812345678",
@@ -146,6 +181,7 @@ class TestEvent:
                 event_type="TestEvent",
                 aggregate_id="AGG001",
                 timestamp=datetime.now(),
+                build_id=BUILD_ID,
                 node_id="test-node",
                 lamport_clock=0,
                 project_uuid="not-a-uuid",
@@ -160,6 +196,7 @@ class TestEvent:
                 event_type="TestEvent",
                 aggregate_id="AGG001",
                 timestamp=datetime.now(),
+                build_id=BUILD_ID,
                 node_id="test-node",
                 lamport_clock=0,
                 project_uuid="",
@@ -173,6 +210,7 @@ class TestEvent:
             event_type="TestEvent",
             aggregate_id="AGG001",
             timestamp=datetime.now(),
+            build_id=BUILD_ID,
             node_id="test-node",
             lamport_clock=0,
             project_uuid=TEST_PROJECT_UUID,
@@ -187,6 +225,7 @@ class TestEvent:
             event_type="TestEvent",
             aggregate_id="AGG001",
             timestamp=datetime.now(),
+            build_id=BUILD_ID,
             node_id="test-node",
             lamport_clock=0,
             project_uuid=TEST_PROJECT_UUID,
@@ -202,6 +241,7 @@ class TestEvent:
             event_type="TestEvent",
             aggregate_id="AGG001",
             timestamp=datetime.now(),
+            build_id=BUILD_ID,
             node_id="test-node",
             lamport_clock=0,
             project_uuid=TEST_PROJECT_UUID,
@@ -217,6 +257,7 @@ class TestEvent:
             event_type="TestEvent",
             aggregate_id="AGG001",
             timestamp=datetime(2026, 1, 26, 10, 0, 0),
+            build_id=BUILD_ID,
             node_id="test-node",
             lamport_clock=5,
             project_uuid=TEST_PROJECT_UUID,
@@ -224,6 +265,7 @@ class TestEvent:
             correlation_id=str(ULID()),
         )
         data = event.to_dict()
+        assert data["build_id"] == BUILD_ID
         assert data["project_uuid"] == TEST_PROJECT_UUID
         assert data["project_slug"] == "my-project"
 
@@ -235,6 +277,7 @@ class TestEvent:
             "aggregate_id": "AGG001",
             "payload": {},
             "timestamp": datetime(2026, 1, 26, 10, 0, 0),
+            "build_id": BUILD_ID,
             "node_id": "test-node",
             "lamport_clock": 5,
             "causation_id": None,
@@ -246,6 +289,7 @@ class TestEvent:
         assert isinstance(event.project_uuid, uuid.UUID)
         assert event.project_uuid == TEST_PROJECT_UUID
         assert event.project_slug == "my-project"
+        assert event.build_id == BUILD_ID
 
 
 class TestCorrelationId:
@@ -259,6 +303,7 @@ class TestCorrelationId:
             event_type="TestEvent",
             aggregate_id="AGG001",
             timestamp=datetime.now(),
+            build_id=BUILD_ID,
             node_id="test-node",
             lamport_clock=0,
             project_uuid=TEST_PROJECT_UUID,
@@ -274,6 +319,7 @@ class TestCorrelationId:
                 event_type="TestEvent",
                 aggregate_id="AGG001",
                 timestamp=datetime.now(),
+                build_id=BUILD_ID,
                 node_id="test-node",
                 lamport_clock=0,
                 project_uuid=TEST_PROJECT_UUID,
@@ -288,6 +334,7 @@ class TestCorrelationId:
                 event_type="TestEvent",
                 aggregate_id="AGG001",
                 timestamp=datetime.now(),
+                build_id=BUILD_ID,
                 node_id="test-node",
                 lamport_clock=0,
                 project_uuid=TEST_PROJECT_UUID,
@@ -302,6 +349,7 @@ class TestCorrelationId:
                 event_type="TestEvent",
                 aggregate_id="AGG001",
                 timestamp=datetime.now(),
+                build_id=BUILD_ID,
                 node_id="test-node",
                 lamport_clock=0,
                 project_uuid=TEST_PROJECT_UUID,
@@ -316,6 +364,7 @@ class TestCorrelationId:
             event_type="TestEvent",
             aggregate_id="AGG001",
             timestamp=datetime(2026, 1, 26, 10, 0, 0),
+            build_id=BUILD_ID,
             node_id="test-node",
             lamport_clock=0,
             project_uuid=TEST_PROJECT_UUID,
@@ -329,18 +378,19 @@ class TestSchemaVersion:
     """Tests for the schema_version field (T007)."""
 
     def test_schema_version_default(self) -> None:
-        """Default value is '1.0.0'."""
+        """Default value is the cutover contract version."""
         event = Event(
             event_id="01ARZ3NDEKTSV4RRFFQ69G5FAV",
             event_type="TestEvent",
             aggregate_id="AGG001",
             timestamp=datetime.now(),
+            build_id=BUILD_ID,
             node_id="test-node",
             lamport_clock=0,
             project_uuid=TEST_PROJECT_UUID,
             correlation_id=str(ULID()),
         )
-        assert event.schema_version == "1.0.0"
+        assert event.schema_version == "3.0.0"
 
     def test_schema_version_valid_semver(self) -> None:
         """Valid semver '2.1.3' accepted."""
@@ -349,6 +399,7 @@ class TestSchemaVersion:
             event_type="TestEvent",
             aggregate_id="AGG001",
             timestamp=datetime.now(),
+            build_id=BUILD_ID,
             node_id="test-node",
             lamport_clock=0,
             project_uuid=TEST_PROJECT_UUID,
@@ -365,6 +416,7 @@ class TestSchemaVersion:
                 event_type="TestEvent",
                 aggregate_id="AGG001",
                 timestamp=datetime.now(),
+                build_id=BUILD_ID,
                 node_id="test-node",
                 lamport_clock=0,
                 project_uuid=TEST_PROJECT_UUID,
@@ -380,6 +432,7 @@ class TestSchemaVersion:
                 event_type="TestEvent",
                 aggregate_id="AGG001",
                 timestamp=datetime.now(),
+                build_id=BUILD_ID,
                 node_id="test-node",
                 lamport_clock=0,
                 project_uuid=TEST_PROJECT_UUID,
@@ -394,6 +447,7 @@ class TestSchemaVersion:
             event_type="TestEvent",
             aggregate_id="AGG001",
             timestamp=datetime(2026, 1, 26, 10, 0, 0),
+            build_id=BUILD_ID,
             node_id="test-node",
             lamport_clock=0,
             project_uuid=TEST_PROJECT_UUID,
@@ -414,6 +468,7 @@ class TestDataTier:
             event_type="TestEvent",
             aggregate_id="AGG001",
             timestamp=datetime.now(),
+            build_id=BUILD_ID,
             node_id="test-node",
             lamport_clock=0,
             project_uuid=TEST_PROJECT_UUID,
@@ -429,6 +484,7 @@ class TestDataTier:
             event_type="TestEvent",
             aggregate_id="AGG001",
             timestamp=datetime.now(),
+            build_id=BUILD_ID,
             node_id="test-node",
             lamport_clock=0,
             project_uuid=TEST_PROJECT_UUID,
@@ -445,6 +501,7 @@ class TestDataTier:
                 event_type="TestEvent",
                 aggregate_id="AGG001",
                 timestamp=datetime.now(),
+                build_id=BUILD_ID,
                 node_id="test-node",
                 lamport_clock=0,
                 project_uuid=TEST_PROJECT_UUID,
@@ -460,6 +517,7 @@ class TestDataTier:
                 event_type="TestEvent",
                 aggregate_id="AGG001",
                 timestamp=datetime.now(),
+                build_id=BUILD_ID,
                 node_id="test-node",
                 lamport_clock=0,
                 project_uuid=TEST_PROJECT_UUID,
@@ -475,6 +533,7 @@ class TestDataTier:
                 event_type="TestEvent",
                 aggregate_id="AGG001",
                 timestamp=datetime.now(),
+                build_id=BUILD_ID,
                 node_id="test-node",
                 lamport_clock=0,
                 project_uuid=TEST_PROJECT_UUID,
@@ -489,6 +548,7 @@ class TestDataTier:
             event_type="TestEvent",
             aggregate_id="AGG001",
             timestamp=datetime(2026, 1, 26, 10, 0, 0),
+            build_id=BUILD_ID,
             node_id="test-node",
             lamport_clock=0,
             project_uuid=TEST_PROJECT_UUID,
@@ -544,6 +604,7 @@ class TestConflictResolution:
             event_type="TestEvent",
             aggregate_id="AGG001",
             timestamp=datetime.now(),
+            build_id=BUILD_ID,
             node_id="node1",
             lamport_clock=5,
             project_uuid=TEST_PROJECT_UUID,
@@ -554,6 +615,7 @@ class TestConflictResolution:
             event_type="TestEvent",
             aggregate_id="AGG001",
             timestamp=datetime.now(),
+            build_id=BUILD_ID,
             node_id="node2",
             lamport_clock=5,
             project_uuid=TEST_PROJECT_UUID,
@@ -593,6 +655,7 @@ class TestEventIdFormats:
             "event_type": "TestEvent",
             "aggregate_id": "AGG001",
             "timestamp": datetime.now(),
+            "build_id": BUILD_ID,
             "node_id": "test-node",
             "lamport_clock": 0,
             "project_uuid": TEST_PROJECT_UUID,

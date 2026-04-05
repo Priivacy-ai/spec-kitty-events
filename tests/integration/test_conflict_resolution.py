@@ -11,6 +11,7 @@ from spec_kitty_events import (
 )
 
 TEST_PROJECT_UUID = uuid.UUID("12345678-1234-5678-1234-567812345678")
+TEST_BUILD_ID = "build-test"
 
 
 class TestConflictResolution:
@@ -31,6 +32,7 @@ class TestConflictResolution:
             event_type="WPStatusChanged",
             aggregate_id="WP001",
             timestamp=datetime.now(),
+            build_id=TEST_BUILD_ID,
             node_id="alice",
             lamport_clock=5,
             payload={"state": "for_review"},
@@ -43,6 +45,7 @@ class TestConflictResolution:
             event_type="WPStatusChanged",
             aggregate_id="WP001",
             timestamp=datetime.now(),
+            build_id=TEST_BUILD_ID,
             node_id="bob",
             lamport_clock=5,  # Same clock = concurrent
             payload={"state": "done"},
@@ -78,6 +81,7 @@ class TestConflictResolution:
             event_type="WPStatusChanged",
             aggregate_id="WP001",
             timestamp=datetime.now(),
+            build_id=TEST_BUILD_ID,
             node_id="alice",
             lamport_clock=5,
             payload={"state": "done"},
@@ -90,6 +94,7 @@ class TestConflictResolution:
             event_type="WPStatusChanged",
             aggregate_id="WP002",  # Different aggregate
             timestamp=datetime.now(),
+            build_id=TEST_BUILD_ID,
             node_id="bob",
             lamport_clock=5,
             payload={"state": "done"},
@@ -108,6 +113,7 @@ class TestConflictResolution:
             event_type="WPCreated",
             aggregate_id="WP001",
             timestamp=datetime.now(),
+            build_id=TEST_BUILD_ID,
             node_id="alice",
             lamport_clock=1,
             causation_id=None,  # Root
@@ -120,6 +126,7 @@ class TestConflictResolution:
             event_type="WPStatusChanged",
             aggregate_id="WP001",
             timestamp=datetime.now(),
+            build_id=TEST_BUILD_ID,
             node_id="alice",
             lamport_clock=2,
             causation_id="01ARZ3NDEKTSV4RRFFQ69G5001",  # Child of e1
@@ -132,6 +139,7 @@ class TestConflictResolution:
             event_type="WPStatusChanged",
             aggregate_id="WP001",
             timestamp=datetime.now(),
+            build_id=TEST_BUILD_ID,
             node_id="bob",
             lamport_clock=3,
             causation_id="01ARZ3NDEKTSV4RRFFQ69G5002",  # Child of e2

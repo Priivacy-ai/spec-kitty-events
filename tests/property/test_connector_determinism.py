@@ -42,6 +42,7 @@ def _make_event(event_type: str, payload_obj: object, lamport: int) -> Event:
         aggregate_id="connector/conn-prop-001",
         payload=payload_obj.model_dump(),  # type: ignore[union-attr]
         timestamp=datetime(2026, 1, 1, 12, 0, lamport, tzinfo=timezone.utc),
+        build_id="test-build",
         node_id="node-prop",
         lamport_clock=lamport,
         project_uuid=_PROJECT_UUID,

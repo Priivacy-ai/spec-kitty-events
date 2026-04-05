@@ -44,6 +44,7 @@ def make_glossary_event(
         aggregate_id=aggregate_id,
         payload=payload,
         timestamp=datetime(2024, 1, 1, 0, 0, lamport_clock % 60, tzinfo=UTC).isoformat(),
+        build_id="test-build",
         node_id="test-node",
         lamport_clock=lamport_clock,
         correlation_id=corr_id,

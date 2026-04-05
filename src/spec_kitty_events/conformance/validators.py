@@ -14,6 +14,7 @@ from dataclasses import dataclass
 from typing import Any, Dict, Tuple, Type, Union
 
 from pydantic import ValidationError as PydanticValidationError
+from spec_kitty_events.cutover import assert_canonical_cutover_signal
 
 from spec_kitty_events.gates import GateFailedPayload, GatePassedPayload
 from spec_kitty_events.lifecycle import (
@@ -401,13 +402,38 @@ def validate_event(
     model_class = _EVENT_TYPE_TO_MODEL[event_type]
     schema_name = _EVENT_TYPE_TO_SCHEMA.get(event_type)
 
+    envelope = None
+    model_payload = payload
+    if (
+        event_type != "Event"
+        and isinstance(payload.get("payload"), dict)
+        and payload.get("event_type") == event_type
+    ):
+        envelope = payload
+        model_payload = payload["payload"]
+
+    cutover_violations: Tuple[ModelViolation, ...] = ()
+    if envelope is not None or event_type == "Event":
+        candidate_envelope = envelope or payload
+        try:
+            assert_canonical_cutover_signal(candidate_envelope)
+        except (TypeError, ValueError) as exc:
+            cutover_violations = (
+                ModelViolation(
+                    field="schema_version",
+                    message=str(exc),
+                    violation_type="cutover_policy",
+                    input_value=candidate_envelope,
+                ),
+            )
+
     # Layer 1: Pydantic validation
-    model_violations = _validate_with_model(payload, model_class)
+    model_violations = cutover_violations + _validate_with_model(model_payload, model_class)
 
     # Layer 2: JSON Schema validation (skip if no schema mapping exists)
     if schema_name is not None:
         schema_violations, schema_skipped = _validate_with_schema(
-            payload, schema_name, strict=strict
+            model_payload, schema_name, strict=strict
         )
     else:
         schema_violations = ()

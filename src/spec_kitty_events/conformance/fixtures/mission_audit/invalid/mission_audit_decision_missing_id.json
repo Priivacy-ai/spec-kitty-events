@@ -1,9 +1,11 @@
 {
   "mission_id": "mission-010",
   "run_id": "run-001",
-  "feature_slug": "010-mission-audit-lifecycle-contracts",
   "actor": "agent-claude",
   "question": "Should we block on this finding?",
   "context_summary": "Missing decision identifier.",
-  "severity": "error"
+  "severity": "error",
+  "mission_slug": "mission-010",
+  "mission_number": 10,
+  "mission_type": "software-dev"
 }

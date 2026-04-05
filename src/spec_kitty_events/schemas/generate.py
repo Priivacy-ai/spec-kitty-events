@@ -19,12 +19,15 @@ from spec_kitty_events.status import (
     StatusTransitionPayload,
 )
 from spec_kitty_events.lifecycle import (
+    MissionCreatedPayload,
+    MissionClosedPayload,
     MissionStartedPayload,
     MissionCompletedPayload,
     MissionCancelledPayload,
     PhaseEnteredPayload,
     ReviewRollbackPayload,
 )
+from spec_kitty_events.cutover import CutoverArtifact
 from spec_kitty_events.gates import (
     GatePassedPayload,
     GateFailedPayload,
@@ -121,6 +124,8 @@ PYDANTIC_MODELS: List[tuple[str, Type[BaseModel]]] = [
     ("gate_passed_payload", GatePassedPayload),
     ("gate_failed_payload", GateFailedPayload),
     ("mission_started_payload", MissionStartedPayload),
+    ("mission_created_payload", MissionCreatedPayload),
+    ("mission_closed_payload", MissionClosedPayload),
     ("mission_completed_payload", MissionCompletedPayload),
     ("mission_cancelled_payload", MissionCancelledPayload),
     ("phase_entered_payload", PhaseEnteredPayload),
@@ -177,6 +182,7 @@ PYDANTIC_MODELS: List[tuple[str, Type[BaseModel]]] = [
     ("mission_audit_decision_requested_payload", MissionAuditDecisionRequestedPayload),
     ("mission_audit_completed_payload", MissionAuditCompletedPayload),
     ("mission_audit_failed_payload", MissionAuditFailedPayload),
+    ("cutover_artifact", CutoverArtifact),
     # DecisionPoint lifecycle contracts (2.6.0)
     ("decision_point_opened_payload", DecisionPointOpenedPayload),
     ("decision_point_discussing_payload", DecisionPointDiscussingPayload),

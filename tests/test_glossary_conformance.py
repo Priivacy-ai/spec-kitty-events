@@ -59,11 +59,12 @@ def _make_event(
         aggregate_id=aggregate_id,
         payload=payload,
         timestamp="2026-02-16T10:00:00Z",
+        build_id="test-build",
         node_id="fixture-node",
         lamport_clock=lamport_clock,
         project_uuid=uuid.UUID("12345678-1234-5678-1234-567812345678"),
         correlation_id="01HTESTC0RRE1AT10N00000001",
-        schema_version="2.0.0",
+        schema_version="3.0.0",
     )
 
 

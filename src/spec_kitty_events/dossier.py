@@ -56,12 +56,12 @@ class LocalNamespaceTuple(BaseModel):
     manifest_version is defined HERE ONLY — event payloads must NOT duplicate it.
     """
 
-    model_config = ConfigDict(frozen=True)
+    model_config = ConfigDict(frozen=True, extra="forbid")
 
     project_uuid: str = Field(..., min_length=1)
-    feature_slug: str = Field(..., min_length=1)
+    mission_slug: str = Field(..., min_length=1)
     target_branch: str = Field(..., min_length=1)
-    mission_key: str = Field(..., min_length=1)
+    mission_type: str = Field(..., min_length=1)
     manifest_version: str = Field(..., min_length=1)
     step_id: Optional[str] = Field(default=None)
 
@@ -73,9 +73,9 @@ class ArtifactIdentity(BaseModel):
     Event payloads MUST NOT duplicate this field at the top level.
     """
 
-    model_config = ConfigDict(frozen=True)
+    model_config = ConfigDict(frozen=True, extra="forbid")
 
-    mission_key: str = Field(..., min_length=1)
+    mission_type: str = Field(..., min_length=1)
     path: str = Field(..., min_length=1, description="Repository-relative path")
     artifact_class: ArtifactClassT = Field(...)
     run_id: Optional[str] = Field(default=None)
@@ -85,7 +85,7 @@ class ArtifactIdentity(BaseModel):
 class ContentHashRef(BaseModel):
     """Content fingerprint with optional size and encoding metadata."""
 
-    model_config = ConfigDict(frozen=True)
+    model_config = ConfigDict(frozen=True, extra="forbid")
 
     hash: str = Field(..., min_length=1, description="Hex-encoded content hash")
     algorithm: AlgorithmT = Field(...)
@@ -96,7 +96,7 @@ class ContentHashRef(BaseModel):
 class ProvenanceRef(BaseModel):
     """Source trace connecting an artifact or event to its authoritative origin."""
 
-    model_config = ConfigDict(frozen=True)
+    model_config = ConfigDict(frozen=True, extra="forbid")
 
     source_event_ids: Optional[Tuple[str, ...]] = Field(default=None)
     git_sha: Optional[str] = Field(default=None)
@@ -112,7 +112,7 @@ class ProvenanceRef(BaseModel):
 class MissionDossierArtifactIndexedPayload(BaseModel):
     """Payload for MissionDossierArtifactIndexed events."""
 
-    model_config = ConfigDict(frozen=True)
+    model_config = ConfigDict(frozen=True, extra="forbid")
 
     namespace: LocalNamespaceTuple = Field(
         ...,
@@ -133,7 +133,7 @@ class MissionDossierArtifactIndexedPayload(BaseModel):
 class MissionDossierArtifactMissingPayload(BaseModel):
     """Payload for MissionDossierArtifactMissing events."""
 
-    model_config = ConfigDict(frozen=True)
+    model_config = ConfigDict(frozen=True, extra="forbid")
 
     namespace: LocalNamespaceTuple = Field(...)
     expected_identity: ArtifactIdentity = Field(
@@ -157,7 +157,7 @@ class MissionDossierSnapshotComputedPayload(BaseModel):
     manifest_version NOT duplicated here — use namespace.manifest_version.
     """
 
-    model_config = ConfigDict(frozen=True)
+    model_config = ConfigDict(frozen=True, extra="forbid")
 
     namespace: LocalNamespaceTuple = Field(
         ...,
@@ -178,7 +178,7 @@ class MissionDossierSnapshotComputedPayload(BaseModel):
 class MissionDossierParityDriftDetectedPayload(BaseModel):
     """Payload for MissionDossierParityDriftDetected events."""
 
-    model_config = ConfigDict(frozen=True)
+    model_config = ConfigDict(frozen=True, extra="forbid")
 
     namespace: LocalNamespaceTuple = Field(...)
     expected_hash: str = Field(..., min_length=1)
@@ -278,9 +278,9 @@ def _namespace_key(ns: LocalNamespaceTuple) -> Tuple[str, str, str, str, str]:
     """
     return (
         ns.project_uuid,
-        ns.feature_slug,
+        ns.mission_slug,
         ns.target_branch,
-        ns.mission_key,
+        ns.mission_type,
         ns.manifest_version,
     )
 

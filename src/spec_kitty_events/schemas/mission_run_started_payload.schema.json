@@ -77,10 +77,10 @@
       "$ref": "#/$defs/RuntimeActorIdentity",
       "description": "Actor who started the run"
     },
-    "mission_key": {
-      "description": "Mission key being executed",
+    "mission_type": {
+      "description": "Mission workflow/template type being executed",
       "minLength": 1,
-      "title": "Mission Key",
+      "title": "Mission Type",
       "type": "string"
     },
     "run_id": {
@@ -92,7 +92,7 @@
   },
   "required": [
     "run_id",
-    "mission_key",
+    "mission_type",
     "actor"
   ],
   "title": "MissionRunStartedPayload",

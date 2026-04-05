@@ -53,6 +53,7 @@ def _make_event(
         aggregate_id="mission/M001",
         payload=payload,
         timestamp=_BASE_TIME + timedelta(seconds=lamport_clock),
+        build_id="build-test",
         node_id=node_id,
         lamport_clock=lamport_clock,
         project_uuid=_PROJECT_UUID,
@@ -67,7 +68,7 @@ def _build_wp_status_payload(
 ) -> dict:  # type: ignore[type-arg]
     """Build a WPStatusChanged payload dict."""
     return StatusTransitionPayload(
-        feature_slug="004-test",
+        mission_slug="mission-004",
         wp_id=wp_id,
         from_lane=Lane(from_lane) if from_lane else None,
         to_lane=Lane(to_lane),

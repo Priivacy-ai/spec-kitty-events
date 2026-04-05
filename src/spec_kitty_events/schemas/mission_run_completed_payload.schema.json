@@ -77,10 +77,10 @@
       "$ref": "#/$defs/RuntimeActorIdentity",
       "description": "Actor context for the completion"
     },
-    "mission_key": {
-      "description": "Mission key that completed",
+    "mission_type": {
+      "description": "Mission workflow/template type that completed",
       "minLength": 1,
-      "title": "Mission Key",
+      "title": "Mission Type",
       "type": "string"
     },
     "run_id": {
@@ -92,7 +92,7 @@
   },
   "required": [
     "run_id",
-    "mission_key",
+    "mission_type",
     "actor"
   ],
   "title": "MissionRunCompletedPayload",

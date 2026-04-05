@@ -87,7 +87,8 @@ def _valid_payload_dict() -> dict:
         "decision_point_id": "dp-001",
         "mission_id": "m-001",
         "run_id": "run-001",
-        "feature_slug": "feature-x",
+        "mission_slug": "mission-x",
+        "mission_type": "software-dev",
         "phase": "P1",
         "actor_id": "human-1",
         "actor_type": "human",
@@ -119,7 +120,8 @@ class TestPayloadValidation:
         assert payload.decision_point_id == "dp-001"
         assert payload.mission_id == "m-001"
         assert payload.run_id == "run-001"
-        assert payload.feature_slug == "feature-x"
+        assert payload.mission_slug == "mission-x"
+        assert payload.mission_type == "software-dev"
         assert payload.actor_id == "human-1"
         assert payload.actor_type == "human"
         assert payload.authority_role == DecisionAuthorityRole.MISSION_OWNER
@@ -132,7 +134,8 @@ class TestPayloadValidation:
         "decision_point_id",
         "mission_id",
         "run_id",
-        "feature_slug",
+        "mission_slug",
+        "mission_type",
         "phase",
         "actor_id",
         "actor_type",
@@ -164,12 +167,19 @@ class TestPayloadValidation:
             DecisionPointOpenedPayload.model_validate(data)
 
     def test_empty_string_fields_raise(self) -> None:
-        for field in ["decision_point_id", "mission_id", "run_id", "feature_slug",
+        for field in ["decision_point_id", "mission_id", "run_id", "mission_slug",
+                       "mission_type",
                        "phase", "actor_id", "rationale"]:
             data = _valid_payload_dict()
             data[field] = ""
             with pytest.raises(ValidationError):
                 DecisionPointOpenedPayload.model_validate(data)
+
+    def test_legacy_feature_slug_field_is_rejected(self) -> None:
+        data = _valid_payload_dict()
+        data["feature_slug"] = "legacy-feature"
+        with pytest.raises(ValidationError):
+            DecisionPointOpenedPayload.model_validate(data)
 
     def test_invalid_actor_type_raises(self) -> None:
         data = _valid_payload_dict()

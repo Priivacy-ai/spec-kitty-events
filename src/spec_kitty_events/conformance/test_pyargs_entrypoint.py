@@ -183,6 +183,7 @@ def test_event_round_trip() -> None:
         event_type="TestEvent",
         aggregate_id="agg-001",
         timestamp=datetime(2026, 1, 1, tzinfo=timezone.utc),
+        build_id="build-test-conformance",
         node_id="node-1",
         lamport_clock=1,
         causation_id=None,

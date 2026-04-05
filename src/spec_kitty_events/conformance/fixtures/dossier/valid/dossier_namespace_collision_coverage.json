@@ -1,15 +1,15 @@
 {
   "namespace": {
     "project_uuid": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-    "feature_slug": "009-another-feature",
     "target_branch": "2.x",
-    "mission_key": "software-dev",
-    "manifest_version": "1.0.0"
+    "manifest_version": "1.0.0",
+    "mission_slug": "009-another-feature",
+    "mission_type": "software-dev"
   },
   "artifact_id": {
-    "mission_key": "software-dev",
     "path": "kitty-specs/009-another-feature/spec.md",
-    "artifact_class": "input"
+    "artifact_class": "input",
+    "mission_type": "software-dev"
   },
   "content_ref": {
     "hash": "fedcba987654",

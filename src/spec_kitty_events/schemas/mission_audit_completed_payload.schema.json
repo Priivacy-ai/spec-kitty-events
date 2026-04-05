@@ -1,6 +1,7 @@
 {
   "$defs": {
     "AuditArtifactRef": {
+      "additionalProperties": false,
       "description": "Links an audit report to its content hash and provenance.",
       "properties": {
         "content_hash": {
@@ -44,6 +45,7 @@
       "type": "string"
     },
     "ContentHashRef": {
+      "additionalProperties": false,
       "description": "Content fingerprint with optional size and encoding metadata.",
       "properties": {
         "algorithm": {
@@ -95,6 +97,7 @@
       "type": "object"
     },
     "ProvenanceRef": {
+      "additionalProperties": false,
       "description": "Source trace connecting an artifact or event to its authoritative origin.",
       "properties": {
         "actor_id": {
@@ -185,6 +188,7 @@
   },
   "$id": "spec-kitty-events/mission_audit_completed_payload",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
   "description": "Payload for MissionAuditCompleted events (FR-006).\n\nartifact_ref is required \u2014 not Optional. If artifact generation fails,\nthe emitter MUST emit MissionAuditFailed instead.",
   "properties": {
     "actor": {
@@ -195,11 +199,6 @@
     "artifact_ref": {
       "$ref": "#/$defs/AuditArtifactRef"
     },
-    "feature_slug": {
-      "minLength": 1,
-      "title": "Feature Slug",
-      "type": "string"
-    },
     "findings_count": {
       "minimum": 0,
       "title": "Findings Count",
@@ -208,6 +207,21 @@
     "mission_id": {
       "minLength": 1,
       "title": "Mission Id",
+      "type": "string"
+    },
+    "mission_number": {
+      "minimum": 1,
+      "title": "Mission Number",
+      "type": "integer"
+    },
+    "mission_slug": {
+      "minLength": 1,
+      "title": "Mission Slug",
+      "type": "string"
+    },
+    "mission_type": {
+      "minLength": 1,
+      "title": "Mission Type",
       "type": "string"
     },
     "run_id": {
@@ -229,7 +243,9 @@
   "required": [
     "mission_id",
     "run_id",
-    "feature_slug",
+    "mission_slug",
+    "mission_number",
+    "mission_type",
     "actor",
     "verdict",
     "severity",

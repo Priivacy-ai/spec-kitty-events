@@ -8,8 +8,10 @@ from pydantic import ValidationError as PydanticValidationError
 from ulid import ULID
 
 from spec_kitty_events.lifecycle import (
+    MISSION_CLOSED,
     MISSION_CANCELLED,
     MISSION_COMPLETED,
+    MISSION_CREATED,
     MISSION_EVENT_TYPES,
     MISSION_STARTED,
     PHASE_ENTERED,
@@ -17,8 +19,10 @@ from spec_kitty_events.lifecycle import (
     SCHEMA_VERSION,
     TERMINAL_MISSION_STATUSES,
     LifecycleAnomaly,
+    MissionClosedPayload,
     MissionCancelledPayload,
     MissionCompletedPayload,
+    MissionCreatedPayload,
     MissionStartedPayload,
     MissionStatus,
     PhaseEnteredPayload,
@@ -45,6 +49,7 @@ def _make_mission_event(
         aggregate_id="mission/M001",
         payload=payload,
         timestamp=datetime.now(timezone.utc),
+        build_id="build-test",
         node_id=node_id,
         lamport_clock=lamport_clock,
         project_uuid=_PROJECT_UUID,
@@ -91,6 +96,12 @@ class TestConstants:
     def test_mission_started(self) -> None:
         assert MISSION_STARTED == "MissionStarted"
 
+    def test_mission_created(self) -> None:
+        assert MISSION_CREATED == "MissionCreated"
+
+    def test_mission_closed(self) -> None:
+        assert MISSION_CLOSED == "MissionClosed"
+
     def test_mission_completed(self) -> None:
         assert MISSION_COMPLETED == "MissionCompleted"
 
@@ -104,12 +115,14 @@ class TestConstants:
         assert REVIEW_ROLLBACK == "ReviewRollback"
 
     def test_mission_event_types_contains_all(self) -> None:
+        assert MISSION_CREATED in MISSION_EVENT_TYPES
+        assert MISSION_CLOSED in MISSION_EVENT_TYPES
         assert MISSION_STARTED in MISSION_EVENT_TYPES
         assert MISSION_COMPLETED in MISSION_EVENT_TYPES
         assert MISSION_CANCELLED in MISSION_EVENT_TYPES
         assert PHASE_ENTERED in MISSION_EVENT_TYPES
         assert REVIEW_ROLLBACK in MISSION_EVENT_TYPES
-        assert len(MISSION_EVENT_TYPES) == 5
+        assert len(MISSION_EVENT_TYPES) == 7
 
     def test_mission_event_types_frozen(self) -> None:
         assert isinstance(MISSION_EVENT_TYPES, frozenset)
@@ -261,6 +274,56 @@ class TestMissionCompletedPayload:
         )
         restored = MissionCompletedPayload(**p.model_dump())
         assert restored == p
+
+
+# ── MissionCreatedPayload ────────────────────────────────────────────────────
+
+
+class TestMissionCreatedPayload:
+    """Tests for MissionCreatedPayload model."""
+
+    def test_valid_construction(self) -> None:
+        payload = MissionCreatedPayload(
+            mission_slug="mission-contract-cutover",
+            mission_number=14,
+            mission_type="software-dev",
+        )
+        assert payload.mission_slug == "mission-contract-cutover"
+        assert payload.mission_number == 14
+        assert payload.mission_type == "software-dev"
+
+    def test_missing_mission_type(self) -> None:
+        with pytest.raises(PydanticValidationError):
+            MissionCreatedPayload(
+                mission_slug="mission-contract-cutover",
+                mission_number=14,
+            )  # type: ignore[call-arg]
+
+
+# ── MissionClosedPayload ─────────────────────────────────────────────────────
+
+
+class TestMissionClosedPayload:
+    """Tests for MissionClosedPayload model."""
+
+    def test_valid_construction(self) -> None:
+        payload = MissionClosedPayload(
+            mission_slug="mission-contract-cutover",
+            mission_number=14,
+            mission_type="software-dev",
+        )
+        assert payload.mission_slug == "mission-contract-cutover"
+        assert payload.mission_number == 14
+        assert payload.mission_type == "software-dev"
+
+    def test_rejects_legacy_catalog_fields(self) -> None:
+        with pytest.raises(PydanticValidationError):
+            MissionClosedPayload(
+                mission_slug="mission-contract-cutover",
+                mission_number=14,
+                mission_type="software-dev",
+                mission_id="M014",
+            )
 
 
 # ── MissionCancelledPayload ──────────────────────────────────────────────────
@@ -573,6 +636,36 @@ class TestReduceLifecycleEvents:
         assert result.phases_entered == ("specify",)
         assert result.event_count == 1
 
+    def test_catalog_events_validate_without_affecting_lifecycle_projection(self) -> None:
+        events = [
+            _make_mission_event(
+                MISSION_CREATED,
+                MissionCreatedPayload(
+                    mission_slug="mission-contract-cutover",
+                    mission_number=14,
+                    mission_type="software-dev",
+                ).model_dump(),
+                lamport_clock=1,
+            ),
+            _make_mission_event(
+                MISSION_CLOSED,
+                MissionClosedPayload(
+                    mission_slug="mission-contract-cutover",
+                    mission_number=14,
+                    mission_type="software-dev",
+                ).model_dump(),
+                lamport_clock=2,
+            ),
+        ]
+
+        result = reduce_lifecycle_events(events)
+
+        assert result.mission_status is None
+        assert result.mission_id is None
+        assert result.current_phase is None
+        assert result.anomalies == ()
+        assert result.event_count == 2
+
     def test_full_happy_path(self) -> None:
         events = [
             _make_mission_event(
@@ -697,6 +790,34 @@ class TestReduceLifecycleEvents:
         assert result.mission_status == MissionStatus.COMPLETED
         assert len(result.anomalies) == 1
         assert "terminal" in result.anomalies[0].reason.lower()
+
+    def test_mission_closed_does_not_alias_to_mission_completed(self) -> None:
+        events = [
+            _make_mission_event(
+                MISSION_STARTED,
+                MissionStartedPayload(
+                    mission_id="M001",
+                    mission_type="software-dev",
+                    initial_phase="specify",
+                    actor="user-1",
+                ).model_dump(),
+                lamport_clock=1,
+            ),
+            _make_mission_event(
+                MISSION_CLOSED,
+                MissionClosedPayload(
+                    mission_slug="mission-contract-cutover",
+                    mission_number=14,
+                    mission_type="software-dev",
+                ).model_dump(),
+                lamport_clock=2,
+            ),
+        ]
+
+        result = reduce_lifecycle_events(events)
+
+        assert result.mission_status == MissionStatus.ACTIVE
+        assert result.anomalies == ()
 
     def test_f_reducer_001_cancel_beats_reopen(self) -> None:
         """F-Reducer-001: Cancel beats re-open in concurrent group."""
@@ -847,9 +968,9 @@ class TestReduceLifecycleEvents:
             Event(
                 event_id=str(ULID()),
                 event_type="WPStatusChanged",
-                aggregate_id="feat/WP01",
+                aggregate_id="mission/WP01",
                 payload=StatusTransitionPayload(
-                    feature_slug="feat",
+                    mission_slug="mission-001",
                     wp_id="WP01",
                     from_lane=None,
                     to_lane=Lane.PLANNED,
@@ -857,6 +978,7 @@ class TestReduceLifecycleEvents:
                     execution_mode="worktree",
                 ).model_dump(),
                 timestamp=datetime.now(timezone.utc),
+                build_id="build-test",
                 node_id="node-1",
                 lamport_clock=2,
                 project_uuid=_PROJECT_UUID,

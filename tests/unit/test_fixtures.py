@@ -113,6 +113,14 @@ INVALID_EVENT_FILES = [
     ("events/invalid/gate_failed_invalid_conclusion.json", "GateFailed"),
 ]
 
+CUTOVER_INVALID_EVENT_FILES = [
+    ("events/invalid/event_missing_schema_version.json", "Event"),
+    ("events/invalid/event_wrong_cutover_major.json", "Event"),
+    ("events/invalid/event_forbidden_legacy_key.json", "Event"),
+    ("events/invalid/event_forbidden_legacy_event_name.json", "Event"),
+    ("events/invalid/event_forbidden_legacy_aggregate_name.json", "Event"),
+]
+
 
 class TestInvalidEventFixtures:
     """Verify each invalid event fixture fails model validation."""
@@ -128,6 +136,17 @@ class TestInvalidEventFixtures:
 
     @pytest.mark.parametrize("path,event_type", INVALID_EVENT_FILES)
     def test_invalid_fixture_fails_conformance(
+        self, path: str, event_type: str
+    ) -> None:
+        full = _FIXTURES_DIR / path
+        with open(full, encoding="utf-8") as f:
+            data = json.load(f)
+        result = validate_event(data, event_type)
+        assert result.valid is False, f"Expected invalid for {path}"
+        assert len(result.model_violations) > 0
+
+    @pytest.mark.parametrize("path,event_type", CUTOVER_INVALID_EVENT_FILES)
+    def test_cutover_invalid_fixture_fails_conformance(
         self, path: str, event_type: str
     ) -> None:
         full = _FIXTURES_DIR / path
@@ -160,6 +179,41 @@ class TestInvalidEventFixtures:
         result = validate_event(data, "WPStatusChanged")
         messages = [v.message for v in result.model_violations]
         assert any("reason" in m.lower() for m in messages)
+
+    def test_missing_schema_version_reports_cutover_signal_error(self) -> None:
+        full = _FIXTURES_DIR / "events/invalid/event_missing_schema_version.json"
+        with open(full, encoding="utf-8") as f:
+            data = json.load(f)
+        result = validate_event(data, "Event")
+        assert any("missing canonical cutover signal" in v.message for v in result.model_violations)
+
+    def test_wrong_cutover_major_reports_major_error(self) -> None:
+        full = _FIXTURES_DIR / "events/invalid/event_wrong_cutover_major.json"
+        with open(full, encoding="utf-8") as f:
+            data = json.load(f)
+        result = validate_event(data, "Event")
+        assert any("unsupported cutover major version" in v.message for v in result.model_violations)
+
+    def test_forbidden_legacy_key_reports_cutover_error(self) -> None:
+        full = _FIXTURES_DIR / "events/invalid/event_forbidden_legacy_key.json"
+        with open(full, encoding="utf-8") as f:
+            data = json.load(f)
+        result = validate_event(data, "Event")
+        assert any("forbidden legacy keys" in v.message for v in result.model_violations)
+
+    def test_forbidden_legacy_event_name_reports_cutover_error(self) -> None:
+        full = _FIXTURES_DIR / "events/invalid/event_forbidden_legacy_event_name.json"
+        with open(full, encoding="utf-8") as f:
+            data = json.load(f)
+        result = validate_event(data, "Event")
+        assert any("forbidden legacy event names" in v.message for v in result.model_violations)
+
+    def test_forbidden_legacy_aggregate_name_reports_cutover_error(self) -> None:
+        full = _FIXTURES_DIR / "events/invalid/event_forbidden_legacy_aggregate_name.json"
+        with open(full, encoding="utf-8") as f:
+            data = json.load(f)
+        result = validate_event(data, "Event")
+        assert any("forbidden legacy aggregate names" in v.message for v in result.model_violations)
 
 
 # ---------------------------------------------------------------------------
@@ -361,7 +415,7 @@ class TestLoadFixtures:
     def test_events_invalid_cases_expected_valid_false(self) -> None:
         cases = load_fixtures("events")
         invalid_cases = [c for c in cases if not c.expected_valid]
-        assert len(invalid_cases) == 5
+        assert len(invalid_cases) == 10
 
     def test_fixture_case_has_payload(self) -> None:
         cases = load_fixtures("events")

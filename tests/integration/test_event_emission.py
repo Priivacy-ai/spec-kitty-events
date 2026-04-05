@@ -10,6 +10,7 @@ from spec_kitty_events import (
 )
 
 TEST_PROJECT_UUID = uuid.UUID("12345678-1234-5678-1234-567812345678")
+BUILD_ID = "build-lane-a"
 
 
 class TestEventEmissionSync:
@@ -32,6 +33,7 @@ class TestEventEmissionSync:
             event_type="WPStatusChanged",
             aggregate_id="WP001",
             timestamp=datetime.now(),
+            build_id=BUILD_ID,
             node_id="alice",
             lamport_clock=alice_clock.current(),
             payload={"state": "doing"},
@@ -47,6 +49,7 @@ class TestEventEmissionSync:
             event_type="WPStatusChanged",
             aggregate_id="WP001",
             timestamp=datetime.now(),
+            build_id=BUILD_ID,
             node_id="alice",
             lamport_clock=alice_clock.current(),
             causation_id=e1.event_id,  # e2 caused by e1
@@ -67,6 +70,7 @@ class TestEventEmissionSync:
             event_type="WPStatusChanged",
             aggregate_id="WP001",
             timestamp=datetime.now(),
+            build_id=BUILD_ID,
             node_id="bob",
             lamport_clock=bob_clock.current(),
             causation_id=e2.event_id,  # e3 caused by e2
@@ -86,6 +90,7 @@ class TestEventEmissionSync:
         assert all_events[0].event_id == e1.event_id  # Clock 1
         assert all_events[1].event_id == e2.event_id  # Clock 2
         assert all_events[2].event_id == e3.event_id  # Clock 4
+        assert all(event.build_id == BUILD_ID for event in all_events)
 
         # Verify: Causation chain
         assert e2.causation_id == e1.event_id
@@ -100,6 +105,7 @@ class TestEventEmissionSync:
             event_type="TestEvent",
             aggregate_id="WP001",
             timestamp=datetime.now(),
+            build_id=BUILD_ID,
             node_id="alice",
             lamport_clock=1,
             project_uuid=TEST_PROJECT_UUID,

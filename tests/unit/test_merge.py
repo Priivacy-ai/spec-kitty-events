@@ -21,6 +21,7 @@ class TestStateMachineMerge:
             event_type="WPStatusChanged",
             aggregate_id="WP001",
             timestamp=datetime.now(),
+            build_id="test-build",
             node_id="alice",
             lamport_clock=5,
             payload={"state": "doing"},  # Priority 2
@@ -32,6 +33,7 @@ class TestStateMachineMerge:
             event_type="WPStatusChanged",
             aggregate_id="WP001",
             timestamp=datetime.now(),
+            build_id="test-build",
             node_id="bob",
             lamport_clock=5,
             payload={"state": "done"},  # Priority 4 (highest)
@@ -43,6 +45,7 @@ class TestStateMachineMerge:
             event_type="WPStatusChanged",
             aggregate_id="WP001",
             timestamp=datetime.now(),
+            build_id="test-build",
             node_id="charlie",
             lamport_clock=5,
             payload={"state": "for_review"},  # Priority 3
@@ -65,6 +68,7 @@ class TestStateMachineMerge:
             event_type="WPStatusChanged",
             aggregate_id="WP001",
             timestamp=datetime.now(),
+            build_id="test-build",
             node_id="charlie",  # Later alphabetically
             lamport_clock=5,
             payload={"state": "done"},
@@ -76,6 +80,7 @@ class TestStateMachineMerge:
             event_type="WPStatusChanged",
             aggregate_id="WP001",
             timestamp=datetime.now(),
+            build_id="test-build",
             node_id="alice",  # Earlier alphabetically (wins)
             lamport_clock=5,
             payload={"state": "done"},
@@ -97,6 +102,7 @@ class TestStateMachineMerge:
             event_type="WPStatusChanged",
             aggregate_id="WP001",
             timestamp=datetime.now(),
+            build_id="test-build",
             node_id="alice",
             lamport_clock=5,
             payload={"state": "planned"},
@@ -118,6 +124,7 @@ class TestStateMachineMerge:
             event_type="WPStatusChanged",
             aggregate_id="WP001",
             timestamp=datetime.now(),
+            build_id="test-build",
             node_id="alice",
             lamport_clock=5,
             payload={"state": "done"},
@@ -129,6 +136,7 @@ class TestStateMachineMerge:
             event_type="WPStatusChanged",
             aggregate_id="WP001",
             timestamp=datetime.now(),
+            build_id="test-build",
             node_id="bob",
             lamport_clock=5,
             payload={"state": "done"},
@@ -152,6 +160,7 @@ class TestStateMachineMerge:
             event_type="WPStatusChanged",
             aggregate_id="WP001",
             timestamp=datetime.now(),
+            build_id="test-build",
             node_id="alice",
             lamport_clock=5,  # Different clock
             payload={"state": "done"},
@@ -163,6 +172,7 @@ class TestStateMachineMerge:
             event_type="WPStatusChanged",
             aggregate_id="WP001",
             timestamp=datetime.now(),
+            build_id="test-build",
             node_id="bob",
             lamport_clock=6,  # Different clock
             payload={"state": "planned"},
@@ -182,6 +192,7 @@ class TestStateMachineMerge:
             event_type="WPStatusChanged",
             aggregate_id="WP001",  # Different aggregate
             timestamp=datetime.now(),
+            build_id="test-build",
             node_id="alice",
             lamport_clock=5,
             payload={"state": "done"},
@@ -193,6 +204,7 @@ class TestStateMachineMerge:
             event_type="WPStatusChanged",
             aggregate_id="WP002",  # Different aggregate
             timestamp=datetime.now(),
+            build_id="test-build",
             node_id="bob",
             lamport_clock=5,
             payload={"state": "done"},
@@ -212,6 +224,7 @@ class TestStateMachineMerge:
             event_type="WPStatusChanged",
             aggregate_id="WP001",
             timestamp=datetime.now(),
+            build_id="test-build",
             node_id="alice",
             lamport_clock=5,
             payload={},  # No "state" or "status" key
@@ -231,6 +244,7 @@ class TestStateMachineMerge:
             event_type="WPStatusChanged",
             aggregate_id="WP001",
             timestamp=datetime.now(),
+            build_id="test-build",
             node_id="alice",
             lamport_clock=5,
             payload={"state": "invalid_state"},
@@ -257,6 +271,7 @@ class TestStateMachineMerge:
             event_type="StatusChanged",
             aggregate_id="USER001",
             timestamp=datetime.now(),
+            build_id="test-build",
             node_id="alice",
             lamport_clock=5,
             payload={"status": "active"},  # Using "status" instead of "state"
@@ -277,6 +292,7 @@ class TestStateMachineMerge:
             event_type="WPStatusChanged",
             aggregate_id="WP001",
             timestamp=datetime.now(),
+            build_id="test-build",
             node_id="alice",
             lamport_clock=5,
             payload={"status": "doing"},  # Using "status" not "state"
@@ -288,6 +304,7 @@ class TestStateMachineMerge:
             event_type="WPStatusChanged",
             aggregate_id="WP001",
             timestamp=datetime.now(),
+            build_id="test-build",
             node_id="bob",
             lamport_clock=5,
             payload={"status": "done"},  # Using "status" not "state"

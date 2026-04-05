@@ -84,7 +84,7 @@ class DecisionPointAnomaly(BaseModel):
     "llm_policy_violation", "malformed_payload", "event_after_terminal".
     """
 
-    model_config = ConfigDict(frozen=True)
+    model_config = ConfigDict(frozen=True, extra="forbid")
 
     kind: str
     event_id: str
@@ -97,12 +97,13 @@ class DecisionPointAnomaly(BaseModel):
 class DecisionPointOpenedPayload(BaseModel):
     """Payload for DecisionPointOpened events."""
 
-    model_config = ConfigDict(frozen=True)
+    model_config = ConfigDict(frozen=True, extra="forbid")
 
     decision_point_id: str = Field(..., min_length=1)
     mission_id: str = Field(..., min_length=1)
     run_id: str = Field(..., min_length=1)
-    feature_slug: str = Field(..., min_length=1)
+    mission_slug: str = Field(..., min_length=1)
+    mission_type: str = Field(..., min_length=1)
     phase: str = Field(..., min_length=1)
     actor_id: str = Field(..., min_length=1)
     actor_type: str = Field(..., pattern=r"^(human|llm|service)$")
@@ -119,12 +120,13 @@ class DecisionPointOpenedPayload(BaseModel):
 class DecisionPointDiscussingPayload(BaseModel):
     """Payload for DecisionPointDiscussing events."""
 
-    model_config = ConfigDict(frozen=True)
+    model_config = ConfigDict(frozen=True, extra="forbid")
 
     decision_point_id: str = Field(..., min_length=1)
     mission_id: str = Field(..., min_length=1)
     run_id: str = Field(..., min_length=1)
-    feature_slug: str = Field(..., min_length=1)
+    mission_slug: str = Field(..., min_length=1)
+    mission_type: str = Field(..., min_length=1)
     phase: str = Field(..., min_length=1)
     actor_id: str = Field(..., min_length=1)
     actor_type: str = Field(..., pattern=r"^(human|llm|service)$")
@@ -141,12 +143,13 @@ class DecisionPointDiscussingPayload(BaseModel):
 class DecisionPointResolvedPayload(BaseModel):
     """Payload for DecisionPointResolved events."""
 
-    model_config = ConfigDict(frozen=True)
+    model_config = ConfigDict(frozen=True, extra="forbid")
 
     decision_point_id: str = Field(..., min_length=1)
     mission_id: str = Field(..., min_length=1)
     run_id: str = Field(..., min_length=1)
-    feature_slug: str = Field(..., min_length=1)
+    mission_slug: str = Field(..., min_length=1)
+    mission_type: str = Field(..., min_length=1)
     phase: str = Field(..., min_length=1)
     actor_id: str = Field(..., min_length=1)
     actor_type: str = Field(..., pattern=r"^(human|llm|service)$")
@@ -163,12 +166,13 @@ class DecisionPointResolvedPayload(BaseModel):
 class DecisionPointOverriddenPayload(BaseModel):
     """Payload for DecisionPointOverridden events."""
 
-    model_config = ConfigDict(frozen=True)
+    model_config = ConfigDict(frozen=True, extra="forbid")
 
     decision_point_id: str = Field(..., min_length=1)
     mission_id: str = Field(..., min_length=1)
     run_id: str = Field(..., min_length=1)
-    feature_slug: str = Field(..., min_length=1)
+    mission_slug: str = Field(..., min_length=1)
+    mission_type: str = Field(..., min_length=1)
     phase: str = Field(..., min_length=1)
     actor_id: str = Field(..., min_length=1)
     actor_type: str = Field(..., pattern=r"^(human|llm|service)$")
@@ -210,7 +214,8 @@ class ReducedDecisionPointState(BaseModel):
     decision_point_id: Optional[str] = None
     mission_id: Optional[str] = None
     run_id: Optional[str] = None
-    feature_slug: Optional[str] = None
+    mission_slug: Optional[str] = None
+    mission_type: Optional[str] = None
     phase: Optional[str] = None
     last_actor_id: Optional[str] = None
     last_actor_type: Optional[str] = None
@@ -266,7 +271,8 @@ def reduce_decision_point_events(
     decision_point_id: Optional[str] = None
     mission_id: Optional[str] = None
     run_id: Optional[str] = None
-    feature_slug: Optional[str] = None
+    mission_slug: Optional[str] = None
+    mission_type: Optional[str] = None
     phase: Optional[str] = None
     last_actor_id: Optional[str] = None
     last_actor_type: Optional[str] = None
@@ -384,7 +390,8 @@ def reduce_decision_point_events(
         decision_point_id = payload.decision_point_id
         mission_id = payload.mission_id
         run_id = payload.run_id
-        feature_slug = payload.feature_slug
+        mission_slug = payload.mission_slug
+        mission_type = payload.mission_type
         phase = payload.phase
         last_actor_id = payload.actor_id
         last_actor_type = payload.actor_type
@@ -400,7 +407,8 @@ def reduce_decision_point_events(
         decision_point_id=decision_point_id,
         mission_id=mission_id,
         run_id=run_id,
-        feature_slug=feature_slug,
+        mission_slug=mission_slug,
+        mission_type=mission_type,
         phase=phase,
         last_actor_id=last_actor_id,
         last_actor_type=last_actor_type,

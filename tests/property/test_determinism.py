@@ -17,6 +17,7 @@ def event_with_state(draw):
         event_type="WPStatusChanged",
         aggregate_id="WP001",  # Same aggregate for all (concurrent)
         timestamp=datetime.now(),
+        build_id="test-build",
         node_id=draw(st.text(min_size=1, max_size=10)),
         lamport_clock=5,  # Same clock for all (concurrent)
         payload={"state": draw(st.sampled_from(states))},

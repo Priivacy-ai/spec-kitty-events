@@ -56,6 +56,7 @@ def _event(
         aggregate_id="connector/conn-001",
         payload=payload_dict,
         timestamp=datetime(2026, 2, 27, 12, 0, lamport, tzinfo=timezone.utc),
+        build_id="test-build",
         node_id="node-1",
         lamport_clock=lamport,
         project_uuid=_PROJECT_UUID,

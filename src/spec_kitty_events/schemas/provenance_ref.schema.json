@@ -1,6 +1,7 @@
 {
   "$id": "spec-kitty-events/provenance_ref",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
   "description": "Source trace connecting an artifact or event to its authoritative origin.",
   "properties": {
     "actor_id": {

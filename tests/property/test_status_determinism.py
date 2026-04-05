@@ -34,7 +34,7 @@ def _make_lifecycle_events(wp_id: str, base_clock: int = 1) -> List[Event]:
     for i, (from_l, to_l) in enumerate(transitions):
         eid = f"01HV{base_clock + i:022d}"
         payload = StatusTransitionPayload(
-            feature_slug="test",
+            mission_slug="test",
             wp_id=wp_id,
             from_lane=from_l,
             to_lane=to_l,
@@ -49,6 +49,7 @@ def _make_lifecycle_events(wp_id: str, base_clock: int = 1) -> List[Event]:
                 payload=payload.model_dump(),
                 timestamp=datetime(2026, 1, 1, tzinfo=timezone.utc)
                 + timedelta(seconds=i),
+                build_id="test-build",
                 node_id="n",
                 lamport_clock=base_clock + i,
                 project_uuid=_PROJECT_UUID,

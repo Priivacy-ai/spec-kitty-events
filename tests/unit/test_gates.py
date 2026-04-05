@@ -288,6 +288,7 @@ class TestEventIntegration:
             aggregate_id="project-1",
             payload=gate_payload.model_dump(),
             timestamp=datetime.now(),
+            build_id="test-build",
             node_id="worker-1",
             lamport_clock=1,
             project_uuid=uuid.uuid4(),

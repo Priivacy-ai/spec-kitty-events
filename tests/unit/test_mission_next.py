@@ -15,7 +15,6 @@ from spec_kitty_events.mission_next import (
     NEXT_STEP_ISSUED,
     NEXT_STEP_PLANNED,
     TERMINAL_RUN_STATUSES,
-    _COMPLETION_ALIAS,
     DecisionInputAnsweredPayload,
     DecisionInputRequestedPayload,
     MissionNextAnomaly,
@@ -44,9 +43,6 @@ class TestConstants:
         assert DECISION_INPUT_ANSWERED == "DecisionInputAnswered"
         assert MISSION_RUN_COMPLETED == "MissionRunCompleted"
 
-    def test_completion_alias(self) -> None:
-        assert _COMPLETION_ALIAS == "MissionCompleted"
-
     def test_frozenset_contains_all_types(self) -> None:
         assert MISSION_RUN_STARTED in MISSION_NEXT_EVENT_TYPES
         assert NEXT_STEP_PLANNED in MISSION_NEXT_EVENT_TYPES
@@ -55,13 +51,13 @@ class TestConstants:
         assert DECISION_INPUT_REQUESTED in MISSION_NEXT_EVENT_TYPES
         assert DECISION_INPUT_ANSWERED in MISSION_NEXT_EVENT_TYPES
         assert MISSION_RUN_COMPLETED in MISSION_NEXT_EVENT_TYPES
-        assert _COMPLETION_ALIAS in MISSION_NEXT_EVENT_TYPES
+        assert "MissionCompleted" not in MISSION_NEXT_EVENT_TYPES
 
     def test_frozenset_is_frozen(self) -> None:
         assert isinstance(MISSION_NEXT_EVENT_TYPES, frozenset)
 
     def test_frozenset_size(self) -> None:
-        assert len(MISSION_NEXT_EVENT_TYPES) == 8
+        assert len(MISSION_NEXT_EVENT_TYPES) == 7
 
 
 # ── MissionRunStatus Enum ────────────────────────────────────────────────────
@@ -151,27 +147,27 @@ class TestMissionRunStartedPayload:
 
     def test_valid(self) -> None:
         p = MissionRunStartedPayload(
-            run_id="run-1", mission_key="feat-login", actor=_make_actor()
+            run_id="run-1", mission_type="software-dev", actor=_make_actor()
         )
         assert p.run_id == "run-1"
-        assert p.mission_key == "feat-login"
+        assert p.mission_type == "software-dev"
 
     def test_missing_run_id(self) -> None:
         with pytest.raises(PydanticValidationError):
             MissionRunStartedPayload(
-                mission_key="feat-login", actor=_make_actor()
+                mission_type="software-dev", actor=_make_actor()
             )  # type: ignore[call-arg]
 
     def test_frozen(self) -> None:
         p = MissionRunStartedPayload(
-            run_id="run-1", mission_key="feat-login", actor=_make_actor()
+            run_id="run-1", mission_type="software-dev", actor=_make_actor()
         )
         with pytest.raises(Exception):
             p.run_id = "new"  # type: ignore[misc]
 
     def test_round_trip(self) -> None:
         p = MissionRunStartedPayload(
-            run_id="run-1", mission_key="feat-login", actor=_make_actor()
+            run_id="run-1", mission_type="software-dev", actor=_make_actor()
         )
         data = p.model_dump()
         p2 = MissionRunStartedPayload(**data)
@@ -270,12 +266,12 @@ class TestMissionRunCompletedPayload:
 
     def test_valid(self) -> None:
         p = MissionRunCompletedPayload(
-            run_id="run-1", mission_key="feat-login", actor=_make_actor()
+            run_id="run-1", mission_type="software-dev", actor=_make_actor()
         )
         assert p.run_id == "run-1"
-        assert p.mission_key == "feat-login"
+        assert p.mission_type == "software-dev"
 
-    def test_missing_mission_key(self) -> None:
+    def test_missing_mission_type(self) -> None:
         with pytest.raises(PydanticValidationError):
             MissionRunCompletedPayload(
                 run_id="run-1", actor=_make_actor()
@@ -312,7 +308,7 @@ class TestReducedMissionRunStateDefaults:
     def test_empty_state(self) -> None:
         state = ReducedMissionRunState()
         assert state.run_id is None
-        assert state.mission_key is None
+        assert state.mission_type is None
         assert state.run_status is None
         assert state.current_step_id is None
         assert state.completed_steps == ()

@@ -1,6 +1,7 @@
 {
   "$id": "spec-kitty-events/mission_audit_started_payload",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
   "description": "Payload for MissionAuditStarted events (FR-004).",
   "properties": {
     "actor": {
@@ -13,14 +14,24 @@
       "title": "Audit Scope Hash",
       "type": "string"
     },
-    "feature_slug": {
-      "minLength": 1,
-      "title": "Feature Slug",
-      "type": "string"
-    },
     "mission_id": {
       "minLength": 1,
       "title": "Mission Id",
+      "type": "string"
+    },
+    "mission_number": {
+      "minimum": 1,
+      "title": "Mission Number",
+      "type": "integer"
+    },
+    "mission_slug": {
+      "minLength": 1,
+      "title": "Mission Slug",
+      "type": "string"
+    },
+    "mission_type": {
+      "minLength": 1,
+      "title": "Mission Type",
       "type": "string"
     },
     "run_id": {
@@ -32,7 +43,9 @@
   "required": [
     "mission_id",
     "run_id",
-    "feature_slug",
+    "mission_slug",
+    "mission_number",
+    "mission_type",
     "actor",
     "audit_scope_hash"
   ],

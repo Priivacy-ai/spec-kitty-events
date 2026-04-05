@@ -1,5 +1,4 @@
 {
-  "feature_slug": "my-feature",
   "wp_id": "WP01",
   "from_lane": "planned",
   "to_lane": "claimed",
@@ -8,5 +7,6 @@
   "reason": null,
   "execution_mode": "worktree",
   "review_ref": null,
-  "evidence": null
+  "evidence": null,
+  "mission_slug": "mission-001"
 }

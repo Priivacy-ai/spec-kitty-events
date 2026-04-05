@@ -19,6 +19,7 @@ from spec_kitty_events import (
 )
 
 TEST_PROJECT_UUID = uuid.UUID("12345678-1234-5678-1234-567812345678")
+TEST_BUILD_ID = "build-test"
 
 
 class InMemoryClockStorage(ClockStorage):
@@ -78,6 +79,7 @@ class TestQuickstartExamples:
             aggregate_id="AGG1",
             payload={"state": "doing"},
             timestamp=datetime.now(),
+            build_id=TEST_BUILD_ID,
             node_id="alice",
             lamport_clock=1,
             project_uuid=TEST_PROJECT_UUID,
@@ -105,6 +107,7 @@ class TestQuickstartExamples:
             aggregate_id="WP01",
             payload={"previous_state": "planned", "state": "doing"},
             timestamp=datetime.now(),
+            build_id=TEST_BUILD_ID,
             node_id="alice-laptop",
             lamport_clock=clock.tick(),  # Increments clock to 1
             causation_id=None,  # Root event (no parent)
@@ -132,6 +135,7 @@ class TestQuickstartExamples:
             aggregate_id="WP02",
             payload={"state": "for_review"},
             timestamp=datetime.now(),
+            build_id=TEST_BUILD_ID,
             node_id="bob-laptop",
             lamport_clock=10,
             causation_id=None,
@@ -152,6 +156,7 @@ class TestQuickstartExamples:
             event_type="WPStatusChanged",
             aggregate_id="WP03",
             payload={"state": "doing"},
+            build_id=TEST_BUILD_ID,
             node_id="alice-laptop",
             lamport_clock=5,
             timestamp=datetime.now(),
@@ -164,6 +169,7 @@ class TestQuickstartExamples:
             event_type="WPStatusChanged",
             aggregate_id="WP03",
             payload={"state": "for_review"},
+            build_id=TEST_BUILD_ID,
             node_id="bob-laptop",
             lamport_clock=5,
             timestamp=datetime.now(),
@@ -191,6 +197,7 @@ class TestQuickstartExamples:
                 aggregate_id="WP01",
                 payload={"tags": {"urgent"}},
                 timestamp=datetime.now(),
+                build_id=TEST_BUILD_ID,
                 node_id="alice",
                 lamport_clock=5,
                 project_uuid=TEST_PROJECT_UUID,
@@ -202,6 +209,7 @@ class TestQuickstartExamples:
                 aggregate_id="WP01",
                 payload={"tags": {"backend"}},
                 timestamp=datetime.now(),
+                build_id=TEST_BUILD_ID,
                 node_id="bob",
                 lamport_clock=5,
                 project_uuid=TEST_PROJECT_UUID,
@@ -220,6 +228,7 @@ class TestQuickstartExamples:
                 aggregate_id="WP01",
                 payload={"delta": 1},
                 timestamp=datetime.now(),
+                build_id=TEST_BUILD_ID,
                 node_id="alice",
                 lamport_clock=5,
                 project_uuid=TEST_PROJECT_UUID,
@@ -231,6 +240,7 @@ class TestQuickstartExamples:
                 aggregate_id="WP01",
                 payload={"delta": 3},
                 timestamp=datetime.now(),
+                build_id=TEST_BUILD_ID,
                 node_id="bob",
                 lamport_clock=5,
                 project_uuid=TEST_PROJECT_UUID,
@@ -273,6 +283,7 @@ class TestQuickstartExamples:
             aggregate_id="WP01",
             payload={"state": "doing"},
             timestamp=datetime.now(),
+            build_id=TEST_BUILD_ID,
             node_id="alice-laptop",
             lamport_clock=alice_clock.tick(),  # 1
             project_uuid=TEST_PROJECT_UUID,
@@ -291,6 +302,7 @@ class TestQuickstartExamples:
             aggregate_id="WP01",
             payload={"state": "for_review"},
             timestamp=datetime.now(),
+            build_id=TEST_BUILD_ID,
             node_id="bob-laptop",
             lamport_clock=bob_clock.tick(),  # 1 (concurrent with Alice)
             project_uuid=TEST_PROJECT_UUID,

@@ -11,6 +11,7 @@ from spec_kitty_events import (
 from datetime import datetime
 
 TEST_PROJECT_UUID = uuid.UUID("12345678-1234-5678-1234-567812345678")
+TEST_BUILD_ID = "build-test"
 
 
 class DictEventStore(EventStore):
@@ -57,6 +58,7 @@ class TestCustomAdapters:
             event_type="TestEvent",
             aggregate_id="AGG001",
             timestamp=datetime.now(),
+            build_id=TEST_BUILD_ID,
             node_id="node1",
             lamport_clock=1,
             project_uuid=TEST_PROJECT_UUID,
@@ -94,6 +96,7 @@ class TestCustomAdapters:
             event_type="TestEvent",
             aggregate_id="AGG001",
             timestamp=datetime.now(),
+            build_id=TEST_BUILD_ID,
             node_id="node1",
             lamport_clock=1,
             project_uuid=TEST_PROJECT_UUID,

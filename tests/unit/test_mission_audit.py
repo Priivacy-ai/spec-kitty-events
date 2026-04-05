@@ -52,7 +52,9 @@ def test_requested_payload_round_trip() -> None:
     original = MissionAuditRequestedPayload(
         mission_id="m-001",
         run_id="run-001",
-        feature_slug="my-feature",
+        mission_slug="mission-x",
+        mission_number=14,
+        mission_type="software-dev",
         actor="agent-1",
         trigger_mode="manual",
         audit_scope=["file1.py", "file2.py"],
@@ -71,7 +73,9 @@ def test_started_payload_round_trip() -> None:
     original = MissionAuditStartedPayload(
         mission_id="m-001",
         run_id="run-001",
-        feature_slug="my-feature",
+        mission_slug="mission-x",
+        mission_number=14,
+        mission_type="software-dev",
         actor="agent-1",
         audit_scope_hash="sha256:aabbcc",
     )
@@ -85,7 +89,9 @@ def test_decision_requested_payload_round_trip() -> None:
     original = MissionAuditDecisionRequestedPayload(
         mission_id="m-001",
         run_id="run-001",
-        feature_slug="my-feature",
+        mission_slug="mission-x",
+        mission_number=14,
+        mission_type="software-dev",
         actor="agent-1",
         decision_id="dec-001",
         question="Should we proceed?",
@@ -103,7 +109,9 @@ def test_completed_payload_round_trip() -> None:
     original = MissionAuditCompletedPayload(
         mission_id="m-001",
         run_id="run-001",
-        feature_slug="my-feature",
+        mission_slug="mission-x",
+        mission_number=14,
+        mission_type="software-dev",
         actor="agent-1",
         verdict=AuditVerdict.PASS,
         severity=AuditSeverity.INFO,
@@ -122,7 +130,9 @@ def test_failed_payload_round_trip() -> None:
     original = MissionAuditFailedPayload(
         mission_id="m-001",
         run_id="run-001",
-        feature_slug="my-feature",
+        mission_slug="mission-x",
+        mission_number=14,
+        mission_type="software-dev",
         actor="agent-1",
         error_code="TIMEOUT",
         error_message="Audit timed out after 60s",
@@ -140,7 +150,9 @@ def test_requested_payload_missing_mission_id_raises() -> None:
     with pytest.raises(ValidationError):
         MissionAuditRequestedPayload(  # type: ignore[call-arg]
             run_id="run-001",
-            feature_slug="my-feature",
+            mission_slug="mission-x",
+            mission_number=14,
+            mission_type="software-dev",
             actor="agent-1",
             trigger_mode="manual",
             audit_scope=["file1.py"],
@@ -153,7 +165,9 @@ def test_completed_payload_missing_verdict_raises() -> None:
         MissionAuditCompletedPayload(  # type: ignore[call-arg]
             mission_id="m-001",
             run_id="run-001",
-            feature_slug="my-feature",
+            mission_slug="mission-x",
+            mission_number=14,
+            mission_type="software-dev",
             actor="agent-1",
             severity=AuditSeverity.INFO,
             findings_count=0,
@@ -167,7 +181,9 @@ def test_decision_requested_payload_missing_decision_id_raises() -> None:
         MissionAuditDecisionRequestedPayload(  # type: ignore[call-arg]
             mission_id="m-001",
             run_id="run-001",
-            feature_slug="my-feature",
+            mission_slug="mission-x",
+            mission_number=14,
+            mission_type="software-dev",
             actor="agent-1",
             question="?",
             context_summary="ctx",
@@ -180,7 +196,9 @@ def test_failed_payload_missing_error_code_raises() -> None:
         MissionAuditFailedPayload(  # type: ignore[call-arg]
             mission_id="m-001",
             run_id="run-001",
-            feature_slug="my-feature",
+            mission_slug="mission-x",
+            mission_number=14,
+            mission_type="software-dev",
             actor="agent-1",
             error_message="oops",
         )
@@ -191,7 +209,9 @@ def test_started_payload_missing_audit_scope_hash_raises() -> None:
         MissionAuditStartedPayload(  # type: ignore[call-arg]
             mission_id="m-001",
             run_id="run-001",
-            feature_slug="my-feature",
+            mission_slug="mission-x",
+            mission_number=14,
+            mission_type="software-dev",
             actor="agent-1",
         )
 
@@ -203,7 +223,9 @@ def test_invalid_trigger_mode_raises() -> None:
         MissionAuditRequestedPayload(
             mission_id="m-001",
             run_id="run-001",
-            feature_slug="my-feature",
+            mission_slug="mission-x",
+            mission_number=14,
+            mission_type="software-dev",
             actor="agent-1",
             trigger_mode="invalid",  # type: ignore[arg-type]
             audit_scope=["file1.py"],
@@ -216,7 +238,9 @@ def test_invalid_enforcement_mode_raises() -> None:
         MissionAuditRequestedPayload(
             mission_id="m-001",
             run_id="run-001",
-            feature_slug="my-feature",
+            mission_slug="mission-x",
+            mission_number=14,
+            mission_type="software-dev",
             actor="agent-1",
             trigger_mode="manual",
             audit_scope=["file1.py"],
@@ -231,7 +255,9 @@ def test_negative_findings_count_raises() -> None:
         MissionAuditCompletedPayload(
             mission_id="m-001",
             run_id="run-001",
-            feature_slug="my-feature",
+            mission_slug="mission-x",
+            mission_number=14,
+            mission_type="software-dev",
             actor="agent-1",
             verdict=AuditVerdict.PASS,
             severity=AuditSeverity.INFO,
@@ -276,7 +302,9 @@ def test_invalid_audit_severity_raises() -> None:
         MissionAuditDecisionRequestedPayload(
             mission_id="m-001",
             run_id="run-001",
-            feature_slug="my-feature",
+            mission_slug="mission-x",
+            mission_number=14,
+            mission_type="software-dev",
             actor="agent-1",
             decision_id="dec-001",
             question="?",
@@ -312,7 +340,9 @@ def test_requested_payload_is_frozen() -> None:
     payload = MissionAuditRequestedPayload(
         mission_id="m-001",
         run_id="run-001",
-        feature_slug="my-feature",
+        mission_slug="mission-x",
+        mission_number=14,
+        mission_type="software-dev",
         actor="agent-1",
         trigger_mode="manual",
         audit_scope=["file1.py"],
@@ -326,7 +356,9 @@ def test_completed_payload_is_frozen() -> None:
     payload = MissionAuditCompletedPayload(
         mission_id="m-001",
         run_id="run-001",
-        feature_slug="my-feature",
+        mission_slug="mission-x",
+        mission_number=14,
+        mission_type="software-dev",
         actor="agent-1",
         verdict=AuditVerdict.PASS,
         severity=AuditSeverity.INFO,

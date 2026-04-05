@@ -80,6 +80,7 @@ def _event(
         aggregate_id="audit/run-001",
         payload=payload_obj.model_dump(),
         timestamp=datetime.now(timezone.utc),
+        build_id="test-build",
         node_id="node-1",
         lamport_clock=lamport,
         project_uuid=_PROJECT_UUID,
@@ -93,7 +94,9 @@ def _requested_event(lamport: int = 1) -> Event:
         MissionAuditRequestedPayload(
             mission_id="m-001",
             run_id="run-001",
-            feature_slug="feature-x",
+            mission_slug="mission-x",
+            mission_number=14,
+            mission_type="software-dev",
             actor="agent-1",
             trigger_mode="manual",
             audit_scope=["src/a.py", "src/b.py"],
@@ -109,7 +112,9 @@ def _started_event(lamport: int = 2) -> Event:
         MissionAuditStartedPayload(
             mission_id="m-001",
             run_id="run-001",
-            feature_slug="feature-x",
+            mission_slug="mission-x",
+            mission_number=14,
+            mission_type="software-dev",
             actor="agent-1",
             audit_scope_hash="sha256:abc123",
         ),
@@ -123,7 +128,9 @@ def _completed_event(lamport: int = 3) -> Event:
         MissionAuditCompletedPayload(
             mission_id="m-001",
             run_id="run-001",
-            feature_slug="feature-x",
+            mission_slug="mission-x",
+            mission_number=14,
+            mission_type="software-dev",
             actor="agent-1",
             verdict=AuditVerdict.PASS,
             severity=AuditSeverity.INFO,
@@ -141,7 +148,9 @@ def _failed_event(lamport: int = 3, partial: bool = False) -> Event:
         MissionAuditFailedPayload(
             mission_id="m-001",
             run_id="run-001",
-            feature_slug="feature-x",
+            mission_slug="mission-x",
+            mission_number=14,
+            mission_type="software-dev",
             actor="agent-1",
             error_code="TIMEOUT",
             error_message="Audit timed out",
@@ -157,7 +166,9 @@ def _decision_event(decision_id: str = "dec-001", lamport: int = 3) -> Event:
         MissionAuditDecisionRequestedPayload(
             mission_id="m-001",
             run_id="run-001",
-            feature_slug="feature-x",
+            mission_slug="mission-x",
+            mission_number=14,
+            mission_type="software-dev",
             actor="agent-1",
             decision_id=decision_id,
             question="Proceed despite warnings?",
@@ -185,6 +196,9 @@ def test_happy_path_pass() -> None:
     result = reduce_mission_audit_events(events)
     assert result.audit_status == AuditStatus.COMPLETED
     assert result.verdict == AuditVerdict.PASS
+    assert result.mission_slug == "mission-x"
+    assert result.mission_number == 14
+    assert result.mission_type == "software-dev"
     assert result.artifact_ref is not None
     assert result.anomalies == ()
     assert result.event_count == 3
@@ -269,6 +283,7 @@ def test_anomaly_unrecognized_type_via_filter() -> None:
         aggregate_id="audit/run-001",
         payload={"some": "data"},
         timestamp=datetime.now(timezone.utc),
+        build_id="test-build",
         node_id="node-1",
         lamport_clock=1,
         project_uuid=_PROJECT_UUID,
@@ -311,8 +326,27 @@ def _load_events_from_jsonl(path: Path) -> list[Event]:
     events = []
     for line in path.read_text().strip().split("\n"):
         if line.strip():
-            events.append(Event.model_validate(json.loads(line)))
+            raw = json.loads(line)
+            payload = raw.get("payload")
+            if isinstance(payload, dict):
+                if "feature_slug" in payload and "mission_slug" not in payload:
+                    payload["mission_slug"] = payload.pop("feature_slug")
+                if "mission_number" not in payload:
+                    payload["mission_number"] = 14
+                if "mission_type" not in payload:
+                    payload["mission_type"] = "software-dev"
+            raw.setdefault("build_id", "test-build")
+            events.append(Event.model_validate(raw))
     return events
+
+
+def _canonicalize_output(data: dict[str, Any]) -> dict[str, Any]:
+    canonical = dict(data)
+    if "feature_slug" in canonical and "mission_slug" not in canonical:
+        canonical["mission_slug"] = canonical.pop("feature_slug")
+    canonical.setdefault("mission_number", 14)
+    canonical.setdefault("mission_type", "software-dev")
+    return canonical
 
 
 def _golden_replay(
@@ -342,7 +376,7 @@ def _golden_replay(
     loaded_events = _load_events_from_jsonl(input_path)
     result = reduce_mission_audit_events(loaded_events)
     actual = result.model_dump(mode="json")
-    expected = json.loads(output_path.read_text())
+    expected = _canonicalize_output(json.loads(output_path.read_text()))
     assert actual == expected, (
         f"Golden replay mismatch for {name!r}. "
         f"Re-run with golden files deleted to regenerate."

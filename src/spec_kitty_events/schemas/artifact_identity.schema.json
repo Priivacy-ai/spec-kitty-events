@@ -1,6 +1,7 @@
 {
   "$id": "spec-kitty-events/artifact_identity",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
   "description": "Canonical identity for one artifact instance.\n\nartifact_class is the SINGLE source of truth for artifact taxonomy.\nEvent payloads MUST NOT duplicate this field at the top level.",
   "properties": {
     "artifact_class": {
@@ -15,9 +16,9 @@
       "title": "Artifact Class",
       "type": "string"
     },
-    "mission_key": {
+    "mission_type": {
       "minLength": 1,
-      "title": "Mission Key",
+      "title": "Mission Type",
       "type": "string"
     },
     "path": {
@@ -52,7 +53,7 @@
     }
   },
   "required": [
-    "mission_key",
+    "mission_type",
     "path",
     "artifact_class"
   ],

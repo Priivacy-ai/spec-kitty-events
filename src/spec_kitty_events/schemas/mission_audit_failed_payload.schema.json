@@ -1,6 +1,7 @@
 {
   "$defs": {
     "AuditArtifactRef": {
+      "additionalProperties": false,
       "description": "Links an audit report to its content hash and provenance.",
       "properties": {
         "content_hash": {
@@ -24,6 +25,7 @@
       "type": "object"
     },
     "ContentHashRef": {
+      "additionalProperties": false,
       "description": "Content fingerprint with optional size and encoding metadata.",
       "properties": {
         "algorithm": {
@@ -75,6 +77,7 @@
       "type": "object"
     },
     "ProvenanceRef": {
+      "additionalProperties": false,
       "description": "Source trace connecting an artifact or event to its authoritative origin.",
       "properties": {
         "actor_id": {
@@ -165,6 +168,7 @@
   },
   "$id": "spec-kitty-events/mission_audit_failed_payload",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
   "description": "Payload for MissionAuditFailed events (FR-007).",
   "properties": {
     "actor": {
@@ -181,14 +185,24 @@
       "title": "Error Message",
       "type": "string"
     },
-    "feature_slug": {
-      "minLength": 1,
-      "title": "Feature Slug",
-      "type": "string"
-    },
     "mission_id": {
       "minLength": 1,
       "title": "Mission Id",
+      "type": "string"
+    },
+    "mission_number": {
+      "minimum": 1,
+      "title": "Mission Number",
+      "type": "integer"
+    },
+    "mission_slug": {
+      "minLength": 1,
+      "title": "Mission Slug",
+      "type": "string"
+    },
+    "mission_type": {
+      "minLength": 1,
+      "title": "Mission Type",
       "type": "string"
     },
     "partial_artifact_ref": {
@@ -211,7 +225,9 @@
   "required": [
     "mission_id",
     "run_id",
-    "feature_slug",
+    "mission_slug",
+    "mission_number",
+    "mission_type",
     "actor",
     "error_code",
     "error_message"

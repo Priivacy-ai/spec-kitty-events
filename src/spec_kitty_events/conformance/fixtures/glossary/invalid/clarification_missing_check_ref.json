@@ -4,7 +4,10 @@
   "step_id": "step-002",
   "term": "dashboard",
   "question": "Which meaning of 'dashboard' is intended here?",
-  "options": ["Analytics overview panel", "Vehicle instrument panel"],
+  "options": [
+    "Analytics overview panel",
+    "Vehicle instrument panel"
+  ],
   "urgency": "high",
   "actor": "agent-001"
 }

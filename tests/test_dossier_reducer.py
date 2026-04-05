@@ -30,7 +30,32 @@ from spec_kitty_events.models import Event
 def _events_from_replay(fixture_id: str) -> List[Event]:
     """Load a replay stream and deserialize to Event objects."""
     raw: List[Dict[str, Any]] = load_replay_stream(fixture_id)
-    return [Event(**e) for e in raw]
+    canonical_events: List[Event] = []
+    for item in raw:
+        payload = item.get("payload")
+        if isinstance(payload, dict):
+            namespace = payload.get("namespace")
+            if isinstance(namespace, dict):
+                if "feature_slug" in namespace and "mission_slug" not in namespace:
+                    namespace["mission_slug"] = namespace.pop("feature_slug")
+                if "mission_key" in namespace and "mission_type" not in namespace:
+                    namespace["mission_type"] = namespace.pop("mission_key")
+
+            for key in ("artifact_id", "expected_identity", "supersedes"):
+                identity = payload.get(key)
+                if isinstance(identity, dict) and "mission_key" in identity and "mission_type" not in identity:
+                    identity["mission_type"] = identity.pop("mission_key")
+
+            changed = payload.get("artifact_ids_changed")
+            if isinstance(changed, list):
+                for identity in changed:
+                    if isinstance(identity, dict) and "mission_key" in identity and "mission_type" not in identity:
+                        identity["mission_type"] = identity.pop("mission_key")
+
+        item.setdefault("build_id", "test-build")
+        canonical_events.append(Event(**item))
+
+    return canonical_events
 
 
 # ---------------------------------------------------------------------------
@@ -132,7 +157,8 @@ def test_namespace_populated_from_stream() -> None:
     events = _events_from_replay("dossier-replay-happy-path")
     state = reduce_mission_dossier(events)
     assert state.namespace is not None
-    assert state.namespace.feature_slug == "008-mission-dossier-parity-event-contracts"
+    assert state.namespace.mission_slug == "008-mission-dossier-parity-event-contracts"
+    assert state.namespace.mission_type == "software-dev"
     assert state.namespace.target_branch == "2.x"
 
 
@@ -163,11 +189,11 @@ def test_namespace_mixed_stream_raises() -> None:
     """Reducer raises NamespaceMixedStreamError on multi-namespace input."""
     events = _events_from_replay("dossier-replay-happy-path")
 
-    # Build a second event with a different feature_slug
+    # Build a second event with a different mission_slug
     second_ns_event: Dict[str, Any] = json.loads(events[-1].model_dump_json())
     second_ns_event["event_id"] = "01JNRNS2EVENT0000000000001"
     second_ns_event["lamport_clock"] = 999
-    second_ns_event["payload"]["namespace"]["feature_slug"] = (
+    second_ns_event["payload"]["namespace"]["mission_slug"] = (
         "999-entirely-different-feature"
     )
     different_ns_event = Event(**second_ns_event)
@@ -194,7 +220,7 @@ def test_namespace_mixed_stream_error_message_contains_expected_ns() -> None:
     second_ns_event = json.loads(events[-1].model_dump_json())
     second_ns_event["event_id"] = "01JNRNS2EVENT0000000000002"
     second_ns_event["lamport_clock"] = 999
-    second_ns_event["payload"]["namespace"]["feature_slug"] = "999-different"
+    second_ns_event["payload"]["namespace"]["mission_slug"] = "999-different"
     different_ns_event = Event(**second_ns_event)
 
     with pytest.raises(NamespaceMixedStreamError) as exc_info:
@@ -251,7 +277,7 @@ def test_optional_step_id_variance_does_not_raise() -> None:
         payload={
             "namespace": ns_base,
             "artifact_id": {
-                "mission_key": "software-dev",
+                "mission_type": "software-dev",
                 "path": "some/artifact.md",
                 "artifact_class": "input",
             },
@@ -268,7 +294,7 @@ def test_optional_step_id_variance_does_not_raise() -> None:
         payload={
             "namespace": ns_with_step,
             "artifact_id": {
-                "mission_key": "software-dev",
+                "mission_type": "software-dev",
                 "path": "other/artifact.md",
                 "artifact_class": "output",
             },
@@ -295,7 +321,7 @@ def test_mixed_step_ids_normalize_to_none() -> None:
         payload={
             "namespace": ns_a,
             "artifact_id": {
-                "mission_key": "software-dev",
+                "mission_type": "software-dev",
                 "path": "some/artifact-a.md",
                 "artifact_class": "input",
             },
@@ -312,7 +338,7 @@ def test_mixed_step_ids_normalize_to_none() -> None:
         payload={
             "namespace": ns_b,
             "artifact_id": {
-                "mission_key": "software-dev",
+                "mission_type": "software-dev",
                 "path": "some/artifact-b.md",
                 "artifact_class": "output",
             },
@@ -326,9 +352,9 @@ def test_mixed_step_ids_normalize_to_none() -> None:
     assert state.namespace.step_id is None
     # 5-field identity preserved
     assert state.namespace.project_uuid == ns_base["project_uuid"]
-    assert state.namespace.feature_slug == ns_base["feature_slug"]
+    assert state.namespace.mission_slug == ns_base["mission_slug"]
     assert state.namespace.target_branch == ns_base["target_branch"]
-    assert state.namespace.mission_key == ns_base["mission_key"]
+    assert state.namespace.mission_type == ns_base["mission_type"]
     assert state.namespace.manifest_version == ns_base["manifest_version"]
     assert state.event_count == 2
     assert len(state.artifacts) == 2
@@ -358,7 +384,7 @@ def test_malformed_first_event_does_not_poison_valid_stream() -> None:
         payload={
             "namespace": ns,
             "artifact_id": {
-                "mission_key": "software-dev",
+                "mission_type": "software-dev",
                 "path": "some/artifact.md",
                 "artifact_class": "input",
             },
@@ -371,7 +397,7 @@ def test_malformed_first_event_does_not_poison_valid_stream() -> None:
     assert state.event_count == 2  # both pass filter + dedup
     assert len(state.artifacts) == 1  # malformed payload skipped in fold
     assert state.namespace is not None
-    assert state.namespace.feature_slug == "008-mission-dossier-parity-event-contracts"
+    assert state.namespace.mission_slug == "008-mission-dossier-parity-event-contracts"
 
 
 # ---------------------------------------------------------------------------
@@ -396,6 +422,7 @@ def _make_bare_dossier_event(
         event_type=event_type,
         aggregate_id="mission-software-dev",
         timestamp="2026-02-21T14:00:00.000Z",
+        build_id="test-build",
         node_id="test-node",
         lamport_clock=lamport_clock,
         project_uuid=UUID("a1b2c3d4-e5f6-7890-abcd-ef1234567890"),
@@ -407,9 +434,9 @@ def _make_bare_dossier_event(
 def _make_valid_namespace_dict() -> Dict[str, Any]:
     return {
         "project_uuid": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-        "feature_slug": "008-mission-dossier-parity-event-contracts",
+        "mission_slug": "008-mission-dossier-parity-event-contracts",
         "target_branch": "2.x",
-        "mission_key": "software-dev",
+        "mission_type": "software-dev",
         "manifest_version": "1.0.0",
     }
 
@@ -529,7 +556,7 @@ def test_no_snapshot_no_drift_produces_unknown_parity_status() -> None:
         payload={
             "namespace": ns,
             "artifact_id": {
-                "mission_key": "software-dev",
+                "mission_type": "software-dev",
                 "path": "some/artifact.md",
                 "artifact_class": "input",
             },
@@ -541,6 +568,34 @@ def test_no_snapshot_no_drift_produces_unknown_parity_status() -> None:
     # Artifact indexed, no snapshot → parity_status must be "unknown"
     assert state.parity_status == "unknown"
     assert len(state.artifacts) == 1
+
+
+def test_legacy_namespace_keys_are_rejected() -> None:
+    event = _make_bare_dossier_event(
+        event_type="MissionDossierArtifactIndexed",
+        event_id="01JNR2NKST0000000000000002",
+        lamport_clock=1,
+        payload={
+            "namespace": {
+                "project_uuid": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+                "feature_slug": "legacy-feature",
+                "target_branch": "2.x",
+                "mission_key": "legacy-mission",
+                "manifest_version": "1.0.0",
+            },
+            "artifact_id": {
+                "mission_type": "software-dev",
+                "path": "some/artifact.md",
+                "artifact_class": "input",
+            },
+            "content_ref": {"hash": "aabbccdd", "algorithm": "sha256"},
+            "indexed_at": "2026-02-21T14:00:00Z",
+        },
+    )
+    state = reduce_mission_dossier([event])
+    assert state.namespace is None
+    assert state.artifacts == {}
+    assert state.event_count == 1
 
 
 from hypothesis import given, settings, strategies as st  # noqa: E402

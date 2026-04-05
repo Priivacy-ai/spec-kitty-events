@@ -8,7 +8,6 @@
   ],
   "decision_point_id": "dp-001",
   "event_count": 4,
-  "feature_slug": "feature-x",
   "last_actor_id": "human-1",
   "last_actor_type": "human",
   "last_alternatives_considered": [
@@ -24,5 +23,7 @@
   "mission_id": "m-001",
   "phase": "P1",
   "run_id": "run-001",
-  "state": "overridden"
+  "state": "overridden",
+  "mission_slug": "mission-x",
+  "mission_type": "software-dev"
 }

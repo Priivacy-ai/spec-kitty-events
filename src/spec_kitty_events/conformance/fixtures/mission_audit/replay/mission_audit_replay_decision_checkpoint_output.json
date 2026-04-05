@@ -31,7 +31,6 @@
   "pending_decisions": [],
   "mission_id": "mission-010",
   "run_id": "run-003",
-  "feature_slug": "010-mission-audit-lifecycle-contracts",
   "trigger_mode": "post_merge",
   "enforcement_mode": "blocking",
   "audit_scope": [
@@ -39,5 +38,8 @@
   ],
   "audit_scope_hash": "sha256:c3d4e5f6a7890123456789012345678901234567890123456789012345678901234",
   "anomalies": [],
-  "event_count": 4
+  "event_count": 4,
+  "mission_slug": "mission-010",
+  "mission_number": 10,
+  "mission_type": "software-dev"
 }
