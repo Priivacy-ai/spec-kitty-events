@@ -34,6 +34,9 @@ owned_files:
 - src/spec_kitty_events/models.py
 - src/spec_kitty_events/cutover.py
 - src/spec_kitty_events/conformance/fixtures/manifest.json
+- src/spec_kitty_events/conformance/fixtures/events/valid/**
+- src/spec_kitty_events/conformance/fixtures/edge_cases/valid/event_with_all_optional_fields.json
+- src/spec_kitty_events/conformance/test_pyargs_entrypoint.py
 - tests/unit/test_models.py
 - tests/unit/test_cutover.py
 - tests/integration/test_event_emission.py
@@ -74,11 +77,14 @@ owned_files:
 - `src/spec_kitty_events/models.py`
 - `src/spec_kitty_events/cutover.py` (new if needed)
 - `src/spec_kitty_events/conformance/fixtures/manifest.json` (only if this existing packaged manifest is promoted to the authoritative artifact)
+- `src/spec_kitty_events/conformance/fixtures/events/valid/**` (baseline packaged valid event fixtures that must reflect the new `Event` envelope)
+- `src/spec_kitty_events/conformance/fixtures/edge_cases/valid/event_with_all_optional_fields.json`
+- `src/spec_kitty_events/conformance/test_pyargs_entrypoint.py`
 - `tests/unit/test_models.py`
 - `tests/unit/test_cutover.py` (new if needed)
 - `tests/integration/test_event_emission.py`
 
-Do not modify files outside this list. Schema generation, broad fixture rewrites, public exports, and docs belong to later WPs. If the existing packaged manifest is chosen as the authoritative artifact, structural changes needed to promote it belong here.
+Do not modify files outside this list. Schema generation, broad cross-domain fixture rewrites, public exports, and docs belong to later WPs. If the existing packaged manifest is chosen as the authoritative artifact, structural changes needed to promote it belong here. The baseline packaged valid event fixtures and conformance round-trip entrypoint belong here because the `build_id` envelope cutover must keep the repository's existing event validation surface internally consistent.
 
 ## Subtasks & Detailed Guidance
 
@@ -105,6 +111,9 @@ Do not modify files outside this list. Schema generation, broad fixture rewrites
 
 - `src/spec_kitty_events/cutover.py` or equivalent packaged artifact location
 - `src/spec_kitty_events/conformance/fixtures/manifest.json` if that manifest is promoted to release-authority status
+- `src/spec_kitty_events/conformance/fixtures/events/valid/**`
+- `src/spec_kitty_events/conformance/fixtures/edge_cases/valid/event_with_all_optional_fields.json`
+- `src/spec_kitty_events/conformance/test_pyargs_entrypoint.py`
 - `src/spec_kitty_events/models.py` only if the chosen location requires a typed wrapper or loader reference there
 
 **Validation**:
@@ -153,17 +162,22 @@ Do not modify files outside this list. Schema generation, broad fixture rewrites
 2. Keep `node_id` required, but tighten its description to causal emitter identity only.
 3. Check constructors, serializers, and reprs so the new field is preserved without conflating it with `node_id`.
 4. Keep schema-version handling consistent with the artifact’s eventual signal binding. If `schema_version` is the chosen cutover signal, do not invent a second version field here.
-5. Ensure there is no helper or docstring path that still implies `node_id` identifies the checkout.
+5. Update the baseline packaged valid event fixtures and the direct conformance round-trip entrypoint so the repository's existing `Event` validation surface includes canonical `build_id` values.
+6. Ensure there is no helper or docstring path that still implies `node_id` identifies the checkout.
 
 **Files**:
 
 - `src/spec_kitty_events/models.py`
+- `src/spec_kitty_events/conformance/fixtures/events/valid/**`
+- `src/spec_kitty_events/conformance/fixtures/edge_cases/valid/event_with_all_optional_fields.json`
+- `src/spec_kitty_events/conformance/test_pyargs_entrypoint.py`
 
 **Validation**:
 
 - [ ] `Event` requires `build_id`.
 - [ ] `Event` still requires `node_id`.
 - [ ] Public descriptions distinguish checkout identity from causal ordering identity.
+- [ ] The packaged valid event fixtures and round-trip conformance path include canonical `build_id` values.
 - [ ] Existing event serialization remains deterministic apart from the new required field.
 
 ### Subtask T004 - Add foundation tests for artifact semantics and envelope split
@@ -181,12 +195,14 @@ Do not modify files outside this list. Schema generation, broad fixture rewrites
    - forbidden event name present
    - forbidden aggregate name present
 3. Update `tests/integration/test_event_emission.py` so event creation paths include `build_id` and preserve Lamport ordering behavior.
-4. Keep test fixtures local to these files; later conformance/fixture rewrites happen in WP05.
+4. Extend the direct conformance round-trip entrypoint coverage owned by this WP so the baseline packaged event fixtures prove the envelope change is non-regressive.
+5. Keep broader cross-domain conformance fixture rewrites for WP05.
 
 **Validation**:
 
 - [ ] Unit tests prove the artifact helper is fail-closed.
 - [ ] Integration test coverage proves `Event` construction and emission paths now carry `build_id`.
+- [ ] The direct packaged event round-trip entrypoint passes with canonical `build_id` values.
 - [ ] No tests rely on runtime compatibility aliasing.
 
 ## Implementation Sequence
