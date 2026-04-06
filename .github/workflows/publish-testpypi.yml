@@ -4,7 +4,13 @@ on:
   workflow_dispatch:
 
 jobs:
+  acceptance:
+    uses: ./.github/workflows/acceptance.yml
+    with:
+      verification_profile: release
+
   build:
+    needs: acceptance
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
