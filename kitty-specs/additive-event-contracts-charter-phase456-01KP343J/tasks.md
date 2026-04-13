@@ -19,12 +19,12 @@
 | T008 | Implement RetrospectiveSkippedPayload with trigger_source Literal | WP02 | | [D] |
 | T009 | Create unit tests for retrospective payload models | WP02 | | [D] |
 | T010 | Verify mypy --strict passes on retrospective.py | WP02 | | [D] |
-| T011 | Add new categories to _VALID_CATEGORIES in loader.py | WP03 | |
-| T012 | Create profile_invocation fixture JSON files (2 valid, 2 invalid) | WP03 | [P] |
-| T013 | Create retrospective fixture JSON files (3 valid, 2 invalid) | WP03 | [P] |
-| T014 | Register all 9 fixtures in manifest.json | WP03 | |
-| T015 | Create conformance test for profile invocation fixtures | WP03 | [P] |
-| T016 | Create conformance test for retrospective fixtures | WP03 | [P] |
+| T011 | Add new categories to _VALID_CATEGORIES in loader.py | WP03 | | [D] |
+| T012 | Create profile_invocation fixture JSON files (2 valid, 2 invalid) | WP03 | [D] |
+| T013 | Create retrospective fixture JSON files (3 valid, 2 invalid) | WP03 | [D] |
+| T014 | Register all 9 fixtures in manifest.json | WP03 | | [D] |
+| T015 | Create conformance test for profile invocation fixtures | WP03 | [D] |
+| T016 | Create conformance test for retrospective fixtures | WP03 | [D] |
 | T017 | Register new types in validators.py dispatch maps | WP04 | |
 | T018 | Add imports, exports, and __version__ bump in __init__.py | WP04 | |
 | T019 | Bump pyproject.toml version to 3.1.0 | WP04 | |
@@ -85,12 +85,12 @@ WP02 ─────┘
 **Estimated prompt size**: ~450 lines
 
 **Subtasks**:
-- [ ] T011 Add new categories to _VALID_CATEGORIES in loader.py (WP03)
-- [ ] T012 Create profile_invocation fixture JSON files (2 valid, 2 invalid) (WP03)
-- [ ] T013 Create retrospective fixture JSON files (3 valid, 2 invalid) (WP03)
-- [ ] T014 Register all 9 fixtures in manifest.json (WP03)
-- [ ] T015 Create conformance test for profile invocation fixtures (WP03)
-- [ ] T016 Create conformance test for retrospective fixtures (WP03)
+- [x] T011 Add new categories to _VALID_CATEGORIES in loader.py (WP03)
+- [x] T012 Create profile_invocation fixture JSON files (2 valid, 2 invalid) (WP03)
+- [x] T013 Create retrospective fixture JSON files (3 valid, 2 invalid) (WP03)
+- [x] T014 Register all 9 fixtures in manifest.json (WP03)
+- [x] T015 Create conformance test for profile invocation fixtures (WP03)
+- [x] T016 Create conformance test for retrospective fixtures (WP03)
 
 **Success criteria**: Loader accepts new categories, all fixtures load without error, conformance tests pass via direct model validation, invalid fixtures produce expected violations.
 
