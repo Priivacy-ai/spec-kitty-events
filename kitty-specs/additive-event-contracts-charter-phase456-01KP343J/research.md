@@ -19,11 +19,11 @@ All unknowns resolved. This tranche follows well-established patterns from 14 pr
 
 ### R2: Value Object Reuse Feasibility
 
-**Decision**: Import `RuntimeActorIdentity` from `mission_next.py` and `ProvenanceRef` from `dossier.py` directly.
+**Decision**: Import `RuntimeActorIdentity` from `spec_kitty_events.mission_next` and `ProvenanceRef` from `spec_kitty_events.dossier` directly. Do NOT import from `spec_kitty_events.__init__`.
 
-**Rationale**: Both are already re-exported from `__init__.py`. No circular import risk exists because the new modules are leaf modules (no existing module imports from them). Verified by tracing the import graph:
-- `profile_invocation.py` imports: `mission_next.RuntimeActorIdentity`, `models.Event` (if needed)
-- `retrospective.py` imports: `dossier.ProvenanceRef`, `models.Event` (if needed)
+**Rationale**: `__init__.py` eagerly imports all domain modules. If a new domain module imports from `__init__`, it creates a circular import (init imports the new module, which imports from init). The established pattern is direct imports from defining modules -- e.g., `mission_audit.py` imports `ProvenanceRef` from `spec_kitty_events.dossier`, not from the package root. Import graph for new modules:
+- `profile_invocation.py` imports: `spec_kitty_events.mission_next.RuntimeActorIdentity`
+- `retrospective.py` imports: `spec_kitty_events.dossier.ProvenanceRef`
 - Neither `mission_next.py` nor `dossier.py` will import from the new modules.
 
 **Alternatives considered**: Duplicating the value objects into a shared `value_objects.py`. Rejected as unnecessary indirection.

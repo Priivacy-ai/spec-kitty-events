@@ -91,7 +91,10 @@ Profile invocation and retrospective are distinct contract surfaces with differe
 
 `RuntimeActorIdentity` (from `mission_next.py`) is reused for `ProfileInvocationStartedPayload.actor` rather than defining a new actor model. `ProvenanceRef` (from `dossier.py`) is reused for `RetrospectiveCompletedPayload.artifact_ref`. This keeps the value object surface flat and avoids near-duplicate models.
 
-**Cross-module import**: Both value objects are already re-exported from `__init__.py`, so new modules import from there. If a circular import arises, use the established pattern of deferred import inside a function body (cf. `lifecycle.py` importing from `status.py`).
+**Cross-module import**: New modules MUST import value objects directly from their defining modules, not from `spec_kitty_events.__init__`. The `__init__.py` eagerly imports all domain modules, so importing from it would create circular imports. This matches the existing repo pattern (e.g., `mission_audit.py` imports `ProvenanceRef` from `spec_kitty_events.dossier`, not from the package root).
+
+- `profile_invocation.py`: `from spec_kitty_events.mission_next import RuntimeActorIdentity`
+- `retrospective.py`: `from spec_kitty_events.dossier import ProvenanceRef`
 
 ### D3: No reducers in this tranche
 
@@ -127,7 +130,7 @@ WP02 ─────┘
 ### WP01: Profile Invocation Domain + Unit Tests
 
 **FR coverage**: FR-001, FR-002, FR-007, FR-008, FR-013, FR-014
-**Constraint coverage**: C-001, C-006, C-007, C-010
+**Constraint coverage**: C-001, C-006, C-007
 
 **Deliverables**:
 
@@ -141,7 +144,7 @@ WP02 ─────┘
 ### WP02: Retrospective Domain + Unit Tests
 
 **FR coverage**: FR-003, FR-004, FR-005, FR-006, FR-007, FR-008, FR-013, FR-015
-**Constraint coverage**: C-001, C-006, C-008, C-010
+**Constraint coverage**: C-001, C-006, C-008
 
 **Deliverables**:
 
@@ -192,7 +195,7 @@ WP02 ─────┘
 | File | Action | Description |
 |------|--------|-------------|
 | `src/spec_kitty_events/conformance/validators.py` | Modify | Add entries to `_EVENT_TYPE_TO_MODEL` and `_EVENT_TYPE_TO_SCHEMA` for all 3 new event types |
-| `src/spec_kitty_events/__init__.py` | Modify | Import and re-export new constants, payload models, type sets, schema versions; add to `__all__` |
+| `src/spec_kitty_events/__init__.py` | Modify | Import and re-export new constants, payload models, type sets, schema versions; add to `__all__`; bump `__version__` from `"3.0.0"` to `"3.1.0"` |
 | `src/spec_kitty_events/schemas/*.schema.json` | Create (generated) | Run `python -m spec_kitty_events.schemas.generate` to create 3 new JSON schema files |
 | `pyproject.toml` | Modify | Bump `version` from `"3.0.0"` to `"3.1.0"` |
 
@@ -202,6 +205,7 @@ WP02 ─────┘
 - `pytest` (full suite) passes with zero failures
 - `validate_event()` correctly dispatches for all 3 new event types
 - Package imports work: `from spec_kitty_events import ProfileInvocationStartedPayload` succeeds
+- Both version surfaces agree: `pyproject.toml` version and `spec_kitty_events.__version__` are both `"3.1.0"`
 
 ## Risk Assessment
 

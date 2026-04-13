@@ -55,11 +55,11 @@ An operator decides not to run the retrospective for a trivial mission. The runt
 
 **Acceptance**: Given a `RetrospectiveSkipped` event, when a SaaS consumer projects it, then the consumer can distinguish an intentional skip (with reason) from a retrospective that simply hasn't happened yet.
 
-### Scenario 4: Unknown Event Type Forward Compatibility
+### Scenario 4: Unknown Event Type Handling (Fail-Closed Validator)
 
-A consumer running an older version of `spec-kitty-events` receives a `ProfileInvocationStarted` event it doesn't recognize. The event passes envelope validation but the consumer logs an unknown-type warning and skips payload validation. No crash, no data loss.
+A consumer running `spec-kitty-events` 3.0.x receives a `ProfileInvocationStarted` event it doesn't recognize. The `Event` envelope deserializes successfully (envelope validation does not gate on `event_type`). However, if the consumer calls `validate_event("ProfileInvocationStarted", payload)`, the validator raises `ValueError` because the type is not registered in the 3.0.x dispatch map. This is the library's deliberate fail-closed contract. Reducers, by contrast, filter to their known type sets and silently skip unknown types.
 
-**Acceptance**: Given an event with an unrecognized `event_type`, when the envelope is valid, then the consumer can store the event and skip payload validation without error.
+**Acceptance**: Given an event with an unrecognized `event_type`: (a) `Event(**raw)` envelope deserialization succeeds, (b) `validate_event()` raises `ValueError`, (c) domain reducers skip the event without error. Consumer-level code is responsible for catching `ValueError` on unknown types or checking type membership before calling `validate_event()`.
 
 ---
 
@@ -110,7 +110,7 @@ A consumer running an older version of `spec-kitty-events` receives a `ProfileIn
 | C-007 | `ProfileInvocationCompleted` and `ProfileInvocationFailed` event types SHALL NOT be added in this tranche. They are reserved for a future tranche when a concrete closure consumer exists. | Active |
 | C-008 | The retrospective domain SHALL NOT include a reducer in this tranche. The two events are terminal signals, not a state machine requiring projection. | Active |
 | C-009 | All new events belong in `spec-kitty-events` (the shared library), not as local-only repo artifacts, because SaaS consumers need to validate and project them. | Active |
-| C-010 | New events SHALL use `data_tier=0` (local) by default, consistent with existing domain events. The emitter controls elevation to higher tiers. | Active |
+| C-010 | `data_tier` is an envelope-level field on the `Event` model, not a domain payload concern. Emitters SHOULD set `data_tier=0` (local) by default for new event types, consistent with existing domain events. This is emitter-side guidance, not a domain-module acceptance criterion for this mission. | Active |
 
 ---
 
@@ -219,9 +219,9 @@ Emitted when a retrospective step is explicitly skipped.
 
 | Consumer version | Behavior with new events |
 |-----------------|-------------------------|
-| `3.0.x` consumer | Envelope validates. Unknown `event_type` logged as warning. Payload validation skipped. No crash. |
-| `3.1.x` consumer | Full dual-layer validation of new event types. |
-| SaaS projections | Ignore unknown event types until projection code is deployed for the new types. |
+| `3.0.x` consumer | Envelope deserialization (`Event(**raw)`) succeeds. `validate_event()` raises `ValueError` (fail-closed on unknown types). Domain reducers silently skip unknown types. Consumer-level code must handle unknown types before calling `validate_event()`. |
+| `3.1.x` consumer | Full dual-layer validation of new event types via `validate_event()`. |
+| SaaS projections | Must gate on known type sets before calling `validate_event()`. Unknown types are stored but not validated until projection code is upgraded. |
 
 ### Reserved Event Types
 
@@ -235,7 +235,7 @@ Emitted when a retrospective step is explicitly skipped.
 
 2. **Deployment order**: The `spec-kitty-events` package must be released at `3.1.0` before any runtime emitter references the new event types. SaaS consumers can deploy projection support at their own pace.
 
-3. **Forward compatibility**: Existing consumers already handle unknown event types gracefully (envelope validates, unknown type is logged, no crash). This is tested by the conformance suite.
+3. **Forward compatibility**: Envelope deserialization accepts any `event_type` string. Domain reducers silently skip unknown types. However, `validate_event()` is fail-closed: it raises `ValueError` on unknown types (tested and locked in the conformance suite). Consumer-level code must check type membership before calling `validate_event()`. This is not a new behavior change -- it is the existing, tested contract.
 
 4. **Value object reuse**: `RuntimeActorIdentity` (from `mission_next.py`) and `ProvenanceRef` (from `dossier.py`) are reused in the new payloads. No duplication, no new value objects.
 
