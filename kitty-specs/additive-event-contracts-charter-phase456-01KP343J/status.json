@@ -1,7 +1,7 @@
 {
-  "event_count": 14,
-  "last_event_id": "01KP35R47X5A827ARM84BG0PEB",
-  "materialized_at": "2026-04-13T10:21:13.853418+00:00",
+  "event_count": 15,
+  "last_event_id": "01KP35RNYCENM3TK5KEEBZ8WZZ",
+  "materialized_at": "2026-04-13T10:21:31.980151+00:00",
   "mission_number": "",
   "mission_slug": "additive-event-contracts-charter-phase456-01KP343J",
   "mission_type": "software-dev",
@@ -11,8 +11,8 @@
     "canceled": 0,
     "claimed": 0,
     "done": 0,
-    "for_review": 1,
-    "in_progress": 0,
+    "for_review": 0,
+    "in_progress": 1,
     "in_review": 0,
     "planned": 2
   },
@@ -25,11 +25,11 @@
       "last_transition_at": "2026-04-13T10:18:41.279797+00:00"
     },
     "WP02": {
-      "actor": "user",
-      "force_count": 1,
-      "lane": "for_review",
-      "last_event_id": "01KP35R47X5A827ARM84BG0PEB",
-      "last_transition_at": "2026-04-13T10:21:13.853418+00:00"
+      "actor": "claude:opus:reviewer:reviewer",
+      "force_count": 2,
+      "lane": "in_progress",
+      "last_event_id": "01KP35RNYCENM3TK5KEEBZ8WZZ",
+      "last_transition_at": "2026-04-13T10:21:31.980151+00:00"
     },
     "WP03": {
       "actor": "finalize-tasks",
