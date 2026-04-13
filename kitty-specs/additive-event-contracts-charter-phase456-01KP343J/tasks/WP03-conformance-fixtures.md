@@ -17,8 +17,8 @@ subtasks:
 - T014
 - T015
 - T016
-agent: "claude:opus:implementer:implementer"
-shell_pid: "2071"
+agent: "claude:opus:reviewer:reviewer"
+shell_pid: "2336"
 history:
 - date: '2026-04-13'
   author: spec-kitty.tasks
@@ -447,3 +447,4 @@ spec-kitty agent action implement WP03 --agent <name>
 
 - 2026-04-13T10:23:42Z – claude:opus:implementer:implementer – shell_pid=2071 – Started implementation via action command
 - 2026-04-13T10:26:48Z – claude:opus:implementer:implementer – shell_pid=2071 – Ready for review: conformance fixtures and tests for profile_invocation and retrospective domains
+- 2026-04-13T10:27:06Z – claude:opus:reviewer:reviewer – shell_pid=2336 – Started review via action command
