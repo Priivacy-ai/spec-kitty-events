@@ -17,6 +17,8 @@ subtasks:
 - T014
 - T015
 - T016
+agent: "claude:opus:implementer:implementer"
+shell_pid: "2071"
 history:
 - date: '2026-04-13'
   author: spec-kitty.tasks
@@ -440,3 +442,7 @@ spec-kitty agent action implement WP03 --agent <name>
 - Verify invalid fixtures target a single validation failure (not multiple compounding errors)
 - Verify conformance tests use direct model instantiation, NOT `validate_event()` (that's WP04)
 - Verify `min_version` is `"3.1.0"` for all new entries
+
+## Activity Log
+
+- 2026-04-13T10:23:42Z – claude:opus:implementer:implementer – shell_pid=2071 – Started implementation via action command
