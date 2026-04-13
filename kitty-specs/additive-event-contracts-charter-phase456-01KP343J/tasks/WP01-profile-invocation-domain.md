@@ -12,12 +12,16 @@ requirement_refs:
 planning_base_branch: main
 merge_target_branch: main
 branch_strategy: Planning artifacts for this feature were generated on main. During /spec-kitty.implement this WP may branch from a dependency-specific base, but completed changes must merge back into main unless the human explicitly redirects the landing branch.
+base_branch: kitty/mission-additive-event-contracts-charter-phase456-01KP343J
+base_commit: 02886515375b981353f142b226cc398ed0452f7a
+created_at: '2026-04-13T10:13:01.431085+00:00'
 subtasks:
 - T001
 - T002
 - T003
 - T004
 - T005
+shell_pid: '95999'
 history:
 - date: '2026-04-13'
   author: spec-kitty.tasks
