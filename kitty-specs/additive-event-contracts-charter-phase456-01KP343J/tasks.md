@@ -9,11 +9,11 @@
 
 | ID | Description | WP | Parallel |
 |----|-------------|-----|----------|
-| T001 | Create profile_invocation.py module skeleton with constants and type set | WP01 | [P] |
-| T002 | Implement ProfileInvocationStartedPayload with all fields | WP01 | |
-| T003 | Define reserved constants for COMPLETED and FAILED | WP01 | |
-| T004 | Create unit tests for profile invocation payload models | WP01 | |
-| T005 | Verify mypy --strict passes on profile_invocation.py | WP01 | |
+| T001 | Create profile_invocation.py module skeleton with constants and type set | WP01 | [P] | [D] |
+| T002 | Implement ProfileInvocationStartedPayload with all fields | WP01 | | [D] |
+| T003 | Define reserved constants for COMPLETED and FAILED | WP01 | | [D] |
+| T004 | Create unit tests for profile invocation payload models | WP01 | | [D] |
+| T005 | Verify mypy --strict passes on profile_invocation.py | WP01 | | [D] |
 | T006 | Create retrospective.py module skeleton with constants and type set | WP02 | [P] |
 | T007 | Implement RetrospectiveCompletedPayload with ProvenanceRef | WP02 | |
 | T008 | Implement RetrospectiveSkippedPayload with trigger_source Literal | WP02 | |
@@ -49,11 +49,11 @@ WP02 ─────┘
 **Estimated prompt size**: ~350 lines
 
 **Subtasks**:
-- [ ] T001 Create profile_invocation.py module skeleton with constants and type set (WP01)
-- [ ] T002 Implement ProfileInvocationStartedPayload with all fields (WP01)
-- [ ] T003 Define reserved constants for COMPLETED and FAILED (WP01)
-- [ ] T004 Create unit tests for profile invocation payload models (WP01)
-- [ ] T005 Verify mypy --strict passes on profile_invocation.py (WP01)
+- [x] T001 Create profile_invocation.py module skeleton with constants and type set (WP01)
+- [x] T002 Implement ProfileInvocationStartedPayload with all fields (WP01)
+- [x] T003 Define reserved constants for COMPLETED and FAILED (WP01)
+- [x] T004 Create unit tests for profile invocation payload models (WP01)
+- [x] T005 Verify mypy --strict passes on profile_invocation.py (WP01)
 
 **Success criteria**: Module exists, payload validates, reserved constants present, all unit tests pass, mypy clean.
 
