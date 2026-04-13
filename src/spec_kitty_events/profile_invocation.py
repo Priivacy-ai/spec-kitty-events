@@ -22,9 +22,14 @@ PROFILE_INVOCATION_FAILED: str = "ProfileInvocationFailed"  # Reserved — paylo
 
 PROFILE_INVOCATION_EVENT_TYPES: FrozenSet[str] = frozenset({
     PROFILE_INVOCATION_STARTED,
-    PROFILE_INVOCATION_COMPLETED,  # Reserved — payload deferred
-    PROFILE_INVOCATION_FAILED,     # Reserved — payload deferred
 })
+"""Validatable event types. Consumers can call validate_event() for these."""
+
+PROFILE_INVOCATION_RESERVED_TYPES: FrozenSet[str] = frozenset({
+    PROFILE_INVOCATION_COMPLETED,
+    PROFILE_INVOCATION_FAILED,
+})
+"""Name-reserved types with deferred payload contracts. Not yet validatable."""
 
 # ── Section 2: Payload Models ────────────────────────────────────────────────
 

@@ -1223,6 +1223,22 @@
       "event_type": "RetrospectiveSkipped",
       "notes": "Empty skip_reason violates min_length=1",
       "min_version": "3.1.0"
+    },
+    {
+      "id": "retrospective-completed-invalid-bad-timestamp",
+      "path": "retrospective/invalid/retrospective_completed_bad_timestamp.json",
+      "expected_result": "invalid",
+      "event_type": "RetrospectiveCompleted",
+      "notes": "completed_at is not valid ISO 8601",
+      "min_version": "3.1.0"
+    },
+    {
+      "id": "retrospective-skipped-invalid-bad-timestamp",
+      "path": "retrospective/invalid/retrospective_skipped_bad_timestamp.json",
+      "expected_result": "invalid",
+      "event_type": "RetrospectiveSkipped",
+      "notes": "skipped_at is not valid ISO 8601",
+      "min_version": "3.1.0"
     }
   ]
 }

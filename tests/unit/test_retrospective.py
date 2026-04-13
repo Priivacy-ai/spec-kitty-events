@@ -113,6 +113,15 @@ class TestRetrospectiveCompletedPayload:
         with pytest.raises(ValidationError):
             _make_completed(completed_at="")
 
+    def test_completed_invalid_timestamp_raises(self) -> None:
+        with pytest.raises(ValidationError):
+            _make_completed(completed_at="not-a-date")
+
+    def test_completed_plain_date_no_time_raises(self) -> None:
+        """A date without time component should still parse as ISO 8601."""
+        payload = _make_completed(completed_at="2026-04-13")
+        assert payload.completed_at == "2026-04-13"
+
 
 # ── RetrospectiveSkippedPayload tests ─────────────────────────────────────────
 
@@ -151,6 +160,10 @@ class TestRetrospectiveSkippedPayload:
     def test_skipped_extra_forbid(self) -> None:
         with pytest.raises(ValidationError):
             _make_skipped(unknown_field="nope")
+
+    def test_skipped_invalid_timestamp_raises(self) -> None:
+        with pytest.raises(ValidationError):
+            _make_skipped(skipped_at="not-a-date")
 
     def test_skipped_roundtrip(self) -> None:
         original = _make_skipped()

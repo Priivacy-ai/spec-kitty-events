@@ -9,9 +9,10 @@ RetrospectiveSkipped, or neither.
 """
 from __future__ import annotations
 
+from datetime import datetime
 from typing import FrozenSet, Literal, Optional
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from spec_kitty_events.dossier import ProvenanceRef
 
@@ -56,6 +57,13 @@ class RetrospectiveCompletedPayload(BaseModel):
         ..., min_length=1, description="ISO 8601 completion timestamp"
     )
 
+    @field_validator("completed_at", mode="before")
+    @classmethod
+    def _validate_completed_at_iso8601(cls, v: object) -> object:
+        if isinstance(v, str):
+            datetime.fromisoformat(v)
+        return v
+
 
 class RetrospectiveSkippedPayload(BaseModel):
     """Payload for RetrospectiveSkipped events.
@@ -76,3 +84,10 @@ class RetrospectiveSkippedPayload(BaseModel):
     skipped_at: str = Field(
         ..., min_length=1, description="ISO 8601 skip decision timestamp"
     )
+
+    @field_validator("skipped_at", mode="before")
+    @classmethod
+    def _validate_skipped_at_iso8601(cls, v: object) -> object:
+        if isinstance(v, str):
+            datetime.fromisoformat(v)
+        return v

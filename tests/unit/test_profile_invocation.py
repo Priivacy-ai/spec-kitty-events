@@ -14,6 +14,7 @@ from spec_kitty_events.profile_invocation import (
     PROFILE_INVOCATION_COMPLETED,
     PROFILE_INVOCATION_EVENT_TYPES,
     PROFILE_INVOCATION_FAILED,
+    PROFILE_INVOCATION_RESERVED_TYPES,
     PROFILE_INVOCATION_SCHEMA_VERSION,
     PROFILE_INVOCATION_STARTED,
     ProfileInvocationStartedPayload,
@@ -184,12 +185,22 @@ def test_reserved_constants_exist() -> None:
 
 
 def test_event_types_frozenset() -> None:
-    """Assert all 3 types are in PROFILE_INVOCATION_EVENT_TYPES."""
-    assert len(PROFILE_INVOCATION_EVENT_TYPES) == 3
+    """Assert only validatable types are in PROFILE_INVOCATION_EVENT_TYPES."""
+    assert len(PROFILE_INVOCATION_EVENT_TYPES) == 1
     assert PROFILE_INVOCATION_STARTED in PROFILE_INVOCATION_EVENT_TYPES
-    assert PROFILE_INVOCATION_COMPLETED in PROFILE_INVOCATION_EVENT_TYPES
-    assert PROFILE_INVOCATION_FAILED in PROFILE_INVOCATION_EVENT_TYPES
+    assert PROFILE_INVOCATION_COMPLETED not in PROFILE_INVOCATION_EVENT_TYPES
+    assert PROFILE_INVOCATION_FAILED not in PROFILE_INVOCATION_EVENT_TYPES
     assert isinstance(PROFILE_INVOCATION_EVENT_TYPES, frozenset)
+
+
+def test_reserved_types_frozenset() -> None:
+    """Assert reserved types are in a separate set, not in EVENT_TYPES."""
+    assert len(PROFILE_INVOCATION_RESERVED_TYPES) == 2
+    assert PROFILE_INVOCATION_COMPLETED in PROFILE_INVOCATION_RESERVED_TYPES
+    assert PROFILE_INVOCATION_FAILED in PROFILE_INVOCATION_RESERVED_TYPES
+    assert isinstance(PROFILE_INVOCATION_RESERVED_TYPES, frozenset)
+    # No overlap
+    assert PROFILE_INVOCATION_EVENT_TYPES.isdisjoint(PROFILE_INVOCATION_RESERVED_TYPES)
 
 
 def test_schema_version() -> None:
