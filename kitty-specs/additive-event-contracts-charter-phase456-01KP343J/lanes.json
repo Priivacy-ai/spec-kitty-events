@@ -1,0 +1,75 @@
+{
+  "version": 1,
+  "mission_slug": "additive-event-contracts-charter-phase456-01KP343J",
+  "mission_id": "01KP343JBG2V7WSWSDJ0HD76BR",
+  "mission_branch": "kitty/mission-additive-event-contracts-charter-phase456-01KP343J",
+  "target_branch": "main",
+  "lanes": [
+    {
+      "lane_id": "lane-a",
+      "wp_ids": [
+        "WP01",
+        "WP02",
+        "WP03",
+        "WP04"
+      ],
+      "write_scope": [
+        "pyproject.toml",
+        "src/spec_kitty_events/__init__.py",
+        "src/spec_kitty_events/conformance/fixtures/manifest.json",
+        "src/spec_kitty_events/conformance/fixtures/profile_invocation/**",
+        "src/spec_kitty_events/conformance/fixtures/retrospective/**",
+        "src/spec_kitty_events/conformance/loader.py",
+        "src/spec_kitty_events/conformance/validators.py",
+        "src/spec_kitty_events/profile_invocation.py",
+        "src/spec_kitty_events/retrospective.py",
+        "src/spec_kitty_events/schemas/profile_invocation_started_payload.schema.json",
+        "src/spec_kitty_events/schemas/retrospective_completed_payload.schema.json",
+        "src/spec_kitty_events/schemas/retrospective_skipped_payload.schema.json",
+        "tests/test_profile_invocation_conformance.py",
+        "tests/test_retrospective_conformance.py",
+        "tests/unit/test_profile_invocation.py",
+        "tests/unit/test_retrospective.py"
+      ],
+      "predicted_surfaces": [
+        "api",
+        "app-shell",
+        "artifact-rendering",
+        "tests",
+        "tracker-integration"
+      ],
+      "depends_on_lanes": [],
+      "parallel_group": 0
+    }
+  ],
+  "computed_at": "2026-04-13T10:12:26.435285+00:00",
+  "computed_from": "dependency_graph+ownership",
+  "planning_artifact_wps": [],
+  "collapse_report": {
+    "events": [
+      {
+        "wp_a": "WP03",
+        "wp_b": "WP01",
+        "rule": "dependency",
+        "evidence": "WP03 depends on WP01"
+      },
+      {
+        "wp_a": "WP03",
+        "wp_b": "WP02",
+        "rule": "dependency",
+        "evidence": "WP03 depends on WP02"
+      },
+      {
+        "wp_a": "WP04",
+        "wp_b": "WP03",
+        "rule": "dependency",
+        "evidence": "WP04 depends on WP03"
+      }
+    ],
+    "total_merges": 3,
+    "independent_wps_collapsed": 0,
+    "by_rule": {
+      "dependency": 3
+    }
+  }
+}
