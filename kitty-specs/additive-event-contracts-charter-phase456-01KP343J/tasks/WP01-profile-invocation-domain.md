@@ -267,3 +267,4 @@ def _make_payload(**overrides):
 ## Activity Log
 
 - 2026-04-13T10:13:01Z – claude:opus:implementer:implementer – shell_pid=95999 – Assigned agent via action command
+- 2026-04-13T10:16:52Z – claude:opus:implementer:implementer – shell_pid=95999 – Ready for review: domain module with constants, ProfileInvocationStartedPayload model, reserved constants, and 18 passing unit tests. mypy --strict passes.
