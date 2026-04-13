@@ -1,16 +1,16 @@
 {
-  "event_count": 32,
-  "last_event_id": "01KP36MX5SZV3WJGZNX8HJQZ86",
-  "materialized_at": "2026-04-13T10:36:56.889169+00:00",
+  "event_count": 36,
+  "last_event_id": "01KP36NHTYYVJSVAV2C37SFTBK",
+  "materialized_at": "2026-04-13T10:37:18.046028+00:00",
   "mission_number": "",
   "mission_slug": "additive-event-contracts-charter-phase456-01KP343J",
   "mission_type": "software-dev",
   "summary": {
-    "approved": 4,
+    "approved": 0,
     "blocked": 0,
     "canceled": 0,
     "claimed": 0,
-    "done": 0,
+    "done": 4,
     "for_review": 0,
     "in_progress": 0,
     "in_review": 0,
@@ -18,32 +18,32 @@
   },
   "work_packages": {
     "WP01": {
-      "actor": "user",
+      "actor": "merge",
       "force_count": 2,
-      "lane": "approved",
-      "last_event_id": "01KP35KF7ZVPHM6FX8Y4JGE7WK",
-      "last_transition_at": "2026-04-13T10:18:41.279797+00:00"
+      "lane": "done",
+      "last_event_id": "01KP36NHJP1AA82N3Z24SPT2YD",
+      "last_transition_at": "2026-04-13T10:37:17.782359+00:00"
     },
     "WP02": {
-      "actor": "user",
+      "actor": "merge",
       "force_count": 2,
-      "lane": "approved",
-      "last_event_id": "01KP35W8VRC6AW8Y06HSBVV4KX",
-      "last_transition_at": "2026-04-13T10:23:29.656189+00:00"
+      "lane": "done",
+      "last_event_id": "01KP36NHR2VP23BGBCDYBAPKH2",
+      "last_transition_at": "2026-04-13T10:37:17.954723+00:00"
     },
     "WP03": {
-      "actor": "user",
+      "actor": "merge",
       "force_count": 2,
-      "lane": "approved",
-      "last_event_id": "01KP366JER6VNA4J527KV0XEG5",
-      "last_transition_at": "2026-04-13T10:29:07.160714+00:00"
+      "lane": "done",
+      "last_event_id": "01KP36NHSHWM21KCEA93KK50Z7",
+      "last_transition_at": "2026-04-13T10:37:18.001870+00:00"
     },
     "WP04": {
-      "actor": "user",
+      "actor": "merge",
       "force_count": 2,
-      "lane": "approved",
-      "last_event_id": "01KP36MX5SZV3WJGZNX8HJQZ86",
-      "last_transition_at": "2026-04-13T10:36:56.889169+00:00"
+      "lane": "done",
+      "last_event_id": "01KP36NHTYYVJSVAV2C37SFTBK",
+      "last_transition_at": "2026-04-13T10:37:18.046028+00:00"
     }
   }
 }
