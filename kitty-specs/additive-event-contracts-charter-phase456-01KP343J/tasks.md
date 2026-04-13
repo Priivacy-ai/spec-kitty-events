@@ -14,11 +14,11 @@
 | T003 | Define reserved constants for COMPLETED and FAILED | WP01 | | [D] |
 | T004 | Create unit tests for profile invocation payload models | WP01 | | [D] |
 | T005 | Verify mypy --strict passes on profile_invocation.py | WP01 | | [D] |
-| T006 | Create retrospective.py module skeleton with constants and type set | WP02 | [P] |
-| T007 | Implement RetrospectiveCompletedPayload with ProvenanceRef | WP02 | |
-| T008 | Implement RetrospectiveSkippedPayload with trigger_source Literal | WP02 | |
-| T009 | Create unit tests for retrospective payload models | WP02 | |
-| T010 | Verify mypy --strict passes on retrospective.py | WP02 | |
+| T006 | Create retrospective.py module skeleton with constants and type set | WP02 | [D] |
+| T007 | Implement RetrospectiveCompletedPayload with ProvenanceRef | WP02 | | [D] |
+| T008 | Implement RetrospectiveSkippedPayload with trigger_source Literal | WP02 | | [D] |
+| T009 | Create unit tests for retrospective payload models | WP02 | | [D] |
+| T010 | Verify mypy --strict passes on retrospective.py | WP02 | | [D] |
 | T011 | Add new categories to _VALID_CATEGORIES in loader.py | WP03 | |
 | T012 | Create profile_invocation fixture JSON files (2 valid, 2 invalid) | WP03 | [P] |
 | T013 | Create retrospective fixture JSON files (3 valid, 2 invalid) | WP03 | [P] |
@@ -67,11 +67,11 @@ WP02 ─────┘
 **Estimated prompt size**: ~400 lines
 
 **Subtasks**:
-- [ ] T006 Create retrospective.py module skeleton with constants and type set (WP02)
-- [ ] T007 Implement RetrospectiveCompletedPayload with ProvenanceRef (WP02)
-- [ ] T008 Implement RetrospectiveSkippedPayload with trigger_source Literal (WP02)
-- [ ] T009 Create unit tests for retrospective payload models (WP02)
-- [ ] T010 Verify mypy --strict passes on retrospective.py (WP02)
+- [x] T006 Create retrospective.py module skeleton with constants and type set (WP02)
+- [x] T007 Implement RetrospectiveCompletedPayload with ProvenanceRef (WP02)
+- [x] T008 Implement RetrospectiveSkippedPayload with trigger_source Literal (WP02)
+- [x] T009 Create unit tests for retrospective payload models (WP02)
+- [x] T010 Verify mypy --strict passes on retrospective.py (WP02)
 
 **Success criteria**: Module exists, both payloads validate, trigger_source Literal enforced, ProvenanceRef embedding works, all unit tests pass, mypy clean.
 
