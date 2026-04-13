@@ -1,0 +1,23 @@
+{
+  "wp_id": "WP01",
+  "captured_at": "2026-04-13T10:13:20Z",
+  "base_branch": "main",
+  "base_commit": "7bfee17fed30b34cc02fa1a1ef8aa5740a7ffdb0",
+  "test_runner": "pytest",
+  "total": 1531,
+  "passed": 1529,
+  "failed": 2,
+  "skipped": 0,
+  "failures": [
+    {
+      "test": "tests.test_dossier_conformance.test_canonical_output_snapshot_matches_reducer",
+      "error": "FileNotFoundError: [Errno 2] No such file or directory: '/opt/homebrew/lib/python3.11/site-packages/spec_kitty_events/conformance/fixtures/dossier/replay/canonical_output_snapshot.json'",
+      "file": "unknown:?"
+    },
+    {
+      "test": "tests.unit.test_fixtures.TestManifest.test_every_manifest_entry_resolves",
+      "error": "AssertionError: Manifest entry dossier-canonical-output-snapshot -> /opt/homebrew/lib/python3.11/site-packages/spec_kitty_events/conformance/fixtures/dossier/replay/canonical_output_snapshot.json not ",
+      "file": "unknown:?"
+    }
+  ]
+}
