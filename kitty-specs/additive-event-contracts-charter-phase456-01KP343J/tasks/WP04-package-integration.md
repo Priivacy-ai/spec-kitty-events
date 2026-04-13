@@ -20,8 +20,8 @@ subtasks:
 - T019
 - T020
 - T021
-agent: "claude:opus:implementer:implementer"
-shell_pid: "2532"
+agent: "claude:opus:reviewer:reviewer"
+shell_pid: "2883"
 history:
 - date: '2026-04-13'
   author: spec-kitty.tasks
@@ -307,3 +307,4 @@ spec-kitty agent action implement WP04 --agent <name>
 
 - 2026-04-13T10:29:19Z – claude:opus:implementer:implementer – shell_pid=2532 – Started implementation via action command
 - 2026-04-13T10:34:24Z – claude:opus:implementer:implementer – shell_pid=2532 – Ready for review: all integration surfaces wired, schemas generated, version bumped to 3.1.0, full test suite (1583 tests) passes, mypy --strict clean, schema drift check clean
+- 2026-04-13T10:34:41Z – claude:opus:reviewer:reviewer – shell_pid=2883 – Started review via action command
