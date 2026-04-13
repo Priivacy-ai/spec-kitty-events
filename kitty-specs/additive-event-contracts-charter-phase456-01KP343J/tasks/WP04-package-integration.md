@@ -20,6 +20,8 @@ subtasks:
 - T019
 - T020
 - T021
+agent: "claude:opus:implementer:implementer"
+shell_pid: "2532"
 history:
 - date: '2026-04-13'
   author: spec-kitty.tasks
@@ -300,3 +302,7 @@ spec-kitty agent action implement WP04 --agent <name>
 - Verify the `as` re-export pattern is used in `__init__.py` for mypy compliance
 - Run `python -m spec_kitty_events.schemas.generate --check` to verify zero drift
 - Run the full test suite to verify no regressions
+
+## Activity Log
+
+- 2026-04-13T10:29:19Z – claude:opus:implementer:implementer – shell_pid=2532 – Started implementation via action command
