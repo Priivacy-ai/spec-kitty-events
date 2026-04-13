@@ -25,11 +25,11 @@
 | T014 | Register all 9 fixtures in manifest.json | WP03 | | [D] |
 | T015 | Create conformance test for profile invocation fixtures | WP03 | [D] |
 | T016 | Create conformance test for retrospective fixtures | WP03 | [D] |
-| T017 | Register new types in validators.py dispatch maps | WP04 | |
-| T018 | Add imports, exports, and __version__ bump in __init__.py | WP04 | |
-| T019 | Bump pyproject.toml version to 3.1.0 | WP04 | |
-| T020 | Run schema generation and commit new JSON schemas | WP04 | |
-| T021 | Run full test suite and validate all gates pass | WP04 | |
+| T017 | Register new types in validators.py dispatch maps | WP04 | | [D] |
+| T018 | Add imports, exports, and __version__ bump in __init__.py | WP04 | | [D] |
+| T019 | Bump pyproject.toml version to 3.1.0 | WP04 | | [D] |
+| T020 | Run schema generation and commit new JSON schemas | WP04 | | [D] |
+| T021 | Run full test suite and validate all gates pass | WP04 | | [D] |
 
 ## Dependency Graph
 
@@ -104,11 +104,11 @@ WP02 ─────┘
 **Estimated prompt size**: ~350 lines
 
 **Subtasks**:
-- [ ] T017 Register new types in validators.py dispatch maps (WP04)
-- [ ] T018 Add imports, exports, and __version__ bump in __init__.py (WP04)
-- [ ] T019 Bump pyproject.toml version to 3.1.0 (WP04)
-- [ ] T020 Run schema generation and commit new JSON schemas (WP04)
-- [ ] T021 Run full test suite and validate all gates pass (WP04)
+- [x] T017 Register new types in validators.py dispatch maps (WP04)
+- [x] T018 Add imports, exports, and __version__ bump in __init__.py (WP04)
+- [x] T019 Bump pyproject.toml version to 3.1.0 (WP04)
+- [x] T020 Run schema generation and commit new JSON schemas (WP04)
+- [x] T021 Run full test suite and validate all gates pass (WP04)
 
 **Success criteria**: validate_event() dispatches for all 3 new types, package imports work, both version surfaces read "3.1.0", schema generation has zero drift, full pytest + mypy pass.
 
