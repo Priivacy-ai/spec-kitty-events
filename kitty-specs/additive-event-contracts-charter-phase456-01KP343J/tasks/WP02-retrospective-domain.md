@@ -20,6 +20,8 @@ subtasks:
 - T008
 - T009
 - T010
+agent: "claude:opus:implementer:implementer"
+shell_pid: "99465"
 history:
 - date: '2026-04-13'
   author: spec-kitty.tasks
@@ -289,3 +291,7 @@ def _make_skipped(**overrides):
 - Verify `ProvenanceRef` import comes from `spec_kitty_events.dossier`, not from `spec_kitty_events`
 - Verify no `reduce_` function exists in the module
 - Verify unit tests cover both models' valid construction, field enforcement, immutability, extra-forbid, and Literal validation
+
+## Activity Log
+
+- 2026-04-13T10:18:55Z – claude:opus:implementer:implementer – shell_pid=99465 – Started implementation via action command
