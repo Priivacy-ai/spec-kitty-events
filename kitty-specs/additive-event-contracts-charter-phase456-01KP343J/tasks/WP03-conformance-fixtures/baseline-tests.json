@@ -1,0 +1,12 @@
+{
+  "wp_id": "WP03",
+  "captured_at": "2026-04-13T10:23:58Z",
+  "base_branch": "main",
+  "base_commit": "ff9cf03cc66f37d436bd02b39787143b58b5667e",
+  "test_runner": "pytest",
+  "total": 1531,
+  "passed": 1531,
+  "failed": 0,
+  "skipped": 0,
+  "failures": []
+}
