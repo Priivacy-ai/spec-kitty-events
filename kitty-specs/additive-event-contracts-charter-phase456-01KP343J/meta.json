@@ -1,12 +1,12 @@
 {
   "created_at": "2026-04-13T09:52:31.807817+00:00",
   "friendly_name": "Additive Event Contracts for Charter Phase 4/5/6",
-  "source_description": "Smallest additive contract tranche for charter epic #461: profile invocation, retrospective, and conditional glossary summary events",
-  "vcs": "git",
   "mission_id": "01KP343JBG2V7WSWSDJ0HD76BR",
-  "mission_number": null,
+  "mission_number": 1,
   "mission_slug": "additive-event-contracts-charter-phase456-01KP343J",
   "mission_type": "software-dev",
   "slug": "additive-event-contracts-charter-phase456-01KP343J",
-  "target_branch": "main"
+  "source_description": "Smallest additive contract tranche for charter epic #461: profile invocation, retrospective, and conditional glossary summary events",
+  "target_branch": "main",
+  "vcs": "git"
 }

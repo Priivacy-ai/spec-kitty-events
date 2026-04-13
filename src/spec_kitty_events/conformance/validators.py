@@ -96,6 +96,13 @@ from spec_kitty_events.sync import (
     SyncReplayCompletedPayload,
     ExternalReferenceLinkedPayload,
 )
+from spec_kitty_events.profile_invocation import (
+    ProfileInvocationStartedPayload,
+)
+from spec_kitty_events.retrospective import (
+    RetrospectiveCompletedPayload,
+    RetrospectiveSkippedPayload,
+)
 
 
 @dataclass(frozen=True)
@@ -203,6 +210,11 @@ _EVENT_TYPE_TO_MODEL: Dict[str, Type[Any]] = {
     "SyncDeadLettered": SyncDeadLetteredPayload,
     "SyncReplayCompleted": SyncReplayCompletedPayload,
     "ExternalReferenceLinked": ExternalReferenceLinkedPayload,
+    # Profile invocation contracts (3.1.0)
+    "ProfileInvocationStarted": ProfileInvocationStartedPayload,
+    # Retrospective contracts (3.1.0)
+    "RetrospectiveCompleted": RetrospectiveCompletedPayload,
+    "RetrospectiveSkipped": RetrospectiveSkippedPayload,
 }
 
 # Event type to JSON Schema name mapping (used with load_schema())
@@ -278,6 +290,11 @@ _EVENT_TYPE_TO_SCHEMA: Dict[str, str] = {
     "SyncDeadLettered": "sync_dead_lettered_payload",
     "SyncReplayCompleted": "sync_replay_completed_payload",
     "ExternalReferenceLinked": "external_reference_linked_payload",
+    # Profile invocation contracts (3.1.0)
+    "ProfileInvocationStarted": "profile_invocation_started_payload",
+    # Retrospective contracts (3.1.0)
+    "RetrospectiveCompleted": "retrospective_completed_payload",
+    "RetrospectiveSkipped": "retrospective_skipped_payload",
 }
 
 

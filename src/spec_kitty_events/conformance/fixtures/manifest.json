@@ -1151,6 +1151,78 @@
       "expected_result": "valid",
       "notes": "Golden sync reducer output for mixed-connector-sync-lifecycle.jsonl \u2014 10 events, 5 unique delivery pairs",
       "min_version": "2.7.0"
+    },
+    {
+      "id": "profile-invocation-started-valid-minimal",
+      "path": "profile_invocation/valid/profile_invocation_started_minimal.json",
+      "expected_result": "valid",
+      "event_type": "ProfileInvocationStarted",
+      "notes": "Valid ProfileInvocationStartedPayload with required fields only",
+      "min_version": "3.1.0"
+    },
+    {
+      "id": "profile-invocation-started-valid-full",
+      "path": "profile_invocation/valid/profile_invocation_started_full.json",
+      "expected_result": "valid",
+      "event_type": "ProfileInvocationStarted",
+      "notes": "Valid ProfileInvocationStartedPayload with all optional fields",
+      "min_version": "3.1.0"
+    },
+    {
+      "id": "profile-invocation-started-invalid-missing-slug",
+      "path": "profile_invocation/invalid/profile_invocation_started_missing_profile_slug.json",
+      "expected_result": "invalid",
+      "event_type": "ProfileInvocationStarted",
+      "notes": "Missing required profile_slug field",
+      "min_version": "3.1.0"
+    },
+    {
+      "id": "profile-invocation-started-invalid-empty-action",
+      "path": "profile_invocation/invalid/profile_invocation_started_empty_action.json",
+      "expected_result": "invalid",
+      "event_type": "ProfileInvocationStarted",
+      "notes": "Empty action string violates min_length=1",
+      "min_version": "3.1.0"
+    },
+    {
+      "id": "retrospective-completed-valid-minimal",
+      "path": "retrospective/valid/retrospective_completed_minimal.json",
+      "expected_result": "valid",
+      "event_type": "RetrospectiveCompleted",
+      "notes": "Valid RetrospectiveCompletedPayload without artifact_ref",
+      "min_version": "3.1.0"
+    },
+    {
+      "id": "retrospective-completed-valid-with-artifact",
+      "path": "retrospective/valid/retrospective_completed_with_artifact.json",
+      "expected_result": "valid",
+      "event_type": "RetrospectiveCompleted",
+      "notes": "Valid RetrospectiveCompletedPayload with ProvenanceRef artifact",
+      "min_version": "3.1.0"
+    },
+    {
+      "id": "retrospective-skipped-valid",
+      "path": "retrospective/valid/retrospective_skipped.json",
+      "expected_result": "valid",
+      "event_type": "RetrospectiveSkipped",
+      "notes": "Valid RetrospectiveSkippedPayload with skip reason",
+      "min_version": "3.1.0"
+    },
+    {
+      "id": "retrospective-completed-invalid-missing-actor",
+      "path": "retrospective/invalid/retrospective_completed_missing_actor.json",
+      "expected_result": "invalid",
+      "event_type": "RetrospectiveCompleted",
+      "notes": "Missing required actor field",
+      "min_version": "3.1.0"
+    },
+    {
+      "id": "retrospective-skipped-invalid-empty-reason",
+      "path": "retrospective/invalid/retrospective_skipped_empty_reason.json",
+      "expected_result": "invalid",
+      "event_type": "RetrospectiveSkipped",
+      "notes": "Empty skip_reason violates min_length=1",
+      "min_version": "3.1.0"
     }
   ]
 }

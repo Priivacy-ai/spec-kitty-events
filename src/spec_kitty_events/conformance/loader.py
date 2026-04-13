@@ -19,6 +19,7 @@ _VALID_CATEGORIES = frozenset({
     "collaboration", "glossary", "mission_next",
     "dossier", "mission_audit", "decisionpoint",
     "connector", "sync",
+    "profile_invocation", "retrospective",  # 3.1.0
 })
 
 # Replay stream fixture type sentinel
@@ -50,7 +51,8 @@ def load_fixtures(category: str) -> List[FixtureCase]:
     Args:
         category: One of ``"events"``, ``"lane_mapping"``, ``"edge_cases"``,
             ``"collaboration"``, ``"glossary"``, ``"mission_next"``, ``"dossier"``,
-            ``"mission_audit"``, ``"decisionpoint"``, ``"connector"``, or ``"sync"``.
+            ``"mission_audit"``, ``"decisionpoint"``, ``"connector"``, ``"sync"``,
+            ``"profile_invocation"``, or ``"retrospective"``.
 
     Returns:
         List of :class:`FixtureCase` instances with payloads loaded from JSON.

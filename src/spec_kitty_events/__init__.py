@@ -8,7 +8,7 @@ This release publishes the fail-closed cutover surface for:
 - authoritative artifact-driven compatibility gating via ``spec_kitty_events.cutover``
 """
 
-__version__ = "3.0.0"
+__version__ = "3.1.0"
 
 from spec_kitty_events.cutover import (
     CUTOVER_ARTIFACT,
@@ -344,6 +344,27 @@ from spec_kitty_events.sync import (
     reduce_sync_events as reduce_sync_events,
 )
 
+# Profile invocation contracts (3.1.0)
+from spec_kitty_events.profile_invocation import (
+    PROFILE_INVOCATION_SCHEMA_VERSION as PROFILE_INVOCATION_SCHEMA_VERSION,
+    PROFILE_INVOCATION_STARTED as PROFILE_INVOCATION_STARTED,
+    PROFILE_INVOCATION_COMPLETED as PROFILE_INVOCATION_COMPLETED,
+    PROFILE_INVOCATION_FAILED as PROFILE_INVOCATION_FAILED,
+    PROFILE_INVOCATION_EVENT_TYPES as PROFILE_INVOCATION_EVENT_TYPES,
+    ProfileInvocationStartedPayload as ProfileInvocationStartedPayload,
+)
+
+# Retrospective contracts (3.1.0)
+from spec_kitty_events.retrospective import (
+    RETROSPECTIVE_SCHEMA_VERSION as RETROSPECTIVE_SCHEMA_VERSION,
+    RETROSPECTIVE_COMPLETED as RETROSPECTIVE_COMPLETED,
+    RETROSPECTIVE_SKIPPED as RETROSPECTIVE_SKIPPED,
+    RETROSPECTIVE_EVENT_TYPES as RETROSPECTIVE_EVENT_TYPES,
+    RetrospectiveCompletedPayload as RetrospectiveCompletedPayload,
+    RetrospectiveSkippedPayload as RetrospectiveSkippedPayload,
+    TriggerSourceT as TriggerSourceT,
+)
+
 # Backward-compatible dossier aliases without the Payload suffix.
 # Older consumers import these names directly.
 MissionDossierArtifactIndexed = MissionDossierArtifactIndexedPayload
@@ -641,4 +662,19 @@ __all__ = [
     "ExternalReferenceLinkedPayload",
     "ReducedSyncState",
     "reduce_sync_events",
+    # Profile invocation contracts (3.1.0)
+    "PROFILE_INVOCATION_SCHEMA_VERSION",
+    "PROFILE_INVOCATION_STARTED",
+    "PROFILE_INVOCATION_COMPLETED",
+    "PROFILE_INVOCATION_FAILED",
+    "PROFILE_INVOCATION_EVENT_TYPES",
+    "ProfileInvocationStartedPayload",
+    # Retrospective contracts (3.1.0)
+    "RETROSPECTIVE_SCHEMA_VERSION",
+    "RETROSPECTIVE_COMPLETED",
+    "RETROSPECTIVE_SKIPPED",
+    "RETROSPECTIVE_EVENT_TYPES",
+    "RetrospectiveCompletedPayload",
+    "RetrospectiveSkippedPayload",
+    "TriggerSourceT",
 ]

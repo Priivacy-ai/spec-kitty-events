@@ -112,6 +112,13 @@ from spec_kitty_events.sync import (
     SyncReplayCompletedPayload,
     ExternalReferenceLinkedPayload,
 )
+from spec_kitty_events.profile_invocation import (
+    ProfileInvocationStartedPayload,
+)
+from spec_kitty_events.retrospective import (
+    RetrospectiveCompletedPayload,
+    RetrospectiveSkippedPayload,
+)
 
 
 # Schema directory (same directory as this script)
@@ -204,6 +211,11 @@ PYDANTIC_MODELS: List[tuple[str, Type[BaseModel]]] = [
     ("sync_dead_lettered_payload", SyncDeadLetteredPayload),
     ("sync_replay_completed_payload", SyncReplayCompletedPayload),
     ("external_reference_linked_payload", ExternalReferenceLinkedPayload),
+    # Profile invocation contracts (3.1.0)
+    ("profile_invocation_started_payload", ProfileInvocationStartedPayload),
+    # Retrospective contracts (3.1.0)
+    ("retrospective_completed_payload", RetrospectiveCompletedPayload),
+    ("retrospective_skipped_payload", RetrospectiveSkippedPayload),
 ]
 
 # Enums (use TypeAdapter)
