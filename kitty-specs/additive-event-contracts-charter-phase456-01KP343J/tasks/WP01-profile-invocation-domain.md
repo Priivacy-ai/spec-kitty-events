@@ -21,7 +21,8 @@ subtasks:
 - T003
 - T004
 - T005
-shell_pid: '95999'
+shell_pid: "95999"
+agent: "claude:opus:implementer:implementer"
 history:
 - date: '2026-04-13'
   author: spec-kitty.tasks
@@ -262,3 +263,7 @@ def _make_payload(**overrides):
 - Verify all `str` fields have `min_length=1`
 - Verify imports come from `spec_kitty_events.mission_next`, not from `spec_kitty_events`
 - Verify unit tests cover valid construction, field enforcement, immutability, extra-forbid, and reserved constants
+
+## Activity Log
+
+- 2026-04-13T10:13:01Z – claude:opus:implementer:implementer – shell_pid=95999 – Assigned agent via action command
