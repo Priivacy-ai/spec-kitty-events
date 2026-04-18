@@ -8,7 +8,7 @@ This release publishes the fail-closed cutover surface for:
 - authoritative artifact-driven compatibility gating via ``spec_kitty_events.cutover``
 """
 
-__version__ = "3.1.0"
+__version__ = "3.2.0"
 
 from spec_kitty_events.cutover import (
     CUTOVER_ARTIFACT,

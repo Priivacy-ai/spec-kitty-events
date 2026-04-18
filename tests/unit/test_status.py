@@ -1229,3 +1229,141 @@ class TestReduceStatusEvents:
         ]
         result = reduce_status_events(events)
         assert result.last_processed_event_id == "01HV0000000000000000000002"
+
+
+# ---------------------------------------------------------------------------
+# Section 6: Force=True bypasses from_lane mismatch (spec-kitty-saas#86)
+# ---------------------------------------------------------------------------
+
+
+class TestReduceStatusEventsForceBypass:
+    """Force=True must bypass the from_lane-mismatch check.
+
+    Historical/bootstrap migration events carry mid-lifecycle from_lane with
+    force=true and a non-empty reason (enforced by StatusTransitionPayload).
+    The reducer treats these as valid state-establishing transitions.
+    """
+
+    def test_force_true_bypasses_from_lane_mismatch(self) -> None:
+        """Standalone forced event with mid-lifecycle from_lane emits no anomaly."""
+        base_t = datetime(2026, 1, 1, tzinfo=timezone.utc)
+        # No prior state for WP01. Forced event claims from_lane=IN_PROGRESS.
+        e = _make_event(
+            "01HV0000000000000000000F01",
+            "WP01",
+            Lane.IN_PROGRESS,
+            Lane.FOR_REVIEW,
+            1,
+            timestamp=base_t,
+            force=True,
+            reason="historical_frontmatter_to_jsonl:v1",
+        )
+        result = reduce_status_events([e])
+        assert result.anomalies == []
+        assert result.wp_states["WP01"].current_lane == Lane.FOR_REVIEW
+
+    def test_force_false_still_flags_mismatch(self) -> None:
+        """Same scenario without force still emits a from_lane_mismatch anomaly."""
+        base_t = datetime(2026, 1, 1, tzinfo=timezone.utc)
+        e = _make_event(
+            "01HV0000000000000000000F02",
+            "WP01",
+            Lane.IN_PROGRESS,
+            Lane.FOR_REVIEW,
+            1,
+            timestamp=base_t,
+        )
+        result = reduce_status_events([e])
+        assert len(result.anomalies) == 1
+        assert "from_lane mismatch" in result.anomalies[0].reason
+
+    @pytest.mark.parametrize(
+        "reason",
+        [
+            "historical migration",
+            "canonical bootstrap",
+            "historical_frontmatter_to_jsonl:v1",
+            "bootstrapped from legacy state",
+            "bootstrap from frontmatter lane in_progress before move-task transition",
+        ],
+    )
+    def test_force_true_accepts_known_bootstrap_reasons(self, reason: str) -> None:
+        """All five bootstrap reasons observed in the field project cleanly."""
+        base_t = datetime(2026, 1, 1, tzinfo=timezone.utc)
+        e = _make_event(
+            "01HV0000000000000000000F03",
+            "WP01",
+            Lane.PLANNED,
+            Lane.IN_PROGRESS,
+            1,
+            timestamp=base_t,
+            force=True,
+            reason=reason,
+        )
+        result = reduce_status_events([e])
+        assert result.anomalies == []
+
+
+# ---------------------------------------------------------------------------
+# Section 7: Structured actor support (spec-kitty-saas#86 R3)
+# ---------------------------------------------------------------------------
+
+
+class TestStatusTransitionPayloadActor:
+    """StatusTransitionPayload.actor accepts string or dict with actor_label fallback."""
+
+    def test_actor_accepts_string(self) -> None:
+        p = StatusTransitionPayload(
+            mission_slug="m",
+            wp_id="WP01",
+            from_lane=None,
+            to_lane=Lane.PLANNED,
+            actor="claude",
+            execution_mode=ExecutionMode.WORKTREE,
+        )
+        assert p.actor == "claude"
+        assert p.actor_label == "claude"
+
+    def test_actor_accepts_dict_and_resolves_label(self) -> None:
+        p = StatusTransitionPayload(
+            mission_slug="m",
+            wp_id="WP01",
+            from_lane=None,
+            to_lane=Lane.PLANNED,
+            actor={"role": "implementer", "profile": "implementer", "tool": "claude-code"},
+            execution_mode=ExecutionMode.WORKTREE,
+        )
+        assert p.actor_label == "implementer"
+
+    def test_actor_label_prefers_profile_over_role(self) -> None:
+        p = StatusTransitionPayload(
+            mission_slug="m",
+            wp_id="WP01",
+            from_lane=None,
+            to_lane=Lane.PLANNED,
+            actor={"role": "a", "profile": "b"},
+            execution_mode=ExecutionMode.WORKTREE,
+        )
+        assert p.actor_label == "b"
+
+    def test_actor_label_fallback_to_first_string_value(self) -> None:
+        p = StatusTransitionPayload(
+            mission_slug="m",
+            wp_id="WP01",
+            from_lane=None,
+            to_lane=Lane.PLANNED,
+            actor={"tool": "cli", "model": "claude-sonnet"},
+            execution_mode=ExecutionMode.WORKTREE,
+        )
+        assert p.actor_label in {"cli", "claude-sonnet"}
+
+    def test_empty_dict_actor_rejected(self) -> None:
+        with pytest.raises(pydantic.ValidationError):
+            StatusTransitionPayload(
+                mission_slug="m",
+                wp_id="WP01",
+                from_lane=None,
+                to_lane=Lane.PLANNED,
+                actor={},
+                execution_mode=ExecutionMode.WORKTREE,
+            )
