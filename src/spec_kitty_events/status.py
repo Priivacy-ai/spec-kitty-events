@@ -1,14 +1,17 @@
 """Status state model contracts for work-package lane transitions."""
 
+import logging
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
 from types import MappingProxyType
-from typing import Dict, FrozenSet, List, Literal, Mapping, Optional, Sequence, Set, Tuple
+from typing import Any, Dict, FrozenSet, List, Literal, Mapping, Optional, Sequence, Set, Tuple, Union
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from spec_kitty_events.models import Event, SpecKittyEventsError, ValidationError
+
+logger = logging.getLogger(__name__)
 
 
 class Lane(str, Enum):
@@ -210,7 +213,15 @@ class StatusTransitionPayload(BaseModel):
         None, description="Lane the WP is transitioning from (None for initial)"
     )
     to_lane: Lane = Field(..., description="Lane the WP is transitioning to")
-    actor: str = Field(..., min_length=1, description="Who initiated the transition")
+    actor: Union[str, Dict[str, Any]] = Field(
+        ...,
+        description=(
+            "Who initiated the transition. Accepts either a plain string identifier "
+            "(e.g. 'claude', 'user', 'migration') or a structured dict carrying "
+            "richer audit fields such as {role, profile, tool, model}. Use "
+            "``actor_label`` for a canonical string form."
+        ),
+    )
     force: bool = Field(False, description="Whether this is a forced transition")
     reason: Optional[str] = Field(
         None, description="Reason for the transition (required when force=True)"
@@ -234,6 +245,43 @@ class StatusTransitionPayload(BaseModel):
         if isinstance(v, str) and v in LANE_ALIASES:
             return LANE_ALIASES[v].value
         return v
+
+    @field_validator("actor", mode="after")
+    @classmethod
+    def _validate_actor(cls, v):
+        """Ensure actor is a non-empty string or non-empty dict."""
+        if isinstance(v, str):
+            if not v.strip():
+                raise ValueError("actor string must be non-empty")
+            return v
+        if isinstance(v, dict):
+            if not v:
+                raise ValueError("actor dict must be non-empty")
+            return v
+        raise ValueError("actor must be a string or dict")
+
+    @property
+    def actor_label(self) -> str:
+        """Canonical string form of ``actor`` for reducers, logs, and display.
+
+        Returns the string itself if ``actor`` is a string. For dict actors,
+        prefers ``profile`` then ``role`` then ``display_name`` then ``actor_id``
+        then the first non-empty string value, falling back to ``"unknown"``.
+
+        Intentionally a plain ``@property`` rather than ``@computed_field`` so
+        that the derived value is not round-tripped through ``model_dump()``
+        (which would conflict with ``extra="forbid"`` on reload).
+        """
+        if isinstance(self.actor, str):
+            return self.actor
+        for key in ("profile", "role", "display_name", "actor_id"):
+            value = self.actor.get(key)
+            if isinstance(value, str) and value:
+                return value
+        for value in self.actor.values():
+            if isinstance(value, str) and value:
+                return value
+        return "unknown"
 
     @model_validator(mode="after")
     def _check_business_rules(self) -> "StatusTransitionPayload":
@@ -530,19 +578,34 @@ def reduce_status_events(events: Sequence[Event]) -> ReducedStatus:
             # Check from_lane matches state at group start
             expected_lane = snapped.current_lane if snapped else None
             if payload.from_lane != expected_lane:
-                anomalies.append(
-                    TransitionAnomaly(
-                        event_id=event.event_id,
-                        wp_id=wp_id,
-                        from_lane=payload.from_lane,
-                        to_lane=payload.to_lane,
-                        reason=(
-                            f"from_lane mismatch: expected {expected_lane}, "
-                            f"got {payload.from_lane}"
-                        ),
+                if payload.force:
+                    # Historical/bootstrap migration events (e.g. frontmatter-to-JSONL
+                    # backfill) legitimately carry mid-lifecycle from_lane values.
+                    # StatusTransitionPayload requires a non-empty reason when
+                    # force=true (see validator below), which provides the audit trail.
+                    logger.warning(
+                        "forced transition bypassing from_lane mismatch: "
+                        "wp=%s event=%s expected=%s got=%s reason=%s",
+                        wp_id,
+                        event.event_id,
+                        expected_lane,
+                        payload.from_lane,
+                        payload.reason,
                     )
-                )
-                continue
+                else:
+                    anomalies.append(
+                        TransitionAnomaly(
+                            event_id=event.event_id,
+                            wp_id=wp_id,
+                            from_lane=payload.from_lane,
+                            to_lane=payload.to_lane,
+                            reason=(
+                                f"from_lane mismatch: expected {expected_lane}, "
+                                f"got {payload.from_lane}"
+                            ),
+                        )
+                    )
+                    continue
 
             # Validate transition
             validation = validate_transition(payload)

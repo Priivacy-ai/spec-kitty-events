@@ -181,10 +181,17 @@
   "description": "Payload for a WPStatusChanged event describing a lane transition.",
   "properties": {
     "actor": {
-      "description": "Who initiated the transition",
-      "minLength": 1,
-      "title": "Actor",
-      "type": "string"
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "additionalProperties": true,
+          "type": "object"
+        }
+      ],
+      "description": "Who initiated the transition. Accepts either a plain string identifier (e.g. 'claude', 'user', 'migration') or a structured dict carrying richer audit fields such as {role, profile, tool, model}. Use ``actor_label`` for a canonical string form.",
+      "title": "Actor"
     },
     "evidence": {
       "anyOf": [
