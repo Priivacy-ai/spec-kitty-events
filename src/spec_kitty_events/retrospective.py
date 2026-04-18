@@ -37,6 +37,20 @@ TriggerSourceT = Literal["runtime", "operator", "policy"]
 # ── Section 4: Payload Models ────────────────────────────────────────────────
 
 
+def _assert_iso8601_timestamp(value: object) -> object:
+    """Validate an ISO 8601 timestamp across supported Python runtimes.
+
+    Python 3.10's ``datetime.fromisoformat`` rejects a trailing ``Z`` even
+    though the fixtures and contract use the RFC 3339 UTC form. Normalize that
+    case to ``+00:00`` before parsing.
+    """
+
+    if isinstance(value, str):
+        normalized = f"{value[:-1]}+00:00" if value.endswith("Z") else value
+        datetime.fromisoformat(normalized)
+    return value
+
+
 class RetrospectiveCompletedPayload(BaseModel):
     """Payload for RetrospectiveCompleted events.
 
@@ -60,9 +74,7 @@ class RetrospectiveCompletedPayload(BaseModel):
     @field_validator("completed_at", mode="before")
     @classmethod
     def _validate_completed_at_iso8601(cls, v: object) -> object:
-        if isinstance(v, str):
-            datetime.fromisoformat(v)
-        return v
+        return _assert_iso8601_timestamp(v)
 
 
 class RetrospectiveSkippedPayload(BaseModel):
@@ -88,6 +100,4 @@ class RetrospectiveSkippedPayload(BaseModel):
     @field_validator("skipped_at", mode="before")
     @classmethod
     def _validate_skipped_at_iso8601(cls, v: object) -> object:
-        if isinstance(v, str):
-            datetime.fromisoformat(v)
-        return v
+        return _assert_iso8601_timestamp(v)
