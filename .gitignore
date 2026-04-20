@@ -66,3 +66,8 @@ uv.lock
 .kittify/derived/
 .kittify/runtime/
 .kittify/.migration-backup/
+.kittify/charter/context-state.json
+.kittify/charter/directives.yaml
+.kittify/charter/governance.yaml
+.kittify/charter/metadata.yaml
+.kittify/charter/references.yaml
