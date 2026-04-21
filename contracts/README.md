@@ -101,3 +101,53 @@ kitty-specs/010-mission-audit-lifecycle-contracts/contracts/
 
 See [`kitty-specs/010-mission-audit-lifecycle-contracts/`](../kitty-specs/010-mission-audit-lifecycle-contracts/)
 for the full specification, plan, and task breakdown.
+
+---
+
+## Teamspace Projection Inputs (2026-04-21)
+
+The Private Teamspace / shared Teamspace work does **not** add team-routing state
+to the canonical event envelope in `spec-kitty-events`.
+
+### Ownership Boundary
+
+The canonical envelope remains build-scoped and repository/project-scoped:
+
+| Concern | Canonical owner |
+|---|---|
+| `build_id` checkout identity | event envelope |
+| `node_id` causal emitter identity | event envelope |
+| `project_uuid` / `project_slug` | event envelope |
+| Private-vs-team routing, repository sharing, approval, disconnect | host product layer (`spec-kitty`, `spec-kitty-saas`) |
+
+The important invariant for Teamspace is that `build_id` stays the only canonical
+build identity. Team routing is intentionally **not** part of the shared contract.
+
+### Mission Progress
+
+For Teamspace v1, mission progress percentage is derived from canonical
+work-package lane data already present in the shared contract:
+
+- `WPStatusChanged` / status-transition payloads carry `from_lane`, `to_lane`,
+  `mission_slug`, and `wp_id`.
+- Consumers are expected to compute mission progress from the live distribution
+  of work-package lanes rather than wait for a separate "progress percentage"
+  event.
+
+### Build Presentation State Inputs
+
+For Teamspace v1, the shared contract does **not** mint SaaS-specific states such
+as `private`, `shared`, or `disconnected`, and it does not mint a new
+`merged_local_only` event family.
+
+Instead, consumers combine:
+
+- canonical event-envelope `build_id`
+- host-owned build lifecycle signals (`BuildRegistered`, `BuildHeartbeat`, sync status)
+- recent mission completion derived from work-package transitions
+
+to classify surfaced Teamspace rows such as `active`, `recently_completed`, or
+`merged_local_only`.
+
+This keeps the reusable event contract free of team-boundary policy while still
+giving hosts enough canonical inputs to build the Teamspace projection.
