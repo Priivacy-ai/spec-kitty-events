@@ -87,14 +87,35 @@ class MissionCreatedPayload(BaseModel):
 
     model_config = ConfigDict(frozen=True, extra="forbid")
 
+    mission_id: Optional[str] = Field(
+        None, min_length=1, description="Canonical machine-facing mission identity (ULID)"
+    )
     mission_slug: str = Field(
         ..., min_length=1, description="Canonical mission slug"
     )
-    mission_number: int = Field(
+    mission_number: Optional[int] = Field(
         ..., ge=1, description="Canonical mission number"
     )
     mission_type: str = Field(
         ..., min_length=1, description="Canonical mission workflow/template type"
+    )
+    target_branch: str = Field(
+        ..., min_length=1, description="Target branch for the mission planning artifacts"
+    )
+    wp_count: int = Field(
+        ..., ge=0, description="Work-package count at mission creation time"
+    )
+    friendly_name: str = Field(
+        ..., min_length=1, description="Human-friendly mission title"
+    )
+    purpose_tldr: str = Field(
+        ..., min_length=1, description="One-line stakeholder-facing mission summary"
+    )
+    purpose_context: str = Field(
+        ..., min_length=1, description="Short stakeholder-facing context paragraph"
+    )
+    created_at: Optional[str] = Field(
+        None, min_length=1, description="Mission creation timestamp"
     )
 
 

@@ -35,6 +35,23 @@ from spec_kitty_events.models import Event
 _PROJECT_UUID = uuid.UUID("12345678-1234-5678-1234-567812345678")
 
 
+def _mission_created_payload(**overrides: object) -> MissionCreatedPayload:
+    """Return a valid MissionCreated payload for lifecycle contract tests."""
+    payload: dict[str, object] = {
+        "mission_id": "01KTESTMISSIONID0000000000",
+        "mission_slug": "mission-contract-cutover",
+        "mission_number": 14,
+        "mission_type": "software-dev",
+        "target_branch": "main",
+        "wp_count": 3,
+        "friendly_name": "Mission Contract Cutover",
+        "purpose_tldr": "Keep mission creation readable to product leadership.",
+        "purpose_context": "This mission makes new work readable at a product and leadership level so teams can understand practical intent without parsing technical implementation detail.",
+    }
+    payload.update(overrides)
+    return MissionCreatedPayload(**payload)
+
+
 def _make_mission_event(
     event_type: str,
     payload: dict,  # type: ignore[type-arg]
@@ -283,21 +300,14 @@ class TestMissionCreatedPayload:
     """Tests for MissionCreatedPayload model."""
 
     def test_valid_construction(self) -> None:
-        payload = MissionCreatedPayload(
-            mission_slug="mission-contract-cutover",
-            mission_number=14,
-            mission_type="software-dev",
-        )
+        payload = _mission_created_payload()
         assert payload.mission_slug == "mission-contract-cutover"
         assert payload.mission_number == 14
         assert payload.mission_type == "software-dev"
 
     def test_missing_mission_type(self) -> None:
         with pytest.raises(PydanticValidationError):
-            MissionCreatedPayload(
-                mission_slug="mission-contract-cutover",
-                mission_number=14,
-            )  # type: ignore[call-arg]
+            _mission_created_payload(mission_type=None)  # type: ignore[arg-type]
 
 
 # ── MissionClosedPayload ─────────────────────────────────────────────────────
@@ -640,11 +650,7 @@ class TestReduceLifecycleEvents:
         events = [
             _make_mission_event(
                 MISSION_CREATED,
-                MissionCreatedPayload(
-                    mission_slug="mission-contract-cutover",
-                    mission_number=14,
-                    mission_type="software-dev",
-                ).model_dump(),
+                _mission_created_payload().model_dump(),
                 lamport_clock=1,
             ),
             _make_mission_event(
