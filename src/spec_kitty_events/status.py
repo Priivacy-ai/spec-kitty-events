@@ -248,7 +248,7 @@ class StatusTransitionPayload(BaseModel):
 
     @field_validator("actor", mode="after")
     @classmethod
-    def _validate_actor(cls, v):
+    def _validate_actor(cls, v: Union[str, Dict[str, Any]]) -> Union[str, Dict[str, Any]]:
         """Ensure actor is a non-empty string or non-empty dict."""
         if isinstance(v, str):
             if not v.strip():

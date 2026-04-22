@@ -1161,6 +1161,38 @@
       "min_version": "3.1.0"
     },
     {
+      "id": "analytics-token-usage-recorded-valid",
+      "path": "analytics/valid/token_usage_recorded_valid.json",
+      "expected_result": "valid",
+      "event_type": "TokenUsageRecorded",
+      "notes": "Valid TokenUsageRecordedPayload with runtime actor and cost accounting",
+      "min_version": "3.3.0"
+    },
+    {
+      "id": "analytics-diff-summary-recorded-valid",
+      "path": "analytics/valid/diff_summary_recorded_valid.json",
+      "expected_result": "valid",
+      "event_type": "DiffSummaryRecorded",
+      "notes": "Valid DiffSummaryRecordedPayload with mission, run, and work-package scope",
+      "min_version": "3.3.0"
+    },
+    {
+      "id": "analytics-token-usage-recorded-invalid-total",
+      "path": "analytics/invalid/token_usage_recorded_invalid_total.json",
+      "expected_result": "invalid",
+      "event_type": "TokenUsageRecorded",
+      "notes": "total_tokens must equal input_tokens + output_tokens",
+      "min_version": "3.3.0"
+    },
+    {
+      "id": "analytics-diff-summary-recorded-invalid-missing-base-ref",
+      "path": "analytics/invalid/diff_summary_recorded_missing_base_ref.json",
+      "expected_result": "invalid",
+      "event_type": "DiffSummaryRecorded",
+      "notes": "Missing required base_ref field",
+      "min_version": "3.3.0"
+    },
+    {
       "id": "profile-invocation-started-valid-full",
       "path": "profile_invocation/valid/profile_invocation_started_full.json",
       "expected_result": "valid",

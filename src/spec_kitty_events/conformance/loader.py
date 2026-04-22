@@ -17,6 +17,7 @@ _MANIFEST_PATH = _FIXTURES_DIR / "manifest.json"
 _VALID_CATEGORIES = frozenset({
     "events", "lane_mapping", "edge_cases",
     "collaboration", "glossary", "mission_next",
+    "analytics",
     "dossier", "mission_audit", "decisionpoint",
     "connector", "sync",
     "profile_invocation", "retrospective",  # 3.1.0
@@ -51,7 +52,7 @@ def load_fixtures(category: str) -> List[FixtureCase]:
     Args:
         category: One of ``"events"``, ``"lane_mapping"``, ``"edge_cases"``,
             ``"collaboration"``, ``"glossary"``, ``"mission_next"``, ``"dossier"``,
-            ``"mission_audit"``, ``"decisionpoint"``, ``"connector"``, ``"sync"``,
+            ``"analytics"``, ``"mission_audit"``, ``"decisionpoint"``, ``"connector"``, ``"sync"``,
             ``"profile_invocation"``, or ``"retrospective"``.
 
     Returns:

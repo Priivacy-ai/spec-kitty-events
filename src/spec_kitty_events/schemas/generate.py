@@ -71,6 +71,10 @@ from spec_kitty_events.mission_next import (
     DecisionInputAnsweredPayload,
     MissionRunCompletedPayload,
 )
+from spec_kitty_events.analytics import (
+    TokenUsageRecordedPayload,
+    DiffSummaryRecordedPayload,
+)
 from spec_kitty_events.dossier import (
     ArtifactIdentity,
     ContentHashRef,
@@ -174,6 +178,9 @@ PYDANTIC_MODELS: List[tuple[str, Type[BaseModel]]] = [
     ("decision_input_requested_payload", DecisionInputRequestedPayload),
     ("decision_input_answered_payload", DecisionInputAnsweredPayload),
     ("mission_run_completed_payload", MissionRunCompletedPayload),
+    # Analytics models (3.3.0)
+    ("token_usage_recorded_payload", TokenUsageRecordedPayload),
+    ("diff_summary_recorded_payload", DiffSummaryRecordedPayload),
     # Dossier event contract models
     ("artifact_identity", ArtifactIdentity),
     ("content_hash_ref", ContentHashRef),
