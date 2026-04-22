@@ -62,6 +62,10 @@ from spec_kitty_events.mission_next import (
     DecisionInputAnsweredPayload,
     MissionRunCompletedPayload,
 )
+from spec_kitty_events.analytics import (
+    TokenUsageRecordedPayload,
+    DiffSummaryRecordedPayload,
+)
 from spec_kitty_events.dossier import (
     MissionDossierArtifactIndexedPayload,
     MissionDossierArtifactMissingPayload,
@@ -181,6 +185,9 @@ _EVENT_TYPE_TO_MODEL: Dict[str, Type[Any]] = {
     "DecisionInputRequested": DecisionInputRequestedPayload,
     "DecisionInputAnswered": DecisionInputAnsweredPayload,
     "MissionRunCompleted": MissionRunCompletedPayload,
+    # Analytics contracts (3.3.0)
+    "TokenUsageRecorded": TokenUsageRecordedPayload,
+    "DiffSummaryRecorded": DiffSummaryRecordedPayload,
     # Dossier event contracts
     "MissionDossierArtifactIndexed": MissionDossierArtifactIndexedPayload,
     "MissionDossierArtifactMissing": MissionDossierArtifactMissingPayload,
@@ -261,6 +268,9 @@ _EVENT_TYPE_TO_SCHEMA: Dict[str, str] = {
     "DecisionInputRequested": "decision_input_requested_payload",
     "DecisionInputAnswered": "decision_input_answered_payload",
     "MissionRunCompleted": "mission_run_completed_payload",
+    # Analytics contracts (3.3.0)
+    "TokenUsageRecorded": "token_usage_recorded_payload",
+    "DiffSummaryRecorded": "diff_summary_recorded_payload",
     # Dossier event contracts
     "MissionDossierArtifactIndexed": "mission_dossier_artifact_indexed_payload",
     "MissionDossierArtifactMissing": "mission_dossier_artifact_missing_payload",

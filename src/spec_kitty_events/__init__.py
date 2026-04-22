@@ -8,7 +8,7 @@ This release publishes the fail-closed cutover surface for:
 - authoritative artifact-driven compatibility gating via ``spec_kitty_events.cutover``
 """
 
-__version__ = "3.2.0"
+__version__ = "3.3.0"
 
 from spec_kitty_events.cutover import (
     CUTOVER_ARTIFACT,
@@ -225,6 +225,15 @@ from spec_kitty_events.mission_next import (
     MissionNextAnomaly,
     ReducedMissionRunState,
     reduce_mission_next_events,
+)
+
+# Analytics event contracts
+from spec_kitty_events.analytics import (
+    TOKEN_USAGE_RECORDED,
+    DIFF_SUMMARY_RECORDED,
+    ANALYTICS_EVENT_TYPES,
+    TokenUsageRecordedPayload,
+    DiffSummaryRecordedPayload,
 )
 
 # Dossier event contracts (v2.4.0)

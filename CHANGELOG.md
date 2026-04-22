@@ -5,6 +5,24 @@ All notable changes to spec-kitty-events will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 3.3.0 — Mission Analytics Contracts (2026-04-22)
+
+### Added
+
+- Added canonical analytics payload contracts:
+  `TokenUsageRecordedPayload` and `DiffSummaryRecordedPayload`.
+- Added `TOKEN_USAGE_RECORDED`, `DIFF_SUMMARY_RECORDED`, and
+  `ANALYTICS_EVENT_TYPES` exports.
+- Added committed JSON schemas and conformance fixtures for the analytics
+  payload family.
+
+### Why
+
+- `spec-kitty` and `spec-kitty-saas` now have a canonical contract surface for
+  Mission Scorecard token/cost accounting and diff-summary reporting.
+- Downstream consumers no longer need repo-local telemetry schemas for these
+  analytics records.
+
 ## 2.9.0 — Approved Lane Contract (2026-04-04)
 
 ### Added
