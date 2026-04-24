@@ -114,6 +114,15 @@ exclude_lines = [
 ]
 
 [dependency-groups]
+# Default dev group picked up by `uv run pytest`.  The pytest `addopts` above
+# includes `--cov`, so pytest-cov must be available out of the box or fresh
+# `uv run pytest` invocations fail with a cryptic "unrecognized arguments".
+# Hypothesis is required by the V1 reducer property tests; jsonschema is
+# required by the conformance tests.  Keeping them all here means contributors
+# can run the full suite without remembering `--extra dev --extra conformance`.
 dev = [
     "pytest>=9.0.2",
+    "pytest-cov>=4.0.0",
+    "hypothesis>=6.0.0",
+    "jsonschema>=4.21.0,<5.0.0",
 ]
