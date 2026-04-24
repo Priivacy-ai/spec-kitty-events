@@ -860,6 +860,126 @@
       "min_version": "2.6.0"
     },
     {
+      "id": "decisionpoint-v1-opened-adr-valid",
+      "path": "decisionpoint/valid/v1_opened_adr.json",
+      "event_type": "DecisionPointOpened",
+      "expected_result": "valid",
+      "notes": "V1 ADR-origin Opened: full authority fields, rationale, alternatives, evidence_refs",
+      "min_version": "4.0.0"
+    },
+    {
+      "id": "decisionpoint-v1-opened-interview-valid",
+      "path": "decisionpoint/valid/v1_opened_interview.json",
+      "event_type": "DecisionPointOpened",
+      "expected_result": "valid",
+      "notes": "V1 interview-origin Opened: origin_flow=specify, question, options, input_key, step_id, actor_type=human",
+      "min_version": "4.0.0"
+    },
+    {
+      "id": "decisionpoint-v1-widened-valid",
+      "path": "decisionpoint/valid/v1_widened.json",
+      "event_type": "DecisionPointWidened",
+      "expected_result": "valid",
+      "notes": "V1 Widened: channel=slack, teamspace_ref, default_channel_ref, thread_ref with url, 2 invited_participants with teamspace_member_id",
+      "min_version": "4.0.0"
+    },
+    {
+      "id": "decisionpoint-v1-discussing-interview-valid",
+      "path": "decisionpoint/valid/v1_discussing_interview.json",
+      "event_type": "DecisionPointDiscussing",
+      "expected_result": "valid",
+      "notes": "V1 interview-origin Discussing: snapshot_kind=digest, 2 contributions, actor_type=service",
+      "min_version": "4.0.0"
+    },
+    {
+      "id": "decisionpoint-v1-resolved-interview-resolved-valid",
+      "path": "decisionpoint/valid/v1_resolved_interview_resolved.json",
+      "event_type": "DecisionPointResolved",
+      "expected_result": "valid",
+      "notes": "V1 interview Resolved: terminal_outcome=resolved, final_answer=oauth2, other_answer=false, summary with slack_extraction, 2 actual_participants, closure_message",
+      "min_version": "4.0.0"
+    },
+    {
+      "id": "decisionpoint-v1-resolved-interview-resolved-other-valid",
+      "path": "decisionpoint/valid/v1_resolved_interview_resolved_other.json",
+      "event_type": "DecisionPointResolved",
+      "expected_result": "valid",
+      "notes": "V1 interview Resolved: final_answer=hand-rolled SSO plugin, other_answer=true, summary.source=mission_owner_override",
+      "min_version": "4.0.0"
+    },
+    {
+      "id": "decisionpoint-v1-resolved-interview-deferred-valid",
+      "path": "decisionpoint/valid/v1_resolved_interview_deferred.json",
+      "event_type": "DecisionPointResolved",
+      "expected_result": "valid",
+      "notes": "V1 interview Resolved: terminal_outcome=deferred, rationale=need security review, no final_answer, no summary",
+      "min_version": "4.0.0"
+    },
+    {
+      "id": "decisionpoint-v1-resolved-interview-canceled-valid",
+      "path": "decisionpoint/valid/v1_resolved_interview_canceled.json",
+      "event_type": "DecisionPointResolved",
+      "expected_result": "valid",
+      "notes": "V1 interview Resolved: terminal_outcome=canceled, rationale=out of scope, no final_answer",
+      "min_version": "4.0.0"
+    },
+    {
+      "id": "decisionpoint-v1-resolved-interview-closed-locally-valid",
+      "path": "decisionpoint/valid/v1_resolved_interview_closed_locally.json",
+      "event_type": "DecisionPointResolved",
+      "expected_result": "valid",
+      "notes": "V1 interview Resolved: terminal_outcome=resolved, closed_locally_while_widened=true, summary.source=mission_owner_override, closure_message",
+      "min_version": "4.0.0"
+    },
+    {
+      "id": "decisionpoint-v1-participant-identity-external-refs-valid",
+      "path": "decisionpoint/valid/v1_participant_identity_with_external_refs.json",
+      "event_type": "DecisionPointWidened",
+      "expected_result": "valid",
+      "notes": "V1 Widened with ParticipantIdentity carrying all three external_refs (slack_user_id, slack_team_id, teamspace_member_id)",
+      "min_version": "4.0.0"
+    },
+    {
+      "id": "decisionpoint-v1-resolved-missing-terminal-outcome",
+      "path": "decisionpoint/invalid/v1_resolved_missing_terminal_outcome.json",
+      "event_type": "DecisionPointResolved",
+      "expected_result": "invalid",
+      "notes": "V1 interview Resolved missing terminal_outcome \u2014 required field; Pydantic must reject",
+      "min_version": "4.0.0"
+    },
+    {
+      "id": "decisionpoint-v1-widened-missing-thread-ref",
+      "path": "decisionpoint/invalid/v1_widened_missing_thread_ref.json",
+      "event_type": "DecisionPointWidened",
+      "expected_result": "invalid",
+      "notes": "V1 Widened missing thread_ref \u2014 required field; JSON Schema and Pydantic must reject",
+      "min_version": "4.0.0"
+    },
+    {
+      "id": "decisionpoint-v1-opened-interview-missing-origin-flow",
+      "path": "decisionpoint/invalid/v1_opened_interview_missing_origin_flow.json",
+      "event_type": "DecisionPointOpened",
+      "expected_result": "invalid",
+      "notes": "V1 interview Opened missing origin_flow \u2014 required field; Pydantic must reject",
+      "min_version": "4.0.0"
+    },
+    {
+      "id": "decisionpoint-v1-participant-identity-empty-external-refs",
+      "path": "decisionpoint/invalid/v1_participant_identity_empty_external_refs.json",
+      "event_type": "DecisionPointWidened",
+      "expected_result": "invalid",
+      "notes": "V1 Widened with ParticipantIdentity.external_refs={} \u2014 must set at least one of slack_user_id, slack_team_id, teamspace_member_id",
+      "min_version": "4.0.0"
+    },
+    {
+      "id": "decisionpoint-v1-resolved-interview-deferred-with-final-answer",
+      "path": "decisionpoint/invalid/v1_resolved_interview_deferred_with_final_answer.json",
+      "event_type": "DecisionPointResolved",
+      "expected_result": "invalid",
+      "notes": "V1 interview Resolved: terminal_outcome=deferred AND final_answer set \u2014 cross-field rule violation; Pydantic model_validator must reject",
+      "min_version": "4.0.0"
+    },
+    {
       "id": "decisionpoint-replay-full-lifecycle",
       "path": "decisionpoint/replay/decisionpoint_full_lifecycle.jsonl",
       "fixture_type": "replay_stream",
@@ -1271,6 +1391,60 @@
       "event_type": "RetrospectiveSkipped",
       "notes": "skipped_at is not valid ISO 8601",
       "min_version": "3.1.0"
+    },
+    {
+      "id": "decisionpoint-v1-replay-interview-local-only-resolved-output",
+      "path": "decisionpoint/replay/replay_interview_local_only_resolved_output.json",
+      "fixture_type": "reducer_output",
+      "event_type": "DecisionPointState",
+      "expected_result": "valid",
+      "notes": "Golden reducer output for replay_interview_local_only_resolved — V1 interview resolved locally",
+      "min_version": "4.0.0"
+    },
+    {
+      "id": "decisionpoint-v1-replay-interview-widened-resolved-output",
+      "path": "decisionpoint/replay/replay_interview_widened_resolved_output.json",
+      "fixture_type": "reducer_output",
+      "event_type": "DecisionPointState",
+      "expected_result": "valid",
+      "notes": "Golden reducer output for replay_interview_widened_resolved — V1 interview widened and resolved",
+      "min_version": "4.0.0"
+    },
+    {
+      "id": "decisionpoint-v1-replay-interview-widened-closed-locally-output",
+      "path": "decisionpoint/replay/replay_interview_widened_closed_locally_output.json",
+      "fixture_type": "reducer_output",
+      "event_type": "DecisionPointState",
+      "expected_result": "valid",
+      "notes": "Golden reducer output for replay_interview_widened_closed_locally — V1 interview closed locally while widened",
+      "min_version": "4.0.0"
+    },
+    {
+      "id": "decisionpoint-v1-replay-interview-deferred-output",
+      "path": "decisionpoint/replay/replay_interview_deferred_output.json",
+      "fixture_type": "reducer_output",
+      "event_type": "DecisionPointState",
+      "expected_result": "valid",
+      "notes": "Golden reducer output for replay_interview_deferred — V1 interview terminal_outcome=deferred",
+      "min_version": "4.0.0"
+    },
+    {
+      "id": "decisionpoint-v1-replay-interview-canceled-output",
+      "path": "decisionpoint/replay/replay_interview_canceled_output.json",
+      "fixture_type": "reducer_output",
+      "event_type": "DecisionPointState",
+      "expected_result": "valid",
+      "notes": "Golden reducer output for replay_interview_canceled — V1 interview terminal_outcome=canceled",
+      "min_version": "4.0.0"
+    },
+    {
+      "id": "decisionpoint-v1-replay-interview-resolved-other-output",
+      "path": "decisionpoint/replay/replay_interview_resolved_other_output.json",
+      "fixture_type": "reducer_output",
+      "event_type": "DecisionPointState",
+      "expected_result": "valid",
+      "notes": "Golden reducer output for replay_interview_resolved_other — V1 interview resolved with other_answer=true",
+      "min_version": "4.0.0"
     }
   ]
 }

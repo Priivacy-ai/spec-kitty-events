@@ -1,0 +1,70 @@
+{
+  "event_count": 14,
+  "last_event_id": "01KPWGTR2D336Z90C56E08SGP2",
+  "materialized_at": "2026-04-23T06:35:54.829461+00:00",
+  "mission_number": "2",
+  "mission_slug": "decision-moment-v1-contract-freeze-01KPWA0N",
+  "mission_type": "software-dev",
+  "summary": {
+    "approved": 0,
+    "blocked": 0,
+    "canceled": 0,
+    "claimed": 0,
+    "done": 7,
+    "for_review": 0,
+    "in_progress": 0,
+    "in_review": 0,
+    "planned": 0
+  },
+  "work_packages": {
+    "WP01": {
+      "actor": "user",
+      "force_count": 2,
+      "lane": "done",
+      "last_event_id": "01KPWGTE4EK9B3GEY01VM9GS06",
+      "last_transition_at": "2026-04-23T06:35:44.654775+00:00"
+    },
+    "WP02": {
+      "actor": "user",
+      "force_count": 2,
+      "lane": "done",
+      "last_event_id": "01KPWGTFVSDYSGF89HG1Y5HJN1",
+      "last_transition_at": "2026-04-23T06:35:46.425837+00:00"
+    },
+    "WP03": {
+      "actor": "user",
+      "force_count": 2,
+      "lane": "done",
+      "last_event_id": "01KPWGTHFWBJ1F3FKZ5JJV6BHY",
+      "last_transition_at": "2026-04-23T06:35:48.092101+00:00"
+    },
+    "WP04": {
+      "actor": "user",
+      "force_count": 2,
+      "lane": "done",
+      "last_event_id": "01KPWGTK2VNKV6XM9ZMBACJ7GC",
+      "last_transition_at": "2026-04-23T06:35:49.723494+00:00"
+    },
+    "WP05": {
+      "actor": "user",
+      "force_count": 2,
+      "lane": "done",
+      "last_event_id": "01KPWGTMSZCXDWZNVRF14HD09Y",
+      "last_transition_at": "2026-04-23T06:35:51.487629+00:00"
+    },
+    "WP06": {
+      "actor": "user",
+      "force_count": 2,
+      "lane": "done",
+      "last_event_id": "01KPWGTPE3FBSJVNZY2YAJGEF4",
+      "last_transition_at": "2026-04-23T06:35:53.155397+00:00"
+    },
+    "WP07": {
+      "actor": "user",
+      "force_count": 2,
+      "lane": "done",
+      "last_event_id": "01KPWGTR2D336Z90C56E08SGP2",
+      "last_transition_at": "2026-04-23T06:35:54.829461+00:00"
+    }
+  }
+}

@@ -1,0 +1,105 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DecisionPointResolvedPayload",
+  "description": "Payload for DecisionPointResolved. Discriminated union on origin_surface. Interview variant requires terminal_outcome and cross-field constraints on final_answer, rationale, and other_answer.",
+  "oneOf": [
+    { "$ref": "#/$defs/adr" },
+    { "$ref": "#/$defs/planning_interview" }
+  ],
+  "$defs": {
+    "adr": {
+      "type": "object",
+      "title": "DecisionPointResolvedAdrPayload",
+      "additionalProperties": false,
+      "required": [
+        "origin_surface",
+        "decision_point_id", "mission_id", "run_id", "mission_slug", "mission_type", "phase",
+        "actor_id", "actor_type", "authority_role",
+        "mission_owner_authority_flag", "mission_owner_authority_path",
+        "rationale", "alternatives_considered", "evidence_refs",
+        "state_entered_at", "recorded_at"
+      ],
+      "properties": {
+        "origin_surface": { "const": "adr" },
+        "decision_point_id": { "type": "string", "minLength": 1 },
+        "mission_id": { "type": "string", "minLength": 1 },
+        "run_id": { "type": "string", "minLength": 1 },
+        "mission_slug": { "type": "string", "minLength": 1 },
+        "mission_type": { "type": "string", "minLength": 1 },
+        "phase": { "type": "string", "minLength": 1 },
+        "actor_id": { "type": "string", "minLength": 1 },
+        "actor_type": { "enum": ["human", "llm", "service"] },
+        "authority_role": { "enum": ["mission_owner", "advisory", "informed"] },
+        "mission_owner_authority_flag": { "type": "boolean" },
+        "mission_owner_authority_path": { "type": "string" },
+        "rationale": { "type": "string", "minLength": 1 },
+        "alternatives_considered": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+        "evidence_refs": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+        "state_entered_at": { "type": "string", "format": "date-time" },
+        "recorded_at": { "type": "string", "format": "date-time" }
+      }
+    },
+    "planning_interview": {
+      "type": "object",
+      "title": "DecisionPointResolvedInterviewPayload",
+      "additionalProperties": false,
+      "required": [
+        "origin_surface",
+        "decision_point_id", "mission_id", "run_id", "mission_slug", "mission_type",
+        "terminal_outcome",
+        "resolved_by",
+        "state_entered_at", "recorded_at"
+      ],
+      "properties": {
+        "origin_surface": { "const": "planning_interview" },
+        "decision_point_id": { "type": "string", "minLength": 1 },
+        "mission_id": { "type": "string", "minLength": 1 },
+        "run_id": { "type": "string", "minLength": 1 },
+        "mission_slug": { "type": "string", "minLength": 1 },
+        "mission_type": { "type": "string", "minLength": 1 },
+        "terminal_outcome": { "enum": ["resolved", "deferred", "canceled"] },
+        "final_answer": { "type": "string" },
+        "other_answer": { "type": "boolean" },
+        "rationale": { "type": "string" },
+        "summary": { "$ref": "summary_block.schema.json" },
+        "actual_participants": {
+          "type": "array",
+          "items": { "$ref": "participant_identity_v4.schema.json" }
+        },
+        "resolved_by": { "type": "string", "minLength": 1 },
+        "closed_locally_while_widened": { "type": "boolean" },
+        "closure_message": { "$ref": "closure_message_ref.schema.json" },
+        "state_entered_at": { "type": "string", "format": "date-time" },
+        "recorded_at": { "type": "string", "format": "date-time" }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "terminal_outcome": { "const": "resolved" } }, "required": ["terminal_outcome"] },
+          "then": { "required": ["final_answer"], "properties": { "final_answer": { "type": "string", "minLength": 1 } } }
+        },
+        {
+          "if": { "properties": { "terminal_outcome": { "const": "deferred" } }, "required": ["terminal_outcome"] },
+          "then": {
+            "required": ["rationale"],
+            "properties": {
+              "rationale": { "type": "string", "minLength": 1 },
+              "final_answer": false,
+              "other_answer": { "const": false }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "terminal_outcome": { "const": "canceled" } }, "required": ["terminal_outcome"] },
+          "then": {
+            "required": ["rationale"],
+            "properties": {
+              "rationale": { "type": "string", "minLength": 1 },
+              "final_answer": false,
+              "other_answer": { "const": false }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

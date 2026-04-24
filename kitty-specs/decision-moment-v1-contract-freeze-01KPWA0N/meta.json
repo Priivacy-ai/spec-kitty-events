@@ -1,0 +1,12 @@
+{
+  "created_at": "2026-04-23T04:36:48.503015+00:00",
+  "friendly_name": "Decision Moment V1 Contract Freeze",
+  "mission_id": "01KPWA0N4DX047S3NX734YRFVW",
+  "mission_number": 2,
+  "mission_slug": "decision-moment-v1-contract-freeze-01KPWA0N",
+  "mission_type": "software-dev",
+  "slug": "decision-moment-v1-contract-freeze-01KPWA0N",
+  "source_description": "Freeze the canonical DecisionPoint event contract (v4.0.0) for interview-originated Decision Moment V1: interview-origin metadata on Opened, new Widened event, terminal_outcome on Resolved, structured summary, participant external_refs, and replay-safe conformance fixtures.",
+  "target_branch": "main",
+  "vcs": "git"
+}

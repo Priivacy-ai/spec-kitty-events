@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "SummaryBlock",
+  "description": "Structured summary carried on DecisionPointResolved. Source tracks provenance of the summary text.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["text", "source"],
+  "properties": {
+    "text": { "type": "string", "minLength": 1 },
+    "source": { "enum": ["slack_extraction", "manual", "mission_owner_override"] },
+    "extracted_at": { "type": "string", "format": "date-time" },
+    "candidate_answer": { "type": "string" }
+  }
+}

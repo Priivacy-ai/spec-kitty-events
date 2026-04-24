@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DecisionPointOpenedPayload",
+  "description": "Payload for DecisionPointOpened. Discriminated union on origin_surface.",
+  "oneOf": [
+    { "$ref": "#/$defs/adr" },
+    { "$ref": "#/$defs/planning_interview" }
+  ],
+  "$defs": {
+    "adr": {
+      "type": "object",
+      "title": "DecisionPointOpenedAdrPayload",
+      "additionalProperties": false,
+      "required": [
+        "origin_surface",
+        "decision_point_id", "mission_id", "run_id", "mission_slug", "mission_type", "phase",
+        "actor_id", "actor_type", "authority_role",
+        "mission_owner_authority_flag", "mission_owner_authority_path",
+        "rationale", "alternatives_considered", "evidence_refs",
+        "state_entered_at", "recorded_at"
+      ],
+      "properties": {
+        "origin_surface": { "const": "adr" },
+        "decision_point_id": { "type": "string", "minLength": 1 },
+        "mission_id": { "type": "string", "minLength": 1 },
+        "run_id": { "type": "string", "minLength": 1 },
+        "mission_slug": { "type": "string", "minLength": 1 },
+        "mission_type": { "type": "string", "minLength": 1 },
+        "phase": { "type": "string", "minLength": 1 },
+        "actor_id": { "type": "string", "minLength": 1 },
+        "actor_type": { "enum": ["human", "llm", "service"] },
+        "authority_role": { "enum": ["mission_owner", "advisory", "informed"] },
+        "mission_owner_authority_flag": { "type": "boolean" },
+        "mission_owner_authority_path": { "type": "string" },
+        "rationale": { "type": "string", "minLength": 1 },
+        "alternatives_considered": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+        "evidence_refs": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+        "state_entered_at": { "type": "string", "format": "date-time" },
+        "recorded_at": { "type": "string", "format": "date-time" }
+      }
+    },
+    "planning_interview": {
+      "type": "object",
+      "title": "DecisionPointOpenedInterviewPayload",
+      "additionalProperties": false,
+      "required": [
+        "origin_surface", "origin_flow",
+        "decision_point_id", "mission_id", "run_id", "mission_slug", "mission_type", "phase",
+        "question", "options", "input_key", "step_id",
+        "actor_id", "actor_type",
+        "state_entered_at", "recorded_at"
+      ],
+      "properties": {
+        "origin_surface": { "const": "planning_interview" },
+        "origin_flow": { "enum": ["charter", "specify", "plan"] },
+        "decision_point_id": { "type": "string", "minLength": 1 },
+        "mission_id": { "type": "string", "minLength": 1 },
+        "run_id": { "type": "string", "minLength": 1 },
+        "mission_slug": { "type": "string", "minLength": 1 },
+        "mission_type": { "type": "string", "minLength": 1 },
+        "phase": { "type": "string", "minLength": 1 },
+        "question": { "type": "string", "minLength": 1 },
+        "options": { "type": "array", "items": { "type": "string" } },
+        "input_key": { "type": "string", "minLength": 1 },
+        "step_id": { "type": "string", "minLength": 1 },
+        "actor_id": { "type": "string", "minLength": 1 },
+        "actor_type": { "enum": ["human", "llm", "service"] },
+        "state_entered_at": { "type": "string", "format": "date-time" },
+        "recorded_at": { "type": "string", "format": "date-time" }
+      }
+    }
+  }
+}

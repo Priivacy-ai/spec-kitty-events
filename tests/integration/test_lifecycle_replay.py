@@ -5,12 +5,17 @@ produces identical output whether events arrive incrementally or
 are replayed from scratch.
 """
 
+import itertools
+import json
+import pathlib
 import uuid
 from datetime import datetime, timedelta, timezone
 from typing import List
 
+import pytest
 from ulid import ULID
 
+from spec_kitty_events.decisionpoint import reduce_decision_point_events
 from spec_kitty_events.lifecycle import (
     MISSION_CANCELLED,
     MISSION_COMPLETED,
@@ -404,3 +409,84 @@ class TestFullLifecycleAllEventTypes:
         assert state.mission_status == MissionStatus.COMPLETED
         assert len(state.anomalies) == 1
         assert "terminal" in state.anomalies[0].reason.lower()
+
+
+# ── V1 DecisionPoint golden replay tests ─────────────────────────────────────
+
+V1_GOLDENS = [
+    "replay_interview_local_only_resolved",
+    "replay_interview_widened_resolved",
+    "replay_interview_widened_closed_locally",
+    "replay_interview_deferred",
+    "replay_interview_canceled",
+    "replay_interview_resolved_other",
+]
+
+
+def _load_events(name: str) -> List[Event]:
+    """Load events from a V1 golden .jsonl fixture."""
+    fx = pathlib.Path("tests/fixtures/decisionpoint_golden")
+    events_file = fx / f"{name}.jsonl"
+    return [
+        Event.model_validate_json(line)
+        for line in events_file.read_text().splitlines()
+        if line.strip()
+    ]
+
+
+def _dump_state(reduced: object) -> str:
+    """Dump ReducedDecisionPointState to a canonical JSON string (no trailing newline)."""
+    return json.dumps(
+        reduced.model_dump(mode="json", by_alias=True),  # type: ignore[union-attr]
+        sort_keys=True,
+        indent=2,
+    )
+
+
+@pytest.mark.parametrize("name", V1_GOLDENS)
+def test_v1_golden_replay_byte_identical(name: str) -> None:
+    """FR-016/NFR-001: Replaying V1 golden events produces byte-identical output."""
+    fx = pathlib.Path("tests/fixtures/decisionpoint_golden")
+    events_file = fx / f"{name}.jsonl"
+    expected_file = fx / f"{name}_output.json"
+    events = [
+        Event.model_validate_json(line)
+        for line in events_file.read_text().splitlines()
+        if line.strip()
+    ]
+    reduced = reduce_decision_point_events(events)
+    actual = json.dumps(
+        reduced.model_dump(mode="json", by_alias=True),
+        sort_keys=True,
+        indent=2,
+    )
+    expected = expected_file.read_text().rstrip()
+    assert actual == expected, f"Replay drift in {name}"
+
+
+@pytest.mark.parametrize("name", V1_GOLDENS)
+def test_v1_golden_replay_deterministic_under_permutation(name: str) -> None:
+    """NFR-001: Reducer is byte-identical for all Lamport-consistent permutations.
+
+    Since reduce_decision_point_events re-sorts via status_event_sort_key,
+    every permutation of the event stream should produce the same output.
+    Scenarios have ≤4 events (max 24 permutations), so we exhaust the space.
+    """
+    events = _load_events(name)
+    baseline = _dump_state(reduce_decision_point_events(events))
+
+    permutation_count = 0
+    for perm in itertools.permutations(events):
+        reduced = reduce_decision_point_events(list(perm))
+        actual = _dump_state(reduced)
+        assert actual == baseline, (
+            f"Permutation produced different output for {name!r}:\n"
+            f"  permutation index: {permutation_count}\n"
+            f"  event order: {[e.event_id for e in perm]}"
+        )
+        permutation_count += 1
+
+    # Confirm we covered expected permutation space (≤4! = 24)
+    assert permutation_count <= 24, (
+        f"{name} has more events than expected (>4): {permutation_count} permutations"
+    )

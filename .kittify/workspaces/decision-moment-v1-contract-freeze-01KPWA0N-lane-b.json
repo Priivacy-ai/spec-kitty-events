@@ -1,0 +1,19 @@
+{
+  "wp_id": "WP02",
+  "mission_slug": "decision-moment-v1-contract-freeze-01KPWA0N",
+  "worktree_path": ".worktrees/decision-moment-v1-contract-freeze-01KPWA0N-lane-b",
+  "branch_name": "kitty/mission-decision-moment-v1-contract-freeze-01KPWA0N-lane-b",
+  "base_branch": "kitty/mission-decision-moment-v1-contract-freeze-01KPWA0N",
+  "base_commit": "123bd1154ce20ed1456cfa1c027b29543783d55b",
+  "dependencies": [
+    "WP01"
+  ],
+  "created_at": "2026-04-23T05:13:48.481180+00:00",
+  "created_by": "implement-command-lane",
+  "vcs_backend": "git",
+  "lane_id": "lane-b",
+  "lane_wp_ids": [
+    "WP02"
+  ],
+  "current_wp": "WP02"
+}

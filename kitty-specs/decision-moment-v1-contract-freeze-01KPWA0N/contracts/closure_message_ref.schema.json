@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ClosureMessageRef",
+  "description": "Reference to the Slack closure message posted by the orchestrator at terminal transitions.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["channel_id", "thread_ts", "message_ts"],
+  "properties": {
+    "channel_id": { "type": "string", "minLength": 1 },
+    "thread_ts": { "type": "string", "minLength": 1 },
+    "message_ts": { "type": "string", "minLength": 1 },
+    "url": { "type": "string", "format": "uri" }
+  }
+}

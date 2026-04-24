@@ -34,6 +34,7 @@ from spec_kitty_events.gates import (
 )
 from spec_kitty_events.collaboration import (
     ParticipantIdentity,
+    ParticipantExternalRefs,
     AuthPrincipalBinding,
     FocusTarget,
     ParticipantInvitedPayload,
@@ -92,11 +93,19 @@ from spec_kitty_events.mission_audit import (
     MissionAuditCompletedPayload,
     MissionAuditFailedPayload,
 )
+from spec_kitty_events.decision_moment import (
+    SummaryBlock,
+    TeamspaceRef,
+    DefaultChannelRef,
+    ThreadRef,
+    ClosureMessageRef,
+)
 from spec_kitty_events.decisionpoint import (
-    DecisionPointOpenedPayload,
-    DecisionPointDiscussingPayload,
-    DecisionPointResolvedPayload,
+    DecisionPointWidenedPayload,
     DecisionPointOverriddenPayload,
+    _OPENED_ADAPTER,
+    _DISCUSSING_ADAPTER,
+    _RESOLVED_ADAPTER,
 )
 from spec_kitty_events.connector import (
     ConnectorProvisionedPayload,
@@ -141,8 +150,9 @@ PYDANTIC_MODELS: List[tuple[str, Type[BaseModel]]] = [
     ("mission_cancelled_payload", MissionCancelledPayload),
     ("phase_entered_payload", PhaseEnteredPayload),
     ("review_rollback_payload", ReviewRollbackPayload),
-    # Collaboration identity models
+    # Collaboration identity models (V1: ParticipantIdentity gains external_refs)
     ("participant_identity", ParticipantIdentity),
+    ("participant_external_refs", ParticipantExternalRefs),
     ("auth_principal_binding", AuthPrincipalBinding),
     ("focus_target", FocusTarget),
     # Collaboration payload models
@@ -197,10 +207,16 @@ PYDANTIC_MODELS: List[tuple[str, Type[BaseModel]]] = [
     ("mission_audit_completed_payload", MissionAuditCompletedPayload),
     ("mission_audit_failed_payload", MissionAuditFailedPayload),
     ("cutover_artifact", CutoverArtifact),
-    # DecisionPoint lifecycle contracts (2.6.0)
-    ("decision_point_opened_payload", DecisionPointOpenedPayload),
-    ("decision_point_discussing_payload", DecisionPointDiscussingPayload),
-    ("decision_point_resolved_payload", DecisionPointResolvedPayload),
+    # DecisionPoint shared models (V1 / 4.0.0)
+    ("summary_block", SummaryBlock),
+    ("teamspace_ref", TeamspaceRef),
+    ("default_channel_ref", DefaultChannelRef),
+    ("thread_ref", ThreadRef),
+    ("closure_message_ref", ClosureMessageRef),
+    # DecisionPoint lifecycle contracts (V1 / 4.0.0)
+    # NOTE: Opened, Discussing, Resolved are discriminated unions — generated via
+    # UNION_ADAPTERS below using TypeAdapter.json_schema(); they are NOT listed here.
+    ("decision_point_widened_payload", DecisionPointWidenedPayload),
     ("decision_point_overridden_payload", DecisionPointOverriddenPayload),
     # Connector lifecycle contracts (2.7.0) — extended in 2.8.0
     ("connector_provisioned_payload", ConnectorProvisionedPayload),
@@ -232,6 +248,14 @@ ENUM_TYPES: List[tuple[str, type]] = [
     ("sync_lane_v2", SyncLaneV2),
 ]
 
+# Discriminated-union payloads (V1): use TypeAdapter.json_schema() to emit oneOf
+# Each entry: (schema_name, TypeAdapter_instance)
+UNION_ADAPTERS: List[tuple[str, TypeAdapter[Any]]] = [
+    ("decision_point_opened_payload", _OPENED_ADAPTER),
+    ("decision_point_discussing_payload", _DISCUSSING_ADAPTER),
+    ("decision_point_resolved_payload", _RESOLVED_ADAPTER),
+]
+
 
 def generate_schema(name: str, model: Type[BaseModel]) -> Dict[str, Any]:
     """Generate JSON Schema for a Pydantic model.
@@ -244,6 +268,22 @@ def generate_schema(name: str, model: Type[BaseModel]) -> Dict[str, Any]:
         JSON Schema dict with $schema and $id fields
     """
     schema = model.model_json_schema(mode="serialization")
+    schema["$schema"] = "https://json-schema.org/draft/2020-12/schema"
+    schema["$id"] = f"spec-kitty-events/{name}"
+    return schema
+
+
+def generate_union_schema(name: str, adapter: TypeAdapter[Any]) -> Dict[str, Any]:
+    """Generate JSON Schema for a discriminated-union type via TypeAdapter.
+
+    Args:
+        name: Schema name for $id field
+        adapter: Pre-built TypeAdapter for the union type
+
+    Returns:
+        JSON Schema dict with $schema and $id fields, emitting oneOf for the union
+    """
+    schema = adapter.json_schema(mode="serialization")
     schema["$schema"] = "https://json-schema.org/draft/2020-12/schema"
     schema["$id"] = f"spec-kitty-events/{name}"
     return schema
@@ -306,6 +346,10 @@ def generate_all_schemas() -> Dict[str, Dict[str, Any]]:
     # Generate enum schemas
     for name, enum_cls in ENUM_TYPES:
         schemas[name] = generate_enum_schema(name, enum_cls)
+
+    # Generate discriminated-union schemas (V1: Opened, Discussing, Resolved)
+    for name, adapter in UNION_ADAPTERS:
+        schemas[name] = generate_union_schema(name, adapter)
 
     return schemas
 

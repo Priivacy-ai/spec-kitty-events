@@ -1,0 +1,179 @@
+{
+  "version": 1,
+  "mission_slug": "decision-moment-v1-contract-freeze-01KPWA0N",
+  "mission_id": "01KPWA0N4DX047S3NX734YRFVW",
+  "mission_branch": "kitty/mission-decision-moment-v1-contract-freeze-01KPWA0N",
+  "target_branch": "main",
+  "lanes": [
+    {
+      "lane_id": "lane-a",
+      "wp_ids": [
+        "WP01"
+      ],
+      "write_scope": [
+        "src/spec_kitty_events/collaboration.py",
+        "src/spec_kitty_events/decision_moment.py",
+        "tests/unit/test_collaboration_models.py",
+        "tests/unit/test_decision_moment_models.py"
+      ],
+      "predicted_surfaces": [
+        "api",
+        "artifact-rendering"
+      ],
+      "depends_on_lanes": [],
+      "parallel_group": 0
+    },
+    {
+      "lane_id": "lane-b",
+      "wp_ids": [
+        "WP02"
+      ],
+      "write_scope": [
+        "src/spec_kitty_events/decisionpoint.py",
+        "tests/unit/test_decisionpoint.py"
+      ],
+      "predicted_surfaces": [
+        "api"
+      ],
+      "depends_on_lanes": [],
+      "parallel_group": 0
+    },
+    {
+      "lane_id": "lane-c",
+      "wp_ids": [
+        "WP03"
+      ],
+      "write_scope": [
+        "tests/property/test_decisionpoint_determinism.py",
+        "tests/test_decisionpoint_reducer.py"
+      ],
+      "predicted_surfaces": [
+        "api",
+        "tests"
+      ],
+      "depends_on_lanes": [],
+      "parallel_group": 0
+    },
+    {
+      "lane_id": "lane-d",
+      "wp_ids": [
+        "WP04"
+      ],
+      "write_scope": [
+        "src/spec_kitty_events/schemas/closure_message_ref.schema.json",
+        "src/spec_kitty_events/schemas/decision_point_discussing_payload.schema.json",
+        "src/spec_kitty_events/schemas/decision_point_opened_payload.schema.json",
+        "src/spec_kitty_events/schemas/decision_point_overridden_payload.schema.json",
+        "src/spec_kitty_events/schemas/decision_point_resolved_payload.schema.json",
+        "src/spec_kitty_events/schemas/decision_point_widened_payload.schema.json",
+        "src/spec_kitty_events/schemas/default_channel_ref.schema.json",
+        "src/spec_kitty_events/schemas/generate.py",
+        "src/spec_kitty_events/schemas/participant_external_refs.schema.json",
+        "src/spec_kitty_events/schemas/participant_identity.schema.json",
+        "src/spec_kitty_events/schemas/summary_block.schema.json",
+        "src/spec_kitty_events/schemas/teamspace_ref.schema.json",
+        "src/spec_kitty_events/schemas/thread_ref.schema.json",
+        "tests/integration/test_schema_drift.py"
+      ],
+      "predicted_surfaces": [
+        "api",
+        "tests"
+      ],
+      "depends_on_lanes": [],
+      "parallel_group": 0
+    },
+    {
+      "lane_id": "lane-e",
+      "wp_ids": [
+        "WP05"
+      ],
+      "write_scope": [
+        "src/spec_kitty_events/conformance/fixtures/decisionpoint/invalid/v1_opened_interview_missing_origin_flow.json",
+        "src/spec_kitty_events/conformance/fixtures/decisionpoint/invalid/v1_participant_identity_empty_external_refs.json",
+        "src/spec_kitty_events/conformance/fixtures/decisionpoint/invalid/v1_resolved_interview_deferred_with_final_answer.json",
+        "src/spec_kitty_events/conformance/fixtures/decisionpoint/invalid/v1_resolved_missing_terminal_outcome.json",
+        "src/spec_kitty_events/conformance/fixtures/decisionpoint/invalid/v1_widened_missing_thread_ref.json",
+        "src/spec_kitty_events/conformance/fixtures/decisionpoint/valid/v1_discussing_interview.json",
+        "src/spec_kitty_events/conformance/fixtures/decisionpoint/valid/v1_opened_adr.json",
+        "src/spec_kitty_events/conformance/fixtures/decisionpoint/valid/v1_opened_interview.json",
+        "src/spec_kitty_events/conformance/fixtures/decisionpoint/valid/v1_participant_identity_with_external_refs.json",
+        "src/spec_kitty_events/conformance/fixtures/decisionpoint/valid/v1_resolved_interview_canceled.json",
+        "src/spec_kitty_events/conformance/fixtures/decisionpoint/valid/v1_resolved_interview_closed_locally.json",
+        "src/spec_kitty_events/conformance/fixtures/decisionpoint/valid/v1_resolved_interview_deferred.json",
+        "src/spec_kitty_events/conformance/fixtures/decisionpoint/valid/v1_resolved_interview_resolved.json",
+        "src/spec_kitty_events/conformance/fixtures/decisionpoint/valid/v1_resolved_interview_resolved_other.json",
+        "src/spec_kitty_events/conformance/fixtures/decisionpoint/valid/v1_widened.json",
+        "tests/test_decisionpoint_conformance.py"
+      ],
+      "predicted_surfaces": [
+        "api",
+        "legacy-cleanup",
+        "tests"
+      ],
+      "depends_on_lanes": [],
+      "parallel_group": 0
+    },
+    {
+      "lane_id": "lane-f",
+      "wp_ids": [
+        "WP06"
+      ],
+      "write_scope": [
+        "src/spec_kitty_events/conformance/fixtures/decisionpoint/replay/replay_interview_canceled.jsonl",
+        "src/spec_kitty_events/conformance/fixtures/decisionpoint/replay/replay_interview_canceled_output.json",
+        "src/spec_kitty_events/conformance/fixtures/decisionpoint/replay/replay_interview_deferred.jsonl",
+        "src/spec_kitty_events/conformance/fixtures/decisionpoint/replay/replay_interview_deferred_output.json",
+        "src/spec_kitty_events/conformance/fixtures/decisionpoint/replay/replay_interview_local_only_resolved.jsonl",
+        "src/spec_kitty_events/conformance/fixtures/decisionpoint/replay/replay_interview_local_only_resolved_output.json",
+        "src/spec_kitty_events/conformance/fixtures/decisionpoint/replay/replay_interview_resolved_other.jsonl",
+        "src/spec_kitty_events/conformance/fixtures/decisionpoint/replay/replay_interview_resolved_other_output.json",
+        "src/spec_kitty_events/conformance/fixtures/decisionpoint/replay/replay_interview_widened_closed_locally.jsonl",
+        "src/spec_kitty_events/conformance/fixtures/decisionpoint/replay/replay_interview_widened_closed_locally_output.json",
+        "src/spec_kitty_events/conformance/fixtures/decisionpoint/replay/replay_interview_widened_resolved.jsonl",
+        "src/spec_kitty_events/conformance/fixtures/decisionpoint/replay/replay_interview_widened_resolved_output.json",
+        "tests/fixtures/decisionpoint_golden/replay_interview_canceled.jsonl",
+        "tests/fixtures/decisionpoint_golden/replay_interview_canceled_output.json",
+        "tests/fixtures/decisionpoint_golden/replay_interview_deferred.jsonl",
+        "tests/fixtures/decisionpoint_golden/replay_interview_deferred_output.json",
+        "tests/fixtures/decisionpoint_golden/replay_interview_local_only_resolved.jsonl",
+        "tests/fixtures/decisionpoint_golden/replay_interview_local_only_resolved_output.json",
+        "tests/fixtures/decisionpoint_golden/replay_interview_resolved_other.jsonl",
+        "tests/fixtures/decisionpoint_golden/replay_interview_resolved_other_output.json",
+        "tests/fixtures/decisionpoint_golden/replay_interview_widened_closed_locally.jsonl",
+        "tests/fixtures/decisionpoint_golden/replay_interview_widened_closed_locally_output.json",
+        "tests/fixtures/decisionpoint_golden/replay_interview_widened_resolved.jsonl",
+        "tests/fixtures/decisionpoint_golden/replay_interview_widened_resolved_output.json",
+        "tests/integration/test_lifecycle_replay.py"
+      ],
+      "predicted_surfaces": [
+        "api",
+        "artifact-rendering",
+        "tracker-integration"
+      ],
+      "depends_on_lanes": [],
+      "parallel_group": 0
+    },
+    {
+      "lane_id": "lane-g",
+      "wp_ids": [
+        "WP07"
+      ],
+      "write_scope": [
+        "CHANGELOG.md",
+        "COMPATIBILITY.md",
+        "pyproject.toml",
+        "src/spec_kitty_events/__init__.py"
+      ],
+      "predicted_surfaces": [
+        "api",
+        "artifact-rendering",
+        "legacy-cleanup"
+      ],
+      "depends_on_lanes": [],
+      "parallel_group": 0
+    }
+  ],
+  "computed_at": "2026-04-23T05:02:32.598946+00:00",
+  "computed_from": "dependency_graph+ownership",
+  "planning_artifact_wps": []
+}

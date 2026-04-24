@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DecisionPointWidenedPayload",
+  "description": "V1 event emitted when an interview-origin Decision Moment is widened to a Slack-backed thread. Single origin variant (planning_interview).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "origin_surface", "channel",
+    "decision_point_id", "mission_id", "run_id", "mission_slug", "mission_type",
+    "teamspace_ref", "default_channel_ref", "thread_ref",
+    "invited_participants",
+    "widened_by", "widened_at", "recorded_at"
+  ],
+  "properties": {
+    "origin_surface": { "const": "planning_interview" },
+    "channel": { "const": "slack" },
+    "decision_point_id": { "type": "string", "minLength": 1 },
+    "mission_id": { "type": "string", "minLength": 1 },
+    "run_id": { "type": "string", "minLength": 1 },
+    "mission_slug": { "type": "string", "minLength": 1 },
+    "mission_type": { "type": "string", "minLength": 1 },
+    "teamspace_ref": { "$ref": "teamspace_ref.schema.json" },
+    "default_channel_ref": { "$ref": "default_channel_ref.schema.json" },
+    "thread_ref": { "$ref": "thread_ref.schema.json" },
+    "invited_participants": {
+      "type": "array",
+      "items": { "$ref": "participant_identity_v4.schema.json" }
+    },
+    "widened_by": { "type": "string", "minLength": 1 },
+    "widened_at": { "type": "string", "format": "date-time" },
+    "recorded_at": { "type": "string", "format": "date-time" }
+  }
+}

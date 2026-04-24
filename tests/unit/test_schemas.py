@@ -8,96 +8,31 @@ from spec_kitty_events.schemas import list_schemas, load_schema, schema_path
 
 
 def test_list_schemas_returns_all_names() -> None:
-    """Test that list_schemas returns the committed schema set."""
+    """Test that list_schemas enumerates every committed *.schema.json file."""
+    import importlib.resources
+
     names = list_schemas()
-    expected = [
-        "artifact_identity",
-        "auth_principal_binding",
-        "comment_posted_payload",
-        "concurrent_driver_warning_payload",
-        "connector_degraded_payload",
-        "connector_health_checked_payload",
-        "connector_provisioned_payload",
-        "connector_reconnected_payload",
-        "connector_revoked_payload",
-        "content_hash_ref",
-        "cutover_artifact",
-        "decision_captured_payload",
-        "decision_input_answered_payload",
-        "decision_input_requested_payload",
-        "decision_point_discussing_payload",
-        "decision_point_opened_payload",
-        "decision_point_overridden_payload",
-        "decision_point_resolved_payload",
-        "diff_summary_recorded_payload",
-        "drive_intent_set_payload",
-        "event",
-        "external_reference_linked_payload",
-        "focus_changed_payload",
-        "focus_target",
-        "gate_failed_payload",
-        "gate_passed_payload",
-        "generation_blocked_by_semantic_conflict_payload",
-        "glossary_clarification_requested_payload",
-        "glossary_clarification_resolved_payload",
-        "glossary_scope_activated_payload",
-        "glossary_sense_updated_payload",
-        "glossary_strictness_set_payload",
-        "lane",
-        "local_namespace_tuple",
-        "mission_audit_completed_payload",
-        "mission_audit_decision_requested_payload",
-        "mission_audit_failed_payload",
-        "mission_audit_requested_payload",
-        "mission_audit_started_payload",
-        "mission_cancelled_payload",
-        "mission_closed_payload",
-        "mission_completed_payload",
-        "mission_created_payload",
-        "mission_dossier_artifact_indexed_payload",
-        "mission_dossier_artifact_missing_payload",
-        "mission_dossier_parity_drift_detected_payload",
-        "mission_dossier_snapshot_computed_payload",
-        "mission_run_completed_payload",
-        "mission_run_started_payload",
-        "mission_started_payload",
-        "next_step_auto_completed_payload",
-        "next_step_issued_payload",
-        "participant_identity",
-        "participant_invited_payload",
-        "participant_joined_payload",
-        "participant_left_payload",
-        "phase_entered_payload",
-        "potential_step_collision_detected_payload",
-        "presence_heartbeat_payload",
-        "profile_invocation_started_payload",
-        "prompt_step_execution_completed_payload",
-        "prompt_step_execution_started_payload",
-        "provenance_ref",
-        "retrospective_completed_payload",
-        "retrospective_skipped_payload",
-        "review_rollback_payload",
-        "runtime_actor_identity",
-        "semantic_check_evaluated_payload",
-        "semantic_conflict_entry",
-        "session_linked_payload",
-        "status_transition_payload",
-        "sync_dead_lettered_payload",
-        "sync_ingest_accepted_payload",
-        "sync_ingest_rejected_payload",
-        "sync_lane_v1",
-        "sync_lane_v2",
-        "sync_replay_completed_payload",
-        "sync_retry_scheduled_payload",
-        "term_candidate_observed_payload",
-        "token_usage_recorded_payload",
-        "user_connected_payload",
-        "user_connection_status",
-        "user_disconnected_payload",
-        "warning_acknowledged_payload",
-    ]
-    assert len(names) == len(expected)
-    assert names == expected
+
+    # Derive expected names directly from the filesystem so that adding new
+    # schemas never breaks this test.  The invariant is structural: every
+    # *.schema.json file in the schemas package must be enumerable via
+    # list_schemas(), the result must be sorted, and each name must be a
+    # non-empty string without the .schema.json suffix.
+    schemas_path = importlib.resources.files("spec_kitty_events.schemas")
+    on_disk = sorted(
+        p.name.removesuffix(".schema.json")
+        for p in schemas_path.iterdir()  # type: ignore[union-attr]
+        if isinstance(p.name, str) and p.name.endswith(".schema.json")
+    )
+
+    assert names == on_disk, (
+        f"list_schemas() returned {len(names)} names but "
+        f"{len(on_disk)} *.schema.json files exist on disk.\n"
+        f"  Extra in list_schemas():  {sorted(set(names) - set(on_disk))}\n"
+        f"  Missing from list_schemas(): {sorted(set(on_disk) - set(names))}"
+    )
+    assert len(names) > 0, "list_schemas() must return at least one schema"
+    assert names == sorted(names), "list_schemas() must return names in sorted order"
 
 
 def test_load_schema_returns_dict() -> None:

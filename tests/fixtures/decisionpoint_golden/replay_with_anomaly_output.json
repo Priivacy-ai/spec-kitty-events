@@ -1,14 +1,18 @@
 {
+  "actual_participants": [],
   "anomalies": [
     {
-      "event_id": "01KJFD6KY9EDTCP7G1FPGM9G6T",
+      "event_id": "01KPWCF4GMH1TTRQMBWNTHTAK1",
       "kind": "event_after_terminal",
       "message": "Event 'DecisionPointDiscussing' arrived after terminal state 'overridden'"
     }
   ],
+  "closed_locally_while_widened": false,
+  "closure_message": null,
   "decision_point_id": "dp-001",
   "event_count": 4,
-  "feature_slug": "feature-x",
+  "final_answer": null,
+  "input_key": null,
   "last_actor_id": "human-1",
   "last_actor_type": "human",
   "last_alternatives_considered": [
@@ -22,7 +26,19 @@
   "last_rationale": "Best option after analysis",
   "last_state_entered_at": "2026-02-27T12:00:03Z",
   "mission_id": "m-001",
+  "mission_slug": "mission-x",
+  "mission_type": "software-dev",
+  "options": null,
+  "origin_flow": null,
+  "origin_surface": "adr",
+  "other_answer": false,
   "phase": "P1",
+  "question": null,
+  "resolved_by": null,
   "run_id": "run-001",
-  "state": "overridden"
+  "state": "overridden",
+  "step_id": null,
+  "summary": null,
+  "terminal_outcome": null,
+  "widening": null
 }

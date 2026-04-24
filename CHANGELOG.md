@@ -5,6 +5,47 @@ All notable changes to spec-kitty-events will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 4.0.0 — 2026-04-23
+
+### Breaking
+
+- **DecisionPoint contract frozen for Decision Moment V1.** `DecisionPointOpenedPayload`, `DecisionPointDiscussingPayload`, and `DecisionPointResolvedPayload` are now Pydantic v2 discriminated unions keyed by `origin_surface` (`"adr"` or `"planning_interview"`). Existing 3.x ADR producers must add `origin_surface: "adr"` to every DecisionPoint payload.
+- **`DecisionPointResolved` (interview variant) requires `terminal_outcome`** (`"resolved" | "deferred" | "canceled"`). No grace period — 4.x validators fail closed. Cross-field constraints on `final_answer`/`rationale`/`other_answer` are enforced by a Pydantic `model_validator`.
+
+### Added
+
+- `DecisionPointWidened` event type for Slack-backed widening of an interview-origin Decision Moment. Carries `channel`, `teamspace_ref`, `default_channel_ref`, `thread_ref`, `invited_participants`, `widened_by`, timestamps.
+- `WIDENED` state in `DecisionPointState` enum. Duplicate `DecisionPointWidened` for the same `decision_point_id` is idempotent.
+- Interview-origin fields on `DecisionPointOpened`: `origin_flow` (`charter`/`specify`/`plan`), `question`, `options`, `input_key`, `step_id`.
+- V1 projection fields on `ReducedDecisionPointState`: `origin_surface`, `origin_flow`, `question`, `options`, `input_key`, `step_id`, `widening`, `terminal_outcome`, `final_answer`, `other_answer`, `summary`, `actual_participants`, `resolved_by`, `closed_locally_while_widened`, `closure_message`.
+- Shared models: `SummaryBlock`, `TeamspaceRef`, `DefaultChannelRef`, `ThreadRef`, `ClosureMessageRef`, `WideningProjection`, `ParticipantExternalRefs`.
+- `ParticipantIdentity` extended with optional `external_refs` (Slack/Teamspace IDs carried losslessly for replay).
+- New reducer anomaly kind: `origin_mismatch` (events for the same `decision_point_id` with inconsistent `origin_surface`).
+- Six golden replay fixtures for every V1 scenario, plus invalid conformance fixtures for schema enforcement.
+
+### Unchanged / compatible
+
+- `DecisionInputRequested` and `DecisionInputAnswered` payloads remain 3.x-compatible.
+- ADR semantics on `DecisionPointOpenedAdrPayload`, `DecisionPointDiscussingAdrPayload`, `DecisionPointResolvedAdrPayload` are preserved exactly.
+- `DecisionPointOverridden` accepts existing 3.x payloads; the optional new `origin_surface` field is additive.
+
+### Behaviour rules
+
+- `DecisionInputAnswered` is emitted ONLY when a real final answer is written back. Deferred and canceled terminal outcomes do NOT emit a `DecisionInputAnswered`.
+- When the mission owner answers locally while a widened Slack discussion is open, `DecisionPointResolved.closed_locally_while_widened=true` is set. `closed_locally_while_widened=true` is only legal when a prior `DecisionPointWidened` exists for the same `decision_point_id`; otherwise the reducer raises an `invalid_transition` anomaly and the field is projected as `false`.
+
+### Migration
+
+- 3.x ADR producers: add `origin_surface: "adr"` to every DecisionPoint payload. No other field changes required.
+- 3.x `DecisionInput*` producers: no changes required.
+- New interview-origin producers (`spec-kitty#757`, `spec-kitty#758`): use `DecisionPointOpenedInterviewPayload`, `DecisionPointWidenedPayload`, `DecisionPointDiscussingInterviewPayload`, `DecisionPointResolvedInterviewPayload`.
+
+### Internal
+
+- `DECISIONPOINT_SCHEMA_VERSION` bumped from `"2.6.0"` to `"3.0.0"`.
+
+---
+
 ## 3.3.0 — Mission Analytics Contracts (2026-04-22)
 
 ### Added

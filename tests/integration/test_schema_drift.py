@@ -7,6 +7,14 @@ from pathlib import Path
 
 import pytest
 
+# V1 schemas added in spec-kitty-events 4.0.0
+_V1_REQUIRED_SCHEMAS = [
+    "decision_point_widened_payload.schema.json",
+    "summary_block.schema.json",
+    "participant_external_refs.schema.json",
+    "thread_ref.schema.json",
+]
+
 
 def test_schema_drift_check_passes() -> None:
     """Test that --check mode passes when schemas are up to date."""
@@ -87,3 +95,17 @@ def test_schema_drift_check_detects_orphaned_file() -> None:
 
     finally:
         orphan_file.unlink(missing_ok=True)
+
+
+def test_decisionpoint_v1_schemas_present() -> None:
+    """Smoke test: assert all V1 DecisionPoint contract schemas are on disk."""
+    import spec_kitty_events.schemas
+
+    schema_dir = Path(spec_kitty_events.schemas.__file__).parent
+
+    for filename in _V1_REQUIRED_SCHEMAS:
+        schema_path = schema_dir / filename
+        assert schema_path.exists(), (
+            f"V1 schema file missing: {filename}. "
+            "Run `python -m spec_kitty_events.schemas.generate` to regenerate."
+        )

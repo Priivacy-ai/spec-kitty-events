@@ -84,6 +84,7 @@ from spec_kitty_events.decisionpoint import (
     DecisionPointDiscussingPayload,
     DecisionPointResolvedPayload,
     DecisionPointOverriddenPayload,
+    DecisionPointWidenedPayload,
 )
 from spec_kitty_events.connector import (
     ConnectorProvisionedPayload,
@@ -142,7 +143,7 @@ class ConformanceResult:
 
 
 # Event type to Pydantic model mapping
-_EVENT_TYPE_TO_MODEL: Dict[str, Type[Any]] = {
+_EVENT_TYPE_TO_MODEL: Dict[str, Any] = {
     "Event": Event,
     "WPStatusChanged": StatusTransitionPayload,
     "GatePassed": GatePassedPayload,
@@ -199,8 +200,9 @@ _EVENT_TYPE_TO_MODEL: Dict[str, Type[Any]] = {
     "MissionAuditDecisionRequested": MissionAuditDecisionRequestedPayload,
     "MissionAuditCompleted": MissionAuditCompletedPayload,
     "MissionAuditFailed": MissionAuditFailedPayload,
-    # DecisionPoint lifecycle contracts (2.6.0)
+    # DecisionPoint lifecycle contracts (2.6.0 / V1 4.0.0)
     "DecisionPointOpened": DecisionPointOpenedPayload,
+    "DecisionPointWidened": DecisionPointWidenedPayload,
     "DecisionPointDiscussing": DecisionPointDiscussingPayload,
     "DecisionPointResolved": DecisionPointResolvedPayload,
     "DecisionPointOverridden": DecisionPointOverriddenPayload,
@@ -282,8 +284,9 @@ _EVENT_TYPE_TO_SCHEMA: Dict[str, str] = {
     "MissionAuditDecisionRequested": "mission_audit_decision_requested_payload",
     "MissionAuditCompleted": "mission_audit_completed_payload",
     "MissionAuditFailed": "mission_audit_failed_payload",
-    # DecisionPoint lifecycle contracts (2.6.0)
+    # DecisionPoint lifecycle contracts (2.6.0 / V1 4.0.0)
     "DecisionPointOpened": "decision_point_opened_payload",
+    "DecisionPointWidened": "decision_point_widened_payload",
     "DecisionPointDiscussing": "decision_point_discussing_payload",
     "DecisionPointResolved": "decision_point_resolved_payload",
     "DecisionPointOverridden": "decision_point_overridden_payload",

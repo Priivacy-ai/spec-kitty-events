@@ -1,7 +1,7 @@
 {
-  "worktree_path": "/Users/robert/spec-kitty-dev/charter-next-step/spec-kitty-events/.worktrees/additive-event-contracts-charter-phase456-01KP343J-lane-a",
-  "wp_id": "WP04",
-  "agent": "claude:opus:reviewer:reviewer",
-  "started_at": "2026-04-13T10:34:41.748051+00:00",
-  "pid": 2885
+  "worktree_path": "/Users/robert/spec-kitty-dev/spec-kitty-20260423-061619/spec-kitty-events/.worktrees/decision-moment-v1-contract-freeze-01KPWA0N-lane-c",
+  "wp_id": "WP03",
+  "agent": "claude:sonnet-4-7:python-reviewer:reviewer",
+  "started_at": "2026-04-23T05:42:16.764552+00:00",
+  "pid": 16432
 }

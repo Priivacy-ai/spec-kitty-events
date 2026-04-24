@@ -8,6 +8,15 @@
       ],
       "title": "DecisionAuthorityRole",
       "type": "string"
+    },
+    "OriginSurface": {
+      "description": "Surface that originated the decision point.",
+      "enum": [
+        "adr",
+        "planning_interview"
+      ],
+      "title": "OriginSurface",
+      "type": "string"
     }
   },
   "$id": "spec-kitty-events/decision_point_overridden_payload",
@@ -21,7 +30,11 @@
       "type": "string"
     },
     "actor_type": {
-      "pattern": "^(human|llm|service)$",
+      "enum": [
+        "human",
+        "llm",
+        "service"
+      ],
       "title": "Actor Type",
       "type": "string"
     },
@@ -71,6 +84,17 @@
       "minLength": 1,
       "title": "Mission Type",
       "type": "string"
+    },
+    "origin_surface": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/OriginSurface"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
     },
     "phase": {
       "minLength": 1,

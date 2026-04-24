@@ -1,4 +1,4 @@
-"""Public package exports for the canonical 3.0.0 mission contract release.
+"""Public package exports for the canonical 4.0.0 Decision Moment V1 release.
 
 This release publishes the fail-closed cutover surface for:
 
@@ -6,9 +6,11 @@ This release publishes the fail-closed cutover surface for:
 - canonical catalog events: ``MissionCreated`` and ``MissionClosed``
 - explicit envelope identity split: ``build_id`` versus ``node_id``
 - authoritative artifact-driven compatibility gating via ``spec_kitty_events.cutover``
+- Decision Moment V1: discriminated-union DecisionPoint payloads, Widened event,
+  interview-origin fields, terminal outcome rules, and shared V1 models
 """
 
-__version__ = "3.3.0"
+__version__ = "4.0.0"
 
 from spec_kitty_events.cutover import (
     CUTOVER_ARTIFACT,
@@ -160,6 +162,7 @@ from spec_kitty_events.collaboration import (
     ParticipantInvitedPayload,
     ParticipantJoinedPayload,
     ParticipantLeftPayload,
+    ParticipantExternalRefs,
     PresenceHeartbeatPayload,
     DriveIntentSetPayload,
     FocusChangedPayload,
@@ -285,23 +288,47 @@ from spec_kitty_events.mission_audit import (
     reduce_mission_audit_events as reduce_mission_audit_events,
 )
 
-# DecisionPoint Lifecycle Contracts (2.6.0)
+# DecisionPoint Lifecycle Contracts (4.0.0 / V1)
 from spec_kitty_events.decisionpoint import (
     DECISIONPOINT_SCHEMA_VERSION as DECISIONPOINT_SCHEMA_VERSION,
     DECISION_POINT_OPENED as DECISION_POINT_OPENED,
     DECISION_POINT_DISCUSSING as DECISION_POINT_DISCUSSING,
     DECISION_POINT_RESOLVED as DECISION_POINT_RESOLVED,
     DECISION_POINT_OVERRIDDEN as DECISION_POINT_OVERRIDDEN,
+    DECISION_POINT_WIDENED as DECISION_POINT_WIDENED,
     DECISION_POINT_EVENT_TYPES as DECISION_POINT_EVENT_TYPES,
     DecisionPointState as DecisionPointState,
     DecisionAuthorityRole as DecisionAuthorityRole,
     DecisionPointAnomaly as DecisionPointAnomaly,
     DecisionPointOpenedPayload as DecisionPointOpenedPayload,
+    DecisionPointOpenedAdrPayload as DecisionPointOpenedAdrPayload,
+    DecisionPointOpenedInterviewPayload as DecisionPointOpenedInterviewPayload,
     DecisionPointDiscussingPayload as DecisionPointDiscussingPayload,
+    DecisionPointDiscussingAdrPayload as DecisionPointDiscussingAdrPayload,
+    DecisionPointDiscussingInterviewPayload as DecisionPointDiscussingInterviewPayload,
     DecisionPointResolvedPayload as DecisionPointResolvedPayload,
+    DecisionPointResolvedAdrPayload as DecisionPointResolvedAdrPayload,
+    DecisionPointResolvedInterviewPayload as DecisionPointResolvedInterviewPayload,
     DecisionPointOverriddenPayload as DecisionPointOverriddenPayload,
+    DecisionPointWidenedPayload as DecisionPointWidenedPayload,
     ReducedDecisionPointState as ReducedDecisionPointState,
     reduce_decision_point_events as reduce_decision_point_events,
+)
+
+# Decision Moment V1 shared models (4.0.0)
+from spec_kitty_events.decision_moment import (
+    ClosureMessageRef,
+    DefaultChannelRef,
+    DiscussingSnapshotKind,
+    OriginFlow,
+    OriginSurface,
+    SummaryBlock,
+    SummarySource,
+    TeamspaceRef,
+    TerminalOutcome,
+    ThreadRef,
+    WideningChannel,
+    WideningProjection,
 )
 
 # Connector Lifecycle Contracts (2.7.0) — extended in 2.8.0
@@ -504,6 +531,7 @@ __all__ = [
     "ParticipantIdentity",
     "AuthPrincipalBinding",
     "FocusTarget",
+    "ParticipantExternalRefs",
     "ParticipantInvitedPayload",
     "ParticipantJoinedPayload",
     "ParticipantLeftPayload",
@@ -613,22 +641,43 @@ __all__ = [
     "MissionAuditFailedPayload",
     "ReducedMissionAuditState",
     "reduce_mission_audit_events",
-    # DecisionPoint Lifecycle Contracts (2.6.0)
+    # DecisionPoint Lifecycle Contracts (4.0.0 / V1)
     "DECISIONPOINT_SCHEMA_VERSION",
-    "DECISION_POINT_OPENED",
     "DECISION_POINT_DISCUSSING",
-    "DECISION_POINT_RESOLVED",
-    "DECISION_POINT_OVERRIDDEN",
     "DECISION_POINT_EVENT_TYPES",
-    "DecisionPointState",
+    "DECISION_POINT_OPENED",
+    "DECISION_POINT_OVERRIDDEN",
+    "DECISION_POINT_RESOLVED",
+    "DECISION_POINT_WIDENED",
     "DecisionAuthorityRole",
     "DecisionPointAnomaly",
-    "DecisionPointOpenedPayload",
+    "DecisionPointDiscussingAdrPayload",
+    "DecisionPointDiscussingInterviewPayload",
     "DecisionPointDiscussingPayload",
-    "DecisionPointResolvedPayload",
+    "DecisionPointOpenedAdrPayload",
+    "DecisionPointOpenedInterviewPayload",
+    "DecisionPointOpenedPayload",
     "DecisionPointOverriddenPayload",
+    "DecisionPointResolvedAdrPayload",
+    "DecisionPointResolvedInterviewPayload",
+    "DecisionPointResolvedPayload",
+    "DecisionPointState",
+    "DecisionPointWidenedPayload",
     "ReducedDecisionPointState",
     "reduce_decision_point_events",
+    # Decision Moment V1 shared models (4.0.0)
+    "ClosureMessageRef",
+    "DefaultChannelRef",
+    "DiscussingSnapshotKind",
+    "OriginFlow",
+    "OriginSurface",
+    "SummaryBlock",
+    "SummarySource",
+    "TeamspaceRef",
+    "TerminalOutcome",
+    "ThreadRef",
+    "WideningChannel",
+    "WideningProjection",
     # Connector Lifecycle Contracts (2.7.0)
     "CONNECTOR_SCHEMA_VERSION",
     "CONNECTOR_PROVISIONED",

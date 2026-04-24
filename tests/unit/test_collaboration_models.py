@@ -7,6 +7,8 @@ from datetime import datetime, timezone
 import pytest
 from pydantic import ValidationError as PydanticValidationError
 
+import json
+
 from spec_kitty_events.collaboration import (
     COLLABORATION_EVENT_TYPES,
     COMMENT_POSTED,
@@ -25,6 +27,7 @@ from spec_kitty_events.collaboration import (
     WARNING_ACKNOWLEDGED,
     AuthPrincipalBinding,
     FocusTarget,
+    ParticipantExternalRefs,
     ParticipantIdentity,
     UnknownParticipantError,
 )
@@ -343,3 +346,151 @@ class TestUnknownParticipantError:
 
     def test_is_subclass_of_spec_kitty_events_error(self) -> None:
         assert issubclass(UnknownParticipantError, SpecKittyEventsError)
+
+
+# ── ParticipantExternalRefs (T004) ───────────────────────────────────────────
+
+
+class TestParticipantExternalRefs:
+    """Tests for the new ParticipantExternalRefs model (WP01 T004)."""
+
+    def test_slack_user_id_only(self) -> None:
+        refs = ParticipantExternalRefs(slack_user_id="U123456")
+        assert refs.slack_user_id == "U123456"
+        assert refs.slack_team_id is None
+        assert refs.teamspace_member_id is None
+
+    def test_slack_team_id_only(self) -> None:
+        refs = ParticipantExternalRefs(slack_team_id="T123456")
+        assert refs.slack_team_id == "T123456"
+        assert refs.slack_user_id is None
+        assert refs.teamspace_member_id is None
+
+    def test_teamspace_member_id_only(self) -> None:
+        refs = ParticipantExternalRefs(teamspace_member_id="M123456")
+        assert refs.teamspace_member_id == "M123456"
+        assert refs.slack_user_id is None
+        assert refs.slack_team_id is None
+
+    def test_all_fields_populated(self) -> None:
+        refs = ParticipantExternalRefs(
+            slack_user_id="U123",
+            slack_team_id="T456",
+            teamspace_member_id="M789",
+        )
+        assert refs.slack_user_id == "U123"
+        assert refs.slack_team_id == "T456"
+        assert refs.teamspace_member_id == "M789"
+
+    def test_rejects_all_none(self) -> None:
+        with pytest.raises(PydanticValidationError) as exc_info:
+            ParticipantExternalRefs()
+        assert "at least one" in str(exc_info.value).lower()
+
+    def test_rejects_empty_slack_user_id(self) -> None:
+        with pytest.raises(PydanticValidationError):
+            ParticipantExternalRefs(slack_user_id="")
+
+    def test_rejects_empty_slack_team_id(self) -> None:
+        with pytest.raises(PydanticValidationError):
+            ParticipantExternalRefs(slack_team_id="")
+
+    def test_rejects_empty_teamspace_member_id(self) -> None:
+        with pytest.raises(PydanticValidationError):
+            ParticipantExternalRefs(teamspace_member_id="")
+
+    def test_forbids_extra_fields(self) -> None:
+        with pytest.raises(PydanticValidationError):
+            ParticipantExternalRefs(slack_user_id="U123", foo="bar")  # type: ignore[call-arg]
+
+    def test_frozen(self) -> None:
+        refs = ParticipantExternalRefs(slack_user_id="U123")
+        with pytest.raises(PydanticValidationError):
+            refs.slack_user_id = "changed"  # type: ignore[misc]
+
+    def test_model_validate_from_dict(self) -> None:
+        refs = ParticipantExternalRefs.model_validate({"slack_user_id": "U123"})
+        assert refs.slack_user_id == "U123"
+
+    def test_json_roundtrip(self) -> None:
+        refs = ParticipantExternalRefs(slack_user_id="U123")
+        dumped = json.dumps(refs.model_dump(mode="json"))
+        restored = ParticipantExternalRefs.model_validate_json(dumped)
+        assert restored == refs
+
+
+# ── ParticipantIdentity.external_refs (T004) ─────────────────────────────────
+
+
+class TestParticipantIdentityExternalRefs:
+    """Tests for the optional external_refs field on ParticipantIdentity (WP01 T004)."""
+
+    def test_participant_identity_without_external_refs_still_valid(self) -> None:
+        pid = ParticipantIdentity(
+            participant_id="p-001",
+            participant_type="human",
+        )
+        assert pid.external_refs is None
+
+    def test_participant_identity_with_slack_user_id_only(self) -> None:
+        refs = ParticipantExternalRefs(slack_user_id="U123")
+        pid = ParticipantIdentity(
+            participant_id="p-002",
+            participant_type="human",
+            external_refs=refs,
+        )
+        assert pid.external_refs is not None
+        assert pid.external_refs.slack_user_id == "U123"
+        # Roundtrip via model_dump -> model_validate
+        data = pid.model_dump()
+        restored = ParticipantIdentity.model_validate(data)
+        assert restored == pid
+
+    def test_participant_identity_with_all_external_refs(self) -> None:
+        refs = ParticipantExternalRefs(
+            slack_user_id="U123",
+            slack_team_id="T456",
+            teamspace_member_id="M789",
+        )
+        pid = ParticipantIdentity(
+            participant_id="p-003",
+            participant_type="llm_context",
+            external_refs=refs,
+        )
+        assert pid.external_refs is not None
+        assert pid.external_refs.slack_user_id == "U123"
+        assert pid.external_refs.slack_team_id == "T456"
+        assert pid.external_refs.teamspace_member_id == "M789"
+
+    def test_external_refs_rejects_all_none(self) -> None:
+        with pytest.raises(PydanticValidationError) as exc_info:
+            ParticipantExternalRefs()
+        msg = str(exc_info.value)
+        assert "at least one" in msg.lower()
+
+    def test_external_refs_rejects_empty_strings(self) -> None:
+        with pytest.raises(PydanticValidationError):
+            ParticipantExternalRefs(slack_user_id="")
+
+    def test_external_refs_forbids_extra_fields(self) -> None:
+        with pytest.raises(PydanticValidationError):
+            ParticipantExternalRefs(slack_user_id="U123", foo="bar")  # type: ignore[call-arg]
+
+    def test_external_refs_optional_on_existing_construction(self) -> None:
+        """Existing call sites that omit external_refs must still work."""
+        pid = ParticipantIdentity(participant_id="p-legacy", participant_type="human")
+        assert pid.external_refs is None
+        assert pid.participant_id == "p-legacy"
+
+    def test_external_refs_json_roundtrip_via_participant_identity(self) -> None:
+        refs = ParticipantExternalRefs(slack_user_id="U999")
+        pid = ParticipantIdentity(
+            participant_id="p-004",
+            participant_type="human",
+            external_refs=refs,
+        )
+        json_str = pid.model_dump_json()
+        restored = ParticipantIdentity.model_validate_json(json_str)
+        assert restored == pid
+        assert restored.external_refs is not None
+        assert restored.external_refs.slack_user_id == "U999"

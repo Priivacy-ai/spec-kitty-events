@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ParticipantExternalRefs",
+  "description": "Optional cross-channel identity references attached to a ParticipantIdentity. At least one field must be present when the object is supplied.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "slack_user_id": { "type": "string", "minLength": 1 },
+    "slack_team_id": { "type": "string", "minLength": 1 },
+    "teamspace_member_id": { "type": "string", "minLength": 1 }
+  },
+  "anyOf": [
+    { "required": ["slack_user_id"] },
+    { "required": ["slack_team_id"] },
+    { "required": ["teamspace_member_id"] }
+  ]
+}

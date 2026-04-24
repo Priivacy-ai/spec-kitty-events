@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ParticipantIdentity",
+  "description": "Canonical mission-scoped participant identity. Extended in 4.0.0 with optional external_refs for cross-channel carry.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["participant_id", "participant_type"],
+  "properties": {
+    "participant_id": { "type": "string", "minLength": 1 },
+    "participant_type": { "enum": ["human", "llm_context"] },
+    "display_name": { "type": "string" },
+    "session_id": { "type": "string" },
+    "external_refs": { "$ref": "participant_external_refs.schema.json" }
+  }
+}

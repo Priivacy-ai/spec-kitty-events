@@ -10,7 +10,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Dict, FrozenSet, List, Literal, Optional, Sequence, Set, Tuple
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from spec_kitty_events.models import SpecKittyEventsError
 
@@ -51,6 +51,25 @@ COLLABORATION_EVENT_TYPES: FrozenSet[str] = frozenset({
 # ── Section 2: Identity and Target Models ────────────────────────────────────
 
 
+class ParticipantExternalRefs(BaseModel):
+    """Optional cross-channel identity references for a ParticipantIdentity."""
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    slack_user_id: Optional[str] = Field(None, min_length=1)
+    slack_team_id: Optional[str] = Field(None, min_length=1)
+    teamspace_member_id: Optional[str] = Field(None, min_length=1)
+
+    @model_validator(mode="after")
+    def _at_least_one(self) -> "ParticipantExternalRefs":
+        if not any((self.slack_user_id, self.slack_team_id, self.teamspace_member_id)):
+            raise ValueError(
+                "ParticipantExternalRefs must populate at least one of "
+                "slack_user_id, slack_team_id, teamspace_member_id"
+            )
+        return self
+
+
 class ParticipantIdentity(BaseModel):
     """SaaS-minted, mission-scoped participant identity."""
 
@@ -67,6 +86,9 @@ class ParticipantIdentity(BaseModel):
     )
     session_id: Optional[str] = Field(
         None, description="SaaS-issued session identifier"
+    )
+    external_refs: Optional[ParticipantExternalRefs] = Field(
+        None, description="Optional cross-channel identity references (V1)"
     )
 
 
