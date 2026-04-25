@@ -59,6 +59,14 @@ template_set: software-dev-default
 - `spec-kitty-events` remains the package authority for event schemas and fixtures, but any event-envelope or payload behavior that currently crosses the live CLI↔SaaS boundary must also be represented or explicitly called out in that contract.
 - When SaaS ingestion expectations change, update the package conformance artifacts and the central SaaS contract together rather than treating live compatibility as implied.
 
+## Package Boundary
+
+- `spec-kitty-events` is the canonical external package for Spec Kitty event envelopes, payload schemas, conformance fixtures, replay helpers, and compatibility policy.
+- The package must remain independent of CLI, SaaS, tracker, and runtime implementation code. It should not import or depend on `spec-kitty`, `spec-kitty-saas`, `spec-kitty-tracker`, or `spec-kitty-runtime`.
+- CLI and SaaS consume this package through released PyPI artifacts. Do not rely on consumer vendoring, committed editable installs, path dependencies, or moving git refs as the production integration model.
+- Use SemVer to communicate compatibility. Breaking event contract changes require a major release or an explicitly documented cutover policy.
+- Consumer compatibility should be proven with package conformance fixtures and downstream consumer tests rather than by forcing unrelated package releases into lockstep.
+
 ## Amendment Process
 
 Update the charter through pull request review by maintainers when governance or compatibility rules change.
