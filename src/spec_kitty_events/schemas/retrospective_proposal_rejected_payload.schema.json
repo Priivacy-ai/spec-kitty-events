@@ -1,0 +1,85 @@
+{
+  "$defs": {
+    "RetrospectiveActorRef": {
+      "additionalProperties": false,
+      "description": "Actor reference embedded in runtime retrospective events.",
+      "properties": {
+        "id": {
+          "minLength": 1,
+          "title": "Id",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "human",
+            "agent",
+            "runtime"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "profile_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Profile Id"
+        }
+      },
+      "required": [
+        "kind",
+        "id"
+      ],
+      "title": "RetrospectiveActorRef",
+      "type": "object"
+    }
+  },
+  "$id": "spec-kitty-events/retrospective_proposal_rejected_payload",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Payload for ``retrospective.proposal.rejected`` events.",
+  "properties": {
+    "detail": {
+      "minLength": 1,
+      "title": "Detail",
+      "type": "string"
+    },
+    "kind": {
+      "minLength": 1,
+      "title": "Kind",
+      "type": "string"
+    },
+    "proposal_id": {
+      "minLength": 1,
+      "title": "Proposal Id",
+      "type": "string"
+    },
+    "reason": {
+      "enum": [
+        "human_decline",
+        "conflict",
+        "stale_evidence",
+        "invalid_payload"
+      ],
+      "title": "Reason",
+      "type": "string"
+    },
+    "rejected_by": {
+      "$ref": "#/$defs/RetrospectiveActorRef"
+    }
+  },
+  "required": [
+    "proposal_id",
+    "kind",
+    "reason",
+    "detail",
+    "rejected_by"
+  ],
+  "title": "RetrospectiveProposalRejectedPayload",
+  "type": "object"
+}

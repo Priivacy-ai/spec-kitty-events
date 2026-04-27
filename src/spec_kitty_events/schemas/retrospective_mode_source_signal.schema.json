@@ -1,0 +1,29 @@
+{
+  "$id": "spec-kitty-events/retrospective_mode_source_signal",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "How retrospective execution mode was resolved.",
+  "properties": {
+    "evidence": {
+      "minLength": 1,
+      "title": "Evidence",
+      "type": "string"
+    },
+    "kind": {
+      "enum": [
+        "charter_override",
+        "explicit_flag",
+        "environment",
+        "parent_process"
+      ],
+      "title": "Kind",
+      "type": "string"
+    }
+  },
+  "required": [
+    "kind",
+    "evidence"
+  ],
+  "title": "RetrospectiveModeSourceSignal",
+  "type": "object"
+}

@@ -1,0 +1,5 @@
+{
+  "failure_code": "facilitator_not_configured",
+  "message": "No retrospective facilitator profile is configured",
+  "record_path": ".kittify/missions/01TESTMISSION000000000001/retrospective.yaml"
+}

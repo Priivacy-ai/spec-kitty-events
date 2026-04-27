@@ -1,0 +1,10 @@
+{
+  "record_path": ".kittify/missions/01TESTMISSION000000000001/retrospective.yaml",
+  "record_hash": "sha256:abc123",
+  "findings_summary": {
+    "helped": 1,
+    "not_helpful": 0,
+    "gaps": 2
+  },
+  "proposals_count": 3
+}

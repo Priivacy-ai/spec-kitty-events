@@ -129,8 +129,19 @@ from spec_kitty_events.profile_invocation import (
     ProfileInvocationStartedPayload,
 )
 from spec_kitty_events.retrospective import (
+    RetrospectiveActorRef,
     RetrospectiveCompletedPayload,
+    RetrospectiveFailedPayload,
+    RetrospectiveLifecycleCompletedPayload,
+    RetrospectiveLifecycleSkippedPayload,
+    RetrospectiveMode,
+    RetrospectiveModeSourceSignal,
+    RetrospectiveProposalAppliedPayload,
+    RetrospectiveProposalGeneratedPayload,
+    RetrospectiveProposalRejectedPayload,
+    RetrospectiveRequestedPayload,
     RetrospectiveSkippedPayload,
+    RetrospectiveStartedPayload,
 )
 
 
@@ -236,7 +247,19 @@ PYDANTIC_MODELS: List[tuple[str, Type[BaseModel]]] = [
     ("external_reference_linked_payload", ExternalReferenceLinkedPayload),
     # Profile invocation contracts (3.1.0)
     ("profile_invocation_started_payload", ProfileInvocationStartedPayload),
-    # Retrospective contracts (3.1.0)
+    # Retrospective contracts (4.1.0)
+    ("retrospective_actor_ref", RetrospectiveActorRef),
+    ("retrospective_mode_source_signal", RetrospectiveModeSourceSignal),
+    ("retrospective_mode", RetrospectiveMode),
+    ("retrospective_requested_payload", RetrospectiveRequestedPayload),
+    ("retrospective_started_payload", RetrospectiveStartedPayload),
+    ("retrospective_lifecycle_completed_payload", RetrospectiveLifecycleCompletedPayload),
+    ("retrospective_lifecycle_skipped_payload", RetrospectiveLifecycleSkippedPayload),
+    ("retrospective_failed_payload", RetrospectiveFailedPayload),
+    ("retrospective_proposal_generated_payload", RetrospectiveProposalGeneratedPayload),
+    ("retrospective_proposal_applied_payload", RetrospectiveProposalAppliedPayload),
+    ("retrospective_proposal_rejected_payload", RetrospectiveProposalRejectedPayload),
+    # Legacy retrospective terminal contracts (3.1.0)
     ("retrospective_completed_payload", RetrospectiveCompletedPayload),
     ("retrospective_skipped_payload", RetrospectiveSkippedPayload),
 ]

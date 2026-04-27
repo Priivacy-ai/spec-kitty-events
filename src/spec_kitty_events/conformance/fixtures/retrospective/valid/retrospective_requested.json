@@ -1,0 +1,14 @@
+{
+  "mode": {
+    "value": "human_in_command",
+    "source_signal": {
+      "kind": "explicit_flag",
+      "evidence": "--mode human_in_command"
+    }
+  },
+  "terminus_step_id": "accept",
+  "requested_by": {
+    "kind": "human",
+    "id": "operator-1"
+  }
+}

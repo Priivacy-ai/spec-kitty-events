@@ -1,0 +1,10 @@
+{
+  "proposal_id": "01TESTPROPOSAL0000000001",
+  "kind": "synthesize_directive",
+  "target_urn": "doctrine:directive:DIRECTIVE_001",
+  "provenance_ref": "mission/01TESTMISSION000000000001/proposals/01TESTPROPOSAL0000000001",
+  "applied_by": {
+    "kind": "agent",
+    "id": "synthesizer"
+  }
+}

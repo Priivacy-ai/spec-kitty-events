@@ -12,12 +12,32 @@ from pydantic import ValidationError
 
 from spec_kitty_events.dossier import ProvenanceRef
 from spec_kitty_events.retrospective import (
+    RETROSPECTIVE_COMPLETED_EVENT,
     RETROSPECTIVE_COMPLETED,
     RETROSPECTIVE_EVENT_TYPES,
+    RETROSPECTIVE_EVENT_NAMES,
+    RETROSPECTIVE_FAILED_EVENT,
+    RETROSPECTIVE_PROPOSAL_APPLIED_EVENT,
+    RETROSPECTIVE_PROPOSAL_GENERATED_EVENT,
+    RETROSPECTIVE_PROPOSAL_REJECTED_EVENT,
+    RETROSPECTIVE_REQUESTED_EVENT,
     RETROSPECTIVE_SCHEMA_VERSION,
+    RETROSPECTIVE_SKIPPED_EVENT,
     RETROSPECTIVE_SKIPPED,
+    RETROSPECTIVE_STARTED_EVENT,
+    RetrospectiveActorRef,
     RetrospectiveCompletedPayload,
+    RetrospectiveFailedPayload,
+    RetrospectiveLifecycleCompletedPayload,
+    RetrospectiveLifecycleSkippedPayload,
+    RetrospectiveMode,
+    RetrospectiveModeSourceSignal,
+    RetrospectiveProposalAppliedPayload,
+    RetrospectiveProposalGeneratedPayload,
+    RetrospectiveProposalRejectedPayload,
+    RetrospectiveRequestedPayload,
     RetrospectiveSkippedPayload,
+    RetrospectiveStartedPayload,
 )
 
 
@@ -177,14 +197,25 @@ class TestRetrospectiveSkippedPayload:
 
 class TestModuleLevel:
     def test_event_types_frozenset(self) -> None:
+        assert RETROSPECTIVE_EVENT_NAMES == frozenset({
+            "retrospective.requested",
+            "retrospective.started",
+            "retrospective.completed",
+            "retrospective.skipped",
+            "retrospective.failed",
+            "retrospective.proposal.generated",
+            "retrospective.proposal.applied",
+            "retrospective.proposal.rejected",
+        })
         assert RETROSPECTIVE_EVENT_TYPES == frozenset({
             "RetrospectiveCompleted",
             "RetrospectiveSkipped",
+            *RETROSPECTIVE_EVENT_NAMES,
         })
-        assert len(RETROSPECTIVE_EVENT_TYPES) == 2
+        assert len(RETROSPECTIVE_EVENT_TYPES) == 10
 
     def test_schema_version(self) -> None:
-        assert RETROSPECTIVE_SCHEMA_VERSION == "3.1.0"
+        assert RETROSPECTIVE_SCHEMA_VERSION == "4.1.0"
 
     def test_no_reducer_exists(self) -> None:
         """C-008: Retrospective is terminal signals only — no reducer."""
@@ -196,3 +227,95 @@ class TestModuleLevel:
     def test_event_type_constants_match_frozenset(self) -> None:
         assert RETROSPECTIVE_COMPLETED in RETROSPECTIVE_EVENT_TYPES
         assert RETROSPECTIVE_SKIPPED in RETROSPECTIVE_EVENT_TYPES
+        assert RETROSPECTIVE_REQUESTED_EVENT in RETROSPECTIVE_EVENT_NAMES
+        assert RETROSPECTIVE_STARTED_EVENT in RETROSPECTIVE_EVENT_NAMES
+        assert RETROSPECTIVE_COMPLETED_EVENT in RETROSPECTIVE_EVENT_NAMES
+        assert RETROSPECTIVE_SKIPPED_EVENT in RETROSPECTIVE_EVENT_NAMES
+        assert RETROSPECTIVE_FAILED_EVENT in RETROSPECTIVE_EVENT_NAMES
+        assert RETROSPECTIVE_PROPOSAL_GENERATED_EVENT in RETROSPECTIVE_EVENT_NAMES
+        assert RETROSPECTIVE_PROPOSAL_APPLIED_EVENT in RETROSPECTIVE_EVENT_NAMES
+        assert RETROSPECTIVE_PROPOSAL_REJECTED_EVENT in RETROSPECTIVE_EVENT_NAMES
+
+
+class TestRuntimeRetrospectivePayloads:
+    def test_requested_payload_shape(self) -> None:
+        actor = RetrospectiveActorRef(kind="human", id="operator-1")
+        mode = RetrospectiveMode(
+            value="human_in_command",
+            source_signal=RetrospectiveModeSourceSignal(
+                kind="explicit_flag",
+                evidence="--mode human_in_command",
+            ),
+        )
+        payload = RetrospectiveRequestedPayload(
+            mode=mode,
+            terminus_step_id="accept",
+            requested_by=actor,
+        )
+        assert payload.mode.value == "human_in_command"
+        assert payload.requested_by.id == "operator-1"
+
+    def test_runtime_payloads_reject_extra_fields(self) -> None:
+        with pytest.raises(ValidationError):
+            RetrospectiveStartedPayload(
+                facilitator_profile_id="retrospective-facilitator",
+                action_id="retrospect",
+                extra="nope",
+            )
+
+    def test_completed_payload_shape(self) -> None:
+        payload = RetrospectiveLifecycleCompletedPayload(
+            record_path=".kittify/missions/01TEST/retrospective.yaml",
+            record_hash="sha256:abc",
+            findings_summary={"helped": 1, "not_helpful": 2, "gaps": 0},
+            proposals_count=3,
+        )
+        assert payload.proposals_count == 3
+
+    def test_completed_payload_rejects_negative_proposal_count(self) -> None:
+        with pytest.raises(ValidationError):
+            RetrospectiveLifecycleCompletedPayload(
+                record_path=".kittify/missions/01TEST/retrospective.yaml",
+                record_hash="sha256:abc",
+                findings_summary={},
+                proposals_count=-1,
+            )
+
+    def test_skipped_payload_shape(self) -> None:
+        payload = RetrospectiveLifecycleSkippedPayload(
+            record_path=".kittify/missions/01TEST/retrospective.yaml",
+            skip_reason="operator declined",
+            skipped_by=RetrospectiveActorRef(kind="human", id="operator-1"),
+        )
+        assert payload.skipped_by.kind == "human"
+
+    def test_failed_payload_shape(self) -> None:
+        payload = RetrospectiveFailedPayload(
+            failure_code="facilitator_not_configured",
+            message="No facilitator profile configured",
+        )
+        assert payload.record_path is None
+
+    def test_proposal_payload_shapes(self) -> None:
+        actor = RetrospectiveActorRef(kind="agent", id="synthesizer")
+        generated = RetrospectiveProposalGeneratedPayload(
+            proposal_id="01TESTPROPOSAL",
+            kind="synthesize_directive",
+            record_path=".kittify/missions/01TEST/retrospective.yaml",
+        )
+        applied = RetrospectiveProposalAppliedPayload(
+            proposal_id=generated.proposal_id,
+            kind=generated.kind,
+            target_urn="doctrine:directive:DIRECTIVE_001",
+            provenance_ref="mission/01TEST/proposals/01TESTPROPOSAL",
+            applied_by=actor,
+        )
+        rejected = RetrospectiveProposalRejectedPayload(
+            proposal_id=generated.proposal_id,
+            kind=generated.kind,
+            reason="conflict",
+            detail="target changed",
+            rejected_by=actor,
+        )
+        assert applied.target_urn == "doctrine:directive:DIRECTIVE_001"
+        assert rejected.reason == "conflict"
