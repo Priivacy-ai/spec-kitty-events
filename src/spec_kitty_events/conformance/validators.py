@@ -106,7 +106,15 @@ from spec_kitty_events.profile_invocation import (
 )
 from spec_kitty_events.retrospective import (
     RetrospectiveCompletedPayload,
+    RetrospectiveFailedPayload,
+    RetrospectiveLifecycleCompletedPayload,
+    RetrospectiveLifecycleSkippedPayload,
+    RetrospectiveProposalAppliedPayload,
+    RetrospectiveProposalGeneratedPayload,
+    RetrospectiveProposalRejectedPayload,
+    RetrospectiveRequestedPayload,
     RetrospectiveSkippedPayload,
+    RetrospectiveStartedPayload,
 )
 
 
@@ -221,7 +229,16 @@ _EVENT_TYPE_TO_MODEL: Dict[str, Any] = {
     "ExternalReferenceLinked": ExternalReferenceLinkedPayload,
     # Profile invocation contracts (3.1.0)
     "ProfileInvocationStarted": ProfileInvocationStartedPayload,
-    # Retrospective contracts (3.1.0)
+    # Retrospective contracts (4.1.0)
+    "retrospective.requested": RetrospectiveRequestedPayload,
+    "retrospective.started": RetrospectiveStartedPayload,
+    "retrospective.completed": RetrospectiveLifecycleCompletedPayload,
+    "retrospective.skipped": RetrospectiveLifecycleSkippedPayload,
+    "retrospective.failed": RetrospectiveFailedPayload,
+    "retrospective.proposal.generated": RetrospectiveProposalGeneratedPayload,
+    "retrospective.proposal.applied": RetrospectiveProposalAppliedPayload,
+    "retrospective.proposal.rejected": RetrospectiveProposalRejectedPayload,
+    # Legacy retrospective terminal contracts (3.1.0)
     "RetrospectiveCompleted": RetrospectiveCompletedPayload,
     "RetrospectiveSkipped": RetrospectiveSkippedPayload,
 }
@@ -305,7 +322,16 @@ _EVENT_TYPE_TO_SCHEMA: Dict[str, str] = {
     "ExternalReferenceLinked": "external_reference_linked_payload",
     # Profile invocation contracts (3.1.0)
     "ProfileInvocationStarted": "profile_invocation_started_payload",
-    # Retrospective contracts (3.1.0)
+    # Retrospective contracts (4.1.0)
+    "retrospective.requested": "retrospective_requested_payload",
+    "retrospective.started": "retrospective_started_payload",
+    "retrospective.completed": "retrospective_lifecycle_completed_payload",
+    "retrospective.skipped": "retrospective_lifecycle_skipped_payload",
+    "retrospective.failed": "retrospective_failed_payload",
+    "retrospective.proposal.generated": "retrospective_proposal_generated_payload",
+    "retrospective.proposal.applied": "retrospective_proposal_applied_payload",
+    "retrospective.proposal.rejected": "retrospective_proposal_rejected_payload",
+    # Legacy retrospective terminal contracts (3.1.0)
     "RetrospectiveCompleted": "retrospective_completed_payload",
     "RetrospectiveSkipped": "retrospective_skipped_payload",
 }

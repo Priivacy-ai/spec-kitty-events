@@ -1361,6 +1361,70 @@
       "min_version": "3.1.0"
     },
     {
+      "id": "retrospective-requested-valid",
+      "path": "retrospective/valid/retrospective_requested.json",
+      "expected_result": "valid",
+      "event_type": "retrospective.requested",
+      "notes": "Valid runtime retrospective requested payload",
+      "min_version": "4.1.0"
+    },
+    {
+      "id": "retrospective-started-valid",
+      "path": "retrospective/valid/retrospective_started.json",
+      "expected_result": "valid",
+      "event_type": "retrospective.started",
+      "notes": "Valid runtime retrospective started payload",
+      "min_version": "4.1.0"
+    },
+    {
+      "id": "retrospective-lifecycle-completed-valid",
+      "path": "retrospective/valid/retrospective_lifecycle_completed.json",
+      "expected_result": "valid",
+      "event_type": "retrospective.completed",
+      "notes": "Valid runtime retrospective completed payload",
+      "min_version": "4.1.0"
+    },
+    {
+      "id": "retrospective-lifecycle-skipped-valid",
+      "path": "retrospective/valid/retrospective_lifecycle_skipped.json",
+      "expected_result": "valid",
+      "event_type": "retrospective.skipped",
+      "notes": "Valid runtime retrospective skipped payload",
+      "min_version": "4.1.0"
+    },
+    {
+      "id": "retrospective-failed-valid",
+      "path": "retrospective/valid/retrospective_failed.json",
+      "expected_result": "valid",
+      "event_type": "retrospective.failed",
+      "notes": "Valid runtime retrospective failed payload",
+      "min_version": "4.1.0"
+    },
+    {
+      "id": "retrospective-proposal-generated-valid",
+      "path": "retrospective/valid/retrospective_proposal_generated.json",
+      "expected_result": "valid",
+      "event_type": "retrospective.proposal.generated",
+      "notes": "Valid runtime retrospective proposal generated payload",
+      "min_version": "4.1.0"
+    },
+    {
+      "id": "retrospective-proposal-applied-valid",
+      "path": "retrospective/valid/retrospective_proposal_applied.json",
+      "expected_result": "valid",
+      "event_type": "retrospective.proposal.applied",
+      "notes": "Valid runtime retrospective proposal applied payload",
+      "min_version": "4.1.0"
+    },
+    {
+      "id": "retrospective-proposal-rejected-valid",
+      "path": "retrospective/valid/retrospective_proposal_rejected.json",
+      "expected_result": "valid",
+      "event_type": "retrospective.proposal.rejected",
+      "notes": "Valid runtime retrospective proposal rejected payload",
+      "min_version": "4.1.0"
+    },
+    {
       "id": "retrospective-completed-invalid-missing-actor",
       "path": "retrospective/invalid/retrospective_completed_missing_actor.json",
       "expected_result": "invalid",

@@ -1,0 +1,116 @@
+{
+  "$defs": {
+    "RetrospectiveActorRef": {
+      "additionalProperties": false,
+      "description": "Actor reference embedded in runtime retrospective events.",
+      "properties": {
+        "id": {
+          "minLength": 1,
+          "title": "Id",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "human",
+            "agent",
+            "runtime"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "profile_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Profile Id"
+        }
+      },
+      "required": [
+        "kind",
+        "id"
+      ],
+      "title": "RetrospectiveActorRef",
+      "type": "object"
+    },
+    "RetrospectiveMode": {
+      "additionalProperties": false,
+      "description": "Resolved retrospective execution mode.",
+      "properties": {
+        "source_signal": {
+          "$ref": "#/$defs/RetrospectiveModeSourceSignal"
+        },
+        "value": {
+          "enum": [
+            "autonomous",
+            "human_in_command"
+          ],
+          "title": "Value",
+          "type": "string"
+        }
+      },
+      "required": [
+        "value",
+        "source_signal"
+      ],
+      "title": "RetrospectiveMode",
+      "type": "object"
+    },
+    "RetrospectiveModeSourceSignal": {
+      "additionalProperties": false,
+      "description": "How retrospective execution mode was resolved.",
+      "properties": {
+        "evidence": {
+          "minLength": 1,
+          "title": "Evidence",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "charter_override",
+            "explicit_flag",
+            "environment",
+            "parent_process"
+          ],
+          "title": "Kind",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "evidence"
+      ],
+      "title": "RetrospectiveModeSourceSignal",
+      "type": "object"
+    }
+  },
+  "$id": "spec-kitty-events/retrospective_requested_payload",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Payload for ``retrospective.requested`` events.",
+  "properties": {
+    "mode": {
+      "$ref": "#/$defs/RetrospectiveMode"
+    },
+    "requested_by": {
+      "$ref": "#/$defs/RetrospectiveActorRef"
+    },
+    "terminus_step_id": {
+      "minLength": 1,
+      "title": "Terminus Step Id",
+      "type": "string"
+    }
+  },
+  "required": [
+    "mode",
+    "terminus_step_id",
+    "requested_by"
+  ],
+  "title": "RetrospectiveRequestedPayload",
+  "type": "object"
+}

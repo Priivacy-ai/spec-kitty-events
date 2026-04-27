@@ -1,0 +1,30 @@
+{
+  "$id": "spec-kitty-events/retrospective_proposal_generated_payload",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Payload for ``retrospective.proposal.generated`` events.",
+  "properties": {
+    "kind": {
+      "minLength": 1,
+      "title": "Kind",
+      "type": "string"
+    },
+    "proposal_id": {
+      "minLength": 1,
+      "title": "Proposal Id",
+      "type": "string"
+    },
+    "record_path": {
+      "minLength": 1,
+      "title": "Record Path",
+      "type": "string"
+    }
+  },
+  "required": [
+    "proposal_id",
+    "kind",
+    "record_path"
+  ],
+  "title": "RetrospectiveProposalGeneratedPayload",
+  "type": "object"
+}

@@ -1,0 +1,68 @@
+{
+  "$defs": {
+    "RetrospectiveActorRef": {
+      "additionalProperties": false,
+      "description": "Actor reference embedded in runtime retrospective events.",
+      "properties": {
+        "id": {
+          "minLength": 1,
+          "title": "Id",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "human",
+            "agent",
+            "runtime"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "profile_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Profile Id"
+        }
+      },
+      "required": [
+        "kind",
+        "id"
+      ],
+      "title": "RetrospectiveActorRef",
+      "type": "object"
+    }
+  },
+  "$id": "spec-kitty-events/retrospective_lifecycle_skipped_payload",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Payload for ``retrospective.skipped`` events.",
+  "properties": {
+    "record_path": {
+      "minLength": 1,
+      "title": "Record Path",
+      "type": "string"
+    },
+    "skip_reason": {
+      "minLength": 1,
+      "title": "Skip Reason",
+      "type": "string"
+    },
+    "skipped_by": {
+      "$ref": "#/$defs/RetrospectiveActorRef"
+    }
+  },
+  "required": [
+    "record_path",
+    "skip_reason",
+    "skipped_by"
+  ],
+  "title": "RetrospectiveLifecycleSkippedPayload",
+  "type": "object"
+}

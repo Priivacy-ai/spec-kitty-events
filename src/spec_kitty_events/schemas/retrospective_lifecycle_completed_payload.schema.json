@@ -1,0 +1,38 @@
+{
+  "$id": "spec-kitty-events/retrospective_lifecycle_completed_payload",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Payload for ``retrospective.completed`` events.",
+  "properties": {
+    "findings_summary": {
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "title": "Findings Summary",
+      "type": "object"
+    },
+    "proposals_count": {
+      "minimum": 0,
+      "title": "Proposals Count",
+      "type": "integer"
+    },
+    "record_hash": {
+      "minLength": 1,
+      "title": "Record Hash",
+      "type": "string"
+    },
+    "record_path": {
+      "minLength": 1,
+      "title": "Record Path",
+      "type": "string"
+    }
+  },
+  "required": [
+    "record_path",
+    "record_hash",
+    "findings_summary",
+    "proposals_count"
+  ],
+  "title": "RetrospectiveLifecycleCompletedPayload",
+  "type": "object"
+}

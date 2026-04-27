@@ -1,0 +1,80 @@
+{
+  "$defs": {
+    "RetrospectiveActorRef": {
+      "additionalProperties": false,
+      "description": "Actor reference embedded in runtime retrospective events.",
+      "properties": {
+        "id": {
+          "minLength": 1,
+          "title": "Id",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "human",
+            "agent",
+            "runtime"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "profile_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Profile Id"
+        }
+      },
+      "required": [
+        "kind",
+        "id"
+      ],
+      "title": "RetrospectiveActorRef",
+      "type": "object"
+    }
+  },
+  "$id": "spec-kitty-events/retrospective_proposal_applied_payload",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Payload for ``retrospective.proposal.applied`` events.",
+  "properties": {
+    "applied_by": {
+      "$ref": "#/$defs/RetrospectiveActorRef"
+    },
+    "kind": {
+      "minLength": 1,
+      "title": "Kind",
+      "type": "string"
+    },
+    "proposal_id": {
+      "minLength": 1,
+      "title": "Proposal Id",
+      "type": "string"
+    },
+    "provenance_ref": {
+      "minLength": 1,
+      "title": "Provenance Ref",
+      "type": "string"
+    },
+    "target_urn": {
+      "minLength": 1,
+      "title": "Target Urn",
+      "type": "string"
+    }
+  },
+  "required": [
+    "proposal_id",
+    "kind",
+    "target_urn",
+    "provenance_ref",
+    "applied_by"
+  ],
+  "title": "RetrospectiveProposalAppliedPayload",
+  "type": "object"
+}

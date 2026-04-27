@@ -7,12 +7,28 @@ from pydantic import ValidationError
 from spec_kitty_events.conformance.loader import load_fixtures
 from spec_kitty_events.retrospective import (
     RetrospectiveCompletedPayload,
+    RetrospectiveFailedPayload,
+    RetrospectiveLifecycleCompletedPayload,
+    RetrospectiveLifecycleSkippedPayload,
+    RetrospectiveProposalAppliedPayload,
+    RetrospectiveProposalGeneratedPayload,
+    RetrospectiveProposalRejectedPayload,
+    RetrospectiveRequestedPayload,
     RetrospectiveSkippedPayload,
+    RetrospectiveStartedPayload,
 )
 
 _EVENT_TYPE_TO_MODEL = {
     "RetrospectiveCompleted": RetrospectiveCompletedPayload,
     "RetrospectiveSkipped": RetrospectiveSkippedPayload,
+    "retrospective.requested": RetrospectiveRequestedPayload,
+    "retrospective.started": RetrospectiveStartedPayload,
+    "retrospective.completed": RetrospectiveLifecycleCompletedPayload,
+    "retrospective.skipped": RetrospectiveLifecycleSkippedPayload,
+    "retrospective.failed": RetrospectiveFailedPayload,
+    "retrospective.proposal.generated": RetrospectiveProposalGeneratedPayload,
+    "retrospective.proposal.applied": RetrospectiveProposalAppliedPayload,
+    "retrospective.proposal.rejected": RetrospectiveProposalRejectedPayload,
 }
 
 
@@ -36,7 +52,7 @@ def test_retrospective_conformance(fixture):
     model_class = _EVENT_TYPE_TO_MODEL[fixture.event_type]
     if fixture.expected_valid:
         payload = model_class(**fixture.payload)
-        assert payload.mission_id  # sanity check
+        assert payload.model_dump()  # sanity check
     else:
         with pytest.raises(ValidationError):
             model_class(**fixture.payload)

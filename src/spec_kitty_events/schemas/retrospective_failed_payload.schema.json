@@ -1,0 +1,36 @@
+{
+  "$id": "spec-kitty-events/retrospective_failed_payload",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Payload for ``retrospective.failed`` events.",
+  "properties": {
+    "failure_code": {
+      "minLength": 1,
+      "title": "Failure Code",
+      "type": "string"
+    },
+    "message": {
+      "minLength": 1,
+      "title": "Message",
+      "type": "string"
+    },
+    "record_path": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Record Path"
+    }
+  },
+  "required": [
+    "failure_code",
+    "message"
+  ],
+  "title": "RetrospectiveFailedPayload",
+  "type": "object"
+}

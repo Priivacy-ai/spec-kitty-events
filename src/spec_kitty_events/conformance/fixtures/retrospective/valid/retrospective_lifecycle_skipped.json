@@ -1,0 +1,8 @@
+{
+  "record_path": ".kittify/missions/01TESTMISSION000000000001/retrospective.yaml",
+  "skip_reason": "operator declined",
+  "skipped_by": {
+    "kind": "human",
+    "id": "operator-1"
+  }
+}

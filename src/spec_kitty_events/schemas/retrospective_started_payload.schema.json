@@ -1,0 +1,24 @@
+{
+  "$id": "spec-kitty-events/retrospective_started_payload",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Payload for ``retrospective.started`` events.",
+  "properties": {
+    "action_id": {
+      "minLength": 1,
+      "title": "Action Id",
+      "type": "string"
+    },
+    "facilitator_profile_id": {
+      "minLength": 1,
+      "title": "Facilitator Profile Id",
+      "type": "string"
+    }
+  },
+  "required": [
+    "facilitator_profile_id",
+    "action_id"
+  ],
+  "title": "RetrospectiveStartedPayload",
+  "type": "object"
+}

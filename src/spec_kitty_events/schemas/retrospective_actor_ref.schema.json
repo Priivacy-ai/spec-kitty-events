@@ -1,0 +1,40 @@
+{
+  "$id": "spec-kitty-events/retrospective_actor_ref",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Actor reference embedded in runtime retrospective events.",
+  "properties": {
+    "id": {
+      "minLength": 1,
+      "title": "Id",
+      "type": "string"
+    },
+    "kind": {
+      "enum": [
+        "human",
+        "agent",
+        "runtime"
+      ],
+      "title": "Kind",
+      "type": "string"
+    },
+    "profile_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Profile Id"
+    }
+  },
+  "required": [
+    "kind",
+    "id"
+  ],
+  "title": "RetrospectiveActorRef",
+  "type": "object"
+}
