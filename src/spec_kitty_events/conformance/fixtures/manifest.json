@@ -1516,7 +1516,7 @@
       "expected_result": "valid",
       "event_type": "MissionCreated",
       "notes": "WP05 class taxonomy: canonical MissionCreated baseline (registered for manifest-coverage gate; runtime read happens via classes.entries).",
-      "min_version": "4.1.0"
+      "min_version": "5.0.0"
     },
     {
       "id": "class-taxonomy-envelope-valid-canonical-mission-closed-baseline",
@@ -1524,7 +1524,7 @@
       "expected_result": "valid",
       "event_type": "MissionClosed",
       "notes": "WP05 class taxonomy: canonical MissionClosed baseline.",
-      "min_version": "4.1.0"
+      "min_version": "5.0.0"
     },
     {
       "id": "class-taxonomy-envelope-valid-canonical-wp-status-changed-in-review",
@@ -1532,7 +1532,7 @@
       "expected_result": "valid",
       "event_type": "WPStatusChanged",
       "notes": "WP05 class taxonomy: canonical WPStatusChanged with to_lane=in_review (handshake with WP01).",
-      "min_version": "4.1.0"
+      "min_version": "5.0.0"
     },
     {
       "id": "class-taxonomy-envelope-valid-canonical-wp-status-changed-planned-to-claimed",
@@ -1540,7 +1540,7 @@
       "expected_result": "valid",
       "event_type": "WPStatusChanged",
       "notes": "WP05 class taxonomy: canonical WPStatusChanged covering planned->claimed.",
-      "min_version": "4.1.0"
+      "min_version": "5.0.0"
     },
     {
       "id": "class-taxonomy-envelope-valid-historical-synthesized-from-pre30-envelope",
@@ -1548,7 +1548,7 @@
       "expected_result": "valid",
       "event_type": "MissionCreated",
       "notes": "WP05 class taxonomy: synthesized from a pre-3.0 envelope.",
-      "min_version": "4.1.0"
+      "min_version": "5.0.0"
     },
     {
       "id": "class-taxonomy-envelope-valid-historical-synthesized-from-in-review-legacy-synonym",
@@ -1556,7 +1556,7 @@
       "expected_result": "valid",
       "event_type": "WPStatusChanged",
       "notes": "WP05 class taxonomy: synthesized from a row using the legacy 'awaiting-review' synonym.",
-      "min_version": "4.1.0"
+      "min_version": "5.0.0"
     },
     {
       "id": "class-taxonomy-envelope-valid-historical-synthesized-from-envelope-with-legacy-keys",
@@ -1564,7 +1564,7 @@
       "expected_result": "valid",
       "event_type": "MissionClosed",
       "notes": "WP05 class taxonomy: synthesized from an envelope that originally carried feature_slug/feature_number.",
-      "min_version": "4.1.0"
+      "min_version": "5.0.0"
     },
     {
       "id": "class-taxonomy-envelope-invalid-unknown-lane-typo",
@@ -1572,7 +1572,7 @@
       "expected_result": "invalid",
       "event_type": "WPStatusChanged",
       "notes": "WP05 class taxonomy: to_lane='blockd' (typo) must reject with UNKNOWN_LANE.",
-      "min_version": "4.1.0"
+      "min_version": "5.0.0"
     },
     {
       "id": "class-taxonomy-envelope-invalid-unknown-lane-uppercase",
@@ -1580,7 +1580,7 @@
       "expected_result": "invalid",
       "event_type": "WPStatusChanged",
       "notes": "WP05 class taxonomy: to_lane='IN_REVIEW' (uppercase) must reject with UNKNOWN_LANE.",
-      "min_version": "4.1.0"
+      "min_version": "5.0.0"
     },
     {
       "id": "class-taxonomy-envelope-invalid-forbidden-key-top-level",
@@ -1588,7 +1588,7 @@
       "expected_result": "invalid",
       "event_type": "MissionCreated",
       "notes": "WP05 class taxonomy: top-level forbidden 'feature_slug' must reject with FORBIDDEN_KEY.",
-      "min_version": "4.1.0"
+      "min_version": "5.0.0"
     },
     {
       "id": "class-taxonomy-envelope-invalid-forbidden-key-nested",
@@ -1596,7 +1596,7 @@
       "expected_result": "invalid",
       "event_type": "MissionCreated",
       "notes": "WP05 class taxonomy: nested 'feature_number' inside payload.metadata must reject with FORBIDDEN_KEY.",
-      "min_version": "4.1.0"
+      "min_version": "5.0.0"
     },
     {
       "id": "class-taxonomy-envelope-invalid-forbidden-key-depth-10",
@@ -1604,7 +1604,7 @@
       "expected_result": "invalid",
       "event_type": "MissionCreated",
       "notes": "WP05 class taxonomy: forbidden 'mission_key' at depth 10 must reject with FORBIDDEN_KEY.",
-      "min_version": "4.1.0"
+      "min_version": "5.0.0"
     },
     {
       "id": "class-taxonomy-envelope-invalid-forbidden-key-in-array",
@@ -1612,7 +1612,7 @@
       "expected_result": "invalid",
       "event_type": "MissionCreated",
       "notes": "WP05 class taxonomy: forbidden key inside array element must reject with FORBIDDEN_KEY.",
-      "min_version": "4.1.0"
+      "min_version": "5.0.0"
     },
     {
       "id": "class-taxonomy-envelope-invalid-payload-schema-extra-field",
@@ -1620,7 +1620,7 @@
       "expected_result": "invalid",
       "event_type": "MissionCreated",
       "notes": "WP05 class taxonomy: extra field on extra=forbid payload must reject with PAYLOAD_SCHEMA_FAIL.",
-      "min_version": "4.1.0"
+      "min_version": "5.0.0"
     },
     {
       "id": "class-taxonomy-envelope-invalid-payload-schema-missing-required",
@@ -1628,7 +1628,7 @@
       "expected_result": "invalid",
       "event_type": "MissionCreated",
       "notes": "WP05 class taxonomy: missing required friendly_name must reject with PAYLOAD_SCHEMA_FAIL.",
-      "min_version": "4.1.0"
+      "min_version": "5.0.0"
     },
     {
       "id": "class-taxonomy-envelope-invalid-payload-schema-wrong-type",
@@ -1636,7 +1636,7 @@
       "expected_result": "invalid",
       "event_type": "MissionCreated",
       "notes": "WP05 class taxonomy: wp_count='three' is wrong type must reject with PAYLOAD_SCHEMA_FAIL.",
-      "min_version": "4.1.0"
+      "min_version": "5.0.0"
     },
     {
       "id": "class-taxonomy-envelope-invalid-shape-missing-event-type",
@@ -1644,7 +1644,7 @@
       "expected_result": "invalid",
       "event_type": "<missing>",
       "notes": "WP05 class taxonomy: envelope missing event_type must reject with ENVELOPE_SHAPE_INVALID.",
-      "min_version": "4.1.0"
+      "min_version": "5.0.0"
     },
     {
       "id": "class-taxonomy-envelope-invalid-shape-wrong-wrapper-array",
@@ -1652,7 +1652,7 @@
       "expected_result": "invalid",
       "event_type": "<wrapper-array>",
       "notes": "WP05 class taxonomy: array wrapper must reject with ENVELOPE_SHAPE_INVALID.",
-      "min_version": "4.1.0"
+      "min_version": "5.0.0"
     },
     {
       "id": "class-taxonomy-historical-row-pre30-envelope-shape",
@@ -1660,7 +1660,7 @@
       "expected_result": "invalid",
       "event_type": "<historical>",
       "notes": "WP05 class taxonomy: pre-3.0 envelope shape; ideally RAW_HISTORICAL_ROW.",
-      "min_version": "4.1.0"
+      "min_version": "5.0.0"
     },
     {
       "id": "class-taxonomy-historical-row-feature-slug-top-level",
@@ -1668,7 +1668,7 @@
       "expected_result": "invalid",
       "event_type": "<historical>",
       "notes": "WP05 class taxonomy: historical row with top-level feature_slug.",
-      "min_version": "4.1.0"
+      "min_version": "5.0.0"
     },
     {
       "id": "class-taxonomy-historical-row-legacy-aggregate-id",
@@ -1676,7 +1676,7 @@
       "expected_result": "invalid",
       "event_type": "<historical>",
       "notes": "WP05 class taxonomy: historical row carrying legacy_aggregate_id.",
-      "min_version": "4.1.0"
+      "min_version": "5.0.0"
     },
     {
       "id": "class-taxonomy-historical-row-in-review-legacy-synonym",
@@ -1684,7 +1684,7 @@
       "expected_result": "invalid",
       "event_type": "<historical>",
       "notes": "WP05 class taxonomy: historical row using 'awaiting-review' legacy synonym.",
-      "min_version": "4.1.0"
+      "min_version": "5.0.0"
     },
     {
       "id": "class-taxonomy-historical-row-raw-status-entry",
@@ -1692,7 +1692,7 @@
       "expected_result": "invalid",
       "event_type": "<historical>",
       "notes": "WP05 class taxonomy: raw status entry without envelope wrapper.",
-      "min_version": "4.1.0"
+      "min_version": "5.0.0"
     },
     {
       "id": "class-taxonomy-lane-mapping-doing-alias",
@@ -1700,7 +1700,7 @@
       "expected_result": "valid",
       "event_type": "<lane-mapping>",
       "notes": "WP05 class taxonomy: 'doing' alias resolves to canonical 'in_progress'.",
-      "min_version": "4.1.0"
+      "min_version": "5.0.0"
     },
     {
       "id": "class-taxonomy-lane-mapping-canonical-in-review-passthrough",
@@ -1708,7 +1708,7 @@
       "expected_result": "valid",
       "event_type": "<lane-mapping>",
       "notes": "WP05 class taxonomy: canonical 'in_review' resolves to itself.",
-      "min_version": "4.1.0"
+      "min_version": "5.0.0"
     },
     {
       "id": "class-taxonomy-lane-mapping-awaiting-review-unmapped",
@@ -1716,7 +1716,7 @@
       "expected_result": "invalid",
       "event_type": "<lane-mapping>",
       "notes": "WP05 class taxonomy: legacy 'awaiting-review' synonym is currently unmapped; must reject with UNKNOWN_LANE.",
-      "min_version": "4.1.0"
+      "min_version": "5.0.0"
     }
   ],
   "classes": {
