@@ -17,7 +17,8 @@ subtasks:
 - T014
 - T015
 - T016
-agent: claude
+agent: "claude:sonnet:implementer-ivan:implementer"
+shell_pid: "33657"
 history:
 - event: created
   at: '2026-05-01T09:44:26Z'
@@ -246,3 +247,7 @@ Codex reviewer will check:
 4. Lane references use `Lane` enum members, not string literals.
 5. Schema regeneration is reproducible.
 6. The `MissionClosed` cross-shape test specifically covers the disagreement the spec called out.
+
+## Activity Log
+
+- 2026-05-01T10:44:46Z – claude:sonnet:implementer-ivan:implementer – shell_pid=33657 – Started implementation via action command
