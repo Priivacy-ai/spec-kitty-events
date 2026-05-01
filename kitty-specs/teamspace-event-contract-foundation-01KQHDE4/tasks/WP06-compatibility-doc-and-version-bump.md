@@ -15,7 +15,8 @@ subtasks:
 - T025
 - T026
 - T027
-agent: claude
+agent: "claude:sonnet:implementer-ivan:implementer"
+shell_pid: "42193"
 history:
 - event: created
   at: '2026-05-01T09:44:26Z'
@@ -196,3 +197,7 @@ Codex reviewer will check:
 3. `COMPATIBILITY.md` does not weaken the local-CLI compatibility wording.
 4. Both examples (local-only-valid, both-valid) are real, copy-pasteable JSON.
 5. No silent rebase of unrelated CHANGELOG entries.
+
+## Activity Log
+
+- 2026-05-01T11:13:24Z – claude:sonnet:implementer-ivan:implementer – shell_pid=42193 – Started implementation via action command
