@@ -17,9 +17,9 @@ This is a reference table only — progress tracking happens via the per-WP chec
 | T002 | Move `in_review` out of "invalid lane" fixtures (lane_mapping/invalid/unknown_lanes.json + events/invalid/wp_status_changed_invalid_lane.json) | WP01 | | [D] |
 | T003 | Author `tests/test_lane_vocabulary.py` proving canonical-lane single-source-of-truth and `Lane.IN_REVIEW` membership | WP01 | | [D] |
 | T004 | Update any existing tests that asserted `in_review` was invalid (search-and-fix pass) | WP01 | | [D] |
-| T005 | Create `src/spec_kitty_events/validation_errors.py` with `ValidationError` Pydantic model and `ValidationErrorCode` closed enum | WP02 | [P] |
-| T006 | Add `as_validation_error()` adapter methods on existing typed exceptions (TransitionError, lifecycle errors) | WP02 | [P] |
-| T007 | Author `tests/test_validation_error.py` for shape, enum membership, determinism | WP02 | [P] |
+| T005 | Create `src/spec_kitty_events/validation_errors.py` with `ValidationError` Pydantic model and `ValidationErrorCode` closed enum | WP02 | [D] |
+| T006 | Add `as_validation_error()` adapter methods on existing typed exceptions (TransitionError, lifecycle errors) | WP02 | [D] |
+| T007 | Author `tests/test_validation_error.py` for shape, enum membership, determinism | WP02 | [D] |
 | T008 | Audit `spec-kitty-saas` ingress rejection rules + epic #920 historical-row survey to expand the forbidden-key set; document audit results | WP03 | |
 | T009 | Create `src/spec_kitty_events/forbidden_keys.py` with `FORBIDDEN_LEGACY_KEYS` constant and recursive validator | WP03 | |
 | T010 | Author `tests/test_forbidden_keys.py` targeted fixtures: top, depth-1, depth-3, depth-10, array element, must-accept-when-value | WP03 | |
@@ -85,9 +85,9 @@ This is a reference table only — progress tracking happens via the per-WP chec
 **Prompt**: [tasks/WP02-validation-error-shape.md](./tasks/WP02-validation-error-shape.md) (~250 lines)
 
 **Subtasks**:
-- [ ] T005 Create `src/spec_kitty_events/validation_errors.py` (WP02)
-- [ ] T006 Add `as_validation_error()` adapters on existing typed exceptions (WP02)
-- [ ] T007 Author `tests/test_validation_error.py` (WP02)
+- [x] T005 Create `src/spec_kitty_events/validation_errors.py` (WP02)
+- [x] T006 Add `as_validation_error()` adapters on existing typed exceptions (WP02)
+- [x] T007 Author `tests/test_validation_error.py` (WP02)
 
 **Dependencies**: none. **Parallel** with WP01.
 
