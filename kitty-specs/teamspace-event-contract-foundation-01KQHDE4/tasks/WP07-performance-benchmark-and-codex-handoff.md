@@ -15,8 +15,8 @@ subtasks:
 - T028
 - T029
 - T030
-agent: "claude:sonnet:implementer-ivan:implementer"
-shell_pid: "43324"
+agent: "claude:sonnet:reviewer-rachel:reviewer"
+shell_pid: "51555"
 history:
 - event: created
   at: '2026-05-01T09:44:26Z'
@@ -251,3 +251,4 @@ Codex reviewer will read this WP's review-handoff doc as the entry point to the 
 
 - 2026-05-01T11:20:46Z – claude:sonnet:implementer-ivan:implementer – shell_pid=43324 – Started implementation via action command
 - 2026-05-01T11:29:08Z – claude:sonnet:implementer-ivan:implementer – shell_pid=43324 – Ready for review: NFR-005 benchmark passing + full spec-to-evidence handoff
+- 2026-05-01T11:29:41Z – claude:sonnet:reviewer-rachel:reviewer – shell_pid=51555 – Started review via action command
