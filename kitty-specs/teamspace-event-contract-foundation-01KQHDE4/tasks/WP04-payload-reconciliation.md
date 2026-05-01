@@ -17,8 +17,8 @@ subtasks:
 - T014
 - T015
 - T016
-agent: "claude:sonnet:implementer-ivan:implementer"
-shell_pid: "33657"
+agent: "claude:sonnet:reviewer-rachel:reviewer"
+shell_pid: "34867"
 history:
 - event: created
   at: '2026-05-01T09:44:26Z'
@@ -252,3 +252,4 @@ Codex reviewer will check:
 
 - 2026-05-01T10:44:46Z – claude:sonnet:implementer-ivan:implementer – shell_pid=33657 – Started implementation via action command
 - 2026-05-01T10:50:01Z – claude:sonnet:implementer-ivan:implementer – shell_pid=33657 – Ready for review: payload reconciliation + schemas + tests + log
+- 2026-05-01T10:50:23Z – claude:sonnet:reviewer-rachel:reviewer – shell_pid=34867 – Started review via action command
