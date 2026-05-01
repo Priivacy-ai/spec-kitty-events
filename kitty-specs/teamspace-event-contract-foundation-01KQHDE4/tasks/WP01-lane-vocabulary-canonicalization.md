@@ -229,3 +229,7 @@ The Codex reviewer will check:
 3. No fixture remains that asserts `in_review` is invalid.
 4. The single-source-of-truth test is non-trivial (it would catch a real drift, not just a typo).
 5. Imports of `Lane` from `spec_kitty_events` (not from internal submodules) are preserved at the public API boundary.
+
+## Activity Log
+
+- 2026-05-01T10:06:46Z – claude – shell_pid=77568 – Ready for review: Lane.IN_REVIEW added; lane vocabulary tests authored
