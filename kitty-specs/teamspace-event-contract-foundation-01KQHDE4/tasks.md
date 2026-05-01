@@ -29,14 +29,14 @@ This is a reference table only — progress tracking happens via the per-WP chec
 | T014 | Update payload models (`MissionCreatedPayload`, `MissionClosedPayload`, `StatusTransitionPayload`) with reconciled fields and `extra='forbid'` | WP04 | | [D] |
 | T015 | Regenerate `src/spec_kitty_events/schemas/*.schema.json` from updated models | WP04 | | [D] |
 | T016 | Author `tests/test_payload_reconciliation.py` covering cross-shape acceptance and rejection | WP04 | | [D] |
-| T017 | Reorganize `src/spec_kitty_events/conformance/fixtures/` into 8 named class directories | WP05 | |
-| T018 | Author `envelope_valid_canonical` fixtures (one per event type, including `in_review`-using `WPStatusChanged`) | WP05 | |
-| T019 | Author `envelope_valid_historical_synthesized` fixtures (CLI canonicalizer dry-run shapes) | WP05 | |
-| T020 | Author `envelope_invalid_*` fixtures (forbidden_key at top/nested/depth-10/array, unknown_lane, payload_schema, envelope_shape) with `expected_error_code` | WP05 | |
-| T021 | Author `historical_row_raw` fixtures (real shapes from epic survey, deterministic values) | WP05 | |
-| T022 | Update `manifest.json` with full class registrations; add `src/spec_kitty_events/conformance/fixtures/README.md` | WP05 | |
-| T023 | Author `tests/test_fixture_determinism.py` (audit forbidden patterns: recent timestamps, non-pinned ULIDs) | WP05 | |
-| T024 | Author `tests/test_conformance_classes.py` asserting every fixture's expected outcome and `expected_error_code` | WP05 | |
+| T017 | Reorganize `src/spec_kitty_events/conformance/fixtures/` into 8 named class directories | WP05 | | [D] |
+| T018 | Author `envelope_valid_canonical` fixtures (one per event type, including `in_review`-using `WPStatusChanged`) | WP05 | | [D] |
+| T019 | Author `envelope_valid_historical_synthesized` fixtures (CLI canonicalizer dry-run shapes) | WP05 | | [D] |
+| T020 | Author `envelope_invalid_*` fixtures (forbidden_key at top/nested/depth-10/array, unknown_lane, payload_schema, envelope_shape) with `expected_error_code` | WP05 | | [D] |
+| T021 | Author `historical_row_raw` fixtures (real shapes from epic survey, deterministic values) | WP05 | | [D] |
+| T022 | Update `manifest.json` with full class registrations; add `src/spec_kitty_events/conformance/fixtures/README.md` | WP05 | | [D] |
+| T023 | Author `tests/test_fixture_determinism.py` (audit forbidden patterns: recent timestamps, non-pinned ULIDs) | WP05 | | [D] |
+| T024 | Author `tests/test_conformance_classes.py` asserting every fixture's expected outcome and `expected_error_code` | WP05 | | [D] |
 | T025 | Update `COMPATIBILITY.md` with "Local-CLI compatibility vs TeamSpace ingress validity" section | WP06 | |
 | T026 | Update `CHANGELOG.md` with a "Breaking Changes" section (in_review canonical, payload reconciliation, recursive forbidden-key validator) | WP06 | |
 | T027 | Bump package version in `pyproject.toml` per major-bump rule | WP06 | |
@@ -161,14 +161,14 @@ This is a reference table only — progress tracking happens via the per-WP chec
 **Prompt**: [tasks/WP05-conformance-fixture-suite.md](./tasks/WP05-conformance-fixture-suite.md) (~700 lines — at upper limit)
 
 **Subtasks**:
-- [ ] T017 Reorganize fixtures into 8 named class directories (WP05)
-- [ ] T018 Author envelope_valid_canonical fixtures (WP05)
-- [ ] T019 Author envelope_valid_historical_synthesized fixtures (WP05)
-- [ ] T020 Author envelope_invalid_* fixtures with expected_error_code (WP05)
-- [ ] T021 Author historical_row_raw fixtures with deterministic values (WP05)
-- [ ] T022 Update manifest.json + add fixtures README (WP05)
-- [ ] T023 Author tests/test_fixture_determinism.py (WP05)
-- [ ] T024 Author tests/test_conformance_classes.py (WP05)
+- [x] T017 Reorganize fixtures into 8 named class directories (WP05)
+- [x] T018 Author envelope_valid_canonical fixtures (WP05)
+- [x] T019 Author envelope_valid_historical_synthesized fixtures (WP05)
+- [x] T020 Author envelope_invalid_* fixtures with expected_error_code (WP05)
+- [x] T021 Author historical_row_raw fixtures with deterministic values (WP05)
+- [x] T022 Update manifest.json + add fixtures README (WP05)
+- [x] T023 Author tests/test_fixture_determinism.py (WP05)
+- [x] T024 Author tests/test_conformance_classes.py (WP05)
 
 **Dependencies**: WP01, WP02, WP03, WP04.
 
