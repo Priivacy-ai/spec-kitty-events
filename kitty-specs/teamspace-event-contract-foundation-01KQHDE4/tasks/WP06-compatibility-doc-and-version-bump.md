@@ -201,3 +201,4 @@ Codex reviewer will check:
 ## Activity Log
 
 - 2026-05-01T11:13:24Z – claude:sonnet:implementer-ivan:implementer – shell_pid=42193 – Started implementation via action command
+- 2026-05-01T11:17:55Z – claude:sonnet:implementer-ivan:implementer – shell_pid=42193 – Ready for review: major bump + COMPATIBILITY + CHANGELOG
