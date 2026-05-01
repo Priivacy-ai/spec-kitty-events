@@ -40,9 +40,9 @@ This is a reference table only — progress tracking happens via the per-WP chec
 | T025 | Update `COMPATIBILITY.md` with "Local-CLI compatibility vs TeamSpace ingress validity" section | WP06 | | [D] |
 | T026 | Update `CHANGELOG.md` with a "Breaking Changes" section (in_review canonical, payload reconciliation, recursive forbidden-key validator) | WP06 | | [D] |
 | T027 | Bump package version in `pyproject.toml` per major-bump rule | WP06 | | [D] |
-| T028 | Author `tests/test_validation_benchmark.py` enforcing < 5 ms p95 envelope validation (NFR-005) | WP07 | |
-| T029 | Run full pytest + mypy --strict + schema-drift CI; document results | WP07 | |
-| T030 | Author `kitty-specs/.../contracts/.review-handoff.md` summarizing all SC-### satisfaction for Codex review | WP07 | |
+| T028 | Author `tests/test_validation_benchmark.py` enforcing < 5 ms p95 envelope validation (NFR-005) | WP07 | | [D] |
+| T029 | Run full pytest + mypy --strict + schema-drift CI; document results | WP07 | | [D] |
+| T030 | Author `kitty-specs/.../contracts/.review-handoff.md` summarizing all SC-### satisfaction for Codex review | WP07 | | [D] |
 
 ---
 
@@ -216,9 +216,9 @@ This is a reference table only — progress tracking happens via the per-WP chec
 **Prompt**: [tasks/WP07-performance-benchmark-and-codex-handoff.md](./tasks/WP07-performance-benchmark-and-codex-handoff.md) (~200 lines)
 
 **Subtasks**:
-- [ ] T028 Author `tests/test_validation_benchmark.py` (WP07)
-- [ ] T029 Run full pytest + mypy --strict + schema-drift; document results (WP07)
-- [ ] T030 Author `kitty-specs/.../contracts/.review-handoff.md` (WP07)
+- [x] T028 Author `tests/test_validation_benchmark.py` (WP07)
+- [x] T029 Run full pytest + mypy --strict + schema-drift; document results (WP07)
+- [x] T030 Author `kitty-specs/.../contracts/.review-handoff.md` (WP07)
 
 **Dependencies**: WP01–WP06.
 
