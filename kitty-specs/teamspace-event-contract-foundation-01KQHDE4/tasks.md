@@ -13,10 +13,10 @@ This is a reference table only — progress tracking happens via the per-WP chec
 
 | ID | Description | WP | Parallel |
 |---|---|---|---|
-| T001 | Add `IN_REVIEW` to the `Lane` enum in `src/spec_kitty_events/status.py` | WP01 | |
-| T002 | Move `in_review` out of "invalid lane" fixtures (lane_mapping/invalid/unknown_lanes.json + events/invalid/wp_status_changed_invalid_lane.json) | WP01 | |
-| T003 | Author `tests/test_lane_vocabulary.py` proving canonical-lane single-source-of-truth and `Lane.IN_REVIEW` membership | WP01 | |
-| T004 | Update any existing tests that asserted `in_review` was invalid (search-and-fix pass) | WP01 | |
+| T001 | Add `IN_REVIEW` to the `Lane` enum in `src/spec_kitty_events/status.py` | WP01 | | [D] |
+| T002 | Move `in_review` out of "invalid lane" fixtures (lane_mapping/invalid/unknown_lanes.json + events/invalid/wp_status_changed_invalid_lane.json) | WP01 | | [D] |
+| T003 | Author `tests/test_lane_vocabulary.py` proving canonical-lane single-source-of-truth and `Lane.IN_REVIEW` membership | WP01 | | [D] |
+| T004 | Update any existing tests that asserted `in_review` was invalid (search-and-fix pass) | WP01 | | [D] |
 | T005 | Create `src/spec_kitty_events/validation_errors.py` with `ValidationError` Pydantic model and `ValidationErrorCode` closed enum | WP02 | [P] |
 | T006 | Add `as_validation_error()` adapter methods on existing typed exceptions (TransitionError, lifecycle errors) | WP02 | [P] |
 | T007 | Author `tests/test_validation_error.py` for shape, enum membership, determinism | WP02 | [P] |
@@ -61,10 +61,10 @@ This is a reference table only — progress tracking happens via the per-WP chec
 **Prompt**: [tasks/WP01-lane-vocabulary-canonicalization.md](./tasks/WP01-lane-vocabulary-canonicalization.md) (~280 lines)
 
 **Subtasks**:
-- [ ] T001 Add `IN_REVIEW` to the `Lane` enum (WP01)
-- [ ] T002 Move `in_review` out of "invalid lane" fixtures (WP01)
-- [ ] T003 Author `tests/test_lane_vocabulary.py` (WP01)
-- [ ] T004 Update existing tests that asserted `in_review` was invalid (WP01)
+- [x] T001 Add `IN_REVIEW` to the `Lane` enum (WP01)
+- [x] T002 Move `in_review` out of "invalid lane" fixtures (WP01)
+- [x] T003 Author `tests/test_lane_vocabulary.py` (WP01)
+- [x] T004 Update existing tests that asserted `in_review` was invalid (WP01)
 
 **Dependencies**: none.
 
