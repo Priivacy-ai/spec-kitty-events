@@ -8,5 +8,7 @@
   "purpose_context": "Existing Spec Kitty repos contain years of historical mission state in shapes that pre-date TeamSpace ingress rules. Before TeamSpace public launch, the spec-kitty-events package must publish a single source of truth for canonical lanes (including in_review), payload contracts (MissionCreated, WPStatusChanged, MissionClosed), and recursive forbidden-key validation, with conformance fixtures the CLI canonicalizer and SaaS ingress can rely on. This mission settles those contracts and their historical-shape fixtures so the downstream CLI, SaaS, runtime, and tracker tranches build on a stable foundation.",
   "purpose_tldr": "Settle the canonical event contract so historical mission state can migrate safely to TeamSpace.",
   "slug": "teamspace-event-contract-foundation-01KQHDE4",
-  "target_branch": "main"
+  "target_branch": "main",
+  "vcs": "git",
+  "vcs_locked_at": "2026-05-01T09:58:40.393044+00:00"
 }
