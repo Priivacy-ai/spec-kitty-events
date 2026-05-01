@@ -15,8 +15,8 @@ subtasks:
 - T025
 - T026
 - T027
-agent: "claude:sonnet:implementer-ivan:implementer"
-shell_pid: "42193"
+agent: "claude:sonnet:reviewer-rachel:reviewer"
+shell_pid: "42871"
 history:
 - event: created
   at: '2026-05-01T09:44:26Z'
@@ -202,3 +202,4 @@ Codex reviewer will check:
 
 - 2026-05-01T11:13:24Z – claude:sonnet:implementer-ivan:implementer – shell_pid=42193 – Started implementation via action command
 - 2026-05-01T11:17:55Z – claude:sonnet:implementer-ivan:implementer – shell_pid=42193 – Ready for review: major bump + COMPATIBILITY + CHANGELOG
+- 2026-05-01T11:18:25Z – claude:sonnet:reviewer-rachel:reviewer – shell_pid=42871 – Started review via action command
