@@ -37,9 +37,9 @@ This is a reference table only — progress tracking happens via the per-WP chec
 | T022 | Update `manifest.json` with full class registrations; add `src/spec_kitty_events/conformance/fixtures/README.md` | WP05 | | [D] |
 | T023 | Author `tests/test_fixture_determinism.py` (audit forbidden patterns: recent timestamps, non-pinned ULIDs) | WP05 | | [D] |
 | T024 | Author `tests/test_conformance_classes.py` asserting every fixture's expected outcome and `expected_error_code` | WP05 | | [D] |
-| T025 | Update `COMPATIBILITY.md` with "Local-CLI compatibility vs TeamSpace ingress validity" section | WP06 | |
-| T026 | Update `CHANGELOG.md` with a "Breaking Changes" section (in_review canonical, payload reconciliation, recursive forbidden-key validator) | WP06 | |
-| T027 | Bump package version in `pyproject.toml` per major-bump rule | WP06 | |
+| T025 | Update `COMPATIBILITY.md` with "Local-CLI compatibility vs TeamSpace ingress validity" section | WP06 | | [D] |
+| T026 | Update `CHANGELOG.md` with a "Breaking Changes" section (in_review canonical, payload reconciliation, recursive forbidden-key validator) | WP06 | | [D] |
+| T027 | Bump package version in `pyproject.toml` per major-bump rule | WP06 | | [D] |
 | T028 | Author `tests/test_validation_benchmark.py` enforcing < 5 ms p95 envelope validation (NFR-005) | WP07 | |
 | T029 | Run full pytest + mypy --strict + schema-drift CI; document results | WP07 | |
 | T030 | Author `kitty-specs/.../contracts/.review-handoff.md` summarizing all SC-### satisfaction for Codex review | WP07 | |
@@ -191,9 +191,9 @@ This is a reference table only — progress tracking happens via the per-WP chec
 **Prompt**: [tasks/WP06-compatibility-doc-and-version-bump.md](./tasks/WP06-compatibility-doc-and-version-bump.md) (~250 lines)
 
 **Subtasks**:
-- [ ] T025 Update `COMPATIBILITY.md` with local-vs-ingress section (WP06)
-- [ ] T026 Update `CHANGELOG.md` with Breaking Changes section (WP06)
-- [ ] T027 Bump package version in `pyproject.toml` (WP06)
+- [x] T025 Update `COMPATIBILITY.md` with local-vs-ingress section (WP06)
+- [x] T026 Update `CHANGELOG.md` with Breaking Changes section (WP06)
+- [x] T027 Bump package version in `pyproject.toml` (WP06)
 
 **Dependencies**: WP01–WP05.
 
