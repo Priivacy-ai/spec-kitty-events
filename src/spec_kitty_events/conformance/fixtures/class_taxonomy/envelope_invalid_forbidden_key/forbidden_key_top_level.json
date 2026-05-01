@@ -3,14 +3,12 @@
   "expected": "invalid",
   "expected_error_code": "FORBIDDEN_KEY",
   "input": {
+    "event_id": "01J0000000000000000000F010",
     "event_type": "MissionCreated",
-    "event_version": "3.0.0",
-    "event_id": "01J000000000000000000FIX10",
-    "occurred_at": "2026-01-01T00:00:00+00:00",
-    "mission_id": "01J0000000000000000000MIS1",
+    "aggregate_id": "mission/01J0000000000000000000MS1",
     "feature_slug": "legacy-feature",
     "payload": {
-      "mission_id": "01J0000000000000000000MIS1",
+      "mission_id": "01J0000000000000000000MS1",
       "mission_slug": "fixture-mission",
       "mission_number": 1,
       "mission_type": "software-dev",
@@ -19,7 +17,14 @@
       "friendly_name": "Fixture Mission",
       "purpose_tldr": "Forbidden top-level key.",
       "purpose_context": "Top-level forbidden key 'feature_slug' must be rejected by the recursive forbidden-key validator."
-    }
+    },
+    "timestamp": "2026-01-01T00:00:00+00:00",
+    "build_id": "build-2026-01-01-fixture",
+    "node_id": "fixture-node",
+    "lamport_clock": 10,
+    "correlation_id": "01J0000000000000000000CR10",
+    "project_uuid": "00000000-0000-0000-0000-000000000001",
+    "schema_version": "3.0.0"
   },
-  "notes": "Top-level forbidden key 'feature_slug' present in the envelope; must reject with FORBIDDEN_KEY."
+  "notes": "Top-level forbidden key 'feature_slug' present alongside an otherwise-valid Event envelope; must reject with FORBIDDEN_KEY via the recursive walker before Event.model_validate runs."
 }

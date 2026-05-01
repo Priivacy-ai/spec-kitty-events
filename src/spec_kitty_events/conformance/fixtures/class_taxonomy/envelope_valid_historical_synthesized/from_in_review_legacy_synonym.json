@@ -2,11 +2,9 @@
   "class": "envelope_valid_historical_synthesized",
   "expected": "valid",
   "input": {
+    "event_id": "01J00000000000000000000006",
     "event_type": "WPStatusChanged",
-    "event_version": "3.0.0",
-    "event_id": "01J0000000000000000000FIX6",
-    "occurred_at": "2026-01-01T00:00:00+00:00",
-    "mission_id": "01J0000000000000000000MIS1",
+    "aggregate_id": "mission/01J0000000000000000000MS1/wp/WP02",
     "payload": {
       "mission_slug": "fixture-mission",
       "wp_id": "WP02",
@@ -18,7 +16,14 @@
       "execution_mode": "worktree",
       "review_ref": null,
       "evidence": null
-    }
+    },
+    "timestamp": "2026-01-01T00:00:00+00:00",
+    "build_id": "build-2026-01-01-fixture",
+    "node_id": "fixture-node",
+    "lamport_clock": 6,
+    "correlation_id": "01J0000000000000000000CR06",
+    "project_uuid": "00000000-0000-0000-0000-000000000001",
+    "schema_version": "3.0.0"
   },
-  "notes": "Synthesized from a historical row whose to_lane was an 'awaiting-review' legacy synonym, normalized by the CLI canonicalizer to canonical 'in_review'."
+  "notes": "Synthesized from a historical row whose to_lane was an 'awaiting-review' legacy synonym, normalized by the CLI canonicalizer to canonical 'in_review'. Validates against the real Event model."
 }

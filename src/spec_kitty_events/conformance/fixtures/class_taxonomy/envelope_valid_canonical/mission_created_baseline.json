@@ -2,13 +2,11 @@
   "class": "envelope_valid_canonical",
   "expected": "valid",
   "input": {
+    "event_id": "01J00000000000000000000001",
     "event_type": "MissionCreated",
-    "event_version": "3.0.0",
-    "event_id": "01J0000000000000000000FIX1",
-    "occurred_at": "2026-01-01T00:00:00+00:00",
-    "mission_id": "01J0000000000000000000MIS1",
+    "aggregate_id": "mission/01J0000000000000000000MS1",
     "payload": {
-      "mission_id": "01J0000000000000000000MIS1",
+      "mission_id": "01J0000000000000000000MS1",
       "mission_slug": "fixture-mission",
       "mission_number": 1,
       "mission_type": "software-dev",
@@ -16,8 +14,15 @@
       "wp_count": 3,
       "friendly_name": "Fixture Mission",
       "purpose_tldr": "Pinned canonical MissionCreated baseline.",
-      "purpose_context": "Canonical 3.0.x MissionCreated fixture used to assert that the validator accepts the baseline shape produced by the contract's typed payload model."
-    }
+      "purpose_context": "Canonical 3.0.x MissionCreated fixture used to assert that the public Event model accepts the baseline shape produced by the contract's typed payload model."
+    },
+    "timestamp": "2026-01-01T00:00:00+00:00",
+    "build_id": "build-2026-01-01-fixture",
+    "node_id": "fixture-node",
+    "lamport_clock": 1,
+    "correlation_id": "01J0000000000000000000CR01",
+    "project_uuid": "00000000-0000-0000-0000-000000000001",
+    "schema_version": "3.0.0"
   },
-  "notes": "Canonical MissionCreated envelope with pinned ULID and timestamp."
+  "notes": "Canonical MissionCreated envelope using the real spec_kitty_events.Event model with pinned ULIDs, timestamp, build_id, node_id, lamport_clock, correlation_id, project_uuid, and schema_version=3.0.0."
 }

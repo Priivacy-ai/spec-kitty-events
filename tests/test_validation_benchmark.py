@@ -54,6 +54,8 @@ from typing import Any, Iterable, List
 
 import pytest
 
+from pydantic import ValidationError as PydanticValidationError
+
 from spec_kitty_events import (
     LANE_ALIASES,
     MISSION_CLOSED,
@@ -68,6 +70,7 @@ from spec_kitty_events.forbidden_keys import (
     FORBIDDEN_LEGACY_KEYS,
     find_forbidden_keys,
 )
+from spec_kitty_events.models import Event
 
 
 _FIXTURES_ROOT = (
@@ -91,11 +94,16 @@ _PAYLOAD_MODELS: dict[str, type] = {
 }
 
 _REQUIRED_ENVELOPE_FIELDS: tuple[str, ...] = (
-    "event_type",
-    "event_version",
     "event_id",
-    "occurred_at",
+    "event_type",
+    "aggregate_id",
     "payload",
+    "timestamp",
+    "build_id",
+    "node_id",
+    "lamport_clock",
+    "correlation_id",
+    "project_uuid",
 )
 
 _CANONICAL_LANE_VALUES: frozenset[str] = frozenset(member.value for member in Lane)
@@ -145,6 +153,12 @@ def _validate_envelope(envelope: Any) -> bool:
                 and value not in LANE_ALIASES
             ):
                 return False
+
+    # Real Event model validation — the public envelope SSOT.
+    try:
+        Event.model_validate(envelope)
+    except PydanticValidationError:
+        return False
 
     model = _PAYLOAD_MODELS.get(event_type)
     if model is not None:

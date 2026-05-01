@@ -4,13 +4,18 @@
   "expected_error_code": "ENVELOPE_SHAPE_INVALID",
   "input": [
     {
+      "event_id": "01J0000000000000000000F018",
       "event_type": "MissionCreated",
-      "event_version": "3.0.0",
-      "event_id": "01J000000000000000000FIX18",
-      "occurred_at": "2026-01-01T00:00:00+00:00",
-      "mission_id": "01J0000000000000000000MIS1",
-      "payload": {}
+      "aggregate_id": "mission/01J0000000000000000000MS1",
+      "payload": {},
+      "timestamp": "2026-01-01T00:00:00+00:00",
+      "build_id": "build-2026-01-01-fixture",
+      "node_id": "fixture-node",
+      "lamport_clock": 18,
+      "correlation_id": "01J0000000000000000000CR18",
+      "project_uuid": "00000000-0000-0000-0000-000000000001",
+      "schema_version": "3.0.0"
     }
   ],
-  "notes": "Envelope wrapper is an array, not a JSON object; must reject with ENVELOPE_SHAPE_INVALID."
+  "notes": "Envelope wrapper is an array, not a JSON object; must reject with ENVELOPE_SHAPE_INVALID. The wrapper-shape check runs before any field validation."
 }

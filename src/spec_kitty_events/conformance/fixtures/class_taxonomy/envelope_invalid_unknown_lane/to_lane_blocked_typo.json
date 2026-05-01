@@ -3,11 +3,9 @@
   "expected": "invalid",
   "expected_error_code": "UNKNOWN_LANE",
   "input": {
+    "event_id": "01J0000000000000000000F008",
     "event_type": "WPStatusChanged",
-    "event_version": "3.0.0",
-    "event_id": "01J0000000000000000000FIX8",
-    "occurred_at": "2026-01-01T00:00:00+00:00",
-    "mission_id": "01J0000000000000000000MIS1",
+    "aggregate_id": "mission/01J0000000000000000000MS1/wp/WP01",
     "payload": {
       "mission_slug": "fixture-mission",
       "wp_id": "WP01",
@@ -19,7 +17,14 @@
       "execution_mode": "worktree",
       "review_ref": null,
       "evidence": null
-    }
+    },
+    "timestamp": "2026-01-01T00:00:00+00:00",
+    "build_id": "build-2026-01-01-fixture",
+    "node_id": "fixture-node",
+    "lamport_clock": 8,
+    "correlation_id": "01J0000000000000000000CR08",
+    "project_uuid": "00000000-0000-0000-0000-000000000001",
+    "schema_version": "3.0.0"
   },
-  "notes": "to_lane='blockd' is a typo for 'blocked' but is outside the canonical lane vocabulary; must reject with UNKNOWN_LANE."
+  "notes": "Otherwise-valid Event envelope; to_lane='blockd' (typo for 'blocked') is outside the canonical lane vocabulary and must reject with UNKNOWN_LANE."
 }

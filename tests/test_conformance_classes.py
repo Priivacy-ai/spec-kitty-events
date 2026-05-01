@@ -3,23 +3,32 @@ eight-class taxonomy, asserts each fixture's expected outcome (and the
 ``expected_error_code`` for invalid fixtures).
 
 This test reads ``manifest.json``'s ``classes.entries`` array (added in
-WP05), runs a small, package-level envelope validator built from the
-already-public public surface of ``spec_kitty_events``
-(``find_forbidden_keys``, ``Lane`` / ``LANE_ALIASES``, ``MissionCreatedPayload``,
-``MissionClosedPayload``, ``StatusTransitionPayload``), and asserts
-agreement.
+WP05), runs a small package-level envelope validator built on the real
+public surface of ``spec_kitty_events`` — including the canonical
+``Event`` model in ``spec_kitty_events.models`` — and asserts agreement.
 
-Coverage assertions:
+The validator's order of checks (deterministic):
 
-* Each of the eight classes has at least one fixture (FR-006/FR-007 per
-  conformance-fixture-classes.md).
-* Every canonical event type referenced by ``envelope_valid_canonical``
-  validates.
+1. Wrapper must be a JSON object.
+2. Required *Event* envelope fields must be present.
+3. No forbidden legacy keys (recursive walk via
+   :func:`spec_kitty_events.forbidden_keys.find_forbidden_keys`).
+4. ``payload`` must be a JSON object.
+5. Lane fields (when present, on ``WPStatusChanged``) must be in the
+   canonical vocabulary; aliases like ``doing`` are accepted.
+6. The full envelope must validate against
+   :class:`spec_kitty_events.models.Event`. A ``payload``-localised
+   failure becomes ``PAYLOAD_SCHEMA_FAIL``; any other envelope-level
+   failure becomes ``ENVELOPE_SHAPE_INVALID``.
+7. The typed payload model (when known) must accept the inner payload
+   — this catches payload-level rejections (e.g. ``extra='forbid'``,
+   missing required fields, type mismatches).
 
-For ``historical_row_raw`` fixtures, the validator is not yet expected to
-distinguish them from generic envelope-shape failures; the test accepts any
-rejection (and documents the gap in the fixture's ``notes``). The
-``expected_error_code`` is preserved as the *ideal* code for a future WP.
+For ``historical_row_raw`` fixtures, the validator is not yet expected
+to distinguish them from generic envelope-shape failures; the test
+accepts any rejection (and documents the gap in the fixture's
+``notes``). The ``expected_error_code`` is preserved as the *ideal*
+code for a future WP.
 """
 
 from __future__ import annotations
@@ -30,6 +39,7 @@ from pathlib import Path
 from typing import Any
 
 import pytest
+from pydantic import ValidationError as PydanticValidationError
 
 from spec_kitty_events import (
     LANE_ALIASES,
@@ -45,6 +55,7 @@ from spec_kitty_events.forbidden_keys import (
     FORBIDDEN_LEGACY_KEYS,
     find_forbidden_keys,
 )
+from spec_kitty_events.models import Event
 from spec_kitty_events.validation_errors import (
     ValidationError,
     ValidationErrorCode,
@@ -116,7 +127,7 @@ def _load_fixture_file(rel_path: str) -> dict[str, Any]:
 
 
 # ---------------------------------------------------------------------------
-# Validator (built from the public surface)
+# Validator (built from the real public surface, including Event)
 # ---------------------------------------------------------------------------
 
 
@@ -132,30 +143,44 @@ _PAYLOAD_MODELS: dict[str, type] = {
     WP_STATUS_CHANGED: StatusTransitionPayload,
 }
 
+# Required envelope fields per the public Event model. We pre-check
+# these so the wrapper can emit ENVELOPE_SHAPE_INVALID with a clear
+# missing-fields list before Event.model_validate runs (which would
+# emit a Pydantic-internal "Field required" error).
 _REQUIRED_ENVELOPE_FIELDS: tuple[str, ...] = (
-    "event_type",
-    "event_version",
     "event_id",
-    "occurred_at",
+    "event_type",
+    "aggregate_id",
     "payload",
+    "timestamp",
+    "build_id",
+    "node_id",
+    "lamport_clock",
+    "correlation_id",
+    "project_uuid",
 )
 
 _CANONICAL_LANE_VALUES: frozenset[str] = frozenset(member.value for member in Lane)
 
 
+def _classify_pydantic_error(exc: PydanticValidationError) -> ValidationErrorCode:
+    """Map a Pydantic Event-level error to a public ValidationErrorCode.
+
+    Errors anchored at ``payload`` (or below) are payload schema
+    failures; anything else is an envelope shape failure.
+    """
+
+    for err in exc.errors():
+        loc = err.get("loc") or ()
+        if loc and loc[0] == "payload":
+            return ValidationErrorCode.PAYLOAD_SCHEMA_FAIL
+    return ValidationErrorCode.ENVELOPE_SHAPE_INVALID
+
+
 def _validate_envelope(envelope: Any) -> _ValidationOutcome:
     """Validate a JSON-shape envelope against the package contract.
 
-    Order of checks (deterministic):
-
-    1. Wrapper must be a JSON object.
-    2. Required envelope fields must be present.
-    3. No forbidden legacy keys (recursive walk).
-    4. ``payload`` must be a JSON object.
-    5. Lane fields (when present) must be in the canonical vocabulary
-       (aliases like ``doing`` are allowed; legacy synonyms not in
-       ``LANE_ALIASES`` are not).
-    6. Payload must validate against its typed model (when known).
+    Uses the real :class:`Event` model as the envelope source of truth.
     """
 
     # 1. Wrapper shape.
@@ -170,7 +195,8 @@ def _validate_envelope(envelope: Any) -> _ValidationOutcome:
             ),
         )
 
-    # 2. Required envelope fields.
+    # 2. Required envelope fields (pre-check so ENVELOPE_SHAPE_INVALID
+    # surfaces a clean missing-fields list ahead of Pydantic).
     missing = [f for f in _REQUIRED_ENVELOPE_FIELDS if f not in envelope]
     if missing:
         return _ValidationOutcome(
@@ -183,7 +209,10 @@ def _validate_envelope(envelope: Any) -> _ValidationOutcome:
             ),
         )
 
-    # 3. Forbidden keys (recursive).
+    # 3. Forbidden keys (recursive). Runs before Event.model_validate so
+    # that a deeply nested or array-element forbidden key reports
+    # FORBIDDEN_KEY rather than getting masked by a Pydantic
+    # extra='forbid' rejection.
     first_forbidden = next(
         find_forbidden_keys(envelope, forbidden=FORBIDDEN_LEGACY_KEYS),
         None,
@@ -235,7 +264,23 @@ def _validate_envelope(envelope: Any) -> _ValidationOutcome:
                     ),
                 )
 
-    # 6. Typed payload model (when known).
+    # 6. Real Event model validation. Public envelope SSOT.
+    try:
+        Event.model_validate(envelope)
+    except PydanticValidationError as exc:
+        code = _classify_pydantic_error(exc)
+        return _ValidationOutcome(
+            ok=False,
+            error=ValidationError(
+                code=code,
+                message=str(exc),
+                path=["payload"] if code == ValidationErrorCode.PAYLOAD_SCHEMA_FAIL else [],
+                details={"event_type": event_type},
+            ),
+        )
+
+    # 7. Typed payload model (catches payload-level errors that Event
+    # doesn't constrain because it carries `payload: Dict[str, Any]`).
     model = _PAYLOAD_MODELS.get(event_type)
     if model is not None:
         try:
@@ -368,6 +413,13 @@ def test_fixture_outcome_matches_expected(entry: ClassFixtureEntry) -> None:
             f"Fixture {entry.path} expected to validate but failed with "
             f"{outcome.error!r}"
         )
+        # Additionally assert the canonical fixture survives the real
+        # public Event.model_validate entry point (envelope SSOT).
+        if entry.fixture_class in {
+            "envelope_valid_canonical",
+            "envelope_valid_historical_synthesized",
+        }:
+            Event.model_validate(fixture["input"])
         return
 
     # expected == "invalid"
@@ -450,3 +502,22 @@ def test_invalid_fixtures_have_expected_error_code() -> None:
             f"Invalid manifest entry {entry.id} declares unknown error code "
             f"{entry.expected_error_code!r}."
         )
+
+
+def test_valid_canonical_fixtures_validate_against_real_event_model() -> None:
+    """Sanity gate: every envelope_valid_canonical and
+    envelope_valid_historical_synthesized fixture validates against
+    the real public ``Event`` model."""
+
+    target_classes = {
+        "envelope_valid_canonical",
+        "envelope_valid_historical_synthesized",
+    }
+    for entry in _ALL_ENTRIES:
+        if entry.fixture_class not in target_classes:
+            continue
+        fixture = _load_fixture_file(entry.path)
+        # The exception type intentionally bubbles up if it fails — this
+        # is the SSOT gate: every "valid" canonical fixture MUST pass
+        # Event.model_validate.
+        Event.model_validate(fixture["input"])

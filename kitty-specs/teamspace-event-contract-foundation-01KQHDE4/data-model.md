@@ -11,24 +11,32 @@ This document captures the entities, value objects, invariants, and state transi
 
 ### Canonical Envelope
 
-The TeamSpace 3.0.x event wrapper. Every event accepted by the contract package is, structurally, a `CanonicalEnvelope`.
+The TeamSpace 3.0.x event wrapper. Every event accepted by the contract package is, structurally, a `CanonicalEnvelope`. The fields below are the public `Event` model in `src/spec_kitty_events/models.py` — the envelope source of truth.
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
+| `event_id` | string (ULID or UUID) | yes | Stable identity for the event; accepts 26-char Crockford ULID, 36-char hyphenated UUID, or 32-char bare hex UUID |
 | `event_type` | string (enum) | yes | One of the canonical event types: `MissionCreated`, `WPStatusChanged`, `MissionClosed`, plus the existing event-type catalog |
-| `event_version` | string | yes | Semantic version of the envelope contract (FR-010 / R-03) |
-| `event_id` | string (ULID) | yes | Stable identity for the event |
-| `occurred_at` | string (ISO-8601 UTC) | yes | Producer-assigned timestamp; never overwritten by the consumer |
-| `mission_id` | string (ULID) | yes | Canonical mission identity |
+| `aggregate_id` | string | yes | Identifier of the entity this event modifies |
 | `payload` | object (Typed Payload) | yes | Per-event-type payload, validated against the corresponding typed payload schema |
+| `timestamp` | string (ISO-8601 UTC) | yes | Producer-assigned wall-clock timestamp |
+| `build_id` | string | yes | Canonical checkout or worktree identity that produced this event |
+| `node_id` | string | yes | Causal emitter identity used for Lamport ordering |
+| `lamport_clock` | integer (>= 0) | yes | Lamport logical clock value (monotonically increasing) |
+| `correlation_id` | string (ULID or UUID) | yes | Correlation identifier |
+| `project_uuid` | UUID | yes | UUID of the project this event belongs to |
+| `schema_version` | string (semver) | optional | Envelope schema version; defaults to `3.0.0` (the cutover-contract version) |
+| `causation_id` | string (ULID or UUID) | optional | Event ID of the parent event; `None` for root events |
+| `project_slug` | string | optional | Human-readable project identifier |
+| `data_tier` | integer (0..4) | optional | Progressive data sharing tier (default `0`) |
 
 **Invariants**:
 - No field, anywhere within the envelope or payload, may use a key from the **Forbidden-Key Set** (recursive).
 - `payload` must validate against the typed payload schema named by `event_type`.
 - `event_type` must be in the canonical catalog.
-- `event_version` must match the package's contract version on accept.
+- `schema_version` must match the package's cutover-contract version on accept (the cutover artifact's `cutover_contract_version` constant — `3.0.0` on first ship of this mission). The package version (e.g. `5.0.0`) is *separate* from the envelope schema version on the wire.
 
-**Source of truth**: `src/spec_kitty_events/` (Pydantic models + committed JSON Schemas).
+**Source of truth**: `src/spec_kitty_events/models.py` (`Event` Pydantic model) plus the typed payload models in `src/spec_kitty_events/lifecycle.py` and `src/spec_kitty_events/status.py`, with committed JSON Schemas under `src/spec_kitty_events/schemas/`.
 
 ---
 
@@ -136,9 +144,9 @@ The result returned by the validator on rejection (R-04).
 
 For an envelope to be accepted:
 
-1. Envelope shape is well-formed (`event_type`, `event_version`, `event_id`, `occurred_at`, `mission_id`, `payload` all present and well-typed).
+1. Envelope shape is well-formed against the `Event` Pydantic model — all required fields (`event_id`, `event_type`, `aggregate_id`, `payload`, `timestamp`, `build_id`, `node_id`, `lamport_clock`, `correlation_id`, `project_uuid`) present and well-typed.
 2. `event_type` is in the canonical catalog.
-3. `event_version` matches the package's contract version.
+3. `schema_version` matches the package's cutover-contract version (`3.0.0` on first ship of this mission, per `cutover.py::CUTOVER_ARTIFACT.cutover_contract_version`). The package version may be later (e.g. `5.0.0`) — that is independent of the envelope schema version.
 4. `payload` validates against the typed payload model corresponding to `event_type`.
 5. No key, anywhere in the envelope or payload, is in the Forbidden-Key Set (recursive).
 6. Every lane reference in the payload is a canonical lane (per Lane Vocabulary), including `in_review`.

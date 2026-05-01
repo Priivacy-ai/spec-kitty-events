@@ -3,15 +3,20 @@
   "expected": "invalid",
   "expected_error_code": "ENVELOPE_SHAPE_INVALID",
   "input": {
-    "event_version": "3.0.0",
-    "event_id": "01J000000000000000000FIX17",
-    "occurred_at": "2026-01-01T00:00:00+00:00",
-    "mission_id": "01J0000000000000000000MIS1",
+    "event_id": "01J0000000000000000000F017",
+    "aggregate_id": "mission/01J0000000000000000000MS1",
     "payload": {
       "mission_slug": "fixture-mission",
       "mission_number": 1,
       "mission_type": "software-dev"
-    }
+    },
+    "timestamp": "2026-01-01T00:00:00+00:00",
+    "build_id": "build-2026-01-01-fixture",
+    "node_id": "fixture-node",
+    "lamport_clock": 17,
+    "correlation_id": "01J0000000000000000000CR17",
+    "project_uuid": "00000000-0000-0000-0000-000000000001",
+    "schema_version": "3.0.0"
   },
-  "notes": "Envelope missing required top-level 'event_type'; must reject with ENVELOPE_SHAPE_INVALID."
+  "notes": "Envelope missing required top-level 'event_type'; must reject with ENVELOPE_SHAPE_INVALID. The wrapper checks required Event fields before invoking Event.model_validate."
 }
