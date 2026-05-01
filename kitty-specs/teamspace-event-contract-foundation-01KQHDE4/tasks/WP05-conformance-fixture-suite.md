@@ -26,7 +26,8 @@ subtasks:
 - T022
 - T023
 - T024
-agent: claude
+agent: "claude:sonnet:implementer-ivan:implementer"
+shell_pid: "36553"
 history:
 - event: created
   at: '2026-05-01T09:44:26Z'
@@ -367,3 +368,7 @@ Codex reviewer will check:
 3. Determinism audit catches non-pinned values.
 4. The conformance test parametrizes over every fixture and checks `expected_error_code` (not just accept/reject).
 5. The reorganization preserved the in-review fixture moves from WP01 (no orphans).
+
+## Activity Log
+
+- 2026-05-01T10:53:57Z – claude:sonnet:implementer-ivan:implementer – shell_pid=36553 – Started implementation via action command
