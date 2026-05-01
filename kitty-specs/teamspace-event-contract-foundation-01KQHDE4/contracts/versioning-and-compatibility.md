@@ -5,7 +5,7 @@
 
 ## Rule
 
-This mission lands as a **major schema-version bump** on the package's contract version axis. The bump is recorded in `CHANGELOG.md`, in `COMPATIBILITY.md`, and in the committed JSON Schemas.
+This mission lands as a **major package-version bump** on the package's contract behaviour axis (package `4.x` → `5.0.0`). The on-wire envelope schema version stays at `3.0.0` (the cutover-contract version pinned by `cutover.py::CUTOVER_ARTIFACT.cutover_contract_version`). The package bump is recorded in `CHANGELOG.md`, in `COMPATIBILITY.md`, and in the committed JSON Schemas. Producers must continue to emit `schema_version="3.0.0"` on the envelope; the cutover gate will reject anything else.
 
 ## Why major
 
@@ -19,7 +19,7 @@ Each of these is a behavior change for at least one role (consumer or producer).
 
 | Artifact | Where versioned |
 |---|---|
-| Envelope contract | `event_version` field in the envelope; the package's contract version constant |
+| Envelope contract | `schema_version` field on the public `Event` model in the envelope; the package's cutover-contract version constant (`cutover.py::CUTOVER_ARTIFACT.cutover_contract_version` = `3.0.0`). The PACKAGE version (e.g. `5.0.0`) is recorded separately in `pyproject.toml` and `__version__`. |
 | Typed payload schemas | Each `*.schema.json` under `src/spec_kitty_events/schemas/` carries a `$id` and is regenerated on bump |
 | Conformance fixtures | Class taxonomy and fixture format are versioned with the package |
 | Forbidden-key set | `since_version` field on the named constant |

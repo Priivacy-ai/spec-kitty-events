@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [5.0.0] - 2026-05-01
 
+> **Package 5.0.0; envelope schema remains 3.0.0.** This release is a
+> major **package** bump for contract behaviour changes; the on-wire
+> envelope `schema_version` is unchanged at `3.0.0` (the
+> cutover-contract version pinned by
+> `spec_kitty_events.cutover.CUTOVER_ARTIFACT.cutover_contract_version`).
+> Producers must continue to emit `schema_version="3.0.0"`.
+
 ### Breaking Changes
 
 - **`in_review` is now a canonical lane** (FR-001, FR-002). Consumers that
@@ -21,7 +28,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Recursive forbidden-key validator** (FR-005). The package now rejects
   envelopes containing legacy keys (`feature_slug`, `feature_number`,
   `mission_key`, plus the audit-derived expansion) at any depth, including
-  inside array elements.
+  inside array elements. The public cutover gate
+  (`assert_canonical_cutover_signal`) now routes through the recursive
+  walker too — pre-bump it only checked the top level and the immediate
+  payload.
 
 ### Added
 

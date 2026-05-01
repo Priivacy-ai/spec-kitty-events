@@ -1,6 +1,6 @@
 # Compatibility Guide
 
-`spec-kitty-events` `4.0.0` is a fail-closed contract cutover release.
+`spec-kitty-events` package version `5.0.0` is a fail-closed contract release. The on-wire envelope schema version is `3.0.0` (the cutover-contract version pinned by `cutover.py`); the major package bump from `4.x` to `5.0.0` reflects contract behaviour changes (`in_review` canonical, payload reconciliation, recursive forbidden-key validator) and is independent of the envelope schema version.
 
 This document is the public compatibility policy for consumers of:
 
@@ -10,19 +10,23 @@ This document is the public compatibility policy for consumers of:
 
 ## Canonical On-Wire Policy
 
-The authoritative cutover artifact ships in the package and defines the live compatibility gate.
+The authoritative cutover artifact ships in the package
+(`spec_kitty_events.cutover.CUTOVER_ARTIFACT`) and defines the live
+compatibility gate. Note: the **package** is at version `5.0.0`; the
+**envelope schema on the wire** is at version `3.0.0`. The two are
+intentionally distinct (see the bump-rationale section below).
 
 - Signal field: `schema_version`
 - Signal location: event envelope
-- Required cutover value: `4.0.0`
-- Accepted major: `4`
+- Required cutover value: `3.0.0`
+- Accepted major: `3`
 
 Live ingestion paths fail closed when any of the following are true:
 
 - the envelope is missing `schema_version`
 - `schema_version` has the wrong accepted major
-- `schema_version` does not equal `4.0.0`
-- the envelope or nested payload contains forbidden legacy keys
+- `schema_version` does not equal `3.0.0`
+- the envelope or nested payload contains forbidden legacy keys (recursive walk)
 - the envelope uses forbidden legacy event names
 - the envelope uses forbidden legacy aggregate prefixes
 
@@ -51,26 +55,26 @@ Event envelopes distinguish build and node identity explicitly:
 
 There are no runtime compatibility bridges in live ingestion.
 
-- New producers must emit canonical `4.0.0` envelopes from day one.
+- New producers must emit canonical envelopes (`schema_version="3.0.0"`) from day one.
 - Consumers must reject legacy mission-domain envelopes on live paths.
 - Historical `2.x` or pre-cutover data may only be read by offline migration or rewrite jobs.
-- Offline rewrite workflows must convert historical data into canonical `4.0.0` form before re-ingestion.
+- Offline rewrite workflows must convert historical data into canonical `schema_version="3.0.0"` form before re-ingestion.
 
 ## Cross-Repo Release Gates
 
 `spec-kitty-events` should only be treated as released when all of the following are true:
 
-1. `spec-kitty-events` package metadata is `4.0.0`.
+1. `spec-kitty-events` package metadata is at the latest release (`5.0.0` at this writing).
 2. Committed JSON Schemas are regenerated and drift-free.
 3. Conformance fixtures and replay goldens pass with artifact-driven validation.
-4. `spec-kitty-saas` is updated to emit canonical `4.0.0` envelopes only.
+4. `spec-kitty-saas` is updated to emit canonical envelopes (`schema_version="3.0.0"`) only.
 5. `spec-kitty` is updated to consume canonical mission/build terminology and fail-closed validation outcomes.
 
 ## Consumer Guidance
 
 If you operate a producer:
 
-- emit `schema_version="4.0.0"`
+- emit `schema_version="3.0.0"` (the cutover-contract version; see note above)
 - emit `build_id`
 - emit canonical mission-domain fields only
 
@@ -88,7 +92,7 @@ Accepted live envelope:
 {
   "event_type": "WPStatusChanged",
   "aggregate_id": "mission/WP01",
-  "schema_version": "4.0.0",
+  "schema_version": "3.0.0",
   "build_id": "build-2026-04-05",
   "node_id": "runner-01",
   "payload": {
@@ -112,10 +116,10 @@ Rejected live envelope examples:
 
 ## Versioning
 
-`4.0.0` is the breaking release that publishes the canonical mission/build contract.
+The current package release is `5.0.0`. The on-wire envelope schema is `3.0.0`. Together they publish the canonical mission/build contract and the recursive forbidden-key gate.
 
 - `2.x` additive compatibility language no longer applies.
-- Future breaking contract changes require a new major release.
+- Future breaking contract changes require a new major **package** release; whether they also bump the envelope schema version depends on whether they change the wire format (the `5.0.0` package release intentionally did NOT bump the wire-format envelope version — it changed contract behaviour with the existing `3.0.0` envelope shape).
 
 ## Decision Moment V1 (4.0.0)
 
@@ -190,21 +194,33 @@ TeamSpace ingress** (legacy `feature_slug` key, missing `schema_version`):
 
 A canonical envelope that is **valid for both** the local CLI and TeamSpace
 ingress (canonical mission-domain fields, canonical lane vocabulary including
-`in_review`, `schema_version="5.0.0"`, no forbidden legacy keys at any depth):
+`in_review`, `schema_version="3.0.0"`, no forbidden legacy keys at any depth):
 
 ```json
-{"event_type":"WPStatusChanged","aggregate_id":"mission/WP01","schema_version":"5.0.0","build_id":"build-2026-05-01","node_id":"runner-01","payload":{"mission_slug":"mission-001","wp_id":"WP01","from_lane":"claimed","to_lane":"in_review","actor":"implementer-ivan","execution_mode":"worktree"}}
+{"event_type":"WPStatusChanged","aggregate_id":"mission/WP01","schema_version":"3.0.0","build_id":"build-2026-05-01","node_id":"runner-01","payload":{"mission_slug":"mission-001","wp_id":"WP01","from_lane":"claimed","to_lane":"in_review","actor":"implementer-ivan","execution_mode":"worktree"}}
 ```
+
+> **Package version vs envelope schema version (read this carefully).**
+> `spec-kitty-events` ships at **package version `5.0.0`** (the value you
+> see in `pyproject.toml` and `__version__`). The **envelope schema
+> version on the wire** is **`3.0.0`** — it is the cutover-contract
+> version pinned by `cutover.py::CUTOVER_ARTIFACT.cutover_contract_version`
+> and is the default for `Event.schema_version`. The major package bump
+> from `4.x` to `5.0.0` reflects contract behaviour changes (`in_review`
+> canonical, payload reconciliation, recursive forbidden-key validator),
+> NOT a wire-format envelope-version bump. Producers must continue to
+> emit `schema_version="3.0.0"` on the envelope; the cutover gate will
+> reject anything else.
 
 ### The documented bridge
 
 The bridge between these two domains is the **CLI canonicalizer** that ships in
 `spec-kitty` Tranche B. The canonicalizer reads historical `status.events.jsonl`
-rows and produces canonical `5.0.0` envelopes suitable for ingress. Producers
-that need to forward historical data into TeamSpace MUST run it through the
-canonicalizer first; ingress will not accept raw historical rows. Consumers
-that read locally MUST NOT assume their local-disk rows have already been
-canonicalized.
+rows and produces canonical envelopes (`schema_version="3.0.0"`, accepted by
+the package-`5.0.0` cutover gate) suitable for ingress. Producers that need to
+forward historical data into TeamSpace MUST run it through the canonicalizer
+first; ingress will not accept raw historical rows. Consumers that read locally
+MUST NOT assume their local-disk rows have already been canonicalized.
 
 ### Cross-references
 
@@ -213,7 +229,9 @@ canonicalized.
 
 ### Bump rationale (per R-03)
 
-The `5.0.0` bump is a genuine major bump under semantic versioning. Per
+The `5.0.0` package bump is a genuine major bump under semantic versioning.
+The envelope schema version on the wire stays at `3.0.0`; only the *package*
+moves to `5.0.0`. Per
 research item R-03 (schema version bump semantic), each of the following is a
 behavior change for at least one role and therefore each independently
 justifies a major:
