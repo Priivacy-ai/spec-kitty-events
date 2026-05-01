@@ -250,3 +250,4 @@ Codex reviewer will read this WP's review-handoff doc as the entry point to the 
 ## Activity Log
 
 - 2026-05-01T11:20:46Z – claude:sonnet:implementer-ivan:implementer – shell_pid=43324 – Started implementation via action command
+- 2026-05-01T11:29:08Z – claude:sonnet:implementer-ivan:implementer – shell_pid=43324 – Ready for review: NFR-005 benchmark passing + full spec-to-evidence handoff
