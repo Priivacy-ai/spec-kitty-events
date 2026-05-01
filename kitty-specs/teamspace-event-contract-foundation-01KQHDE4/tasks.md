@@ -20,10 +20,10 @@ This is a reference table only — progress tracking happens via the per-WP chec
 | T005 | Create `src/spec_kitty_events/validation_errors.py` with `ValidationError` Pydantic model and `ValidationErrorCode` closed enum | WP02 | [D] |
 | T006 | Add `as_validation_error()` adapter methods on existing typed exceptions (TransitionError, lifecycle errors) | WP02 | [D] |
 | T007 | Author `tests/test_validation_error.py` for shape, enum membership, determinism | WP02 | [D] |
-| T008 | Audit `spec-kitty-saas` ingress rejection rules + epic #920 historical-row survey to expand the forbidden-key set; document audit results | WP03 | |
-| T009 | Create `src/spec_kitty_events/forbidden_keys.py` with `FORBIDDEN_LEGACY_KEYS` constant and recursive validator | WP03 | |
-| T010 | Author `tests/test_forbidden_keys.py` targeted fixtures: top, depth-1, depth-3, depth-10, array element, must-accept-when-value | WP03 | |
-| T011 | Add hypothesis property tests for the recursive validator + determinism test | WP03 | |
+| T008 | Audit `spec-kitty-saas` ingress rejection rules + epic #920 historical-row survey to expand the forbidden-key set; document audit results | WP03 | | [D] |
+| T009 | Create `src/spec_kitty_events/forbidden_keys.py` with `FORBIDDEN_LEGACY_KEYS` constant and recursive validator | WP03 | | [D] |
+| T010 | Author `tests/test_forbidden_keys.py` targeted fixtures: top, depth-1, depth-3, depth-10, array element, must-accept-when-value | WP03 | | [D] |
+| T011 | Add hypothesis property tests for the recursive validator + determinism test | WP03 | | [D] |
 | T012 | Audit CLI emission sites for `MissionCreated`, `WPStatusChanged`, `MissionClosed` and document field disposition | WP04 | |
 | T013 | Append reconciliation log to `contracts/payload-reconciliation.md` recording decisions per event type | WP04 | |
 | T014 | Update payload models (`MissionCreatedPayload`, `MissionClosedPayload`, `StatusTransitionPayload`) with reconciled fields and `extra='forbid'` | WP04 | |
@@ -110,10 +110,10 @@ This is a reference table only — progress tracking happens via the per-WP chec
 **Prompt**: [tasks/WP03-recursive-forbidden-key-validator.md](./tasks/WP03-recursive-forbidden-key-validator.md) (~400 lines)
 
 **Subtasks**:
-- [ ] T008 Audit SaaS ingress + epic survey; expand the forbidden-key set (WP03)
-- [ ] T009 Create `src/spec_kitty_events/forbidden_keys.py` (WP03)
-- [ ] T010 Targeted fixtures (top/depth-1/depth-3/depth-10/array/must-accept) (WP03)
-- [ ] T011 Hypothesis property tests + determinism test (WP03)
+- [x] T008 Audit SaaS ingress + epic survey; expand the forbidden-key set (WP03)
+- [x] T009 Create `src/spec_kitty_events/forbidden_keys.py` (WP03)
+- [x] T010 Targeted fixtures (top/depth-1/depth-3/depth-10/array/must-accept) (WP03)
+- [x] T011 Hypothesis property tests + determinism test (WP03)
 
 **Dependencies**: WP02.
 
