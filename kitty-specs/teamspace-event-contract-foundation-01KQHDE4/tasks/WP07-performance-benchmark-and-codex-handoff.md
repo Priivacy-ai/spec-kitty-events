@@ -3,10 +3,6 @@ work_package_id: WP07
 title: Performance Benchmark and Codex Review Handoff
 dependencies:
 - WP01
-- WP02
-- WP03
-- WP04
-- WP05
 - WP06
 requirement_refs:
 - C-005
@@ -14,7 +10,7 @@ requirement_refs:
 - NFR-005
 planning_base_branch: main
 merge_target_branch: main
-branch_strategy: Worktree per lane; planning base main; merge target main
+branch_strategy: Planning artifacts for this feature were generated on main. During /spec-kitty.implement this WP may branch from a dependency-specific base, but completed changes must merge back into main unless the human explicitly redirects the landing branch.
 subtasks:
 - T028
 - T029

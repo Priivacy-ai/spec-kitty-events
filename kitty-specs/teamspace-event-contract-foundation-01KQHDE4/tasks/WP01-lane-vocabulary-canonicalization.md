@@ -8,7 +8,7 @@ requirement_refs:
 - FR-002
 planning_base_branch: main
 merge_target_branch: main
-branch_strategy: Worktree per lane; planning base main; merge target main
+branch_strategy: Planning artifacts for this feature were generated on main. During /spec-kitty.implement this WP may branch from a dependency-specific base, but completed changes must merge back into main unless the human explicitly redirects the landing branch.
 subtasks:
 - T001
 - T002
@@ -25,8 +25,6 @@ execution_mode: code_change
 owned_files:
 - src/spec_kitty_events/status.py
 - tests/test_lane_vocabulary.py
-- src/spec_kitty_events/conformance/fixtures/lane_mapping/**
-- src/spec_kitty_events/conformance/fixtures/events/invalid/wp_status_changed_invalid_lane.json
 role: implementer
 tags: []
 ---
