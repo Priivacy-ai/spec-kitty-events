@@ -2,7 +2,7 @@
   "event_count": 36,
   "last_event_id": "01KP36NHTYYVJSVAV2C37SFTBK",
   "materialized_at": "2026-04-13T10:37:18.046028+00:00",
-  "mission_number": "",
+  "mission_number": "1",
   "mission_slug": "additive-event-contracts-charter-phase456-01KP343J",
   "mission_type": "software-dev",
   "summary": {
