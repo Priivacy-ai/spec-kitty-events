@@ -1,0 +1,23 @@
+{
+  "class": "envelope_valid_historical_synthesized",
+  "expected": "valid",
+  "input": {
+    "event_type": "MissionCreated",
+    "event_version": "3.0.0",
+    "event_id": "01J0000000000000000000FIX5",
+    "occurred_at": "2026-01-01T00:00:00+00:00",
+    "mission_id": "01J0000000000000000000MIS1",
+    "payload": {
+      "mission_id": "01J0000000000000000000MIS1",
+      "mission_slug": "fixture-mission",
+      "mission_number": 1,
+      "mission_type": "software-dev",
+      "target_branch": "main",
+      "wp_count": 3,
+      "friendly_name": "Fixture Mission",
+      "purpose_tldr": "Synthesized from a pre-3.0 envelope shape.",
+      "purpose_context": "This canonical envelope was synthesized by the CLI canonicalizer dry-run from a pre-3.0 envelope shape that lacked event_version and used a flat payload."
+    }
+  },
+  "notes": "Synthesized from a historical pre-3.0 envelope (no event_version, no nested payload)."
+}

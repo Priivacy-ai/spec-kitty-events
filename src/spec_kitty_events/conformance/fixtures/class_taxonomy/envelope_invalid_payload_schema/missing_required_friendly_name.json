@@ -1,0 +1,23 @@
+{
+  "class": "envelope_invalid_payload_schema",
+  "expected": "invalid",
+  "expected_error_code": "PAYLOAD_SCHEMA_FAIL",
+  "input": {
+    "event_type": "MissionCreated",
+    "event_version": "3.0.0",
+    "event_id": "01J000000000000000000FIX15",
+    "occurred_at": "2026-01-01T00:00:00+00:00",
+    "mission_id": "01J0000000000000000000MIS1",
+    "payload": {
+      "mission_id": "01J0000000000000000000MIS1",
+      "mission_slug": "fixture-mission",
+      "mission_number": 1,
+      "mission_type": "software-dev",
+      "target_branch": "main",
+      "wp_count": 1,
+      "purpose_tldr": "Missing required friendly_name.",
+      "purpose_context": "friendly_name is required; absence must trigger PAYLOAD_SCHEMA_FAIL."
+    }
+  },
+  "notes": "MissionCreatedPayload requires 'friendly_name'; omitting it triggers PAYLOAD_SCHEMA_FAIL."
+}

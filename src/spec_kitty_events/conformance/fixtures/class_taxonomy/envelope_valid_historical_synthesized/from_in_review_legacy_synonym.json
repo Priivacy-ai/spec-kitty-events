@@ -1,0 +1,24 @@
+{
+  "class": "envelope_valid_historical_synthesized",
+  "expected": "valid",
+  "input": {
+    "event_type": "WPStatusChanged",
+    "event_version": "3.0.0",
+    "event_id": "01J0000000000000000000FIX6",
+    "occurred_at": "2026-01-01T00:00:00+00:00",
+    "mission_id": "01J0000000000000000000MIS1",
+    "payload": {
+      "mission_slug": "fixture-mission",
+      "wp_id": "WP02",
+      "from_lane": "for_review",
+      "to_lane": "in_review",
+      "actor": "fixture-actor",
+      "force": false,
+      "reason": null,
+      "execution_mode": "worktree",
+      "review_ref": null,
+      "evidence": null
+    }
+  },
+  "notes": "Synthesized from a historical row whose to_lane was an 'awaiting-review' legacy synonym, normalized by the CLI canonicalizer to canonical 'in_review'."
+}

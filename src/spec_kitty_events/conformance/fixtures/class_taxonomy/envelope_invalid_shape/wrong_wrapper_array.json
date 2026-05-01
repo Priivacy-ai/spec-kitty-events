@@ -1,0 +1,16 @@
+{
+  "class": "envelope_invalid_shape",
+  "expected": "invalid",
+  "expected_error_code": "ENVELOPE_SHAPE_INVALID",
+  "input": [
+    {
+      "event_type": "MissionCreated",
+      "event_version": "3.0.0",
+      "event_id": "01J000000000000000000FIX18",
+      "occurred_at": "2026-01-01T00:00:00+00:00",
+      "mission_id": "01J0000000000000000000MIS1",
+      "payload": {}
+    }
+  ],
+  "notes": "Envelope wrapper is an array, not a JSON object; must reject with ENVELOPE_SHAPE_INVALID."
+}

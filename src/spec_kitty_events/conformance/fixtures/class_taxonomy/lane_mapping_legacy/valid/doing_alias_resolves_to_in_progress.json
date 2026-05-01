@@ -1,0 +1,9 @@
+{
+  "class": "lane_mapping_legacy",
+  "expected": "valid",
+  "input": {
+    "legacy_lane": "doing",
+    "canonical_lane": "in_progress"
+  },
+  "notes": "Legacy lane synonym 'doing' resolves to canonical 'in_progress' via LANE_ALIASES."
+}

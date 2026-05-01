@@ -1,0 +1,14 @@
+{
+  "class": "historical_row_raw",
+  "expected": "invalid",
+  "expected_error_code": "RAW_HISTORICAL_ROW",
+  "input": {
+    "type": "WPStatusChanged",
+    "ts": "2026-01-01T00:00:00+00:00",
+    "wp": "WP01",
+    "from": "planned",
+    "to": "doing",
+    "actor": "fixture-actor"
+  },
+  "notes": "Pre-3.0 envelope shape: keys 'type'/'ts'/'wp' instead of 'event_type'/'occurred_at'/'wp_id'; no 'event_version'. Ideally validator returns RAW_HISTORICAL_ROW; current validator may emit ENVELOPE_SHAPE_INVALID — downstream WP can refine."
+}

@@ -1,0 +1,17 @@
+{
+  "class": "historical_row_raw",
+  "expected": "invalid",
+  "expected_error_code": "RAW_HISTORICAL_ROW",
+  "input": {
+    "event_type": "WPStatusChanged",
+    "event_version": "2.7.0",
+    "event_id": "01J000000000000000000FIX20",
+    "occurred_at": "2026-01-01T00:00:00+00:00",
+    "legacy_aggregate_id": "01J000000000000000000LEG1",
+    "payload": {
+      "wp_id": "WP01",
+      "to_lane": "for_review"
+    }
+  },
+  "notes": "Historical row with 'legacy_aggregate_id' (referenced in epic #920 survey). Ideally validator returns RAW_HISTORICAL_ROW; current validator may flag FORBIDDEN_KEY first."
+}

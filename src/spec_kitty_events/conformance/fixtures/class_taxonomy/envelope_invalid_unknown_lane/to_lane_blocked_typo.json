@@ -1,0 +1,25 @@
+{
+  "class": "envelope_invalid_unknown_lane",
+  "expected": "invalid",
+  "expected_error_code": "UNKNOWN_LANE",
+  "input": {
+    "event_type": "WPStatusChanged",
+    "event_version": "3.0.0",
+    "event_id": "01J0000000000000000000FIX8",
+    "occurred_at": "2026-01-01T00:00:00+00:00",
+    "mission_id": "01J0000000000000000000MIS1",
+    "payload": {
+      "mission_slug": "fixture-mission",
+      "wp_id": "WP01",
+      "from_lane": "planned",
+      "to_lane": "blockd",
+      "actor": "fixture-actor",
+      "force": false,
+      "reason": null,
+      "execution_mode": "worktree",
+      "review_ref": null,
+      "evidence": null
+    }
+  },
+  "notes": "to_lane='blockd' is a typo for 'blocked' but is outside the canonical lane vocabulary; must reject with UNKNOWN_LANE."
+}

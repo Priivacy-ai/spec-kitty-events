@@ -1,0 +1,25 @@
+{
+  "class": "envelope_invalid_forbidden_key",
+  "expected": "invalid",
+  "expected_error_code": "FORBIDDEN_KEY",
+  "input": {
+    "event_type": "MissionCreated",
+    "event_version": "3.0.0",
+    "event_id": "01J000000000000000000FIX10",
+    "occurred_at": "2026-01-01T00:00:00+00:00",
+    "mission_id": "01J0000000000000000000MIS1",
+    "feature_slug": "legacy-feature",
+    "payload": {
+      "mission_id": "01J0000000000000000000MIS1",
+      "mission_slug": "fixture-mission",
+      "mission_number": 1,
+      "mission_type": "software-dev",
+      "target_branch": "main",
+      "wp_count": 1,
+      "friendly_name": "Fixture Mission",
+      "purpose_tldr": "Forbidden top-level key.",
+      "purpose_context": "Top-level forbidden key 'feature_slug' must be rejected by the recursive forbidden-key validator."
+    }
+  },
+  "notes": "Top-level forbidden key 'feature_slug' present in the envelope; must reject with FORBIDDEN_KEY."
+}

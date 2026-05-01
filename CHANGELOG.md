@@ -5,6 +5,43 @@ All notable changes to spec-kitty-events will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.0.0] - 2026-05-01
+
+### Breaking Changes
+
+- **`in_review` is now a canonical lane** (FR-001, FR-002). Consumers that
+  previously rejected `in_review` as an unknown lane now accept it. Update
+  consumer code that switches on the lane vocabulary's exact membership.
+
+- **Payload contracts reconciled** (FR-003, FR-004). `MissionCreatedPayload`,
+  `WPStatusChangedPayload`, and `MissionClosedPayload` are now the single
+  source of truth; CLI and SaaS producers must conform. See the reconciliation
+  log in `kitty-specs/teamspace-event-contract-foundation-01KQHDE4/contracts/payload-reconciliation.md`.
+
+- **Recursive forbidden-key validator** (FR-005). The package now rejects
+  envelopes containing legacy keys (`feature_slug`, `feature_number`,
+  `mission_key`, plus the audit-derived expansion) at any depth, including
+  inside array elements.
+
+### Added
+
+- `ValidationError` and `ValidationErrorCode` for structured rejection
+  reporting (NFR-006).
+- `forbidden_keys` module with `FORBIDDEN_LEGACY_KEYS` and the recursive
+  validator.
+- Eight-class conformance fixture suite covering canonical envelopes,
+  historical synthesized envelopes, every rejection class, raw historical
+  rows, and lane-mapping legacy.
+- `COMPATIBILITY.md` section: local-CLI compatibility vs TeamSpace ingress
+  validity.
+
+### Fixed
+
+- `MissionClosed` payload disagreement between CLI emission and library
+  model (resolved per the reconciliation log).
+
+---
+
 ## 4.0.0 — 2026-04-23
 
 ### Breaking

@@ -48,6 +48,7 @@
         "claimed",
         "in_progress",
         "for_review",
+        "in_review",
         "approved",
         "done",
         "blocked",

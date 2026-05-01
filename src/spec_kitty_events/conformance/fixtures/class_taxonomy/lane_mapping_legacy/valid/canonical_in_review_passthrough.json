@@ -1,0 +1,9 @@
+{
+  "class": "lane_mapping_legacy",
+  "expected": "valid",
+  "input": {
+    "legacy_lane": "in_review",
+    "canonical_lane": "in_review"
+  },
+  "notes": "The canonical lane 'in_review' resolves to itself (identity); confirms the lane vocabulary survives normalization."
+}

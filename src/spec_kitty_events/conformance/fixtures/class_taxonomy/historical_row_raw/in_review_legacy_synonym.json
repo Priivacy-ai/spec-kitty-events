@@ -1,0 +1,17 @@
+{
+  "class": "historical_row_raw",
+  "expected": "invalid",
+  "expected_error_code": "RAW_HISTORICAL_ROW",
+  "input": {
+    "event_type": "WPStatusChanged",
+    "event_version": "2.7.0",
+    "event_id": "01J000000000000000000FIX21",
+    "occurred_at": "2026-01-01T00:00:00+00:00",
+    "payload": {
+      "wp_id": "WP01",
+      "from_lane": "for_review",
+      "to_lane": "awaiting-review"
+    }
+  },
+  "notes": "Historical row using 'awaiting-review' as a legacy synonym for the canonical lane 'in_review'. Ideally validator returns RAW_HISTORICAL_ROW; UNKNOWN_LANE may be returned today — downstream WP can refine."
+}

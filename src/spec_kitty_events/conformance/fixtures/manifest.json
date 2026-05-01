@@ -1509,6 +1509,419 @@
       "expected_result": "valid",
       "notes": "Golden reducer output for replay_interview_resolved_other — V1 interview resolved with other_answer=true",
       "min_version": "4.0.0"
+    },
+    {
+      "id": "class-taxonomy-envelope-valid-canonical-mission-created-baseline",
+      "path": "class_taxonomy/envelope_valid_canonical/mission_created_baseline.json",
+      "expected_result": "valid",
+      "event_type": "MissionCreated",
+      "notes": "WP05 class taxonomy: canonical MissionCreated baseline (registered for manifest-coverage gate; runtime read happens via classes.entries).",
+      "min_version": "4.1.0"
+    },
+    {
+      "id": "class-taxonomy-envelope-valid-canonical-mission-closed-baseline",
+      "path": "class_taxonomy/envelope_valid_canonical/mission_closed_baseline.json",
+      "expected_result": "valid",
+      "event_type": "MissionClosed",
+      "notes": "WP05 class taxonomy: canonical MissionClosed baseline.",
+      "min_version": "4.1.0"
+    },
+    {
+      "id": "class-taxonomy-envelope-valid-canonical-wp-status-changed-in-review",
+      "path": "class_taxonomy/envelope_valid_canonical/wp_status_changed_in_review.json",
+      "expected_result": "valid",
+      "event_type": "WPStatusChanged",
+      "notes": "WP05 class taxonomy: canonical WPStatusChanged with to_lane=in_review (handshake with WP01).",
+      "min_version": "4.1.0"
+    },
+    {
+      "id": "class-taxonomy-envelope-valid-canonical-wp-status-changed-planned-to-claimed",
+      "path": "class_taxonomy/envelope_valid_canonical/wp_status_changed_planned_to_claimed.json",
+      "expected_result": "valid",
+      "event_type": "WPStatusChanged",
+      "notes": "WP05 class taxonomy: canonical WPStatusChanged covering planned->claimed.",
+      "min_version": "4.1.0"
+    },
+    {
+      "id": "class-taxonomy-envelope-valid-historical-synthesized-from-pre30-envelope",
+      "path": "class_taxonomy/envelope_valid_historical_synthesized/from_pre30_envelope.json",
+      "expected_result": "valid",
+      "event_type": "MissionCreated",
+      "notes": "WP05 class taxonomy: synthesized from a pre-3.0 envelope.",
+      "min_version": "4.1.0"
+    },
+    {
+      "id": "class-taxonomy-envelope-valid-historical-synthesized-from-in-review-legacy-synonym",
+      "path": "class_taxonomy/envelope_valid_historical_synthesized/from_in_review_legacy_synonym.json",
+      "expected_result": "valid",
+      "event_type": "WPStatusChanged",
+      "notes": "WP05 class taxonomy: synthesized from a row using the legacy 'awaiting-review' synonym.",
+      "min_version": "4.1.0"
+    },
+    {
+      "id": "class-taxonomy-envelope-valid-historical-synthesized-from-envelope-with-legacy-keys",
+      "path": "class_taxonomy/envelope_valid_historical_synthesized/from_envelope_with_legacy_keys.json",
+      "expected_result": "valid",
+      "event_type": "MissionClosed",
+      "notes": "WP05 class taxonomy: synthesized from an envelope that originally carried feature_slug/feature_number.",
+      "min_version": "4.1.0"
+    },
+    {
+      "id": "class-taxonomy-envelope-invalid-unknown-lane-typo",
+      "path": "class_taxonomy/envelope_invalid_unknown_lane/to_lane_blocked_typo.json",
+      "expected_result": "invalid",
+      "event_type": "WPStatusChanged",
+      "notes": "WP05 class taxonomy: to_lane='blockd' (typo) must reject with UNKNOWN_LANE.",
+      "min_version": "4.1.0"
+    },
+    {
+      "id": "class-taxonomy-envelope-invalid-unknown-lane-uppercase",
+      "path": "class_taxonomy/envelope_invalid_unknown_lane/to_lane_uppercase.json",
+      "expected_result": "invalid",
+      "event_type": "WPStatusChanged",
+      "notes": "WP05 class taxonomy: to_lane='IN_REVIEW' (uppercase) must reject with UNKNOWN_LANE.",
+      "min_version": "4.1.0"
+    },
+    {
+      "id": "class-taxonomy-envelope-invalid-forbidden-key-top-level",
+      "path": "class_taxonomy/envelope_invalid_forbidden_key/forbidden_key_top_level.json",
+      "expected_result": "invalid",
+      "event_type": "MissionCreated",
+      "notes": "WP05 class taxonomy: top-level forbidden 'feature_slug' must reject with FORBIDDEN_KEY.",
+      "min_version": "4.1.0"
+    },
+    {
+      "id": "class-taxonomy-envelope-invalid-forbidden-key-nested",
+      "path": "class_taxonomy/envelope_invalid_forbidden_key/forbidden_key_nested.json",
+      "expected_result": "invalid",
+      "event_type": "MissionCreated",
+      "notes": "WP05 class taxonomy: nested 'feature_number' inside payload.metadata must reject with FORBIDDEN_KEY.",
+      "min_version": "4.1.0"
+    },
+    {
+      "id": "class-taxonomy-envelope-invalid-forbidden-key-depth-10",
+      "path": "class_taxonomy/envelope_invalid_forbidden_key/forbidden_key_depth_10.json",
+      "expected_result": "invalid",
+      "event_type": "MissionCreated",
+      "notes": "WP05 class taxonomy: forbidden 'mission_key' at depth 10 must reject with FORBIDDEN_KEY.",
+      "min_version": "4.1.0"
+    },
+    {
+      "id": "class-taxonomy-envelope-invalid-forbidden-key-in-array",
+      "path": "class_taxonomy/envelope_invalid_forbidden_key/forbidden_key_in_array.json",
+      "expected_result": "invalid",
+      "event_type": "MissionCreated",
+      "notes": "WP05 class taxonomy: forbidden key inside array element must reject with FORBIDDEN_KEY.",
+      "min_version": "4.1.0"
+    },
+    {
+      "id": "class-taxonomy-envelope-invalid-payload-schema-extra-field",
+      "path": "class_taxonomy/envelope_invalid_payload_schema/extra_field_on_mission_created.json",
+      "expected_result": "invalid",
+      "event_type": "MissionCreated",
+      "notes": "WP05 class taxonomy: extra field on extra=forbid payload must reject with PAYLOAD_SCHEMA_FAIL.",
+      "min_version": "4.1.0"
+    },
+    {
+      "id": "class-taxonomy-envelope-invalid-payload-schema-missing-required",
+      "path": "class_taxonomy/envelope_invalid_payload_schema/missing_required_friendly_name.json",
+      "expected_result": "invalid",
+      "event_type": "MissionCreated",
+      "notes": "WP05 class taxonomy: missing required friendly_name must reject with PAYLOAD_SCHEMA_FAIL.",
+      "min_version": "4.1.0"
+    },
+    {
+      "id": "class-taxonomy-envelope-invalid-payload-schema-wrong-type",
+      "path": "class_taxonomy/envelope_invalid_payload_schema/wrong_type_wp_count.json",
+      "expected_result": "invalid",
+      "event_type": "MissionCreated",
+      "notes": "WP05 class taxonomy: wp_count='three' is wrong type must reject with PAYLOAD_SCHEMA_FAIL.",
+      "min_version": "4.1.0"
+    },
+    {
+      "id": "class-taxonomy-envelope-invalid-shape-missing-event-type",
+      "path": "class_taxonomy/envelope_invalid_shape/missing_event_type.json",
+      "expected_result": "invalid",
+      "event_type": "<missing>",
+      "notes": "WP05 class taxonomy: envelope missing event_type must reject with ENVELOPE_SHAPE_INVALID.",
+      "min_version": "4.1.0"
+    },
+    {
+      "id": "class-taxonomy-envelope-invalid-shape-wrong-wrapper-array",
+      "path": "class_taxonomy/envelope_invalid_shape/wrong_wrapper_array.json",
+      "expected_result": "invalid",
+      "event_type": "<wrapper-array>",
+      "notes": "WP05 class taxonomy: array wrapper must reject with ENVELOPE_SHAPE_INVALID.",
+      "min_version": "4.1.0"
+    },
+    {
+      "id": "class-taxonomy-historical-row-pre30-envelope-shape",
+      "path": "class_taxonomy/historical_row_raw/pre30_envelope_shape.json",
+      "expected_result": "invalid",
+      "event_type": "<historical>",
+      "notes": "WP05 class taxonomy: pre-3.0 envelope shape; ideally RAW_HISTORICAL_ROW.",
+      "min_version": "4.1.0"
+    },
+    {
+      "id": "class-taxonomy-historical-row-feature-slug-top-level",
+      "path": "class_taxonomy/historical_row_raw/feature_slug_top_level.json",
+      "expected_result": "invalid",
+      "event_type": "<historical>",
+      "notes": "WP05 class taxonomy: historical row with top-level feature_slug.",
+      "min_version": "4.1.0"
+    },
+    {
+      "id": "class-taxonomy-historical-row-legacy-aggregate-id",
+      "path": "class_taxonomy/historical_row_raw/legacy_aggregate_id.json",
+      "expected_result": "invalid",
+      "event_type": "<historical>",
+      "notes": "WP05 class taxonomy: historical row carrying legacy_aggregate_id.",
+      "min_version": "4.1.0"
+    },
+    {
+      "id": "class-taxonomy-historical-row-in-review-legacy-synonym",
+      "path": "class_taxonomy/historical_row_raw/in_review_legacy_synonym.json",
+      "expected_result": "invalid",
+      "event_type": "<historical>",
+      "notes": "WP05 class taxonomy: historical row using 'awaiting-review' legacy synonym.",
+      "min_version": "4.1.0"
+    },
+    {
+      "id": "class-taxonomy-historical-row-raw-status-entry",
+      "path": "class_taxonomy/historical_row_raw/raw_status_entry.json",
+      "expected_result": "invalid",
+      "event_type": "<historical>",
+      "notes": "WP05 class taxonomy: raw status entry without envelope wrapper.",
+      "min_version": "4.1.0"
+    },
+    {
+      "id": "class-taxonomy-lane-mapping-doing-alias",
+      "path": "class_taxonomy/lane_mapping_legacy/valid/doing_alias_resolves_to_in_progress.json",
+      "expected_result": "valid",
+      "event_type": "<lane-mapping>",
+      "notes": "WP05 class taxonomy: 'doing' alias resolves to canonical 'in_progress'.",
+      "min_version": "4.1.0"
+    },
+    {
+      "id": "class-taxonomy-lane-mapping-canonical-in-review-passthrough",
+      "path": "class_taxonomy/lane_mapping_legacy/valid/canonical_in_review_passthrough.json",
+      "expected_result": "valid",
+      "event_type": "<lane-mapping>",
+      "notes": "WP05 class taxonomy: canonical 'in_review' resolves to itself.",
+      "min_version": "4.1.0"
+    },
+    {
+      "id": "class-taxonomy-lane-mapping-awaiting-review-unmapped",
+      "path": "class_taxonomy/lane_mapping_legacy/invalid/awaiting_review_legacy_unmapped.json",
+      "expected_result": "invalid",
+      "event_type": "<lane-mapping>",
+      "notes": "WP05 class taxonomy: legacy 'awaiting-review' synonym is currently unmapped; must reject with UNKNOWN_LANE.",
+      "min_version": "4.1.0"
     }
-  ]
+  ],
+  "classes": {
+    "version": "1.0.0",
+    "description": "Eight-class conformance taxonomy from kitty-specs/.../contracts/conformance-fixture-classes.md (R-05). Each entry registers a fixture under the new directory layout with its class label, expected outcome, and (when invalid) expected_error_code. The legacy 'fixtures' array above is preserved for backward compatibility with the existing loader; the 'classes' suite is the authoritative input for the new conformance class assertion test (WP05).",
+    "entries": [
+      {
+        "id": "envelope-valid-canonical-mission-created-baseline",
+        "class": "envelope_valid_canonical",
+        "path": "class_taxonomy/envelope_valid_canonical/mission_created_baseline.json",
+        "expected": "valid",
+        "event_type": "MissionCreated"
+      },
+      {
+        "id": "envelope-valid-canonical-mission-closed-baseline",
+        "class": "envelope_valid_canonical",
+        "path": "class_taxonomy/envelope_valid_canonical/mission_closed_baseline.json",
+        "expected": "valid",
+        "event_type": "MissionClosed"
+      },
+      {
+        "id": "envelope-valid-canonical-wp-status-changed-in-review",
+        "class": "envelope_valid_canonical",
+        "path": "class_taxonomy/envelope_valid_canonical/wp_status_changed_in_review.json",
+        "expected": "valid",
+        "event_type": "WPStatusChanged"
+      },
+      {
+        "id": "envelope-valid-canonical-wp-status-changed-planned-to-claimed",
+        "class": "envelope_valid_canonical",
+        "path": "class_taxonomy/envelope_valid_canonical/wp_status_changed_planned_to_claimed.json",
+        "expected": "valid",
+        "event_type": "WPStatusChanged"
+      },
+      {
+        "id": "envelope-valid-historical-synthesized-from-pre30-envelope",
+        "class": "envelope_valid_historical_synthesized",
+        "path": "class_taxonomy/envelope_valid_historical_synthesized/from_pre30_envelope.json",
+        "expected": "valid",
+        "event_type": "MissionCreated"
+      },
+      {
+        "id": "envelope-valid-historical-synthesized-from-in-review-legacy-synonym",
+        "class": "envelope_valid_historical_synthesized",
+        "path": "class_taxonomy/envelope_valid_historical_synthesized/from_in_review_legacy_synonym.json",
+        "expected": "valid",
+        "event_type": "WPStatusChanged"
+      },
+      {
+        "id": "envelope-valid-historical-synthesized-from-envelope-with-legacy-keys",
+        "class": "envelope_valid_historical_synthesized",
+        "path": "class_taxonomy/envelope_valid_historical_synthesized/from_envelope_with_legacy_keys.json",
+        "expected": "valid",
+        "event_type": "MissionClosed"
+      },
+      {
+        "id": "envelope-invalid-unknown-lane-typo",
+        "class": "envelope_invalid_unknown_lane",
+        "path": "class_taxonomy/envelope_invalid_unknown_lane/to_lane_blocked_typo.json",
+        "expected": "invalid",
+        "expected_error_code": "UNKNOWN_LANE",
+        "event_type": "WPStatusChanged"
+      },
+      {
+        "id": "envelope-invalid-unknown-lane-uppercase",
+        "class": "envelope_invalid_unknown_lane",
+        "path": "class_taxonomy/envelope_invalid_unknown_lane/to_lane_uppercase.json",
+        "expected": "invalid",
+        "expected_error_code": "UNKNOWN_LANE",
+        "event_type": "WPStatusChanged"
+      },
+      {
+        "id": "envelope-invalid-forbidden-key-top-level",
+        "class": "envelope_invalid_forbidden_key",
+        "path": "class_taxonomy/envelope_invalid_forbidden_key/forbidden_key_top_level.json",
+        "expected": "invalid",
+        "expected_error_code": "FORBIDDEN_KEY",
+        "event_type": "MissionCreated"
+      },
+      {
+        "id": "envelope-invalid-forbidden-key-nested",
+        "class": "envelope_invalid_forbidden_key",
+        "path": "class_taxonomy/envelope_invalid_forbidden_key/forbidden_key_nested.json",
+        "expected": "invalid",
+        "expected_error_code": "FORBIDDEN_KEY",
+        "event_type": "MissionCreated"
+      },
+      {
+        "id": "envelope-invalid-forbidden-key-depth-10",
+        "class": "envelope_invalid_forbidden_key",
+        "path": "class_taxonomy/envelope_invalid_forbidden_key/forbidden_key_depth_10.json",
+        "expected": "invalid",
+        "expected_error_code": "FORBIDDEN_KEY",
+        "event_type": "MissionCreated"
+      },
+      {
+        "id": "envelope-invalid-forbidden-key-in-array",
+        "class": "envelope_invalid_forbidden_key",
+        "path": "class_taxonomy/envelope_invalid_forbidden_key/forbidden_key_in_array.json",
+        "expected": "invalid",
+        "expected_error_code": "FORBIDDEN_KEY",
+        "event_type": "MissionCreated"
+      },
+      {
+        "id": "envelope-invalid-payload-schema-extra-field",
+        "class": "envelope_invalid_payload_schema",
+        "path": "class_taxonomy/envelope_invalid_payload_schema/extra_field_on_mission_created.json",
+        "expected": "invalid",
+        "expected_error_code": "PAYLOAD_SCHEMA_FAIL",
+        "event_type": "MissionCreated"
+      },
+      {
+        "id": "envelope-invalid-payload-schema-missing-required",
+        "class": "envelope_invalid_payload_schema",
+        "path": "class_taxonomy/envelope_invalid_payload_schema/missing_required_friendly_name.json",
+        "expected": "invalid",
+        "expected_error_code": "PAYLOAD_SCHEMA_FAIL",
+        "event_type": "MissionCreated"
+      },
+      {
+        "id": "envelope-invalid-payload-schema-wrong-type",
+        "class": "envelope_invalid_payload_schema",
+        "path": "class_taxonomy/envelope_invalid_payload_schema/wrong_type_wp_count.json",
+        "expected": "invalid",
+        "expected_error_code": "PAYLOAD_SCHEMA_FAIL",
+        "event_type": "MissionCreated"
+      },
+      {
+        "id": "envelope-invalid-shape-missing-event-type",
+        "class": "envelope_invalid_shape",
+        "path": "class_taxonomy/envelope_invalid_shape/missing_event_type.json",
+        "expected": "invalid",
+        "expected_error_code": "ENVELOPE_SHAPE_INVALID",
+        "event_type": "<missing>"
+      },
+      {
+        "id": "envelope-invalid-shape-wrong-wrapper-array",
+        "class": "envelope_invalid_shape",
+        "path": "class_taxonomy/envelope_invalid_shape/wrong_wrapper_array.json",
+        "expected": "invalid",
+        "expected_error_code": "ENVELOPE_SHAPE_INVALID",
+        "event_type": "<wrapper-array>"
+      },
+      {
+        "id": "historical-row-pre30-envelope-shape",
+        "class": "historical_row_raw",
+        "path": "class_taxonomy/historical_row_raw/pre30_envelope_shape.json",
+        "expected": "invalid",
+        "expected_error_code": "RAW_HISTORICAL_ROW",
+        "event_type": "<historical>"
+      },
+      {
+        "id": "historical-row-feature-slug-top-level",
+        "class": "historical_row_raw",
+        "path": "class_taxonomy/historical_row_raw/feature_slug_top_level.json",
+        "expected": "invalid",
+        "expected_error_code": "RAW_HISTORICAL_ROW",
+        "event_type": "<historical>"
+      },
+      {
+        "id": "historical-row-legacy-aggregate-id",
+        "class": "historical_row_raw",
+        "path": "class_taxonomy/historical_row_raw/legacy_aggregate_id.json",
+        "expected": "invalid",
+        "expected_error_code": "RAW_HISTORICAL_ROW",
+        "event_type": "<historical>"
+      },
+      {
+        "id": "historical-row-in-review-legacy-synonym",
+        "class": "historical_row_raw",
+        "path": "class_taxonomy/historical_row_raw/in_review_legacy_synonym.json",
+        "expected": "invalid",
+        "expected_error_code": "RAW_HISTORICAL_ROW",
+        "event_type": "<historical>"
+      },
+      {
+        "id": "historical-row-raw-status-entry",
+        "class": "historical_row_raw",
+        "path": "class_taxonomy/historical_row_raw/raw_status_entry.json",
+        "expected": "invalid",
+        "expected_error_code": "RAW_HISTORICAL_ROW",
+        "event_type": "<historical>"
+      },
+      {
+        "id": "lane-mapping-doing-alias-resolves-to-in-progress",
+        "class": "lane_mapping_legacy",
+        "path": "class_taxonomy/lane_mapping_legacy/valid/doing_alias_resolves_to_in_progress.json",
+        "expected": "valid",
+        "event_type": "<lane-mapping>"
+      },
+      {
+        "id": "lane-mapping-canonical-in-review-passthrough",
+        "class": "lane_mapping_legacy",
+        "path": "class_taxonomy/lane_mapping_legacy/valid/canonical_in_review_passthrough.json",
+        "expected": "valid",
+        "event_type": "<lane-mapping>"
+      },
+      {
+        "id": "lane-mapping-awaiting-review-legacy-unmapped",
+        "class": "lane_mapping_legacy",
+        "path": "class_taxonomy/lane_mapping_legacy/invalid/awaiting_review_legacy_unmapped.json",
+        "expected": "invalid",
+        "expected_error_code": "UNKNOWN_LANE",
+        "event_type": "<lane-mapping>"
+      }
+    ]
+  }
 }

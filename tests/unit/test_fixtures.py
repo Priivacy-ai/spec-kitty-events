@@ -108,7 +108,11 @@ class TestValidEventFixtures:
 INVALID_EVENT_FILES = [
     ("events/invalid/event_missing_correlation_id.json", "Event"),
     ("events/invalid/event_invalid_lamport_clock.json", "Event"),
-    ("events/invalid/wp_status_changed_invalid_lane.json", "WPStatusChanged"),
+    # NOTE: wp_status_changed_invalid_lane.json was previously listed here
+    # because `in_review` was treated as an invalid lane. WP01 of mission
+    # teamspace-event-contract-foundation-01KQHDE4 promoted `in_review` to
+    # the canonical Lane vocabulary, so this fixture no longer represents
+    # an invalid case. Fixture cleanup is owned by WP05.
     ("events/invalid/wp_status_changed_force_no_reason.json", "WPStatusChanged"),
     ("events/invalid/gate_failed_invalid_conclusion.json", "GateFailed"),
 ]
@@ -224,19 +228,28 @@ class TestInvalidEventFixtures:
 class TestLaneMappingFixtures:
     """Verify lane mapping fixtures cover all 8 canonical lanes."""
 
-    def test_valid_mapping_has_eight_entries(self) -> None:
+    def test_valid_mapping_has_expected_entry_count(self) -> None:
         full = _FIXTURES_DIR / "lane_mapping/valid/all_canonical_to_sync_v1.json"
         with open(full, encoding="utf-8") as f:
             entries: List[Dict[str, str]] = json.load(f)
-        assert len(entries) == 8
+        # The fixture currently covers the 8 lanes that existed before
+        # `in_review` was promoted to canonical (WP01 of mission
+        # teamspace-event-contract-foundation-01KQHDE4). Updating the
+        # fixture itself to cover all 9 canonical lanes is owned by WP05.
+        assert len(entries) >= 8
 
-    def test_valid_mapping_covers_all_lanes(self) -> None:
+    def test_valid_mapping_covers_pre_in_review_lanes(self) -> None:
         full = _FIXTURES_DIR / "lane_mapping/valid/all_canonical_to_sync_v1.json"
         with open(full, encoding="utf-8") as f:
             entries: List[Dict[str, str]] = json.load(f)
         canonical_values = {e["canonical"] for e in entries}
-        expected = {lane.value for lane in Lane}
-        assert canonical_values == expected
+        # Until WP05 widens this fixture to include `in_review`, the fixture
+        # is expected to cover the canonical Lane set MINUS `in_review`.
+        expected = {lane.value for lane in Lane} - {"in_review"}
+        assert canonical_values >= expected, (
+            f"Lane-mapping fixture missing canonical lanes: "
+            f"{sorted(expected - canonical_values)}"
+        )
 
     def test_valid_mapping_expected_sync_values(self) -> None:
         full = _FIXTURES_DIR / "lane_mapping/valid/all_canonical_to_sync_v1.json"
@@ -254,9 +267,23 @@ class TestLaneMappingFixtures:
         full = _FIXTURES_DIR / "lane_mapping/invalid/unknown_lanes.json"
         with open(full, encoding="utf-8") as f:
             entries: List[Dict[str, str]] = json.load(f)
+        # NOTE: One of the entries in this fixture (``"canonical": "in_review"``)
+        # is no longer truly invalid: WP01 of mission
+        # teamspace-event-contract-foundation-01KQHDE4 promoted `in_review`
+        # to the canonical Lane vocabulary. Until WP05 cleans up this fixture
+        # we skip the now-canonical entry rather than asserting it fails
+        # construction. Fixture ownership belongs to WP05; this test file
+        # adapts so the rest of the entries continue to be exercised.
+        canonical_values = {lane.value for lane in Lane}
         for entry in entries:
+            value = entry["canonical"]
+            if value in canonical_values:
+                # Now-canonical: should construct cleanly. WP05 will remove
+                # this entry from the invalid-lanes fixture.
+                assert Lane(value).value == value
+                continue
             with pytest.raises(ValueError):
-                Lane(entry["canonical"])
+                Lane(value)
 
 
 # ---------------------------------------------------------------------------
@@ -443,6 +470,16 @@ class TestLoadFixtures:
                 f"{result.model_violations}"
             )
 
+    # Fixtures whose "invalid" classification is no longer truthful after
+    # WP01 of mission teamspace-event-contract-foundation-01KQHDE4 promoted
+    # `in_review` to the canonical Lane vocabulary. These fixtures will be
+    # cleaned up by WP05 (fixture-suite ownership). Until then we skip them
+    # in this iterator-style test rather than assert their (now-passing)
+    # validation result is a failure.
+    _STALE_INVALID_FIXTURE_IDS = frozenset({
+        "wp-status-changed-invalid-lane",
+    })
+
     def test_invalid_event_fixtures_fail_model(self) -> None:
         """Verify that all invalid event fixtures actually fail validation."""
         cases = load_fixtures("events")
@@ -450,6 +487,8 @@ class TestLoadFixtures:
             if case.expected_valid:
                 continue
             if case.event_type not in _EVENT_TYPE_TO_MODEL:
+                continue
+            if case.id in self._STALE_INVALID_FIXTURE_IDS:
                 continue
             result = validate_event(case.payload, case.event_type)
             assert result.valid is False, (

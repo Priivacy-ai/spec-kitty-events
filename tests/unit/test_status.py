@@ -98,8 +98,13 @@ class TestLane:
     def test_canceled_value(self) -> None:
         assert Lane.CANCELED.value == "canceled"
 
-    def test_all_eight_members(self) -> None:
-        assert len(Lane) == 8
+    def test_in_review_value(self) -> None:
+        assert Lane.IN_REVIEW.value == "in_review"
+
+    def test_all_nine_members(self) -> None:
+        # IN_REVIEW was added to the canonical vocabulary in mission
+        # teamspace-event-contract-foundation-01KQHDE4 (WP01).
+        assert len(Lane) == 9
 
     def test_string_equality(self) -> None:
         assert Lane.PLANNED == "planned"
@@ -110,7 +115,8 @@ class TestLane:
         assert "approved" in values
         assert "planned" in values
         assert "canceled" in values
-        assert len(values) == 8
+        assert "in_review" in values
+        assert len(values) == 9
 
     def test_from_value(self) -> None:
         assert Lane("planned") is Lane.PLANNED
@@ -176,8 +182,8 @@ class TestNormalizeLane:
     """Test normalize_lane function."""
 
     @pytest.mark.parametrize("value", [
-        "planned", "claimed", "in_progress", "for_review", "approved",
-        "done", "blocked", "canceled",
+        "planned", "claimed", "in_progress", "for_review", "in_review",
+        "approved", "done", "blocked", "canceled",
     ])
     def test_canonical_values(self, value: str) -> None:
         result = normalize_lane(value)

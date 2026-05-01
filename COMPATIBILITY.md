@@ -149,3 +149,89 @@ Rejected live envelope examples:
 ### No grace period
 
 4.x validators fail closed on missing `terminal_outcome` or missing `origin_surface`. There is no temporary permissive path. Downstream consumers must migrate deliberately against this contract boundary.
+
+## Local-CLI compatibility vs TeamSpace ingress validity (added 2026-05-01)
+
+The `5.0.0` major release sharpens a distinction that has always been implicit in
+`spec-kitty-events`: there are two distinct validity domains, and a row that is
+acceptable in one is not necessarily acceptable in the other. This section is the
+authoritative explanation. Consumers and producers must read it before assuming
+that "valid" is a single global property.
+
+### The two validity domains
+
+- **Local-CLI compatibility.** The `spec-kitty` CLI continues to read historical
+  `status.events.jsonl` rows on local disk for users' own bookkeeping —
+  reconstructing a mission's history, rendering local dashboards, replaying
+  status, computing diff summaries, etc. The CLI's local reader is deliberately
+  permissive: it tolerates pre-cutover envelope shapes (including legacy keys
+  such as `feature_slug`, `mission_key`, raw rows missing `schema_version`, and
+  pre-canonical lane vocabularies) so that users do not lose access to their own
+  historical data after this bump. Local compatibility is **not** weakened by
+  the `5.0.0` release.
+
+- **TeamSpace ingress validity.** Only canonical envelopes pass TeamSpace
+  ingress. The ingress path runs the full fail-closed contract gate from
+  `4.0.0` plus the additions landed in this mission (canonical lane vocabulary
+  including `in_review`, reconciled `MissionCreated`/`WPStatusChanged`/
+  `MissionClosed` payloads, and the recursive forbidden-key validator that
+  rejects legacy keys at any depth, including inside array elements). A row
+  that the local CLI happily reads off disk will be rejected at TeamSpace
+  ingress unless it has been canonicalized first.
+
+### Concrete examples
+
+A historical row that is **valid for the local CLI** but **invalid for
+TeamSpace ingress** (legacy `feature_slug` key, missing `schema_version`):
+
+```json
+{"event_type":"FeatureCreated","aggregate_id":"feature/123","payload":{"feature_slug":"my-feature","feature_number":7}}
+```
+
+A canonical envelope that is **valid for both** the local CLI and TeamSpace
+ingress (canonical mission-domain fields, canonical lane vocabulary including
+`in_review`, `schema_version="5.0.0"`, no forbidden legacy keys at any depth):
+
+```json
+{"event_type":"WPStatusChanged","aggregate_id":"mission/WP01","schema_version":"5.0.0","build_id":"build-2026-05-01","node_id":"runner-01","payload":{"mission_slug":"mission-001","wp_id":"WP01","from_lane":"claimed","to_lane":"in_review","actor":"implementer-ivan","execution_mode":"worktree"}}
+```
+
+### The documented bridge
+
+The bridge between these two domains is the **CLI canonicalizer** that ships in
+`spec-kitty` Tranche B. The canonicalizer reads historical `status.events.jsonl`
+rows and produces canonical `5.0.0` envelopes suitable for ingress. Producers
+that need to forward historical data into TeamSpace MUST run it through the
+canonicalizer first; ingress will not accept raw historical rows. Consumers
+that read locally MUST NOT assume their local-disk rows have already been
+canonicalized.
+
+### Cross-references
+
+- [`kitty-specs/teamspace-event-contract-foundation-01KQHDE4/contracts/lane-vocabulary.md`](kitty-specs/teamspace-event-contract-foundation-01KQHDE4/contracts/lane-vocabulary.md) — the canonical lane vocabulary including `in_review`.
+- [`kitty-specs/teamspace-event-contract-foundation-01KQHDE4/contracts/payload-reconciliation.md`](kitty-specs/teamspace-event-contract-foundation-01KQHDE4/contracts/payload-reconciliation.md) — the reconciliation log for `MissionCreated`, `WPStatusChanged`, and `MissionClosed` payloads.
+
+### Bump rationale (per R-03)
+
+The `5.0.0` bump is a genuine major bump under semantic versioning. Per
+research item R-03 (schema version bump semantic), each of the following is a
+behavior change for at least one role and therefore each independently
+justifies a major:
+
+1. **Lane vocabulary widens.** `in_review` is now a canonical lane (FR-001,
+   FR-002). Consumers that previously rejected `in_review` as unknown now
+   accept it; consumers that switch on exact lane-set membership are
+   behaviorally affected.
+2. **Payload reconciliation.** `MissionCreatedPayload`,
+   `WPStatusChangedPayload`, and `MissionClosedPayload` are now the single
+   source of truth (FR-003, FR-004). CLI emission and library models have been
+   reconciled; pre-bump producers of disagreeing shapes are now invalid.
+3. **Recursive forbidden-key validator.** Legacy keys (`feature_slug`,
+   `feature_number`, `mission_key`, plus the audit-derived expansion) are now
+   rejected at any depth, including inside array elements (FR-005). Envelopes
+   that previously slipped through with a deeply nested legacy key are now
+   rejected.
+
+These three changes compound: any one of them is a contract change for at
+least one role, and together they require a major bump rather than a minor or
+patch.

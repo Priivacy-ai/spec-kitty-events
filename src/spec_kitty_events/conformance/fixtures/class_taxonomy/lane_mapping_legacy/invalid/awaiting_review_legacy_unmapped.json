@@ -1,0 +1,9 @@
+{
+  "class": "lane_mapping_legacy",
+  "expected": "invalid",
+  "expected_error_code": "UNKNOWN_LANE",
+  "input": {
+    "legacy_lane": "awaiting-review"
+  },
+  "notes": "'awaiting-review' is a legacy synonym not currently in LANE_ALIASES; resolution must fail with UNKNOWN_LANE until/unless the alias map is widened."
+}

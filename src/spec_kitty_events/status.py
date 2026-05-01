@@ -21,6 +21,7 @@ class Lane(str, Enum):
     CLAIMED = "claimed"
     IN_PROGRESS = "in_progress"
     FOR_REVIEW = "for_review"
+    IN_REVIEW = "in_review"
     APPROVED = "approved"
     DONE = "done"
     BLOCKED = "blocked"
@@ -51,6 +52,7 @@ CANONICAL_TO_SYNC_V1: Mapping[Lane, SyncLaneV1] = MappingProxyType({
     Lane.CLAIMED: SyncLaneV1.PLANNED,
     Lane.IN_PROGRESS: SyncLaneV1.DOING,
     Lane.FOR_REVIEW: SyncLaneV1.FOR_REVIEW,
+    Lane.IN_REVIEW: SyncLaneV1.FOR_REVIEW,
     Lane.APPROVED: SyncLaneV1.DONE,
     Lane.DONE: SyncLaneV1.DONE,
     Lane.BLOCKED: SyncLaneV1.DOING,
@@ -63,6 +65,7 @@ CANONICAL_TO_SYNC_V2: Mapping[Lane, SyncLaneV2] = MappingProxyType({
     Lane.CLAIMED: SyncLaneV2.PLANNED,
     Lane.IN_PROGRESS: SyncLaneV2.DOING,
     Lane.FOR_REVIEW: SyncLaneV2.FOR_REVIEW,
+    Lane.IN_REVIEW: SyncLaneV2.FOR_REVIEW,
     Lane.APPROVED: SyncLaneV2.APPROVED,
     Lane.DONE: SyncLaneV2.DONE,
     Lane.BLOCKED: SyncLaneV2.DOING,
@@ -317,12 +320,18 @@ _ALLOWED_TRANSITIONS: FrozenSet[Tuple[Optional[Lane], Lane]] = frozenset({
     (Lane.CLAIMED, Lane.IN_PROGRESS),
     (Lane.IN_PROGRESS, Lane.FOR_REVIEW),
     (Lane.IN_PROGRESS, Lane.APPROVED),
+    (Lane.FOR_REVIEW, Lane.IN_REVIEW),
     (Lane.FOR_REVIEW, Lane.APPROVED),
     (Lane.FOR_REVIEW, Lane.DONE),
+    (Lane.IN_REVIEW, Lane.APPROVED),
+    (Lane.IN_REVIEW, Lane.DONE),
     (Lane.APPROVED, Lane.DONE),
     # Review rollback
     (Lane.FOR_REVIEW, Lane.IN_PROGRESS),
     (Lane.FOR_REVIEW, Lane.PLANNED),
+    (Lane.IN_REVIEW, Lane.IN_PROGRESS),
+    (Lane.IN_REVIEW, Lane.FOR_REVIEW),
+    (Lane.IN_REVIEW, Lane.PLANNED),
     (Lane.APPROVED, Lane.IN_PROGRESS),
     (Lane.APPROVED, Lane.PLANNED),
     # Abandon/reassign
@@ -383,7 +392,7 @@ def validate_transition(payload: StatusTransitionPayload) -> TransitionValidatio
 
     # Guard conditions (checked regardless of force)
     if (
-        payload.from_lane in {Lane.FOR_REVIEW, Lane.APPROVED}
+        payload.from_lane in {Lane.FOR_REVIEW, Lane.IN_REVIEW, Lane.APPROVED}
         and payload.to_lane in {Lane.IN_PROGRESS, Lane.PLANNED}
         and (payload.review_ref is None or payload.review_ref.strip() == "")
     ):
@@ -475,7 +484,7 @@ def _rollback_aware_order(
 
     def _is_rollback(payload: StatusTransitionPayload) -> bool:
         return (
-            payload.from_lane == Lane.FOR_REVIEW
+            payload.from_lane in {Lane.FOR_REVIEW, Lane.IN_REVIEW}
             and payload.to_lane == Lane.IN_PROGRESS
             and payload.review_ref is not None
         )

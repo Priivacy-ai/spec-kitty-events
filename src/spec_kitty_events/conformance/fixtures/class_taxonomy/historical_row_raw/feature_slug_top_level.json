@@ -1,0 +1,18 @@
+{
+  "class": "historical_row_raw",
+  "expected": "invalid",
+  "expected_error_code": "RAW_HISTORICAL_ROW",
+  "input": {
+    "event_type": "WPStatusChanged",
+    "event_version": "2.7.0",
+    "event_id": "01J000000000000000000FIX19",
+    "occurred_at": "2026-01-01T00:00:00+00:00",
+    "feature_slug": "legacy-historical-feature",
+    "feature_number": 42,
+    "payload": {
+      "wp_id": "WP01",
+      "to_lane": "doing"
+    }
+  },
+  "notes": "Historical row containing top-level 'feature_slug'/'feature_number' (legacy keys from epic #920 survey). Ideally validator returns RAW_HISTORICAL_ROW; FORBIDDEN_KEY may be returned by current validator — downstream WP can refine."
+}

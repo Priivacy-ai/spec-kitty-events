@@ -10,7 +10,7 @@ This release publishes the fail-closed cutover surface for:
   interview-origin fields, terminal outcome rules, and shared V1 models
 """
 
-__version__ = "4.1.0"
+__version__ = "5.0.0"
 
 from spec_kitty_events.cutover import (
     CUTOVER_ARTIFACT,

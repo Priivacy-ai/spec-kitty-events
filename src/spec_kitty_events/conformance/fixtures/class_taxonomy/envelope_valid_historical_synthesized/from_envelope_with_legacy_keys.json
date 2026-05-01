@@ -1,0 +1,17 @@
+{
+  "class": "envelope_valid_historical_synthesized",
+  "expected": "valid",
+  "input": {
+    "event_type": "MissionClosed",
+    "event_version": "3.0.0",
+    "event_id": "01J0000000000000000000FIX7",
+    "occurred_at": "2026-01-01T00:00:00+00:00",
+    "mission_id": "01J0000000000000000000MIS1",
+    "payload": {
+      "mission_slug": "fixture-mission",
+      "mission_number": 1,
+      "mission_type": "software-dev"
+    }
+  },
+  "notes": "Synthesized from a historical envelope that originally contained 'feature_slug' and 'feature_number'; the CLI canonicalizer dropped both legacy keys and emitted this canonical MissionClosed envelope."
+}

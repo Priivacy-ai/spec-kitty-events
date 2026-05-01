@@ -1,0 +1,24 @@
+{
+  "class": "envelope_valid_canonical",
+  "expected": "valid",
+  "input": {
+    "event_type": "WPStatusChanged",
+    "event_version": "3.0.0",
+    "event_id": "01J0000000000000000000FIX4",
+    "occurred_at": "2026-01-01T00:00:00+00:00",
+    "mission_id": "01J0000000000000000000MIS1",
+    "payload": {
+      "mission_slug": "fixture-mission",
+      "wp_id": "WP01",
+      "from_lane": "planned",
+      "to_lane": "claimed",
+      "actor": "fixture-actor",
+      "force": false,
+      "reason": null,
+      "execution_mode": "worktree",
+      "review_ref": null,
+      "evidence": null
+    }
+  },
+  "notes": "Canonical WPStatusChanged covering the planned->claimed happy path transition."
+}

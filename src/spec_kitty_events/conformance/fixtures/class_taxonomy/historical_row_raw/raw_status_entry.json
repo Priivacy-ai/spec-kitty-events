@@ -1,0 +1,12 @@
+{
+  "class": "historical_row_raw",
+  "expected": "invalid",
+  "expected_error_code": "RAW_HISTORICAL_ROW",
+  "input": {
+    "wp_id": "WP01",
+    "lane": "doing",
+    "actor": "fixture-actor",
+    "ts": "2026-01-01T00:00:00+00:00"
+  },
+  "notes": "Raw status entry with no envelope wrapper at all (no event_type, no event_version, no payload). Ideally validator returns RAW_HISTORICAL_ROW; current validator likely emits ENVELOPE_SHAPE_INVALID."
+}
