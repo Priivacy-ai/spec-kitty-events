@@ -6,6 +6,11 @@ from typing import Any, Literal, Mapping
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from spec_kitty_events.forbidden_keys import (
+    FORBIDDEN_LEGACY_KEYS,
+    find_forbidden_keys,
+)
+
 
 class CutoverArtifact(BaseModel):
     """Machine-readable cutover policy shipped with the package."""
@@ -99,15 +104,42 @@ def required_cutover_value_matches(signal_value: str) -> bool:
     return signal_value == CUTOVER_ARTIFACT.cutover_contract_version
 
 
-def forbidden_legacy_keys(payload: Mapping[str, Any]) -> set[str]:
-    """Return any forbidden legacy keys present in the envelope or payload body."""
+def _legacy_top_level_forbidden_check(payload: Mapping[str, Any]) -> set[str]:
+    """Deprecated. Top-level + payload-level only check kept for diagnostics.
 
-    present = {
+    Use :func:`forbidden_legacy_keys` (which delegates to the recursive
+    walker in :mod:`spec_kitty_events.forbidden_keys`) for the public
+    contract. This helper is internal and exists so the previous
+    behaviour can be exercised in regression tests; production callers
+    must use the recursive form so a forbidden key buried inside an
+    array element or at depth 10 is not silently accepted.
+    """
+
+    return {
         key
         for key in CUTOVER_ARTIFACT.forbidden_legacy_keys
-        if key in payload or (isinstance(payload.get("payload"), Mapping) and key in payload["payload"])
+        if key in payload
+        or (isinstance(payload.get("payload"), Mapping) and key in payload["payload"])
     }
-    return present
+
+
+def forbidden_legacy_keys(payload: Mapping[str, Any]) -> set[str]:
+    """Return any forbidden legacy keys present anywhere in the envelope.
+
+    Walks the entire envelope recursively (objects and array elements
+    alike) using :func:`spec_kitty_events.forbidden_keys.find_forbidden_keys`.
+    The set of forbidden names comes from
+    :data:`spec_kitty_events.forbidden_keys.FORBIDDEN_LEGACY_KEYS`,
+    which is the SSOT and is a superset of the cutover artifact's
+    historical 3-key list (it adds ``legacy_aggregate_id``). The
+    walker inspects KEYS only — a string *value* equal to a forbidden
+    key name is accepted.
+    """
+
+    return {
+        error.details["key"]
+        for error in find_forbidden_keys(payload, forbidden=FORBIDDEN_LEGACY_KEYS)
+    }
 
 
 def forbidden_legacy_event_names(payload: Mapping[str, Any]) -> set[str]:
