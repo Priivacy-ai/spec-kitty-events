@@ -24,11 +24,11 @@ This is a reference table only — progress tracking happens via the per-WP chec
 | T009 | Create `src/spec_kitty_events/forbidden_keys.py` with `FORBIDDEN_LEGACY_KEYS` constant and recursive validator | WP03 | | [D] |
 | T010 | Author `tests/test_forbidden_keys.py` targeted fixtures: top, depth-1, depth-3, depth-10, array element, must-accept-when-value | WP03 | | [D] |
 | T011 | Add hypothesis property tests for the recursive validator + determinism test | WP03 | | [D] |
-| T012 | Audit CLI emission sites for `MissionCreated`, `WPStatusChanged`, `MissionClosed` and document field disposition | WP04 | |
-| T013 | Append reconciliation log to `contracts/payload-reconciliation.md` recording decisions per event type | WP04 | |
-| T014 | Update payload models (`MissionCreatedPayload`, `MissionClosedPayload`, `StatusTransitionPayload`) with reconciled fields and `extra='forbid'` | WP04 | |
-| T015 | Regenerate `src/spec_kitty_events/schemas/*.schema.json` from updated models | WP04 | |
-| T016 | Author `tests/test_payload_reconciliation.py` covering cross-shape acceptance and rejection | WP04 | |
+| T012 | Audit CLI emission sites for `MissionCreated`, `WPStatusChanged`, `MissionClosed` and document field disposition | WP04 | | [D] |
+| T013 | Append reconciliation log to `contracts/payload-reconciliation.md` recording decisions per event type | WP04 | | [D] |
+| T014 | Update payload models (`MissionCreatedPayload`, `MissionClosedPayload`, `StatusTransitionPayload`) with reconciled fields and `extra='forbid'` | WP04 | | [D] |
+| T015 | Regenerate `src/spec_kitty_events/schemas/*.schema.json` from updated models | WP04 | | [D] |
+| T016 | Author `tests/test_payload_reconciliation.py` covering cross-shape acceptance and rejection | WP04 | | [D] |
 | T017 | Reorganize `src/spec_kitty_events/conformance/fixtures/` into 8 named class directories | WP05 | |
 | T018 | Author `envelope_valid_canonical` fixtures (one per event type, including `in_review`-using `WPStatusChanged`) | WP05 | |
 | T019 | Author `envelope_valid_historical_synthesized` fixtures (CLI canonicalizer dry-run shapes) | WP05 | |
@@ -134,11 +134,11 @@ This is a reference table only — progress tracking happens via the per-WP chec
 **Prompt**: [tasks/WP04-payload-reconciliation.md](./tasks/WP04-payload-reconciliation.md) (~480 lines)
 
 **Subtasks**:
-- [ ] T012 Audit CLI emission sites (WP04)
-- [ ] T013 Append reconciliation log to contracts/payload-reconciliation.md (WP04)
-- [ ] T014 Update payload models with reconciled fields + `extra='forbid'` (WP04)
-- [ ] T015 Regenerate `src/spec_kitty_events/schemas/*.schema.json` (WP04)
-- [ ] T016 Author `tests/test_payload_reconciliation.py` (WP04)
+- [x] T012 Audit CLI emission sites (WP04)
+- [x] T013 Append reconciliation log to contracts/payload-reconciliation.md (WP04)
+- [x] T014 Update payload models with reconciled fields + `extra='forbid'` (WP04)
+- [x] T015 Regenerate `src/spec_kitty_events/schemas/*.schema.json` (WP04)
+- [x] T016 Author `tests/test_payload_reconciliation.py` (WP04)
 
 **Dependencies**: WP01, WP02.
 
