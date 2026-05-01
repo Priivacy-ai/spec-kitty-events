@@ -17,8 +17,8 @@ subtasks:
 - T002
 - T003
 - T004
-agent: claude
-shell_pid: '77568'
+agent: "codex:gpt-5:reviewer-rachel:reviewer"
+shell_pid: "3544"
 history:
 - event: created
   at: '2026-05-01T09:44:26Z'
@@ -233,3 +233,4 @@ The Codex reviewer will check:
 ## Activity Log
 
 - 2026-05-01T10:06:46Z – claude – shell_pid=77568 – Ready for review: Lane.IN_REVIEW added; lane vocabulary tests authored
+- 2026-05-01T10:07:15Z – codex:gpt-5:reviewer-rachel:reviewer – shell_pid=3544 – Started review via action command

@@ -1,7 +1,7 @@
 {
-  "event_count": 10,
-  "last_event_id": "01KQHG2K69N42MFQ8YMKZBGEVE",
-  "materialized_at": "2026-05-01T10:06:46.473864+00:00",
+  "event_count": 11,
+  "last_event_id": "01KQHG3FKQ1QGDMBW9HH6QB7BF",
+  "materialized_at": "2026-05-01T10:07:15.575803+00:00",
   "mission_number": "",
   "mission_slug": "teamspace-event-contract-foundation-01KQHDE4",
   "mission_type": "software-dev",
@@ -11,18 +11,18 @@
     "canceled": 0,
     "claimed": 0,
     "done": 0,
-    "for_review": 1,
+    "for_review": 0,
     "in_progress": 0,
-    "in_review": 0,
+    "in_review": 1,
     "planned": 6
   },
   "work_packages": {
     "WP01": {
-      "actor": "user",
+      "actor": "codex:gpt-5:reviewer-rachel:reviewer",
       "force_count": 1,
-      "lane": "for_review",
-      "last_event_id": "01KQHG2K69N42MFQ8YMKZBGEVE",
-      "last_transition_at": "2026-05-01T10:06:46.473864+00:00"
+      "lane": "in_review",
+      "last_event_id": "01KQHG3FKQ1QGDMBW9HH6QB7BF",
+      "last_transition_at": "2026-05-01T10:07:15.575803+00:00"
     },
     "WP02": {
       "actor": "finalize-tasks",
