@@ -15,7 +15,8 @@ subtasks:
 - T028
 - T029
 - T030
-agent: claude
+agent: "claude:sonnet:implementer-ivan:implementer"
+shell_pid: "43324"
 history:
 - event: created
   at: '2026-05-01T09:44:26Z'
@@ -245,3 +246,7 @@ Codex reviewer will read this WP's review-handoff doc as the entry point to the 
 3. Inspect the reconciliation log in `contracts/payload-reconciliation.md` for completeness.
 4. Confirm the Breaking Changes language in CHANGELOG matches reality.
 5. Sign off in the "Reviewer notes" section of the handoff doc to close C-005 and SC-007.
+
+## Activity Log
+
+- 2026-05-01T11:20:46Z – claude:sonnet:implementer-ivan:implementer – shell_pid=43324 – Started implementation via action command
