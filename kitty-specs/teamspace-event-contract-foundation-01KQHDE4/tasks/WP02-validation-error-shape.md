@@ -12,7 +12,8 @@ subtasks:
 - T005
 - T006
 - T007
-agent: claude
+agent: "claude:sonnet:implementer-ivan:implementer"
+shell_pid: "94874"
 history:
 - event: created
   at: '2026-05-01T09:44:26Z'
@@ -266,3 +267,7 @@ Codex reviewer will check:
 2. `extra='forbid'` and `frozen=True` are both set on the model.
 3. Conversion helpers do not invent new codes; if a typed exception cannot be mapped, the helper raises rather than using a fallback.
 4. The determinism test uses `model_dump_json()` (or equivalent canonical serialization) to assert byte equality, not just `==`.
+
+## Activity Log
+
+- 2026-05-01T10:32:56Z – claude:sonnet:implementer-ivan:implementer – shell_pid=94874 – Started implementation via action command
