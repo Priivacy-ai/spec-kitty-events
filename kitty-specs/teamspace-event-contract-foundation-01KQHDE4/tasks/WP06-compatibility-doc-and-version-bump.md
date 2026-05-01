@@ -203,3 +203,4 @@ Codex reviewer will check:
 - 2026-05-01T11:13:24Z – claude:sonnet:implementer-ivan:implementer – shell_pid=42193 – Started implementation via action command
 - 2026-05-01T11:17:55Z – claude:sonnet:implementer-ivan:implementer – shell_pid=42193 – Ready for review: major bump + COMPATIBILITY + CHANGELOG
 - 2026-05-01T11:18:25Z – claude:sonnet:reviewer-rachel:reviewer – shell_pid=42871 – Started review via action command
+- 2026-05-01T11:20:17Z – claude:sonnet:reviewer-rachel:reviewer – shell_pid=42871 – Review passed: major bump 4.1.0->5.0.0 + COMPATIBILITY + CHANGELOG; __init__.py emergency edit (test_placeholder pin) accepted. --force used to ignore review-lock.json housekeeping diff.
