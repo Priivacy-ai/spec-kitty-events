@@ -271,3 +271,4 @@ Codex reviewer will check:
 ## Activity Log
 
 - 2026-05-01T10:32:56Z – claude:sonnet:implementer-ivan:implementer – shell_pid=94874 – Started implementation via action command
+- 2026-05-01T10:36:27Z – claude:sonnet:implementer-ivan:implementer – shell_pid=94874 – Ready for review: ValidationError + closed enum + helpers + tests
