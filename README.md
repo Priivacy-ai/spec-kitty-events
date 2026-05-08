@@ -2,16 +2,20 @@
 
 Canonical event contracts for Spec Kitty mission state, mission runtime, conformance, and replay.
 
-**Version**: `3.0.0` | **Cutover Contract**: `3.0.0` | **Python**: `>=3.10`
+**Package Version**: `5.0.0` | **Cutover Contract**: `3.0.0` | **Python**: `>=3.10`
 
-## What Changed In 3.0.0
+## What Changed In 5.0.0
 
-`3.0.0` is a breaking mission-contract cutover release.
+`5.0.0` is a fail-closed TeamSpace migration contract release. The package
+major version is `5.0.0`; the on-wire envelope schema remains
+`schema_version="3.0.0"`.
 
 - Mission identity fields are canonicalized to `mission_slug`, `mission_number`, and `mission_type`.
 - Event envelopes require `build_id` and use the cutover signal `schema_version="3.0.0"`.
 - Live ingestion is fail-closed. There are no runtime compatibility aliases for legacy mission-domain fields.
-- Legacy mission-domain keys and names such as `feature_slug`, `feature_number`, `mission_key`, `FeatureCreated`, and `FeatureClosed` are rejected on live paths.
+- Legacy mission-domain keys and names such as `feature_slug`, `feature_number`, `mission_key`, `legacy_aggregate_id`, `FeatureCreated`, and `FeatureClosed` are rejected on live paths.
+- `in_review` is part of the canonical lane vocabulary.
+- The conformance package includes historical-shape fixtures for TeamSpace migration dry-runs.
 
 See `COMPATIBILITY.md` for the exact fail-closed rollout policy.
 
@@ -20,13 +24,13 @@ See `COMPATIBILITY.md` for the exact fail-closed rollout policy.
 From PyPI:
 
 ```bash
-pip install "spec-kitty-events>=3.0.0,<4.0.0"
+pip install "spec-kitty-events==5.0.0"
 ```
 
 With conformance validation support:
 
 ```bash
-pip install "spec-kitty-events[conformance]>=3.0.0,<4.0.0"
+pip install "spec-kitty-events[conformance]==5.0.0"
 ```
 
 Development install:
@@ -43,7 +47,7 @@ pip install -e ".[dev,conformance]"
 - `build_id` identifies the build that emitted the envelope.
 - `node_id` identifies the emitting node within that build.
 - `schema_version` is the on-wire compatibility signal. Live envelopes must use `3.0.0` for this release.
-- `StatusTransitionPayload` uses `mission_slug` for mission identity.
+- `StatusTransitionPayload` uses `mission_slug` for mission identity and accepts `in_review`.
 - Mission catalog payloads use `mission_slug`, `mission_number`, and `mission_type`.
 - Mission runtime payloads use `mission_type`; they do not accept `mission_key`.
 
@@ -149,10 +153,11 @@ pytest --pyargs spec_kitty_events.conformance -v
 
 ## Versioning
 
-This package now publishes the breaking cutover release as `3.0.0`.
+This package now publishes the TeamSpace migration release as package `5.0.0`.
 
 - `2.x` documentation and mixed-field operation are no longer the public contract.
-- `3.x` consumers should treat the cutover artifact and committed fixtures as the authoritative compatibility surface.
+- Consumers should treat the cutover artifact, recursive forbidden-key helper, and committed fixtures as the authoritative compatibility surface.
+- The envelope schema version intentionally remains `3.0.0`.
 
 ## License
 

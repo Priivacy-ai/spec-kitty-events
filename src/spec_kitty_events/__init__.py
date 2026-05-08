@@ -1,4 +1,4 @@
-"""Public package exports for the canonical 4.0.0 Decision Moment V1 release.
+"""Public package exports for the canonical 5.0.0 TeamSpace migration release.
 
 This release publishes the fail-closed cutover surface for:
 
@@ -8,6 +8,9 @@ This release publishes the fail-closed cutover surface for:
 - authoritative artifact-driven compatibility gating via ``spec_kitty_events.cutover``
 - Decision Moment V1: discriminated-union DecisionPoint payloads, Widened event,
   interview-origin fields, terminal outcome rules, and shared V1 models
+- TeamSpace migration readiness: canonical ``in_review`` lane handling,
+  reconciled mission payloads, recursive forbidden-key validation, and
+  historical-shape conformance fixtures.
 """
 
 __version__ = "5.0.0"

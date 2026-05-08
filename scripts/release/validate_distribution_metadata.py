@@ -12,6 +12,17 @@ from typing import List
 
 MIT_CLASSIFIER = "License :: OSI Approved :: MIT License"
 
+REQUIRED_WHEEL_SUFFIXES = (
+    "spec_kitty_events/cutover.py",
+    "spec_kitty_events/forbidden_keys.py",
+    "spec_kitty_events/conformance/README.md",
+    "spec_kitty_events/conformance/fixtures/manifest.json",
+    "spec_kitty_events/conformance/fixtures/class_taxonomy/envelope_valid_canonical/wp_status_changed_in_review.json",
+    "spec_kitty_events/conformance/fixtures/class_taxonomy/envelope_valid_historical_synthesized/from_in_review_legacy_synonym.json",
+    "spec_kitty_events/conformance/fixtures/class_taxonomy/envelope_invalid_forbidden_key/forbidden_key_depth_10.json",
+    "spec_kitty_events/conformance/fixtures/class_taxonomy/historical_row_raw/legacy_aggregate_id.json",
+)
+
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
@@ -46,6 +57,18 @@ def validate_wheel_metadata(metadata: email.message.Message, label: str) -> List
 
     if "LICENSE" not in license_files:
         issues.append(f"{label}: wheel METADATA must include License-File: LICENSE")
+
+    return issues
+
+
+def validate_wheel_contents(wheel_path: Path) -> List[str]:
+    issues: List[str] = []
+    with zipfile.ZipFile(wheel_path) as zf:
+        names = set(zf.namelist())
+
+    for suffix in REQUIRED_WHEEL_SUFFIXES:
+        if not any(name.endswith(suffix) for name in names):
+            issues.append(f"{wheel_path.name}: wheel missing required release file {suffix}")
 
     return issues
 
@@ -87,6 +110,7 @@ def main() -> int:
     for wheel in wheels:
         metadata = read_wheel_metadata(wheel)
         issues.extend(validate_wheel_metadata(metadata, wheel.name))
+        issues.extend(validate_wheel_contents(wheel))
 
     for sdist in sdists:
         issues.extend(validate_sdist(sdist))
