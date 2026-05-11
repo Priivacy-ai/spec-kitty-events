@@ -1,0 +1,1 @@
+/Users/robert/.agents/skills/spec-kitty-charter-doctrine/references/doctrine-artifact-structure.md

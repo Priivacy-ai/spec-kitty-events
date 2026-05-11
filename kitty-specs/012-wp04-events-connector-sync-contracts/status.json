@@ -1,8 +1,10 @@
 {
   "event_count": 16,
-  "feature_slug": "012-wp04-events-connector-sync-contracts",
   "last_event_id": "01KJFMAP03A1NFPH584Y3TKBV3",
-  "materialized_at": "2026-03-11T07:08:27.745896+00:00",
+  "materialized_at": "2026-02-27T13:24:07.811152+00:00",
+  "mission_number": "12",
+  "mission_slug": "012-wp04-events-connector-sync-contracts",
+  "mission_type": "software-dev",
   "summary": {
     "approved": 0,
     "blocked": 0,
@@ -11,6 +13,7 @@
     "done": 2,
     "for_review": 0,
     "in_progress": 0,
+    "in_review": 0,
     "planned": 0
   },
   "work_packages": {
