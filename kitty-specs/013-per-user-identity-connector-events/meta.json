@@ -1,12 +1,12 @@
 {
-  "feature_number": "013",
-  "slug": "013-per-user-identity-connector-events",
-  "feature_slug": "013-per-user-identity-connector-events",
-  "friendly_name": "Per-User Identity in Connector Events",
-  "mission": "software-dev",
-  "source_description": "Per-User Identity in Connector Lifecycle Events (from per-user-auth-specify-prompts.md, section 3)",
   "created_at": "2026-03-05T10:10:50.460602+00:00",
+  "friendly_name": "Per-User Identity in Connector Events",
+  "mission_id": "01KN233MB1GVMCSS9KCNPN6P2A",
+  "mission_number": 13,
+  "mission_slug": "013-per-user-identity-connector-events",
+  "mission_type": "software-dev",
+  "slug": "013-per-user-identity-connector-events",
+  "source_description": "Per-User Identity in Connector Lifecycle Events (from per-user-auth-specify-prompts.md, section 3)",
   "target_branch": "2.x",
-  "vcs": "git",
-  "mission_id": "01KN233MB1GVMCSS9KCNPN6P2A"
+  "vcs": "git"
 }

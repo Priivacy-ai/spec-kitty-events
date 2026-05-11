@@ -1,12 +1,12 @@
 {
-  "feature_number": "012",
-  "slug": "012-wp04-events-connector-sync-contracts",
-  "feature_slug": "012-wp04-events-connector-sync-contracts",
-  "friendly_name": "wp04 events connector sync contracts",
-  "mission": "software-dev",
-  "target_branch": "codex/wp04-events-connector-sync-contracts",
   "created_at": "2026-02-27T12:11:06.699698+00:00",
+  "friendly_name": "wp04 events connector sync contracts",
+  "mission_id": "01KN233MB1GVMCSS9KCNPN6P29",
+  "mission_number": 12,
+  "mission_slug": "012-wp04-events-connector-sync-contracts",
+  "mission_type": "software-dev",
+  "slug": "012-wp04-events-connector-sync-contracts",
+  "target_branch": "codex/wp04-events-connector-sync-contracts",
   "vcs": "git",
-  "vcs_locked_at": "2026-02-27T12:21:45.978739+00:00",
-  "mission_id": "01KN233MB1GVMCSS9KCNPN6P29"
+  "vcs_locked_at": "2026-02-27T12:21:45.978739+00:00"
 }

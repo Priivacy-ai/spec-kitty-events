@@ -1,8 +1,10 @@
 {
   "event_count": 5,
-  "feature_slug": "008-mission-dossier-parity-event-contracts",
   "last_event_id": "01KJ5V2VA1JX1XFR6ZBJFE0CBR",
-  "materialized_at": "2026-03-11T07:08:27.501352+00:00",
+  "materialized_at": "2026-02-21T14:00:00Z",
+  "mission_number": "8",
+  "mission_slug": "008-mission-dossier-parity-event-contracts",
+  "mission_type": "software-dev",
   "summary": {
     "approved": 0,
     "blocked": 0,
@@ -11,6 +13,7 @@
     "done": 5,
     "for_review": 0,
     "in_progress": 0,
+    "in_review": 0,
     "planned": 0
   },
   "work_packages": {

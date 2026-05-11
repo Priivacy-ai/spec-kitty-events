@@ -1,8 +1,10 @@
 {
   "event_count": 12,
-  "feature_slug": "004-canonical-event-contract",
   "last_event_id": "01KH14A28TJN85E5RH383XJXXZ",
-  "materialized_at": "2026-03-11T07:08:27.067321+00:00",
+  "materialized_at": "2026-02-09T11:59:06.522686+00:00",
+  "mission_number": "4",
+  "mission_slug": "004-canonical-event-contract",
+  "mission_type": "software-dev",
   "summary": {
     "approved": 0,
     "blocked": 0,
@@ -11,6 +13,7 @@
     "done": 4,
     "for_review": 0,
     "in_progress": 0,
+    "in_review": 0,
     "planned": 0
   },
   "work_packages": {

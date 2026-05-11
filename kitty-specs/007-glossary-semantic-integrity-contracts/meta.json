@@ -1,12 +1,12 @@
 {
-  "feature_number": "007",
-  "slug": "007-glossary-semantic-integrity-contracts",
-  "friendly_name": "Glossary Semantic Integrity Contracts",
-  "mission": "software-dev",
-  "source_description": "/Users/robert/ClaudeCowork/Spec-Kitty-Cowork/spec-kitty-planning/product-ideas/mission-collaboration-platform-ddd/sprint-s2-kickoff-prompt-spec-kitty-events-2026-02-16.md",
   "created_at": "2026-02-16T00:00:00Z",
+  "friendly_name": "Glossary Semantic Integrity Contracts",
+  "mission_id": "01KN233MAZ48PRQRGCNZQJRTR0",
+  "mission_number": 7,
+  "mission_slug": "007-glossary-semantic-integrity-contracts",
+  "mission_type": "software-dev",
+  "slug": "007-glossary-semantic-integrity-contracts",
+  "source_description": "/Users/robert/ClaudeCowork/Spec-Kitty-Cowork/spec-kitty-planning/product-ideas/mission-collaboration-platform-ddd/sprint-s2-kickoff-prompt-spec-kitty-events-2026-02-16.md",
   "target_branch": "2.x",
-  "vcs": "git",
-  "feature_slug": "007-glossary-semantic-integrity-contracts",
-  "mission_id": "01KN233MAZ48PRQRGCNZQJRTR0"
+  "vcs": "git"
 }

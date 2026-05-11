@@ -1,11 +1,12 @@
 {
   "created_at": "2026-04-05T12:16:03.357857+00:00",
-  "feature_number": "014",
-  "feature_slug": "014-mission-contract-cutover",
   "friendly_name": "Mission Contract Cutover",
-  "mission": "software-dev",
+  "mission_id": "01KRB9C8DXDG4A1RPDYHAWZ24B",
+  "mission_number": 14,
+  "mission_slug": "014-mission-contract-cutover",
+  "mission_type": "software-dev",
   "slug": "014-mission-contract-cutover",
-  "target_branch": "main",
   "source_description": "Publish the breaking event-contract release in spec-kitty-events that replaces mission-domain feature terminology with canonical mission/build terminology, introduces explicit build identity, removes event-name ambiguity, and makes downstream rejection behavior and lockstep rollout external release gates.",
+  "target_branch": "main",
   "vcs": "git"
 }

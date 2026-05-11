@@ -3,9 +3,10 @@
 # DO NOT EDIT MANUALLY
 
 spec_kitty:
-  version: 3.0.3
+  version: 3.2.0rc4
   initialized_at: '2026-02-07T07:46:50.090112'
-  last_upgraded_at: '2026-04-04T09:58:10.807798'
+  last_upgraded_at: '2026-05-11T12:29:58.363338'
+  schema_version: 3
 environment:
   python_version: 3.11.14
   platform: darwin
@@ -59,7 +60,7 @@ migrations:
     applied_at: '2026-03-21T15:02:29.723675'
     result: success
     notes: Installed 6 skill(s) for 1 agent(s) (17 managed files); Rebuilt .kittify/skills-manifest.json
-  - id: 2.1.2_fix_constitution_doctrine_skill
+  - id: 2.1.2_fix_charter_doctrine_skill
     applied_at: '2026-03-27T14:33:04.068400'
     result: success
     notes: Replaced .agents/skills/spec-kitty-constitution-doctrine/SKILL.md
@@ -117,3 +118,80 @@ migrations:
     result: success
     notes: Processed 2 agent directories; Wrote 32 command files; Deleted 0 stale
       files
+  - id: 3.0.3_globalize_skill_pack
+    applied_at: '2026-05-11T12:29:58.170065'
+    result: success
+    notes: 'Relinked 14 canonical skill(s) for 3 agent(s) (93 managed files); Updated
+      .kittify/skills-manifest.json for global canonical skill links; Archived customized
+      skill file for manual review: .kittify/.migration-backup/agent-skills/20260511T102958Z/.agents/skills/spec-kitty-git-workflow/SKILL.md;
+      Archived customized skill file for manual review: .kittify/.migration-backup/agent-skills/20260511T102958Z/.agents/skills/spec-kitty-git-workflow/references/git-operations-matrix.md;
+      Archived customized skill file for manual review: .kittify/.migration-backup/agent-skills/20260511T102958Z/.agents/skills/spec-kitty-glossary-context/references/glossary-field-guide.md;
+      Archived customized skill file for manual review: .kittify/.migration-backup/agent-skills/20260511T102958Z/.agents/skills/spec-kitty-mission-system/SKILL.md;
+      Archived customized skill file for manual review: .kittify/.migration-backup/agent-skills/20260511T102958Z/.agents/skills/spec-kitty-orchestrator-api-operator/SKILL.md;
+      Archived customized skill file for manual review: .kittify/.migration-backup/agent-skills/20260511T102958Z/.agents/skills/spec-kitty-orchestrator-api-operator/references/host-boundary-rules.md;
+      Archived customized skill file for manual review: .kittify/.migration-backup/agent-skills/20260511T102958Z/.agents/skills/spec-kitty-orchestrator-api-operator/references/orchestrator-api-contract.md;
+      Archived customized skill file for manual review: .kittify/.migration-backup/agent-skills/20260511T102958Z/.agents/skills/spec-kitty-runtime-next/SKILL.md;
+      Archived customized skill file for manual review: .kittify/.migration-backup/agent-skills/20260511T102958Z/.agents/skills/spec-kitty-runtime-next/references/blocked-state-recovery.md;
+      Archived customized skill file for manual review: .kittify/.migration-backup/agent-skills/20260511T102958Z/.agents/skills/spec-kitty-runtime-review/SKILL.md;
+      Archived customized skill file for manual review: .kittify/.migration-backup/agent-skills/20260511T102958Z/.agents/skills/spec-kitty-runtime-review/references/review-checklist.md;
+      Archived customized skill file for manual review: .kittify/.migration-backup/agent-skills/20260511T102958Z/.agents/skills/spec-kitty-setup-doctor/SKILL.md;
+      Archived customized skill file for manual review: .kittify/.migration-backup/agent-skills/20260511T102958Z/.agents/skills/spec-kitty-setup-doctor/references/agent-path-matrix.md;
+      Archived customized skill file for manual review: .kittify/.migration-backup/agent-skills/20260511T102958Z/.agents/skills/spec-kitty-setup-doctor/references/common-failure-signatures.md'
+  - id: 3.1.1_charter_rename
+    applied_at: '2026-05-11T12:29:58.178445'
+    result: skipped
+    notes: Not applicable
+  - id: 3.1.1_direct_canonical_commands
+    applied_at: '2026-05-11T12:29:58.186806'
+    result: skipped
+    notes: Not applicable
+  - id: 3.1.1_event_log_merge_driver
+    applied_at: '2026-05-11T12:29:58.265584'
+    result: success
+    notes: Configured git merge.spec-kitty-event-log.name; Configured git merge.spec-kitty-event-log.driver
+  - id: 3.1.1_normalize_status_json
+    applied_at: '2026-05-11T12:29:58.285068'
+    result: success
+    notes: '001-event-model-project-identity: normalised status.json; 002-github-gate-observability-contracts:
+      normalised status.json; 003-status-state-model-contracts: normalised status.json;
+      004-canonical-event-contract: normalised status.json; 005-event-contract-conformance-suite:
+      normalised status.json; 006-mission-collaboration-soft-coordination-contracts:
+      normalised status.json; 007-glossary-semantic-integrity-contracts: normalised
+      status.json; 008-mission-dossier-parity-event-contracts: normalised status.json;
+      009-dossier-contracts-remote-baseline-release: normalised status.json; 010-mission-audit-lifecycle-contracts:
+      normalised status.json; 011-wp03-decisionpoint-lifecycle-contracts: normalised
+      status.json; 012-wp04-events-connector-sync-contracts: normalised status.json;
+      013-per-user-identity-connector-events: normalised status.json; 014-mission-contract-cutover:
+      normalised status.json'
+  - id: 3.1.2_globalize_commands
+    applied_at: '2026-05-11T12:29:58.294015'
+    result: skipped
+    notes: Not applicable
+  - id: 3.2.0a4_normalize_mission_lifecycle
+    applied_at: '2026-05-11T12:29:58.346946'
+    result: success
+    notes: '001-event-model-project-identity: Regenerated canonical status/progress/lifecycle
+      views; 002-github-gate-observability-contracts: Regenerated canonical status/progress/lifecycle
+      views; 003-status-state-model-contracts: Regenerated canonical status/progress/lifecycle
+      views; 004-canonical-event-contract: Regenerated canonical status/progress/lifecycle
+      views; 005-event-contract-conformance-suite: Regenerated canonical status/progress/lifecycle
+      views; 006-mission-collaboration-soft-coordination-contracts: Regenerated canonical
+      status/progress/lifecycle views; 007-glossary-semantic-integrity-contracts:
+      Regenerated canonical status/progress/lifecycle views; 008-mission-dossier-parity-event-contracts:
+      Regenerated canonical status/progress/lifecycle views; 009-dossier-contracts-remote-baseline-release:
+      Regenerated canonical status/progress/lifecycle views; 010-mission-audit-lifecycle-contracts:
+      Regenerated canonical status/progress/lifecycle views; 011-wp03-decisionpoint-lifecycle-contracts:
+      Regenerated canonical status/progress/lifecycle views; 012-wp04-events-connector-sync-contracts:
+      Regenerated canonical status/progress/lifecycle views; 013-per-user-identity-connector-events:
+      Regenerated canonical status/progress/lifecycle views; 014-mission-contract-cutover:
+      Backfilled mission identity metadata; 014-mission-contract-cutover: Regenerated
+      canonical status/progress/lifecycle views; additive-event-contracts-charter-phase456-01KP343J:
+      Regenerated canonical status/progress/lifecycle views; cli-interview-decision-moments-01KPWT82:
+      Rebuilt status.events.jsonl (0 synthetic events, 0 corrected); cli-interview-decision-moments-01KPWT82:
+      Regenerated canonical status/progress/lifecycle views; decision-moment-v1-contract-freeze-01KPWA0N:
+      Regenerated canonical status/progress/lifecycle views; teamspace-event-contract-foundation-01KQHDE4:
+      Regenerated canonical status/progress/lifecycle views'
+  - id: 3.2.0a4_safe_globalize_commands
+    applied_at: '2026-05-11T12:29:58.355897'
+    result: skipped
+    notes: Not applicable
