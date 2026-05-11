@@ -1,12 +1,12 @@
 {
-  "feature_number": "002",
-  "slug": "002-github-gate-observability-contracts",
-  "friendly_name": "GitHub Gate Observability Contracts",
-  "mission": "software-dev",
-  "source_description": "",
   "created_at": "2026-02-07T00:00:00Z",
+  "friendly_name": "GitHub Gate Observability Contracts",
+  "mission_id": "01KN233MAYW3KW9RDF2XACZQJZ",
+  "mission_number": 2,
+  "mission_slug": "002-github-gate-observability-contracts",
+  "mission_type": "software-dev",
+  "slug": "002-github-gate-observability-contracts",
+  "source_description": "",
   "target_branch": "main",
-  "vcs": "git",
-  "feature_slug": "002-github-gate-observability-contracts",
-  "mission_id": "01KN233MAYW3KW9RDF2XACZQJZ"
+  "vcs": "git"
 }

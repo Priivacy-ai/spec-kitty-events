@@ -1,0 +1,3337 @@
+{
+  "manifest_path": ".kittify/migrations/mission-state/3e99f5e7764a1821.json",
+  "missions": [
+    {
+      "file_changes": [
+        {
+          "new_sha256": "df922c466c9cf265fbca34803f33d46c744f88dd3a189a032980933de9ab06ec",
+          "new_size": 671,
+          "old_sha256": "c6d3df1f7734025934a5281b5d8289c1dae0f4a4cdec9262d67086ef976c4ea0",
+          "old_size": 670,
+          "path": "kitty-specs/001-event-model-project-identity/meta.json"
+        },
+        {
+          "new_sha256": "08152d63e92af3011b962acb37eb853f7b39fe3bfef508e54f58c79d68798c66",
+          "new_size": 1545,
+          "old_sha256": "211c1a53b8e4303f3ca2882f1760a66e31815842f313087ea356c2f1ad4b368a",
+          "old_size": 1494,
+          "path": "kitty-specs/001-event-model-project-identity/status.events.jsonl"
+        }
+      ],
+      "mission_id": "01KN233MAYW3KW9RDF2XACZQJY",
+      "mission_slug": "001-event-model-project-identity",
+      "quarantined_rows": 0,
+      "row_transformations": [
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/001-event-model-project-identity/status.events.jsonl",
+          "event_id": "01KJ5V2V6YQCFX0B2DA7XTEBMA",
+          "line_number": 1,
+          "new_sha256": "c5b4e92269b75ebfa9041aa1f34d183ee31e6f950235852936b93400db0d6564",
+          "old_sha256": "fa54d1a55a4be2a9a1460f9b3762d0cc021cd00d64fd9c8215e5b17143052f58"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/001-event-model-project-identity/status.events.jsonl",
+          "event_id": "01KJ5V2V70Q8M7M4XRWXZ4DFHG",
+          "line_number": 2,
+          "new_sha256": "c387fb0be1c52d3dbcd9ce98d5dc45a062c8f7d3a806bc4c722675b37aaa77d4",
+          "old_sha256": "e273f3ade806ebf56cbbcc790056eb5e83cb1d96bc5c532c48d627d3c4f6ebc0"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/001-event-model-project-identity/status.events.jsonl",
+          "event_id": "01KJ5V2V72K40G8XSW5BZBJZ4G",
+          "line_number": 3,
+          "new_sha256": "2a439be6c99a065c2d51bbbdc98eee2c7b6f65d8b38aefb8e65c8fb631fd0814",
+          "old_sha256": "21b23cf2454b683f976e3c34b9f7213494b83c2d87c9d1168e14bc45df9bbd17"
+        }
+      ],
+      "status": "updated",
+      "validation_errors": []
+    },
+    {
+      "file_changes": [
+        {
+          "new_sha256": "e380a17292a24bc62739acc9a09ec2547abbb0fecd97bef89cda87e878a326d4",
+          "new_size": 389,
+          "old_sha256": "9c7e9546ca17bc7c4616021d99fc2b3d9cfda994efd92454c67c0c306f7a6c08",
+          "old_size": 388,
+          "path": "kitty-specs/002-github-gate-observability-contracts/meta.json"
+        },
+        {
+          "new_sha256": "5f9761a86d6c904359028f751d995036c42bead32eba602143edda86dcf287b0",
+          "new_size": 1566,
+          "old_sha256": "bdd24778d9e6715f207559365a5b31df4b02ebd2d54e6a806d711fda780f3931",
+          "old_size": 1515,
+          "path": "kitty-specs/002-github-gate-observability-contracts/status.events.jsonl"
+        }
+      ],
+      "mission_id": "01KN233MAYW3KW9RDF2XACZQJZ",
+      "mission_slug": "002-github-gate-observability-contracts",
+      "quarantined_rows": 0,
+      "row_transformations": [
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/002-github-gate-observability-contracts/status.events.jsonl",
+          "event_id": "01KJ5V2V76PCAASRWYVW7YREX4",
+          "line_number": 1,
+          "new_sha256": "e719fcba794f9d379502151ec68827c7f8a4876a7903212b51a3ec3218b1568a",
+          "old_sha256": "f45e9fa859915e76b74c25150bf8ac86e16361c6b045ba00063111bdf7cda755"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/002-github-gate-observability-contracts/status.events.jsonl",
+          "event_id": "01KJ5V2V78C8GC6186X3RJA9JG",
+          "line_number": 2,
+          "new_sha256": "4d019a5b48296d77de6c4bd13ee6197a5e4ae72b045b0bd9c3d8296773248827",
+          "old_sha256": "50c8298e992b47d2eae6f947cfa69d886ca486d758fb8bb5bcb3c158eabebc02"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/002-github-gate-observability-contracts/status.events.jsonl",
+          "event_id": "01KJ5V2V7ANZ7A0AKP3Y2526MK",
+          "line_number": 3,
+          "new_sha256": "160ebd96956706976d0df27159242295aebc8de0197c0b9b3a4d6a311c439cd9",
+          "old_sha256": "90ecad6e2f4a3a8f03fd20a978842d931ac7356e43d2b25d24050a45b3b9eb0c"
+        }
+      ],
+      "status": "updated",
+      "validation_errors": []
+    },
+    {
+      "file_changes": [
+        {
+          "new_sha256": "5430fe4cd04b6a94f05ef073850a440bd78f89b964b51a5f2ced74c16f7d06a4",
+          "new_size": 971,
+          "old_sha256": "845b6748e70f9ce1766c22e7bc559fb13aece803bda6c0740e38ae534420d72f",
+          "old_size": 970,
+          "path": "kitty-specs/003-status-state-model-contracts/meta.json"
+        },
+        {
+          "new_sha256": "04f70a2e6dec34a103e92aadad61d10dd62abdca8143904635e0d1858d675b00",
+          "new_size": 2060,
+          "old_sha256": "f196f7122ad0407d2ed6b15abad188551feaf6068b95bfc3873923e3fbf7d7d4",
+          "old_size": 1992,
+          "path": "kitty-specs/003-status-state-model-contracts/status.events.jsonl"
+        }
+      ],
+      "mission_id": "01KN233MAYW3KW9RDF2XACZQK0",
+      "mission_slug": "003-status-state-model-contracts",
+      "quarantined_rows": 0,
+      "row_transformations": [
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/003-status-state-model-contracts/status.events.jsonl",
+          "event_id": "01KJ5V2V7EKZNR94TPGSYAGFA0",
+          "line_number": 1,
+          "new_sha256": "5769e970f1c320b1021de16182121579bd86f62c20f7f7bfe9daa36a22c958cd",
+          "old_sha256": "a73b62abdee7e1b07043f0212f34860ea9f5140ed2d454ddcee394581fc809e2"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/003-status-state-model-contracts/status.events.jsonl",
+          "event_id": "01KJ5V2V7GAW8YW1PXGTFBMG5R",
+          "line_number": 2,
+          "new_sha256": "3b5b09c4cc5008bf326713a6c2f73d320711a860d62e366253420d07b12d0fc3",
+          "old_sha256": "66de397cf2b4b8b1e31ffb45152fce3c626bcbfb5e41b6739979db16943ff9af"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/003-status-state-model-contracts/status.events.jsonl",
+          "event_id": "01KJ5V2V7JH44RHH7X60WYCY70",
+          "line_number": 3,
+          "new_sha256": "0e934a8b6458210c588f5678e2e498e11ccd2036048a812feb48fce38dbf99c8",
+          "old_sha256": "026ad7597509104e583df4f1da46f1c62105fae4c920e9c31ccbba425bd7ffad"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/003-status-state-model-contracts/status.events.jsonl",
+          "event_id": "01KJ5V2V7MTNG865DWN2R56192",
+          "line_number": 4,
+          "new_sha256": "01ea315335002d427c86494fa57048e381effc9593d0c4a42a40a8f6e4d6b415",
+          "old_sha256": "cf65d6bb65d6daf4d0a30e00f5033c958d12bfb56f604ea3a11c8e381c2e7ec9"
+        }
+      ],
+      "status": "updated",
+      "validation_errors": []
+    },
+    {
+      "file_changes": [
+        {
+          "new_sha256": "9145e6afa9886cb4b2f19918179b05a82def32c6fbf8b4b2c5a41d711e87b1a6",
+          "new_size": 694,
+          "old_sha256": "ad563a99bf6e5ce6d3f0e47a30aa860d805546003465f459b637bb0c2f4e466b",
+          "old_size": 693,
+          "path": "kitty-specs/004-canonical-event-contract/meta.json"
+        },
+        {
+          "new_sha256": "2bc692dc5ace91b739214475323c89ddf8273a627befcc065793e065efc9ab72",
+          "new_size": 7502,
+          "old_sha256": "bed23d725078a6b4650978db2e8dc8653e545943a9fa2b5f0541f5a3f0627af8",
+          "old_size": 6998,
+          "path": "kitty-specs/004-canonical-event-contract/status.events.jsonl"
+        }
+      ],
+      "mission_id": "01KN233MAZ48PRQRGCNZQJRTQX",
+      "mission_slug": "004-canonical-event-contract",
+      "quarantined_rows": 0,
+      "row_transformations": [
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/004-canonical-event-contract/status.events.jsonl",
+          "event_id": "01KH13DN8ZTN5EYC31AZ6VE5N9",
+          "line_number": 1,
+          "new_sha256": "e170a99c8158c184d4e4da4778a1f8d31147362a5b5be0d9a33e248ed390e028",
+          "old_sha256": "a5c2b3734e0ce5c602600c479f6807e27b06d7d36e6312d35fbe510b14ff70c8"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/004-canonical-event-contract/status.events.jsonl",
+          "event_id": "01KH13DNC2GMA25QJAQTHN9C8R",
+          "line_number": 2,
+          "new_sha256": "a1a7197ec76781f362f43ddc601b54367d44505405aa1e5c510da782ee8a8168",
+          "old_sha256": "c4742c656a4dad77a5cffbc0e010b7c3db270d9b6544a219f4482151578ee858"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/004-canonical-event-contract/status.events.jsonl",
+          "event_id": "01KH13HBBF8BYT4GZHYKJRFT35",
+          "line_number": 3,
+          "new_sha256": "250402535a8bacb83eb584bbe61600253dc92aaa84d787073a521360382755b2",
+          "old_sha256": "5b43a9a892526214b148b4b41056098b558dcaccc45f421cee94c641e3cc90e4"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/004-canonical-event-contract/status.events.jsonl",
+          "event_id": "01KH13J01SZX92888B04P6QFVE",
+          "line_number": 4,
+          "new_sha256": "9c89dabc870ae7caca0bdb9b5f9828916a0ba4578456dfa72fb90aa135b0482f",
+          "old_sha256": "2416b2bfe789c9b0658f3850524d30e7acc158756072325e133202054705b37c"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/004-canonical-event-contract/status.events.jsonl",
+          "event_id": "01KH13J05M9H67HT3FB58HDH3Y",
+          "line_number": 5,
+          "new_sha256": "f5d36e154cbbe21dd786e5048e53ec46c2f2709cb6961289af55db344e485bd6",
+          "old_sha256": "67e2bb78a9ed3d77008bdc4e3b937009b5de643998e1720de6def12eee6631b9"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/004-canonical-event-contract/status.events.jsonl",
+          "event_id": "01KH13MHVEXT0ZYF1EACZK87T0",
+          "line_number": 6,
+          "new_sha256": "ee1f6f20c19b0309612c048754297466928fe240cc34284027ed2c2f4229d136",
+          "old_sha256": "c3564c8a0f6dfd04fc226b3b05fca507ffba4b114fa05d237fdf50ee06f48480"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/004-canonical-event-contract/status.events.jsonl",
+          "event_id": "01KH13Z7TZQY4Q2XSZTVVRHNF0",
+          "line_number": 7,
+          "new_sha256": "3b6d605ca4d024d6cd1b17bcde7e9fba92d569ff1d35fda9a102b66f435ab37e",
+          "old_sha256": "81e155d27e793ac8f5101c757bd2ee2bade7ee996631024872a736d05184f1fd"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/004-canonical-event-contract/status.events.jsonl",
+          "event_id": "01KH13Z7YABE3GGPEP5DDRJYQY",
+          "line_number": 8,
+          "new_sha256": "3f79eda56ec9805ca896c69fc148085f423326f1c9463a4435815a4e72702ac5",
+          "old_sha256": "f82d3c1780b0a86d618a1da96d281d9c6679bc6af06afe3074a9004b83d95e70"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/004-canonical-event-contract/status.events.jsonl",
+          "event_id": "01KH1425GPQP4GVPGXFS4NAHS5",
+          "line_number": 9,
+          "new_sha256": "1ff9a11844aa0785e73cae0e9dc8e98f0e942de9324f0f78dfa3c48c5c10ccaf",
+          "old_sha256": "341f4d02be13e6ab715a19432f11b81e23ab4d4cbdb46972dde6ad4e722a6b63"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/004-canonical-event-contract/status.events.jsonl",
+          "event_id": "01KH145YCPD9PRZXCGT5TR4YW2",
+          "line_number": 10,
+          "new_sha256": "b9027da98cfe57caf086a5e9ceb9a9436f9bfb5522d12301664be81a59a2b3c1",
+          "old_sha256": "593f1e4cf2f735be7755575723e1ff9e420d3d6e98e09c6c9a95748243317e67"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/004-canonical-event-contract/status.events.jsonl",
+          "event_id": "01KH145YGNYVCV0W3KEBF6KDRQ",
+          "line_number": 11,
+          "new_sha256": "d61f9fda9fca3ab952e1c460cad46a466cd38915a531c4617b1a225f872861bf",
+          "old_sha256": "ffede5dbf6cc910c2169905e95bcecfcc90fb279bfa4c7baf236fbac047d3f16"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/004-canonical-event-contract/status.events.jsonl",
+          "event_id": "01KH14A28TJN85E5RH383XJXXZ",
+          "line_number": 12,
+          "new_sha256": "1c8ebb8651f855007edf26fd26b77befb6918c73c05a23a044b7202b0e6db22b",
+          "old_sha256": "07ef38b48243b47f588a338665a0afa18f4342d3575efd641337cd22e8cdec6c"
+        }
+      ],
+      "status": "updated",
+      "validation_errors": []
+    },
+    {
+      "file_changes": [
+        {
+          "new_sha256": "6011ce9ade19ce1dfc7336060f95fcae443d05543ddabc85b79079ceaf491f19",
+          "new_size": 1244,
+          "old_sha256": "915d5a5ae5da6228827279f973ccc4cb535da54c928371a79ed0130360b607e4",
+          "old_size": 1243,
+          "path": "kitty-specs/005-event-contract-conformance-suite/meta.json"
+        },
+        {
+          "new_sha256": "73741b25ee1aad63a8967b78d42dde91d888e75129c4db6daaa51a79c594c7cf",
+          "new_size": 3192,
+          "old_sha256": "8666bba3dcf9f9f3f4f8339b2176163cff39091ceb22db34e545f97816bec814",
+          "old_size": 3073,
+          "path": "kitty-specs/005-event-contract-conformance-suite/status.events.jsonl"
+        }
+      ],
+      "mission_id": "01KN233MAZ48PRQRGCNZQJRTQY",
+      "mission_slug": "005-event-contract-conformance-suite",
+      "quarantined_rows": 0,
+      "row_transformations": [
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/005-event-contract-conformance-suite/status.events.jsonl",
+          "event_id": "01KJ5V2V7ST1P6QADAH6TH1ZDD",
+          "line_number": 1,
+          "new_sha256": "ab11bef4201b88f4dbf40adadbe163385c909eaa5eeec5413e29f00c4d9e3b30",
+          "old_sha256": "65d1ef0b8124b17c7bdc90a15f988235076ae355fd4581836bb227d500d23dbf"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/005-event-contract-conformance-suite/status.events.jsonl",
+          "event_id": "01KJ5V2V7TAKCM0ZCHR03GMDBB",
+          "line_number": 2,
+          "new_sha256": "934a3c14efe09fc42d9b6206f40199c61405e56da219805b9d3c0abeedc92ef7",
+          "old_sha256": "9707700974771d798b4c47d9a01e35fef317c28cef9d49fc659d3619294df87e"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/005-event-contract-conformance-suite/status.events.jsonl",
+          "event_id": "01KJ5V2V7WS14ZR7QDJXRM9XHH",
+          "line_number": 3,
+          "new_sha256": "0d35348660c2bb5270d72b6c27a82e0353cdd846495a6b1aabdb076f5025db08",
+          "old_sha256": "3ef8d0c84a7d03a978a9a20aa613ec410c274c0cfe0b3b982a310c27cf48d3a3"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/005-event-contract-conformance-suite/status.events.jsonl",
+          "event_id": "01KJ5V2V7YTZXARFWA0314428K",
+          "line_number": 4,
+          "new_sha256": "c5a1bc780e54c068d08c43ad3d4521f6730acc0d6343014eafac6b8529944947",
+          "old_sha256": "c05922107dab0fd90f2b95489e02c33d41cc3f135ebe2b23527f14110371fabf"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/005-event-contract-conformance-suite/status.events.jsonl",
+          "event_id": "01KJ5V2V80H5T5B7W8FQ7ED7P4",
+          "line_number": 5,
+          "new_sha256": "52831fcb2d475837dbb1d397249a64a195977a8e95f978901d12008666ff7f79",
+          "old_sha256": "26b84fead7e6c6ab01ca004fc4d90e6ee6a1c48863e8d4cd32df067786715697"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/005-event-contract-conformance-suite/status.events.jsonl",
+          "event_id": "01KJ5V2V8298QJXCGQSMH62KAA",
+          "line_number": 6,
+          "new_sha256": "7cc5924ae044f184343fae22e6694e1d185e5cb5ecdb226d568c708b7a125528",
+          "old_sha256": "b1d84f352fc5e6f5df26bd465cf985078adfe4f987f810369242599ed1341d4d"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/005-event-contract-conformance-suite/status.events.jsonl",
+          "event_id": "01KJ5V2V848XNE7DNCKQYBP0KW",
+          "line_number": 7,
+          "new_sha256": "679a1b69cb0524f626fa719c0fad7fe2123544b742ab27f006170dc49acdb47c",
+          "old_sha256": "cb604c851ee6550ed6999724aebdfcbfaf71f1e68145c6265808fa781bccf640"
+        }
+      ],
+      "status": "updated",
+      "validation_errors": []
+    },
+    {
+      "file_changes": [
+        {
+          "new_sha256": "382c38ea14b6e0ca6cc9880ef9ca4f3b05251fae068750617e6d0a589cc99edb",
+          "new_size": 642,
+          "old_sha256": "8d29ef572a45541e9a951e9ac6c30780fe34821811fb26366b429e1bce546986",
+          "old_size": 641,
+          "path": "kitty-specs/006-mission-collaboration-soft-coordination-contracts/meta.json"
+        },
+        {
+          "new_sha256": "049d3938032b25ce143a524dd313f3f410a758ce8b3528c27e514108eb92ea1e",
+          "new_size": 4824,
+          "old_sha256": "e2b00ce8ed79ca54440de4c63c70067166fd48e59c4a8a8808bcd4de8d8967a6",
+          "old_size": 4671,
+          "path": "kitty-specs/006-mission-collaboration-soft-coordination-contracts/status.events.jsonl"
+        }
+      ],
+      "mission_id": "01KN233MAZ48PRQRGCNZQJRTQZ",
+      "mission_slug": "006-mission-collaboration-soft-coordination-contracts",
+      "quarantined_rows": 0,
+      "row_transformations": [
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/006-mission-collaboration-soft-coordination-contracts/status.events.jsonl",
+          "event_id": "01KJ5V2V88A272640DZ0ZGY81E",
+          "line_number": 1,
+          "new_sha256": "3aab14772dd60f86ff10519db8b9d8f68fc416a19c8a413481f8a30d9a177375",
+          "old_sha256": "e614a85db48718379fd8082dc7d4dd00d9f128736724b7cc3c585e7ef980a3e2"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/006-mission-collaboration-soft-coordination-contracts/status.events.jsonl",
+          "event_id": "01KJ5V2V8AXJN6AB1YEQSH0TSP",
+          "line_number": 2,
+          "new_sha256": "f135f8cfd3d45792f3c52c28cd093a8feb88c9101d15e6ea88a60400f15c09bc",
+          "old_sha256": "840e8537cfec6736f9a1db6b0dbfcdb402ab837404af4791befbe06b3c7b7e1b"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/006-mission-collaboration-soft-coordination-contracts/status.events.jsonl",
+          "event_id": "01KJ5V2V8CZ9S27QMXRPEMNPXE",
+          "line_number": 3,
+          "new_sha256": "a8043b254616491638861c48d10123681e38724351a68b1ccaa44fa7fd9bc028",
+          "old_sha256": "165bd1f56157c8152b2293be81a4fcaa3974a3ffce7865aa64178665c9db5d44"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/006-mission-collaboration-soft-coordination-contracts/status.events.jsonl",
+          "event_id": "01KJ5V2V8FE4C193B10TRM9247",
+          "line_number": 4,
+          "new_sha256": "899db57c57d931a8987fa0b36349255ac741462a120d482cafb9744a7271450c",
+          "old_sha256": "2dff153e7155bd2e17e8d05d4414cf318ec064111415d7b03c91cdaf30a691f9"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/006-mission-collaboration-soft-coordination-contracts/status.events.jsonl",
+          "event_id": "01KJ5V2V8H5RJC3N02FDX8H566",
+          "line_number": 5,
+          "new_sha256": "aa572f95443af2d610ae479c4313a67a56032edd8d4e3d18cbff9e537ebd8dba",
+          "old_sha256": "5e38b82e9feb65de208b00e50f11d50e96f8fd8c51368600397a4a7549b6ca39"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/006-mission-collaboration-soft-coordination-contracts/status.events.jsonl",
+          "event_id": "01KJ5V2V8KW4H1X8ZMBW89HTZ7",
+          "line_number": 6,
+          "new_sha256": "42393e5158f27a6328393a86a441d9d21e88ebd3d35e764e37fbd324c0848981",
+          "old_sha256": "e892292e0b41346eb6b814a6c595a8551e0dc603267ccd13f8f5279810ede81a"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/006-mission-collaboration-soft-coordination-contracts/status.events.jsonl",
+          "event_id": "01KJ5V2V8NR8P40DN859W02V5R",
+          "line_number": 7,
+          "new_sha256": "89d6e6d224ac65aa683c1470f0beb555d96e338a1f9a7f4fa67ddfc1d3362c84",
+          "old_sha256": "64c36d6a32f4dc381b2d5d3a8857e042e3a9d23c91f2afc9081533e5eaa9fe7b"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/006-mission-collaboration-soft-coordination-contracts/status.events.jsonl",
+          "event_id": "01KJ5V2V8QTJDMKTJYYXPJZHN4",
+          "line_number": 8,
+          "new_sha256": "c9499b2baa62e25cd561e49fcf6905212c21209a22c4b9f2eb327998b15d25b1",
+          "old_sha256": "248453b4e912cd1dc79665c9770925357af931bfc2ca1b4ccc1f73b4a79944c5"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/006-mission-collaboration-soft-coordination-contracts/status.events.jsonl",
+          "event_id": "01KJ5V2V8T1RAT6E7ZZ1PE6B2Q",
+          "line_number": 9,
+          "new_sha256": "a20a50b272940e7f17ef6ef1378bc5c238d51f485d879895ea2a00782a0f9076",
+          "old_sha256": "3d36565e008e8d48d3dcd814be78521613a2fab654b691c0184ab7f68fe137b2"
+        }
+      ],
+      "status": "updated",
+      "validation_errors": []
+    },
+    {
+      "file_changes": [
+        {
+          "new_sha256": "eeee4e44c9bf6cda46a819a6cefc439085afdfedabefba71b00c802d31e80641",
+          "new_size": 564,
+          "old_sha256": "2a54a4a0e11ab7b8adf6918a229610cb9aff80dcfbcfc395e7221fc0aabd5110",
+          "old_size": 563,
+          "path": "kitty-specs/007-glossary-semantic-integrity-contracts/meta.json"
+        },
+        {
+          "new_sha256": "33fc4edb839bfed1322db22ada9ba2dbbb0676fb4703d9cb2bae7a3f11529aa9",
+          "new_size": 5240,
+          "old_sha256": "2ce1145556c4b4cbeb3e547fa1c9982a56e0c23cdd20bfad9dac3420bb161ff2",
+          "old_size": 5070,
+          "path": "kitty-specs/007-glossary-semantic-integrity-contracts/status.events.jsonl"
+        }
+      ],
+      "mission_id": "01KN233MAZ48PRQRGCNZQJRTR0",
+      "mission_slug": "007-glossary-semantic-integrity-contracts",
+      "quarantined_rows": 0,
+      "row_transformations": [
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/007-glossary-semantic-integrity-contracts/status.events.jsonl",
+          "event_id": "01KJCYB3H201KDYNXXR8QTJJ0G",
+          "line_number": 1,
+          "new_sha256": "cb5ad74257c72dcc2cefdd63472ff42f35c803e959383ca2a46c89271c626735",
+          "old_sha256": "3cdb3a732de8ee0152616a1491d888515c4d12f05b5988e0cb229b38bc4d5962"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/007-glossary-semantic-integrity-contracts/status.events.jsonl",
+          "event_id": "01KJCYB3H41DGKGBSZYEVP2CE8",
+          "line_number": 2,
+          "new_sha256": "9f667a146507be9d74defd0e32085d6fb3a55420f673f03f33ca2033da0a02d2",
+          "old_sha256": "c29a70f986bc772dcd5e1eff572b151385824a8696b6d832f8dbc3d405475b28"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/007-glossary-semantic-integrity-contracts/status.events.jsonl",
+          "event_id": "01KJCYB3H6MCCNCYQ90QDVZ3BF",
+          "line_number": 3,
+          "new_sha256": "8a388c0226621788cee5117b271fb10825c270f44e81105df1c289b4207ed1c5",
+          "old_sha256": "4ebbd6af9eb10045acc7f8c91a4cd6878c46d2f6feaa1be5c080250c5e4e6887"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/007-glossary-semantic-integrity-contracts/status.events.jsonl",
+          "event_id": "01KJCYB3H8DFTP2B6AE935E03R",
+          "line_number": 4,
+          "new_sha256": "f89566fe1ffa65a72f4d39307ad49b1f6dc357f2ade4a67de5795c2f057f90b9",
+          "old_sha256": "02872e110ab7bf1589310e090679b6308d2c636a5fc40c840d3350dd76345f58"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/007-glossary-semantic-integrity-contracts/status.events.jsonl",
+          "event_id": "01KJCYB3HAMM2W7YKT4X22GGNX",
+          "line_number": 5,
+          "new_sha256": "783a66ea29000a401736360b98984f9eccec73ebda61751970688ca8f4679d59",
+          "old_sha256": "d29cf7ce757a200dfe2aab86ee9e8c0dc7751fde9fe8e9b5506bf9dcba7cc3ea"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/007-glossary-semantic-integrity-contracts/status.events.jsonl",
+          "event_id": "01KJCYB3HCZJSMRVV5MZE2F4D2",
+          "line_number": 6,
+          "new_sha256": "604850773aa138e0066ce2409512c4372404162e2565ce49c473ab914d476c80",
+          "old_sha256": "9b204e812821ca24387637ed7eae05900d873628f76db98ff1ecf35fa91a7caa"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/007-glossary-semantic-integrity-contracts/status.events.jsonl",
+          "event_id": "01KJCYB3HEA0NWNRBMBHQWCHX2",
+          "line_number": 7,
+          "new_sha256": "13e673060a6d2bc30d232be269a26c04e8104a1fb1c66e0ac1dfb82c8a52765f",
+          "old_sha256": "4d44d174815395a0cc52c2fea549c003376bebb760a4cc3f579811a2d3ab0e24"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/007-glossary-semantic-integrity-contracts/status.events.jsonl",
+          "event_id": "01KJCYB3HGYGA8WXCYWNH86JBG",
+          "line_number": 8,
+          "new_sha256": "be0a7a0225b134c1e36a0fc425b5ecd60ad14f8aff4d6e7e6ce185b3937e812c",
+          "old_sha256": "bc62ea102ca59bacb3ce76c30841a978e57c24e339405cac7494205cb5fd09dd"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/007-glossary-semantic-integrity-contracts/status.events.jsonl",
+          "event_id": "01KJCYB3HJN27JSDHRK4WBFFCM",
+          "line_number": 9,
+          "new_sha256": "8c5de781c06363569803f0f0e4d439cb917bb574dbd53572bd0f324436d7aea4",
+          "old_sha256": "6e5896f3dc4a57b4480d2f04af603ee25baa1e2a5a5185964446f4a2a9584f5b"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/007-glossary-semantic-integrity-contracts/status.events.jsonl",
+          "event_id": "01KJCYB3HM8PC902TZV1CVZZPH",
+          "line_number": 10,
+          "new_sha256": "4328a362d22bba7c5aba92ca3ef192ca4f9a2492a986c2ab8f8e833b8a2b3ac1",
+          "old_sha256": "db528abdbbcb4b986f3269663e14d463d6e747d4f4327bcf3f69848444fb682e"
+        }
+      ],
+      "status": "updated",
+      "validation_errors": []
+    },
+    {
+      "file_changes": [
+        {
+          "new_sha256": "4d603359e8ebd2eda83dede192cec9d4e508867ed56d20076465958de1d72d20",
+          "new_size": 436,
+          "old_sha256": "ccf8b5d39295b95554db2c3b2db687d44b6e06e1b577a6c04c86c6f0125eb64e",
+          "old_size": 435,
+          "path": "kitty-specs/008-mission-dossier-parity-event-contracts/meta.json"
+        },
+        {
+          "new_sha256": "3fb7d13ee339fcfe9caa8d715625dbcbb07f07d09e0283db663c538ee32ea23e",
+          "new_size": 2625,
+          "old_sha256": "708c6e75aa5dc6474fc8cd18c93ca83f4703dcd23c86fa89538160585c3e4fa9",
+          "old_size": 2540,
+          "path": "kitty-specs/008-mission-dossier-parity-event-contracts/status.events.jsonl"
+        }
+      ],
+      "mission_id": "01KN233MAZ48PRQRGCNZQJRTR1",
+      "mission_slug": "008-mission-dossier-parity-event-contracts",
+      "quarantined_rows": 0,
+      "row_transformations": [
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/008-mission-dossier-parity-event-contracts/status.events.jsonl",
+          "event_id": "01KJ5V2V9NNSP984YKZ2C0VRMB",
+          "line_number": 1,
+          "new_sha256": "3d4c5c8691aca359d34bf029cf8e5122230a703f780d7fbc5506cb1825fde5bc",
+          "old_sha256": "3c76bb375c434cb9d8793e02ff87a3df889d3ae330e556606ea75540f56f3f66"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/008-mission-dossier-parity-event-contracts/status.events.jsonl",
+          "event_id": "01KJ5V2V9RQFRC48DBNPFCJ744",
+          "line_number": 2,
+          "new_sha256": "fbcd6e19ae6ee42b7243825f623106685dbe6fbd77e9ff5548de3ba558899b8e",
+          "old_sha256": "be8a42544988252ad8433552e504a9b4d59604171a0322cc9858dd24651dd57b"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/008-mission-dossier-parity-event-contracts/status.events.jsonl",
+          "event_id": "01KJ5V2V9W32TYRSV1C0FFHFB1",
+          "line_number": 3,
+          "new_sha256": "c35a93f98c316bedeef818b79f4d80020f58e2846da282f97e88c5a9d3caa49d",
+          "old_sha256": "2c813004927883929cec585cfa818cbbd2546c5f0f114aef746f7fd4a45f3dec"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/008-mission-dossier-parity-event-contracts/status.events.jsonl",
+          "event_id": "01KJ5V2V9YTKHMBPXYX4YGXE9G",
+          "line_number": 4,
+          "new_sha256": "535713f008ebf080f2faa5fdce4fc043341229d332291a8573f8567efd53ab96",
+          "old_sha256": "daf9095b3edb6634ecec34ff9eb0923f88c6f1f64c6029c914a6573f5637c506"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/008-mission-dossier-parity-event-contracts/status.events.jsonl",
+          "event_id": "01KJ5V2VA1JX1XFR6ZBJFE0CBR",
+          "line_number": 5,
+          "new_sha256": "669878fb789634a23d79c0774f93be111e777ba3c5f33d179d67af815281e9da",
+          "old_sha256": "bc8df183e96e78edc982468c33e467c05d7025649041e1ced94d21866b0d837a"
+        }
+      ],
+      "status": "updated",
+      "validation_errors": []
+    },
+    {
+      "file_changes": [
+        {
+          "new_sha256": "22af49826125d916501bd0bd0b2dd1b1058be02c8931a19bcfc1ad0b75b6d18d",
+          "new_size": 445,
+          "old_sha256": "9c4116ba0f424967064b715e6934e2ef30b8a07e8d04b1a46a835e519bcb0491",
+          "old_size": 444,
+          "path": "kitty-specs/009-dossier-contracts-remote-baseline-release/meta.json"
+        },
+        {
+          "new_sha256": "dc95b77f860d5b002b29b888f2d0c6cd9d17f4c0ef67796d2f8461b463f7333f",
+          "new_size": 12735,
+          "old_sha256": "1d7db25ecf3144ba6e68fdfa277b37db8c4abeafdd84b1a1be61e52aa0699595",
+          "old_size": 12310,
+          "path": "kitty-specs/009-dossier-contracts-remote-baseline-release/status.events.jsonl"
+        }
+      ],
+      "mission_id": "01KN233MB0ZCTRZHRD4KP8A8DH",
+      "mission_slug": "009-dossier-contracts-remote-baseline-release",
+      "quarantined_rows": 0,
+      "row_transformations": [
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/009-dossier-contracts-remote-baseline-release/status.events.jsonl",
+          "event_id": "01KJ5VXG59NPN59F2V7WM94PDB",
+          "line_number": 1,
+          "new_sha256": "67b98de1a67bdecd478f95196ea63c228a9dc9e702e52319a79c8c8ca5d56aad",
+          "old_sha256": "7cf2a2c0a9fa55fb11bc9e8a86aca5ccf447500de39e7aa5ffa78a70ce91dcc3"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/009-dossier-contracts-remote-baseline-release/status.events.jsonl",
+          "event_id": "01KJ5VXG7N71FTZ69Z5HQ4AQR5",
+          "line_number": 2,
+          "new_sha256": "9c0b6bff73eb6fca48ac71c971b239c824bb5be091e1572cb3008fb6346db479",
+          "old_sha256": "b436e1017e39d8b245fa18cbb1eb399f7d245119ad527d106958f4780f97a503"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/009-dossier-contracts-remote-baseline-release/status.events.jsonl",
+          "event_id": "01KJ5W6G4Z497VAH895Q82KPQX",
+          "line_number": 3,
+          "new_sha256": "1cc5d8446c2c8d35b355c4f7e7515ecab1359d9d2f34136893a8db3856122670",
+          "old_sha256": "805f0a26b0596a7bebff0eec98a970beabd07eb82b481a164304feebc34f542d"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/009-dossier-contracts-remote-baseline-release/status.events.jsonl",
+          "event_id": "01KJ5W6G6RG5FAS09P18NG5C27",
+          "line_number": 4,
+          "new_sha256": "00a947133d3b42f7ad21642000ec5e20a3507bd83c2fcb24a929788c0def3445",
+          "old_sha256": "e75584765efb73e8fac846fff9d38139b4c1af741ff0a66deb2a033e99e8afd7"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/009-dossier-contracts-remote-baseline-release/status.events.jsonl",
+          "event_id": "01KJ5W6G78QBQE99JFB1M5NM6Y",
+          "line_number": 5,
+          "new_sha256": "0505407c791e831858389f52feac8e2bcc7cf936ba910bc97f9a0a799ac1e7a2",
+          "old_sha256": "ce88692cd55dcd4473b7ac6db08771d0d945a944eab40b96747a3105051562c0"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/009-dossier-contracts-remote-baseline-release/status.events.jsonl",
+          "event_id": "01KJ5X473Z1M37E3K3CTJXG895",
+          "line_number": 6,
+          "new_sha256": "98875c386661127785a1105115d4f88c6d741265889dc570e3b7555b55c02537",
+          "old_sha256": "fd026a398cbfe03fdc8f12dd3c195c8cf22cde7f12dc5aa8020461a3c8b3d8bb"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/009-dossier-contracts-remote-baseline-release/status.events.jsonl",
+          "event_id": "01KJ5X4769W5ZDYNH50RC3W2FG",
+          "line_number": 7,
+          "new_sha256": "c699277b4385080823c669532b3de61c8ee49de6e9af057dda4a3f85a93c619e",
+          "old_sha256": "3eefde4cf44305f1ff80e9df2346f70e0fdd9d758ce1992cc4c9f355c6970690"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/009-dossier-contracts-remote-baseline-release/status.events.jsonl",
+          "event_id": "01KJ5XBJR80BQ4PR40R3B1GSCY",
+          "line_number": 8,
+          "new_sha256": "51ac49c16d78460bca34840b336a6c3d243acf3739d21c11e739b600b847791c",
+          "old_sha256": "d0ba65b20be145766c8018ddf81959c9f792e31d4cc5c21b312ce9a456bf90c4"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/009-dossier-contracts-remote-baseline-release/status.events.jsonl",
+          "event_id": "01KJ5XBJT3DZNM4KHMWG679YPG",
+          "line_number": 9,
+          "new_sha256": "905396fb364708fab4fae11ee53b803c26b7ff0c54d991eb3645054471081354",
+          "old_sha256": "7728b7347b6c45751d7a4e60976c2749430ee7c89cb415392bf93a3eb77fa2ca"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/009-dossier-contracts-remote-baseline-release/status.events.jsonl",
+          "event_id": "01KJ5XGSFW6GVS2C8E460D45BT",
+          "line_number": 10,
+          "new_sha256": "fd803b888442e891f0bcfd15d7f9d70b36df7140dcc25318d4650f2064c269fa",
+          "old_sha256": "36b383819d3e6a6f4ed2f40bcf5ab2e30ed470fc06bcdbadd2acecaedcf92e0d"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/009-dossier-contracts-remote-baseline-release/status.events.jsonl",
+          "event_id": "01KJ5XGSHQ0BVZ0B7VBGB5123N",
+          "line_number": 11,
+          "new_sha256": "d02819880b1b5c2c4e8ca3b89905136484ceeb0131ce32d993cd2c508002f895",
+          "old_sha256": "d7a71b9724c59998f871db97c0554f969bd487c8b77f8629f95974b14d9f33c6"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/009-dossier-contracts-remote-baseline-release/status.events.jsonl",
+          "event_id": "01KJ5XGSJ8TM3982GP9XXAJSR3",
+          "line_number": 12,
+          "new_sha256": "52db4d094b42397d7e3f7aef050195d1983de3edbf06fc0dfc39dd32d0d84b68",
+          "old_sha256": "e3df817ddcd8933dd2594971566f5b078169b5f04b88b3fe8a3b92624e5e9183"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/009-dossier-contracts-remote-baseline-release/status.events.jsonl",
+          "event_id": "01KJ5XHFPATD06MB8QYJEYT6GA",
+          "line_number": 13,
+          "new_sha256": "9c23c393aa66850c0008eeb01b25cfa1a90a98cd15c70f3e567fd3285f7a9536",
+          "old_sha256": "872f020149a14bb5fd9a71cb69aa4621f4e64152d16d7bcb3a05c978506b2eb6"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/009-dossier-contracts-remote-baseline-release/status.events.jsonl",
+          "event_id": "01KJ5XHFQX19K2XVB7Q3S4KT8K",
+          "line_number": 14,
+          "new_sha256": "11690f58b73cc3306585fc5d94e77f953829e8392d81ca640aca7ad1068aa70b",
+          "old_sha256": "bf14657dfd9017313ed6bb023fccb2ea07f9a98f532c4db20d4692e4566d919a"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/009-dossier-contracts-remote-baseline-release/status.events.jsonl",
+          "event_id": "01KJ5XHFRFSM2HS1ER34R8ZS0P",
+          "line_number": 15,
+          "new_sha256": "edf67ec276b376d94e4342cb6d5c4563358499e0f2d9d98625ac8331dc79f3c3",
+          "old_sha256": "b53b1cfb35169d83981ee607e7edf873edf481ddc6de889c92463d592adc8c46"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/009-dossier-contracts-remote-baseline-release/status.events.jsonl",
+          "event_id": "01KJ5XR525SR0NV6PRNZBK3XKA",
+          "line_number": 16,
+          "new_sha256": "6f61c3d09384b1251b7c2ca53c86179cfd9498df9622e3f1fee7f960cadcaae6",
+          "old_sha256": "65843a956f84e380428ef98590d043529694cc44af94e1dc9361e93fa3d5f726"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/009-dossier-contracts-remote-baseline-release/status.events.jsonl",
+          "event_id": "01KJ5XR56M5X0SY8PCWGYZ2MPB",
+          "line_number": 17,
+          "new_sha256": "a8a5cab60c09f0d3f3702371eb9c4581145cb53ad819b9e24046e16ebb90c87a",
+          "old_sha256": "116c201d9635cac6297640dadf1b30fa32be317cf9cbeb34ff894fee00598c26"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/009-dossier-contracts-remote-baseline-release/status.events.jsonl",
+          "event_id": "01KJ5XTG9R5S0S7RWNPBR526J7",
+          "line_number": 18,
+          "new_sha256": "63286518586a07cd5b9e2a8bb1fdd67cd189194ccab7c0da8f3a69d7a556aed2",
+          "old_sha256": "4d5edfd24c06bcfa3cfab94fd1b6e5f6b81de223b255eb008aef5fd43b0c9f58"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/009-dossier-contracts-remote-baseline-release/status.events.jsonl",
+          "event_id": "01KJ5XTGBNG1QG5K71ER7EW375",
+          "line_number": 19,
+          "new_sha256": "fd41cf5002fe4c1e80af1b7a261c11ca89ca48eb1a890039d4630bc87ffbef74",
+          "old_sha256": "68513c5100d0fc563869b3eadbbd976393c08ccfc6373f692591dc0ce8d207d3"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/009-dossier-contracts-remote-baseline-release/status.events.jsonl",
+          "event_id": "01KJ5Y1CVQ5V6HZM8Y1N3046P7",
+          "line_number": 20,
+          "new_sha256": "3dad3976df4502312cb3e8d6ab6fb4085d344195c3b41038cb717817792f1916",
+          "old_sha256": "6d58d0342d847c3a42d826347898e4c1dd7bf328ab0573207f39bfa22dcd4511"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/009-dossier-contracts-remote-baseline-release/status.events.jsonl",
+          "event_id": "01KJ5Y1CXQC944M90BE0H1YS5A",
+          "line_number": 21,
+          "new_sha256": "ec161f5fb25c3f8df0af3b81f5ca86aaefe8571978695c26bd80f0d52e00f646",
+          "old_sha256": "b849270b112759d0f8cb7576aa5666b078edc7be4947a0b85d135bcba7102401"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/009-dossier-contracts-remote-baseline-release/status.events.jsonl",
+          "event_id": "01KJ5Y1CY991QGDY4WW1R02HNR",
+          "line_number": 22,
+          "new_sha256": "377304880b52f05512c33213e7744fefc5f0a867869cade6b378d6296503a4a7",
+          "old_sha256": "14e2538194d2bb6adf888464388f0462da56fb63af89b2844d833724dac16e35"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/009-dossier-contracts-remote-baseline-release/status.events.jsonl",
+          "event_id": "01KJ5Y23PEKNKY61S13PX6EG6H",
+          "line_number": 23,
+          "new_sha256": "a80b4956b2cc7f154366d4a20e3323a74b411f57598f97c92fba384dd2c26106",
+          "old_sha256": "cee0c60172b15817382561cf66c9526c0fb9b65261c3b92c3e4a54806329b8ff"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/009-dossier-contracts-remote-baseline-release/status.events.jsonl",
+          "event_id": "01KJ5Y23R83FNQS66Y94ZQV6MZ",
+          "line_number": 24,
+          "new_sha256": "25c526b417204b5e7a61996b14fbf5bd66a450897a9788e2980ee7ff77f87ed6",
+          "old_sha256": "f5ede7be7e5f1d94de2e5ffb5c75be24dd39ad226a859f5b2222e6ea4368829b"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/009-dossier-contracts-remote-baseline-release/status.events.jsonl",
+          "event_id": "01KJ5Y23RVP5YZKDS5JFCJMVZK",
+          "line_number": 25,
+          "new_sha256": "ab28f8c4d9422121fe88420e40ec169040ae0742c26534e18d116444a0b01c77",
+          "old_sha256": "705098cef024c3437c1940b7006f295fa40e62c692cfb4d54dcd25862662d66d"
+        }
+      ],
+      "status": "updated",
+      "validation_errors": []
+    },
+    {
+      "file_changes": [
+        {
+          "new_sha256": "63d3857f1aafa8102dc9f2e41079866636bd47d9847d2a094f9127c75f81d1ee",
+          "new_size": 1323,
+          "old_sha256": "640b880f99b5e3d132345469e811fdafd74afdaffe0328ad3ca8e41a02e8576e",
+          "old_size": 1321,
+          "path": "kitty-specs/010-mission-audit-lifecycle-contracts/meta.json"
+        },
+        {
+          "new_sha256": "a9b0e907501b51aaf8ae831ac84d970cb348dee3243437aa50fa5780a206abdb",
+          "new_size": 21635,
+          "old_sha256": "85558eee66d76603957d052ffbea1410b3875b7b3fef06911a09c7cf32b0a6c0",
+          "old_size": 21091,
+          "path": "kitty-specs/010-mission-audit-lifecycle-contracts/status.events.jsonl"
+        }
+      ],
+      "mission_id": "01KN233MB0ZCTRZHRD4KP8A8DJ",
+      "mission_slug": "010-mission-audit-lifecycle-contracts",
+      "quarantined_rows": 0,
+      "row_transformations": [
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/010-mission-audit-lifecycle-contracts/status.events.jsonl",
+          "event_id": "01KJCYY4TGQSCJKY4783TR4SQ1",
+          "line_number": 1,
+          "new_sha256": "b00f99f5fb158c65f6d807c0fe7ee41ad3dbdf4c771cb2c650fb617850536c10",
+          "old_sha256": "e33492c6ea52bfdd2e6fca53678ee83c0004919eb3a27d9739388cdb8fd39d1b"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/010-mission-audit-lifecycle-contracts/status.events.jsonl",
+          "event_id": "01KJCYY4W16KY8VZKFZCQEAH9T",
+          "line_number": 2,
+          "new_sha256": "e7a24e831627539c5ba2861da47ef77bdb9bc0663a5945ddd9b44529db945947",
+          "old_sha256": "224ba72ed0bf6f99c6e04e6bdf58c186b8676df642876de3686ece62c7865a72"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/010-mission-audit-lifecycle-contracts/status.events.jsonl",
+          "event_id": "01KJCZ4KB3GAFS2QXDADMH1H24",
+          "line_number": 3,
+          "new_sha256": "0cc229f20ebc25726e637e85cd0634aff2af504bccbb72f01e8bc1d48ff5de83",
+          "old_sha256": "8f96712276ac39c63ef71cde4447cc19ca297b79d0446c618dd6f28808317199"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/010-mission-audit-lifecycle-contracts/status.events.jsonl",
+          "event_id": "01KJCZ4KCMNSY28A6X3PGPSN43",
+          "line_number": 4,
+          "new_sha256": "4afa152941c1325a4734c514aeed8205acead57e1a371eb7c29b7ff6ea931fb3",
+          "old_sha256": "760945612620246ca2d81970014e92864380e7bd7fa72c5287aee3beb02ea6e1"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/010-mission-audit-lifecycle-contracts/status.events.jsonl",
+          "event_id": "01KJCZ4KD58TACA1W1WQ75VK0D",
+          "line_number": 5,
+          "new_sha256": "d79711b75c2d25482e65c3fb9ca47031b5b64f061bedd1fa71a4617ea6eff717",
+          "old_sha256": "134fc5f69028bda6960b3fe5bec5edca7dd430bf89413a5e93184e58c6bb807f"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/010-mission-audit-lifecycle-contracts/status.events.jsonl",
+          "event_id": "01KJCZP5EE5FM9SRYMGZGQJF4B",
+          "line_number": 6,
+          "new_sha256": "69d52eaf93939b266c57c514e8dcc8b90722b970beab6ecd4866d055fde60d17",
+          "old_sha256": "406f45353b406b5cfef137dafbd52d34e08824a46fb3d84ea1afd8ea3795fbc0"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/010-mission-audit-lifecycle-contracts/status.events.jsonl",
+          "event_id": "01KJCZP5G3ZT3XVG71DXYQRE25",
+          "line_number": 7,
+          "new_sha256": "b61eb7a4d0bf1c73e3b2e01a451a3a1377ffbbc861e2e606e4a4c473133a726c",
+          "old_sha256": "3769d6ded0d799c28bb71c4567342110330f1b568cf9f59ff0b215dfca73ad51"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/010-mission-audit-lifecycle-contracts/status.events.jsonl",
+          "event_id": "01KJCZSQ8CWJ87HEQSRG3FA45H",
+          "line_number": 8,
+          "new_sha256": "b2854d8a4b293f7196f118102e097acfef52c9cb7124ad74a70fc90a25f5a265",
+          "old_sha256": "cac8428dcbfd16dc3c32a5de4d67fb6295642d7ebc7fc0157e5196951a52d8bf"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/010-mission-audit-lifecycle-contracts/status.events.jsonl",
+          "event_id": "01KJCZSQA6T10QQRYHEEE1ASY0",
+          "line_number": 9,
+          "new_sha256": "7b0d2ddf3805258caf01a6591adbde49db61c8a6e0bb0e183d78c073da4a09e2",
+          "old_sha256": "b4bd31881b286cf0fd8cdacb91a729675720e1fa40c3c19bcf52c1243d339cc0"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/010-mission-audit-lifecycle-contracts/status.events.jsonl",
+          "event_id": "01KJCZYNFB4WWMQAS6MF1MGKEC",
+          "line_number": 10,
+          "new_sha256": "5ab8b863d9c539eab04e4f2dcdaed6facb40bda3163ff626843d25addbe858f6",
+          "old_sha256": "3fb2cce71ae745601b2b912723774b12cae3ceb0926d10ec81c54b34a56e04a4"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/010-mission-audit-lifecycle-contracts/status.events.jsonl",
+          "event_id": "01KJCZYNJF456KKG35WWZHN852",
+          "line_number": 11,
+          "new_sha256": "94e3ac9afcb2ef9abf63a451b8b52df85067de0b249c702eac474808d3095569",
+          "old_sha256": "b94aa628cf91eb7c5a844fd8fe472aab019560d30dd60b5336e64135c865dc1b"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/010-mission-audit-lifecycle-contracts/status.events.jsonl",
+          "event_id": "01KJCZYNK34Z2BBA5HQNGH9WX6",
+          "line_number": 12,
+          "new_sha256": "39020709c2197bc85ff5d37c258074cc48b6cae1a7ecefefbfb5a0851ba6dd40",
+          "old_sha256": "7594698935043564a274a4726daa9a3edbd44c8c65696d9fc6b685514abf17ea"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/010-mission-audit-lifecycle-contracts/status.events.jsonl",
+          "event_id": "01KJD1458EYGV1HMPVC029P2WQ",
+          "line_number": 13,
+          "new_sha256": "92ccf96b14febdff245e3712ef42e84e3c52493a7d78b62f7851ae8ff6305f88",
+          "old_sha256": "8cd87a64c6cd8b49ac5ba148dec7192f57fc78c8fe665404cbf610b50e7e76bd"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/010-mission-audit-lifecycle-contracts/status.events.jsonl",
+          "event_id": "01KJD1CWPN52JS3RRMMWW4SM46",
+          "line_number": 14,
+          "new_sha256": "fca42923b9d8fdcb0a9d6ad220006de49d8870df77054aefc5c66456e5907fe8",
+          "old_sha256": "09e76ffff85cc17ebc5d5c703b4c081fc0b3dd475bcdabca8bb272a62dab82b3"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/010-mission-audit-lifecycle-contracts/status.events.jsonl",
+          "event_id": "01KJD1CWSVNWVYYHVK297RH1EJ",
+          "line_number": 15,
+          "new_sha256": "33a22895b9ef60791e5e9839645867ce3096022b2ab70158e1ace04b941ae306",
+          "old_sha256": "6359df1769f15380ae02dbace3beb8c181b932e363a6a704db29a3d9e6b0d414"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/010-mission-audit-lifecycle-contracts/status.events.jsonl",
+          "event_id": "01KJD1M8ZHGMFBA784SNHZFQ5V",
+          "line_number": 16,
+          "new_sha256": "c07688246556d59214f0d632093f30cc02d61c9edc8f052af7305e432d95e741",
+          "old_sha256": "928add5be27f05c555ae0fd3c7e781f206a58c5fab81d533702aea0086aae8d2"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/010-mission-audit-lifecycle-contracts/status.events.jsonl",
+          "event_id": "01KJD1M92AKQYFT00XE2SS8C3V",
+          "line_number": 17,
+          "new_sha256": "04f80f9c45e1c919d173293f5ee975f12db36663e995e8c04c0adddd8effca50",
+          "old_sha256": "e546ae642eb03969556b5b1444fd119e4d69926aa5ce4259863e5af2275d20b7"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/010-mission-audit-lifecycle-contracts/status.events.jsonl",
+          "event_id": "01KJD2D4M4W3WJAHAZKAYXC5K9",
+          "line_number": 18,
+          "new_sha256": "84100c2bbbdb9aa34128e644f4fba7951fcb0b7e10833fc2d6dff36439f11637",
+          "old_sha256": "9b79433c95e1572a93f4432bd637f535f0ccd4b182561638f8e370552b26eb94"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/010-mission-audit-lifecycle-contracts/status.events.jsonl",
+          "event_id": "01KJD2D4R6KTJ6W9RDP8TQR5Z7",
+          "line_number": 19,
+          "new_sha256": "1715dca5d1df0d2f31c0741feba1c954603ed09138c787e1ae924baf6af36149",
+          "old_sha256": "0a70a5e7a5d04601dbdd2a4dc0488ffcc72eedd35de67a7cd232d9a310450fd4"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/010-mission-audit-lifecycle-contracts/status.events.jsonl",
+          "event_id": "01KJD2MX33JYA0K2HQTQ4ZKTSA",
+          "line_number": 20,
+          "new_sha256": "a04cd81bba6600e35f1f29f180e3f009f5f8c36f1582c5eff1027f7e035f7d5d",
+          "old_sha256": "5ea9cc2052491b2530f0bc270d8831814e8321b03403f3771ee9d6d312a9834f"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/010-mission-audit-lifecycle-contracts/status.events.jsonl",
+          "event_id": "01KJD2MX6VHT9N2SDH47PS7Y6Q",
+          "line_number": 21,
+          "new_sha256": "11d5c6fc3b30bbedb5636529afc3fb8b4db16016d07cf8934b83d5db2f728b3a",
+          "old_sha256": "d986d3a6018c90b59ef3651502194db877f8a48e8cdb96ed14e8115d6216a831"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/010-mission-audit-lifecycle-contracts/status.events.jsonl",
+          "event_id": "01KJD2MX7KTDQP68MRC69R5M84",
+          "line_number": 22,
+          "new_sha256": "8b994f1ec4cbbc83b4916469919a2045f9048d0ce09b00dfc19a6db71f71f9a6",
+          "old_sha256": "2cd52157fa7cace65ec3612e83769fd3bbc1b8f51ed3ec98185ff166854dc610"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/010-mission-audit-lifecycle-contracts/status.events.jsonl",
+          "event_id": "01KJD2TGQPMAMG963G3ER9FX8R",
+          "line_number": 23,
+          "new_sha256": "dc8c1844fc1b066c973881fc03022e9f678ce9ff824f8a71d5325d5662fcef3b",
+          "old_sha256": "e6bf73633299646844015d1ba848c0687c1e41e44041910b788849fc7afc397e"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/010-mission-audit-lifecycle-contracts/status.events.jsonl",
+          "event_id": "01KJD2TGV8VZ7948KPW7GMD11J",
+          "line_number": 24,
+          "new_sha256": "eff85a36773087830f291fde984c3f8f62a082722fd2c859e0a3b5fa42b58bc2",
+          "old_sha256": "c559f5cfcce6ab1ede889677ee692df17cd8757f2c8ad6e4f53c8c2feb36fd70"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/010-mission-audit-lifecycle-contracts/status.events.jsonl",
+          "event_id": "01KJD3034HYHG156GCJPVTNDX7",
+          "line_number": 25,
+          "new_sha256": "498bcc50063c5b9a34a6ff309bc616e4ed03484ce93df1c87cd8044c7fffd81e",
+          "old_sha256": "c4dd50e1064e658d431fcd0e72e08dfa143ca5fba30c48786b78ab9ed300a085"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/010-mission-audit-lifecycle-contracts/status.events.jsonl",
+          "event_id": "01KJD3037GJZPRJ2K6QD07A32C",
+          "line_number": 26,
+          "new_sha256": "30e0b627845f1971ae368680c040291947b2f19c328230f274da7369561b9741",
+          "old_sha256": "2b2b616451e3b8692a564f6e1f4526eb0ebbf9f2b691139c01b4502000bb93d2"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/010-mission-audit-lifecycle-contracts/status.events.jsonl",
+          "event_id": "01KJD303872HAER1460ZAZZEK2",
+          "line_number": 27,
+          "new_sha256": "bece62eef9a8616e5208b4b288347f41982f002833965ba8cc171996e71b1470",
+          "old_sha256": "69bc170e18a9be2e65806f287ad8debf4002b22631a1695a36e95be75cffa459"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/010-mission-audit-lifecycle-contracts/status.events.jsonl",
+          "event_id": "01KJD3CHWYZWF38XJYGE25JZ7V",
+          "line_number": 28,
+          "new_sha256": "97b80ae795680b415a2318cabda37f9ec89b75fa5b74139ab214c109f1bb9158",
+          "old_sha256": "75d767fe21ccbbae718b03c8df71cca1d4d5c57eff15f1bc1f12e41b1b632eeb"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/010-mission-audit-lifecycle-contracts/status.events.jsonl",
+          "event_id": "01KJD3CHZYJK609C7T68H257YW",
+          "line_number": 29,
+          "new_sha256": "c5ff2efcdf1518f7d299cc44d0f6fbe19db0226dd92b6e9e628416939a51d1d0",
+          "old_sha256": "c700f775e3f2f44bddffd7e61dce07e8cb151227a5ca2f3983596cb412444922"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/010-mission-audit-lifecycle-contracts/status.events.jsonl",
+          "event_id": "01KJD3JV4TRTKEREFVDBN6AER7",
+          "line_number": 30,
+          "new_sha256": "6191130d4e5e63ba8c280e45827c3dd55911c7ea47868e85a255e79e3090e064",
+          "old_sha256": "4ad02579f4d2f28871ea87a904606dc4567754633666e31998e5f1889d595f07"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/010-mission-audit-lifecycle-contracts/status.events.jsonl",
+          "event_id": "01KJD3JV8P064F339M02EKBTPK",
+          "line_number": 31,
+          "new_sha256": "a02c2ba3f2afd089be1b7f084e6b5c1892bed213284abc23303f1f96c70afabc",
+          "old_sha256": "d05fff04664be600b71ca7db8bf84ee0f9721d00acc26599f3d476ed28049691"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/010-mission-audit-lifecycle-contracts/status.events.jsonl",
+          "event_id": "01KJD3JV9DJKB5GCZZKRZMNJ2Q",
+          "line_number": 32,
+          "new_sha256": "8fcd66b1bd9fd319a30e590dc7659054ba6720f2ef0d020beb213d7698c313b9",
+          "old_sha256": "e1d4a043c2026f75516b25ce096e8bc95fba55d15c76a38a33987e63df0f31d0"
+        }
+      ],
+      "status": "updated",
+      "validation_errors": []
+    },
+    {
+      "file_changes": [
+        {
+          "new_sha256": "c0dd4e95704105e8cd40ad3ce27a64d435474463e4c203ae47a5ce1814af801a",
+          "new_size": 438,
+          "old_sha256": "27f079c0a83944db792cab2ea5d3475c94498c3433734207dcb4e95825366a52",
+          "old_size": 436,
+          "path": "kitty-specs/011-wp03-decisionpoint-lifecycle-contracts/meta.json"
+        },
+        {
+          "new_sha256": "e13c75181f595a9bc15329a8605cad626a76da517413dad20435fcee71edebd4",
+          "new_size": 8789,
+          "old_sha256": "dce48537aca33915fe20afbf2eaaf1d34b3b9a0c77e2901708861a773193cd0a",
+          "old_size": 8500,
+          "path": "kitty-specs/011-wp03-decisionpoint-lifecycle-contracts/status.events.jsonl"
+        }
+      ],
+      "mission_id": "01KN233MB1GVMCSS9KCNPN6P28",
+      "mission_slug": "011-wp03-decisionpoint-lifecycle-contracts",
+      "quarantined_rows": 0,
+      "row_transformations": [
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/011-wp03-decisionpoint-lifecycle-contracts/status.events.jsonl",
+          "event_id": "01KJFDA2F6Q8QR7BG5J8DNQ481",
+          "line_number": 1,
+          "new_sha256": "1e1bab0d5c667d1e8de1f994fde6090501c0aebf4adc0c23523b7532b00d68f3",
+          "old_sha256": "37fd810099ca54e59365f215ee1258a257400825247fad1c4e7b15ea2b1e7af1"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/011-wp03-decisionpoint-lifecycle-contracts/status.events.jsonl",
+          "event_id": "01KJFDA2JRR8W47F96WGHJ4968",
+          "line_number": 2,
+          "new_sha256": "26cc326a3c700924735bf2af2f170a83b4136fa099cd2eb1d90908b5e4bf518d",
+          "old_sha256": "dde952164cdc373eecce29e7a85f89e66641f8d335a25ebd4a3b4d519d183e60"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/011-wp03-decisionpoint-lifecycle-contracts/status.events.jsonl",
+          "event_id": "01KJFDTNYRA6MPEAKFS1NH8GVC",
+          "line_number": 3,
+          "new_sha256": "d84e3f386e4598a453b05e64d63fb0942d0c897f984a0a6a85c7b88b8542f848",
+          "old_sha256": "a6d704c40c885ae182442c10240e247dd428875f746034687eb7f5ca899cbee3"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/011-wp03-decisionpoint-lifecycle-contracts/status.events.jsonl",
+          "event_id": "01KJFDTP23W0AK08M3CHJA3T84",
+          "line_number": 4,
+          "new_sha256": "b63737d85c7273cbb88fe09591b575911b79f4b469cd7f3b2d18ea5174c25b3f",
+          "old_sha256": "802e74c55bda403b39b1714c00713a3c8ebef26d69926b14d0deb0dd34644f4c"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/011-wp03-decisionpoint-lifecycle-contracts/status.events.jsonl",
+          "event_id": "01KJFEMZ3TMKT61D1RX51SJ7Z5",
+          "line_number": 5,
+          "new_sha256": "90ebf7d93fb1bac3a40556233038eaf4195beac3f216e12523c4155b0c2bf389",
+          "old_sha256": "2aea8f24af93c6d94ab2e2ea7b4126d2ae74562f933aad0ecdc7861e774f7d49"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/011-wp03-decisionpoint-lifecycle-contracts/status.events.jsonl",
+          "event_id": "01KJFEMZ7BCG77JS2AJ6TKT3E3",
+          "line_number": 6,
+          "new_sha256": "74494b308d408dcb40aa388bed9fdd9d693176e940cf46813cf2da232f9afd77",
+          "old_sha256": "cb207ee16c8c30a02154cc8cead9af22f1d2f4815afd8b7add2cb2947a399bfa"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/011-wp03-decisionpoint-lifecycle-contracts/status.events.jsonl",
+          "event_id": "01KJFEXVXMMP8CXHKBFQR1834E",
+          "line_number": 7,
+          "new_sha256": "0c3aa054f52f2a88aba9b8590e8d322723080915025f95a5c54d264c6aa5e57c",
+          "old_sha256": "89a4b96369553652074071a924334fd7445bf222211bcdf71ceb4ed471ca1bae"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/011-wp03-decisionpoint-lifecycle-contracts/status.events.jsonl",
+          "event_id": "01KJFEXW157WZ5R5BH9R1CH0H5",
+          "line_number": 8,
+          "new_sha256": "9fdad1ae0e44c3c535020a4f3c6a3c44af48a2af0a50aac66b88450025a55ca3",
+          "old_sha256": "7742845b182d50a61304362c590ed88a6f0ce9b5519436b09b1f389a21a676d0"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/011-wp03-decisionpoint-lifecycle-contracts/status.events.jsonl",
+          "event_id": "01KJFF76ZWD6CG23JF00PXKJF5",
+          "line_number": 9,
+          "new_sha256": "118ed279a5c870d6fcd376c6a696bc945c6b4c84b9b67ca79c947584014bb39c",
+          "old_sha256": "ba3da9fea43f137d99e9e99a05fb52d83281fd9eba02e8e02bc26eaedc923b88"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/011-wp03-decisionpoint-lifecycle-contracts/status.events.jsonl",
+          "event_id": "01KJFF7736BWH2Z5B50KDV7YFT",
+          "line_number": 10,
+          "new_sha256": "c759f132a154218ae6304d083c367458c57e56170425d8eda9e64faa1655baf0",
+          "old_sha256": "f8d6ba6c7f7e4330344ccbca33a6568e073e025d306532bd9ea8452ec120c017"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/011-wp03-decisionpoint-lifecycle-contracts/status.events.jsonl",
+          "event_id": "01KJFFEAYWPEJNBP4FGDS5XPTF",
+          "line_number": 11,
+          "new_sha256": "8c7b0d75f4fba6f510ef1b093cd5786fb2be2b4dd76c9dcefc29278c6ac27156",
+          "old_sha256": "b312df6e7a2f12b5536b15f2019037829f5e0aeb56d488b1644e82888914cabb"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/011-wp03-decisionpoint-lifecycle-contracts/status.events.jsonl",
+          "event_id": "01KJFFEB2D2721SRTSK1QC8F14",
+          "line_number": 12,
+          "new_sha256": "87cf890c692c3f3a0fa8d162dbcc5e5ce3e3c5ef4f9a39bd9b324b0a43a16ae8",
+          "old_sha256": "b562c060b930d64e3275ce6f64aae3a17578b392bf2159ff9036d665c1d1e371"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/011-wp03-decisionpoint-lifecycle-contracts/status.events.jsonl",
+          "event_id": "01KJFFKBRHFPQRQ8SR09KD0CW0",
+          "line_number": 13,
+          "new_sha256": "12e608541e92dbfe23f692a9ce29889a5413d3b8da5f3e9eefa60bcc17e0ada7",
+          "old_sha256": "76d580ad8bdfb0ddf1578688fbf5851d96747f803265399ddc177fb622c03494"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/011-wp03-decisionpoint-lifecycle-contracts/status.events.jsonl",
+          "event_id": "01KJFFKBWRKNPAF1NC54WSVQ40",
+          "line_number": 14,
+          "new_sha256": "ce3acd42a2b2a5ff0ada228fe392701e0052a85db4d3c866b198cdbb88a1bf89",
+          "old_sha256": "72f3d34e994d62ad52f0504f5f93f00a1cf85d06d31b5cfae3c5b921fb54a85c"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/011-wp03-decisionpoint-lifecycle-contracts/status.events.jsonl",
+          "event_id": "01KJFFYKRN2DFEXYG024ZFM1AM",
+          "line_number": 15,
+          "new_sha256": "4fa608d29a169939be170495c23d99ab6f0193865bf448a2dcf7017bd6969f05",
+          "old_sha256": "9963edca5d455c145b389d9ea653b0276640110d67399706f22b097035b1c08c"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/011-wp03-decisionpoint-lifecycle-contracts/status.events.jsonl",
+          "event_id": "01KJFFYKVZ0NF070TH6239F4ZA",
+          "line_number": 16,
+          "new_sha256": "5afd05f05394270d6fde1c907d520478c2e14b67536d0d836d726e2c0014812b",
+          "old_sha256": "3e76a56abb19575ca309752beae07db683bfc1799ecda4157d27448dc6f78ebc"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/011-wp03-decisionpoint-lifecycle-contracts/status.events.jsonl",
+          "event_id": "01KJFFYKWH78W27VHPPA4FV426",
+          "line_number": 17,
+          "new_sha256": "b6fa9db3f9e420158cdfed6fa8eba45511ac10fddd6d667ce1cd1a25ddf8f24f",
+          "old_sha256": "98246e318304a7b5792af7b57032681a8b9e7f138fbfc1a4b08b7d642f38a390"
+        }
+      ],
+      "status": "updated",
+      "validation_errors": []
+    },
+    {
+      "file_changes": [
+        {
+          "new_sha256": "c5d67b77e882a7dcce5b7e7161cd6073848f3bce02e5564538d071a565884327",
+          "new_size": 470,
+          "old_sha256": "a83b5dffe5b5777c2c88c93704701d84b17963d0bdd106abb55bcd6266491511",
+          "old_size": 468,
+          "path": "kitty-specs/012-wp04-events-connector-sync-contracts/meta.json"
+        },
+        {
+          "new_sha256": "88335f7e7d4042a51fe37dc7ae6f406c130154a38b30ded69bafd405efde6a36",
+          "new_size": 8692,
+          "old_sha256": "e626675d620da349e64865512eb9b416d10481f257338e4db5f9c2efe009ea80",
+          "old_size": 8420,
+          "path": "kitty-specs/012-wp04-events-connector-sync-contracts/status.events.jsonl"
+        }
+      ],
+      "mission_id": "01KN233MB1GVMCSS9KCNPN6P29",
+      "mission_slug": "012-wp04-events-connector-sync-contracts",
+      "quarantined_rows": 0,
+      "row_transformations": [
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/012-wp04-events-connector-sync-contracts/status.events.jsonl",
+          "event_id": "01KJFHDA6VHGK82PKJ48RBWQ54",
+          "line_number": 1,
+          "new_sha256": "2f47cff566660fd927cdc59cad5a402370ccd802e0cfa69d1c9791e8245678ff",
+          "old_sha256": "7c9c5daf800c3e6adf80538e0f822e12d78aa95f2bb27e4e6d6ad4a15c298cb0"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/012-wp04-events-connector-sync-contracts/status.events.jsonl",
+          "event_id": "01KJFHDA9J555TF5B79054DF2R",
+          "line_number": 2,
+          "new_sha256": "9892fc355d9e36c2de426750214528df750397f4b801a34b72101ae600c1faae",
+          "old_sha256": "68d057d35b06a256094ddc5ba217fca095a4d7c256d598ab3dba6da19e886f8f"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/012-wp04-events-connector-sync-contracts/status.events.jsonl",
+          "event_id": "01KJFHPSCRJT5W7NX11QA6NEAS",
+          "line_number": 3,
+          "new_sha256": "d5fafbc3194c2c53d415f0bdcdbf5c4f79afc61e514ddca9713035c59aff8a54",
+          "old_sha256": "542e4af8530ce8cefe74362d39293b690792da5ec41bcdafa6a5932495aea824"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/012-wp04-events-connector-sync-contracts/status.events.jsonl",
+          "event_id": "01KJFHPSGS8E4CWGEESK59MA2S",
+          "line_number": 4,
+          "new_sha256": "e4ff4e396baabb0b52b00e8d3da4f73a4ea22f03ef0959efebe292c7fbb378cf",
+          "old_sha256": "8e5239e73383897af345226f9c48a6820773db68211632a50eb16d7a46c167c0"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/012-wp04-events-connector-sync-contracts/status.events.jsonl",
+          "event_id": "01KJFHYK4Q61R0PFV70YQ0HPT8",
+          "line_number": 5,
+          "new_sha256": "bee090ccabae13df13e854b0f9a08e92130c8dd92c373754a11ef477f6b1cbb5",
+          "old_sha256": "0ed3b959479ecfa9a7862676727dc48027db6aea9e96ad4523c13b0d1f742fd4"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/012-wp04-events-connector-sync-contracts/status.events.jsonl",
+          "event_id": "01KJFHYK85Q92345PDPP9G38J6",
+          "line_number": 6,
+          "new_sha256": "7fee6ca7b174a237a560cdb35ffabe0b1dc7a9d8a98cb52ae1dea4764ffd820f",
+          "old_sha256": "f88c9757f003b36f04c70f0ecaceaef9a85e36dfcdc13775d914cfcb37476f67"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/012-wp04-events-connector-sync-contracts/status.events.jsonl",
+          "event_id": "01KJFJH1G6HMFJZKKYGK019PB2",
+          "line_number": 7,
+          "new_sha256": "598776ca4dff2f4b77596baf3d90540e9cc4aa0ddc288d18c90615ebb6bd0d79",
+          "old_sha256": "3ab20820b3b9a2234778ddddea69298c08f87943090dfab69311fd2fe69f7b4f"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/012-wp04-events-connector-sync-contracts/status.events.jsonl",
+          "event_id": "01KJFJH1M13Q3JRP678HMKCW3P",
+          "line_number": 8,
+          "new_sha256": "8ebf8d38f162d71ba22ed0f9121e7bfcb0d8231d36a7a4baa3ce582bbb48ff38",
+          "old_sha256": "4b52dba3435238fdb171863c9c11a76ce4f0cb074400b6a388bd815938974723"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/012-wp04-events-connector-sync-contracts/status.events.jsonl",
+          "event_id": "01KJFKS5PNGWHCJ7KKC5J0ZEZV",
+          "line_number": 9,
+          "new_sha256": "8036d8c83b7dce5c14ce71b45b9aa5a40f85e745d5fcb0a586196690c680e0ef",
+          "old_sha256": "3a1a1e2e226a36b51fd31c82e6088c024134c11de3de168b37b8df0600fdafe1"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/012-wp04-events-connector-sync-contracts/status.events.jsonl",
+          "event_id": "01KJFKS5SY9E7SKD168ZXPQ4C4",
+          "line_number": 10,
+          "new_sha256": "9a4258349f439183c2934e1a191778f947e3bd1fa28a01d485f88e10cb3b76ca",
+          "old_sha256": "07d407d9c5d020b1d0b9f7e74ef0bc877f3089a07538cae48b4902f1a15dbda4"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/012-wp04-events-connector-sync-contracts/status.events.jsonl",
+          "event_id": "01KJFM3416S8KA9YPV6GS8CS7W",
+          "line_number": 11,
+          "new_sha256": "1cc15b174120ae2359c5248e8c448f9a3bb16303f7e992104dfeb2c825125b82",
+          "old_sha256": "4248237618621e3bdc9a9d05deabe759a3fbba9549ee79595e4b5af6325a9bb5"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/012-wp04-events-connector-sync-contracts/status.events.jsonl",
+          "event_id": "01KJFM344WM2K9PW28C9BVKZCR",
+          "line_number": 12,
+          "new_sha256": "ac7a443ec673f30619c2df1c312fdf16818b8ba3c9da5e3151700c9a19d35a6e",
+          "old_sha256": "d5dc8af4e1146c2371c73c64be4ebe19ab5ddd8a3aaf63146046bb459f242c07"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/012-wp04-events-connector-sync-contracts/status.events.jsonl",
+          "event_id": "01KJFM82D0NT3PRTSJY8ZHN24E",
+          "line_number": 13,
+          "new_sha256": "c009faddc34d345c8954dc49c8f67d1599100184931fce1a3d1a37ee4dc36051",
+          "old_sha256": "a250ae595191a73e769ccfeb628d164d68c1a2fc51dc84518cbfc0a3324eecdd"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/012-wp04-events-connector-sync-contracts/status.events.jsonl",
+          "event_id": "01KJFM82GFNVAWQZ21Z097EH36",
+          "line_number": 14,
+          "new_sha256": "b2f34a3d2260562699983b1ea4493680dd3c04c75045b41d80b0590022e993b3",
+          "old_sha256": "014c87e66b54616589c710320fafcd0428c70a83efea8e3e972e48673607eaea"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/012-wp04-events-connector-sync-contracts/status.events.jsonl",
+          "event_id": "01KJFMANWBBSXKBC42MFJ8XW2W",
+          "line_number": 15,
+          "new_sha256": "9f068583bb251fa331ff54bc3083cf8130eefdd16d2777213acb73445e1ff025",
+          "old_sha256": "83ffba4aa809173e51b656f6cc9369689995e5655952b21e9cd256f8db1fafe2"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/012-wp04-events-connector-sync-contracts/status.events.jsonl",
+          "event_id": "01KJFMAP03A1NFPH584Y3TKBV3",
+          "line_number": 16,
+          "new_sha256": "c49e8db3cf801eb3a9adab5a479c751c2d5ffe138635cfc7e8380f5c81d714a0",
+          "old_sha256": "291de85aaf8d9ffc183e86ebe2cec8a63dad56611b4f3d68573ff2ee6b35a7e9"
+        }
+      ],
+      "status": "updated",
+      "validation_errors": []
+    },
+    {
+      "file_changes": [
+        {
+          "new_sha256": "3a3789c31fa6aa3bc92e41f9a923f08ab729939665a6a8453495c8f23bc0c0aa",
+          "new_size": 499,
+          "old_sha256": "13e48889be29397e3ce430c8104d6bdba88f5a933e089faabe765a8efcb19588",
+          "old_size": 497,
+          "path": "kitty-specs/013-per-user-identity-connector-events/meta.json"
+        },
+        {
+          "new_sha256": "744e0cc13c01629a86734b1803c1713e126e20f38d23ca493189d8278fc2b51e",
+          "new_size": 13143,
+          "old_sha256": "0382c6ba5db2337787fbee3c08c43b34fd121ad76daceb225c109b24740ef97d",
+          "old_size": 12735,
+          "path": "kitty-specs/013-per-user-identity-connector-events/status.events.jsonl"
+        }
+      ],
+      "mission_id": "01KN233MB1GVMCSS9KCNPN6P2A",
+      "mission_slug": "013-per-user-identity-connector-events",
+      "quarantined_rows": 0,
+      "row_transformations": [
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/013-per-user-identity-connector-events/status.events.jsonl",
+          "event_id": "01KJZB7AEAGXRG6B2A3W6VJSE7",
+          "line_number": 1,
+          "new_sha256": "061a3936135deac5cab35d10f2befef5cc923ef00aa8142237b8df3394b89528",
+          "old_sha256": "1cd2ba40f2d85367cd6b8ba9f8b6b9ff3c08a283e066e3b421163df7aac911d8"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/013-per-user-identity-connector-events/status.events.jsonl",
+          "event_id": "01KJZB7AHFBJSAX3RZXTVJQCE5",
+          "line_number": 2,
+          "new_sha256": "b9a7f40b2f245f9e6bda52ef6d172864d81e6afb3f6ea8be92e1a01b4dcc3a03",
+          "old_sha256": "e6dc88c79a0318a6172fb3b4e624847653dd327d6eb83eaf856c58a95e275188"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/013-per-user-identity-connector-events/status.events.jsonl",
+          "event_id": "01KJZBJH8Z5TM2Q3YNPFKYJFQM",
+          "line_number": 3,
+          "new_sha256": "e2058fc4a82fe041f75d7d989704b2fdfc8076919178d0c19710c84fd29627ea",
+          "old_sha256": "5098db7c374cc83d874c85d7a4722e21d1ee422e2bd984193fccac96d608fb87"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/013-per-user-identity-connector-events/status.events.jsonl",
+          "event_id": "01KJZBNWS7AB5XV2KZJ2T1EREE",
+          "line_number": 4,
+          "new_sha256": "ebae710efe4e48d578dfb575fcc1b9de92fce557b79c464a0945f6722f41d431",
+          "old_sha256": "619a059b76ec0af936cdece68b4b379d19b240923ef8ee4c5a3804a44801363e"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/013-per-user-identity-connector-events/status.events.jsonl",
+          "event_id": "01KJZC1VW3S21XP6N6JW47SM12",
+          "line_number": 5,
+          "new_sha256": "995f830142a387c33c53a6f3b28cdf343d345f37578e8916c5f60f943fa3d8b9",
+          "old_sha256": "1e316cbfbc994fedac886c944a2b50e40b03419f6f2cd8e63afe711b59566385"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/013-per-user-identity-connector-events/status.events.jsonl",
+          "event_id": "01KJZC1W01PF01YRJSP39CV3VR",
+          "line_number": 6,
+          "new_sha256": "1980d45cc1a8fb406a93b2493ecd37eb542104a3cbef5bf981faab403630972a",
+          "old_sha256": "420b7afc73fe752f32795267642a559ed45a1e12ceb49a55ffdd986b490c99d5"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/013-per-user-identity-connector-events/status.events.jsonl",
+          "event_id": "01KJZC41QK5MZ8NZSYJF0HM8BJ",
+          "line_number": 7,
+          "new_sha256": "bcfda8908d1f990cbc1fa1ce72f72bf7af69663dfa370d1eb12b7f0e3dab60de",
+          "old_sha256": "93c952aa447ad7d65b3fba40eb1681ab4421ced01bc53af495dc5639e3533359"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/013-per-user-identity-connector-events/status.events.jsonl",
+          "event_id": "01KJZCAT7K2SER7WXSVCKA97XF",
+          "line_number": 8,
+          "new_sha256": "2d2eb3180ca758dac600014091e52fa1d8d70d6919265949453cb3189f2f3d0f",
+          "old_sha256": "ae40114a68ff766324dc70e084b40fb568fcabdd50f86dac4fb3caa072d56b8c"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/013-per-user-identity-connector-events/status.events.jsonl",
+          "event_id": "01KJZCE3W6CDKRNS1XCHPKMHKB",
+          "line_number": 9,
+          "new_sha256": "7adc2c47700b5aa1867d591fe042ceb6bfdc77f9a5abe9835b2aa84dd8260a8c",
+          "old_sha256": "dcccbb1446d37e5cf54b91cdddcc3498c1cd80333992205bf701c80d6362e791"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/013-per-user-identity-connector-events/status.events.jsonl",
+          "event_id": "01KJZCE3ZKHY13YZS3X24C9JYJ",
+          "line_number": 10,
+          "new_sha256": "8ebe3e50633ed38eb68e88c553e12a76d8bbeef112cdff752a8efe797a87902d",
+          "old_sha256": "91b014c9f866d56296b45b269a296f6d86c257959dedc59889521b2463ae905e"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/013-per-user-identity-connector-events/status.events.jsonl",
+          "event_id": "01KJZZ4QD858RQAR441MQRNVS5",
+          "line_number": 11,
+          "new_sha256": "f7c55a5901f5d896d82f0a1f5ca8a87daa55e72a74737798033e248085f1ae03",
+          "old_sha256": "cacc36bc314710e829eda66cc1a80c49f886bc830394f25f7d1d74e2af2aa7c4"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/013-per-user-identity-connector-events/status.events.jsonl",
+          "event_id": "01KK0011JC7DN4MZMSY1WHRXCD",
+          "line_number": 12,
+          "new_sha256": "d574b34c162b59c5a7891185f0b5722efce5022a8ed4db5c9c03b0ad9639bd71",
+          "old_sha256": "19b5ec2fcab72f232eead6fa2e2b3a02c9858e92b0d4ef6220054ee492ce3742"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/013-per-user-identity-connector-events/status.events.jsonl",
+          "event_id": "01KK006ZMBRWFEJJPVQ40VCQ19",
+          "line_number": 13,
+          "new_sha256": "9a9e0b5146ed109c2c284f74485793412becae92621933721b4cb79ec8434217",
+          "old_sha256": "949166cf2860ffaf972380ee1b10065c645ed4ed93158883c7e02962cbe7e81b"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/013-per-user-identity-connector-events/status.events.jsonl",
+          "event_id": "01KK006ZQF8FPQD9ENVAJKP9DR",
+          "line_number": 14,
+          "new_sha256": "46f44518d6415f9db95fca082172d6bc4800f28884759877ef6a6deb22187f35",
+          "old_sha256": "159d26271c1de4699306c12ea296eee05a65e07cf998ffdd0349995e0ec496a2"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/013-per-user-identity-connector-events/status.events.jsonl",
+          "event_id": "01KK00KQJYTTN7X00MA3PBPWGN",
+          "line_number": 15,
+          "new_sha256": "2f7d191c624636b7b5022ca5197fe39161c8c7a2d879cd7ccf21e7f159d5caf9",
+          "old_sha256": "828221a1b095123a14dd62aca9073afa7214ae443f6f40159fdf02e3253737c7"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/013-per-user-identity-connector-events/status.events.jsonl",
+          "event_id": "01KK00Q282S9FAAKSJ15BXKZTE",
+          "line_number": 16,
+          "new_sha256": "a04d79021b24a55e20684f993184bc0d63ae3660c32fc10579df674dcf5dfd8f",
+          "old_sha256": "d52189569489e789b4afcb1bbc7b4934a763e41668e44a6198e44010d3e981e0"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/013-per-user-identity-connector-events/status.events.jsonl",
+          "event_id": "01KK015WJDFMNRVDGDDS32AGY4",
+          "line_number": 17,
+          "new_sha256": "44fc692eabc9d428a6e7140033c42080b78f17c74fb8f9ce8d665a14ac6938fc",
+          "old_sha256": "b8afeae0a4f43ed072909eb20b2e4758521db38cd7ed4fe1b16db8ca0b3b55d7"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/013-per-user-identity-connector-events/status.events.jsonl",
+          "event_id": "01KK015WNG1KMNCJ6KMKHCT9KM",
+          "line_number": 18,
+          "new_sha256": "24c447049330ca35007e13cb5ba4682c167de913c7f1d1582e57a5cc6efee8ef",
+          "old_sha256": "04db45231ebf5c31475b48d10a8f659fcf33eb0343ace50744c239bf276e236b"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/013-per-user-identity-connector-events/status.events.jsonl",
+          "event_id": "01KK016YKJKEGHYASA4H5CNHD2",
+          "line_number": 19,
+          "new_sha256": "f9f5373e1ba013c71c73cdccad0c6a0246c90b5cb8a9543157e04436eb8f1270",
+          "old_sha256": "64df23933018dfca5c484fee4e60cdc9c348ffc157ce6b46c2304dc0738b27fb"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/013-per-user-identity-connector-events/status.events.jsonl",
+          "event_id": "01KK01BCKRM4RHAP4Y24AJF0DQ",
+          "line_number": 20,
+          "new_sha256": "ad3056c0b22d2aaef02386277478b0bb3762a6884893ebe78be59e19c6774c8c",
+          "old_sha256": "5c842ca6b4f2aec378a4dba43bda0d9035b9e7204f7e1634e67cf917a3c74adf"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/013-per-user-identity-connector-events/status.events.jsonl",
+          "event_id": "01KK0209ZJB47XFC3Y832SEP6M",
+          "line_number": 21,
+          "new_sha256": "399f64c374bb91818d81a42bd6ce0877730cabd79f478770a9808651e0d6a6ce",
+          "old_sha256": "eaaceebe9d0317c4262198d680346a5f6484624f89f706214af946bee18aba5e"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/013-per-user-identity-connector-events/status.events.jsonl",
+          "event_id": "01KK020A34TDJ499D6YDEZ469D",
+          "line_number": 22,
+          "new_sha256": "3281d2ade74540318e0ca8d11f9f50b8341424a8846915a143c480c51deea05b",
+          "old_sha256": "f53cfe52236c04688668a0bd6f416c665d055574cf24de788d177a943be1b379"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/013-per-user-identity-connector-events/status.events.jsonl",
+          "event_id": "01KK027MC3FYH8FRN2WXR7EKRS",
+          "line_number": 23,
+          "new_sha256": "fec9b47c3b67ce02f1151a07be95c41525cd68d60b6120494305c864c5afa506",
+          "old_sha256": "2ab8428fa0b5d7ae567bfba500ccd6f3675065356b3f0bc4553d4de345c176e8"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug",
+            "renamed_key:work_package_id->wp_id"
+          ],
+          "artifact_path": "kitty-specs/013-per-user-identity-connector-events/status.events.jsonl",
+          "event_id": "01KK02BTD9ME7AK8XJSHPRFZ6Q",
+          "line_number": 24,
+          "new_sha256": "f97de832c892ab363c310649908e11179e829ecbc412e1c4370943a7449774f7",
+          "old_sha256": "4f6f2e0673a0e31ccec513f467e5d5bd2c1bbdcea415645e1368a3132e6f083e"
+        }
+      ],
+      "status": "updated",
+      "validation_errors": []
+    },
+    {
+      "file_changes": [
+        {
+          "new_sha256": "61f1679dc8c680297ee00b125cd2de3a27384c9bb05d99041af71ee5aae7a178",
+          "new_size": 675,
+          "old_sha256": "7b73a5d826a3d137e50cb717d77c135ff44c768f8de4307e898d7d722f2d88df",
+          "old_size": 673,
+          "path": "kitty-specs/014-mission-contract-cutover/meta.json"
+        },
+        {
+          "new_sha256": "a5e223ccebc18d046d98f1a4d84ee68612ca7c4d7c0be403d1b4cf88c361c972",
+          "new_size": 31536,
+          "old_sha256": "9dc05bbd208ee45431766eae207adc1c6ef3b697ee6c4332993a297494ca76d9",
+          "old_size": 28412,
+          "path": "kitty-specs/014-mission-contract-cutover/status.events.jsonl"
+        }
+      ],
+      "mission_id": "01KRB9C8DXDG4A1RPDYHAWZ24B",
+      "mission_slug": "014-mission-contract-cutover",
+      "quarantined_rows": 0,
+      "row_transformations": [
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug"
+          ],
+          "artifact_path": "kitty-specs/014-mission-contract-cutover/status.events.jsonl",
+          "event_id": "01KNEV1QT23NQES0XD0XTSP942",
+          "line_number": 1,
+          "new_sha256": "1dc50f86194ebabe7e8c60d3c69012ac0f8d184a6bc12e5b86e460a8cd756665",
+          "old_sha256": "ca760e2aba12a1b2d2fcd81b76e89d332db59af998973855d02c2b2ae379a712"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug"
+          ],
+          "artifact_path": "kitty-specs/014-mission-contract-cutover/status.events.jsonl",
+          "event_id": "01KNEV1QWQVABD7EV2ACJQ5CGY",
+          "line_number": 2,
+          "new_sha256": "da19f73247abba1d0c09e79847f22329719235cacf61f54bc742113e9fbd795e",
+          "old_sha256": "9817d7bab35b56bae6ff0485b028cf69b6112815018f55b717c0560bb7901375"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug"
+          ],
+          "artifact_path": "kitty-specs/014-mission-contract-cutover/status.events.jsonl",
+          "event_id": "01KNEV1QWXHA7QAF4TNAP6FZV1",
+          "line_number": 3,
+          "new_sha256": "3d0f96efabe20fb9fec923b94b901229db5410b3687854aef406e798ffb74b17",
+          "old_sha256": "2cfee5e8f324ceda68b2ebfeddccacc150ae9f29019f368c9505f1792b7f41c6"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug"
+          ],
+          "artifact_path": "kitty-specs/014-mission-contract-cutover/status.events.jsonl",
+          "event_id": "01KNEV1QX2E6CZ35JKDCWPX9EM",
+          "line_number": 4,
+          "new_sha256": "8a560b2d180dc8a40264a7c4a4ac8aa35c3283be56e13a5d3c9f505bbb9559ac",
+          "old_sha256": "b18d6ca42a3e4beefe1856cf2e6b477d2018513d7310b575c0d52f7deb9e6456"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug"
+          ],
+          "artifact_path": "kitty-specs/014-mission-contract-cutover/status.events.jsonl",
+          "event_id": "01KNEV1QX72W546YN410BDJ592",
+          "line_number": 5,
+          "new_sha256": "8d96c1f8bb25ce360143054bbc9e9caaa776a2733a63fe45d40bb927a3d5f5d5",
+          "old_sha256": "1a7b26ee78bfe9170142711ed8d45ae72cd09f66715433e31d0b5703da8fbe3a"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug"
+          ],
+          "artifact_path": "kitty-specs/014-mission-contract-cutover/status.events.jsonl",
+          "event_id": "01KNEV1QXCX5D9MN2KQY330EYD",
+          "line_number": 6,
+          "new_sha256": "d33b04986191273128dee21b58705701180f21829d86013313b9907e3e2ee725",
+          "old_sha256": "e7b8f7143cc237640f78a6581a861606d4d5bfa5fa0e72f8ece8677c8a52b07b"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug"
+          ],
+          "artifact_path": "kitty-specs/014-mission-contract-cutover/status.events.jsonl",
+          "event_id": "01KNEVPX49PEXWKZVY5X8HYVP6",
+          "line_number": 7,
+          "new_sha256": "0299136a09c5f4aaa2a3e17f58a71bc8bf3d495c9ae4268cac4cd66e722f5467",
+          "old_sha256": "07fcff12cd4e89e5c134cfde0db7987c7abe4e97b54e80b10f9d31d3334fb318"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug"
+          ],
+          "artifact_path": "kitty-specs/014-mission-contract-cutover/status.events.jsonl",
+          "event_id": "01KNEVPX4JWW64ACAQ86YRWKEP",
+          "line_number": 8,
+          "new_sha256": "348fffcd7c7a9ef5f5058d8ebf78977bd7062c252ca77298132011a7196c75ba",
+          "old_sha256": "05dda654b6d0bcccdc8076412646b80fd36ed88547dfe251f68069b5245fcbdf"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug"
+          ],
+          "artifact_path": "kitty-specs/014-mission-contract-cutover/status.events.jsonl",
+          "event_id": "01KNEW50VR5SVHEKJFX7Y2D2AB",
+          "line_number": 9,
+          "new_sha256": "576b1c19c95fc1ec61fde029be5cb8eb375ef3d28855b2c40160781aff5cb061",
+          "old_sha256": "0c9e2667ac4e6664e5caf92ec27f9c6d9922582b60a44f2606f7625c0c91556d"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug"
+          ],
+          "artifact_path": "kitty-specs/014-mission-contract-cutover/status.events.jsonl",
+          "event_id": "01KNEW6AK4N927SJW1B0WB3BXE",
+          "line_number": 10,
+          "new_sha256": "3687446e674dbc67e494fac6194e5f2c46e2395071176f7554ff566c10f30c13",
+          "old_sha256": "f87a626d08fe6602fd3d404206e3c174a7690a1a5850511b10175e349fa4469b"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug"
+          ],
+          "artifact_path": "kitty-specs/014-mission-contract-cutover/status.events.jsonl",
+          "event_id": "01KNEWAJGMP3F5A8AF387WT9Y4",
+          "line_number": 11,
+          "new_sha256": "c4853d87c8855a98cddde5bed47a238f0b249e5118d681b214ca3046cb5f0092",
+          "old_sha256": "9401791ed102c483e890eec1517d687b0bc0d406f6b55ac0b20bb5c95ea556a5"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug"
+          ],
+          "artifact_path": "kitty-specs/014-mission-contract-cutover/status.events.jsonl",
+          "event_id": "01KNEWBV7TP8ZBW8S3QYPBHDPZ",
+          "line_number": 12,
+          "new_sha256": "bbe8d015e0322b3082555038d2c825d82490a40f8ee01ea44edad72087e983db",
+          "old_sha256": "eadd9db638ee0025473062c44c819c089a939f0b258ddd66cf5b0dfe63b6834a"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug"
+          ],
+          "artifact_path": "kitty-specs/014-mission-contract-cutover/status.events.jsonl",
+          "event_id": "01KNEWBVAGCCD6W3CSBHMYTPQ0",
+          "line_number": 13,
+          "new_sha256": "6fafda33c12d8e5cdbc30fb1f3b13f2fb738e6bcd76656ba5067bc2fab724add",
+          "old_sha256": "d215147744fc2738e62db1ba0f90e4bc073be98a829f7857873177abd8dae3b6"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug"
+          ],
+          "artifact_path": "kitty-specs/014-mission-contract-cutover/status.events.jsonl",
+          "event_id": "01KNEWHM9T2EMC870WE07HDT72",
+          "line_number": 14,
+          "new_sha256": "3c99281b7a6d0cb2d1287c3ec8e3ab624adf6babf243c714c33129c67f28793b",
+          "old_sha256": "c408734b7741af437ebbb4704c82f24b4f3a2ff29d95505366355819fd86a665"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug"
+          ],
+          "artifact_path": "kitty-specs/014-mission-contract-cutover/status.events.jsonl",
+          "event_id": "01KNEWJKK53AP06Z3TPREJRG20",
+          "line_number": 15,
+          "new_sha256": "0b358849331bb9f9b406eb145944cc64352c5416c65317b72248de9d3afc4813",
+          "old_sha256": "2ae1a79b96d7e1d0a3e17682824f1021d6742b0c9d465efd9dc085d4bf7bd580"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug"
+          ],
+          "artifact_path": "kitty-specs/014-mission-contract-cutover/status.events.jsonl",
+          "event_id": "01KNEWNP4GMES2VHK5A93VCS65",
+          "line_number": 16,
+          "new_sha256": "01cd64b8cbfb9d1accf631a844b853f92914d664b95469ed7d87f39d37040a22",
+          "old_sha256": "9dabfdfbc800306abe5b959b4b87adf5f64f1221522b7277039e71722d6ddbb1"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug"
+          ],
+          "artifact_path": "kitty-specs/014-mission-contract-cutover/status.events.jsonl",
+          "event_id": "01KNEWT4A1EP637ZADFGV5Z0CZ",
+          "line_number": 17,
+          "new_sha256": "4911468236631b05cde15eb10ede2dc8a2ffc9cd08abbb2ad16df9f789acd6e6",
+          "old_sha256": "ba1779d45dfb6adcc3203faf81f479f0306a231d0068542be205bae1f99e9d03"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug"
+          ],
+          "artifact_path": "kitty-specs/014-mission-contract-cutover/status.events.jsonl",
+          "event_id": "01KNEWT4CKQ2NK1VFZAYAVGSH6",
+          "line_number": 18,
+          "new_sha256": "ce069e559732ba222026d1c9d0a386cfee5473876aec65ee863efc81794a9634",
+          "old_sha256": "ec24b23dfe65fd24237ac171a9e1b2745fbbbf43c6e67362c1b43cb31f437b5d"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug"
+          ],
+          "artifact_path": "kitty-specs/014-mission-contract-cutover/status.events.jsonl",
+          "event_id": "01KNEX1GJ2H02CHCNG6PYT3NX6",
+          "line_number": 19,
+          "new_sha256": "825b20505c8b29aea955b0e90d4a20cc861b96f64319396d0376eb113e959ccb",
+          "old_sha256": "90baacec76393807f87f7fde362681bb46ab9885301d3575be552f9036b25d64"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug"
+          ],
+          "artifact_path": "kitty-specs/014-mission-contract-cutover/status.events.jsonl",
+          "event_id": "01KNEX2W3GQ2SDMQVPKVK0PMPV",
+          "line_number": 20,
+          "new_sha256": "88e0bdba5e4effb3c52b6c300c8a1d635be125a1833e332d5378addceca699da",
+          "old_sha256": "8aad0a9b0cf90dfef782cb8f3bd89a80e314e248135846ee0157e04442fdc859"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug"
+          ],
+          "artifact_path": "kitty-specs/014-mission-contract-cutover/status.events.jsonl",
+          "event_id": "01KNEX5JFDQDA01XJ2DPB3ZGHG",
+          "line_number": 21,
+          "new_sha256": "fb02eb9eb2487873433fdd9eb4da8cd5631e09751b55543269f4ed979f9046a5",
+          "old_sha256": "8962763edc76b6f834b47a274dd469cde14afaa67f8ef3865c95106b07fa5721"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug"
+          ],
+          "artifact_path": "kitty-specs/014-mission-contract-cutover/status.events.jsonl",
+          "event_id": "01KNEX6P8RXXV2J6S4YWVAHCG6",
+          "line_number": 22,
+          "new_sha256": "5eacd44088f56a475ac740af0c4567b2d4dba3fd43c34a4e0fae881a60e3b12c",
+          "old_sha256": "a3c9ca1b91c3c3251e452b61980f67998224d68b8ca4f2fe59b4ffef1bfa33d4"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug"
+          ],
+          "artifact_path": "kitty-specs/014-mission-contract-cutover/status.events.jsonl",
+          "event_id": "01KNEX78QX7Y8QYP9V455YVT2R",
+          "line_number": 23,
+          "new_sha256": "1b341f5ff4547f7f891c13d778e816be0a877323f0347873539562a843965e76",
+          "old_sha256": "c4cfcbe5562ee60c8830d9fcab09abb57d6ee2924946473a6e6ea4b0a6df14f6"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug"
+          ],
+          "artifact_path": "kitty-specs/014-mission-contract-cutover/status.events.jsonl",
+          "event_id": "01KNEX78TD0516WTVACR56YAMM",
+          "line_number": 24,
+          "new_sha256": "f8c9f14b12a42fe168666470041ff92597c4c638da98e4196020fda7a718f350",
+          "old_sha256": "ef06c859587f510f7e5c08e5e4964c29889d979cb7d4cff482a356ea0cdaf233"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug"
+          ],
+          "artifact_path": "kitty-specs/014-mission-contract-cutover/status.events.jsonl",
+          "event_id": "01KNEXVAJ5WM3BD7TF49FRVVWS",
+          "line_number": 25,
+          "new_sha256": "54c94267dff0e69f2c39e9dc352cdb092585401bc053a01f1b66933e5a822fa1",
+          "old_sha256": "2ddc7aed7af604ef90bb3d974c2e6afb30f366c72c7f741639f673dfea17457c"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug"
+          ],
+          "artifact_path": "kitty-specs/014-mission-contract-cutover/status.events.jsonl",
+          "event_id": "01KNEXWGY9DJX2520AEQEBAYF4",
+          "line_number": 26,
+          "new_sha256": "e553f6dded78f09ac7c83b0040fa117751c85bf94721057b6931838325063c80",
+          "old_sha256": "f51ca9b48a5a50068d1634a95e0829af5df79af3447d3ebd732913ef3e51891a"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug"
+          ],
+          "artifact_path": "kitty-specs/014-mission-contract-cutover/status.events.jsonl",
+          "event_id": "01KNEXZGM71P5XG7H1JM758H0T",
+          "line_number": 27,
+          "new_sha256": "fe2ded248cf8d1d1cfb2a9b22d878daeb195a36d01f2c4a7b7a817631ec66b64",
+          "old_sha256": "487785842f3b89eb3d99b7b276946eea3091e4ef06194370035808065848348b"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug"
+          ],
+          "artifact_path": "kitty-specs/014-mission-contract-cutover/status.events.jsonl",
+          "event_id": "01KNEY0RGTCPT4QXAJNM2T0AJ9",
+          "line_number": 28,
+          "new_sha256": "3bef0c7500da21e9efbc4afd98817de42fe1f8a5ae4e65847ad92c3a81d66dc6",
+          "old_sha256": "e524ecd7a7bf1f75c14d4f03b0be5fa2fa2b72d4ee04d5b44e6a07e2f3a5edd9"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug"
+          ],
+          "artifact_path": "kitty-specs/014-mission-contract-cutover/status.events.jsonl",
+          "event_id": "01KNEY0RK3VADK8SP4HHF0Z9QJ",
+          "line_number": 29,
+          "new_sha256": "5270ea7423bb46fe457085f8249d3106aba5cdf285cf03b9ada403249d2888f6",
+          "old_sha256": "8525a45d11c86ca8b1b8074c57a110cdda5ba0cf62ec235e05e5c104724011c4"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug"
+          ],
+          "artifact_path": "kitty-specs/014-mission-contract-cutover/status.events.jsonl",
+          "event_id": "01KNEY7ANTT2FPH2HKYRBFAP21",
+          "line_number": 30,
+          "new_sha256": "b111bfa64793ccc3e6d754041c0f877e2bc117c0258bc4ed1342e54ba23d197d",
+          "old_sha256": "752be965e7419d669e2bff802d9a60dcf6d493d84c4dc16be3e6960e14ddd274"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug"
+          ],
+          "artifact_path": "kitty-specs/014-mission-contract-cutover/status.events.jsonl",
+          "event_id": "01KNEY925N323GCDVF1PNPCKRE",
+          "line_number": 31,
+          "new_sha256": "17be7838af3e9e992999b40fe9ef40a49c5158ec73d7f62db389ffd0661d3442",
+          "old_sha256": "35ae9c4196289905a1a67dd20fb044825306a21b6c2e00c0e08d6d0b96333f14"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug"
+          ],
+          "artifact_path": "kitty-specs/014-mission-contract-cutover/status.events.jsonl",
+          "event_id": "01KNEYCGMSGZRN6711Y6F9PNGA",
+          "line_number": 32,
+          "new_sha256": "d4a1b52a01802c2262c92ada6dc5aa8b930f257e626eea535e24c881ef449d9f",
+          "old_sha256": "b17d37241a53d407d7c5942c35918e59ae0f92f2fbb5e9d98f44a89962c454b5"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug"
+          ],
+          "artifact_path": "kitty-specs/014-mission-contract-cutover/status.events.jsonl",
+          "event_id": "01KNEYG5GH1TJ771BB0XG3YE1K",
+          "line_number": 33,
+          "new_sha256": "80d8e028fb2e15643a8f137a5195dd18d861543c9427a6ba40bee47cb28d7625",
+          "old_sha256": "5c8a2c0a8ea5794fb8792b1d514e4bbb180de034d9b17fc17842c74683f072a0"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug"
+          ],
+          "artifact_path": "kitty-specs/014-mission-contract-cutover/status.events.jsonl",
+          "event_id": "01KNEYG5M7Z5NENSDFFZK09MZ4",
+          "line_number": 34,
+          "new_sha256": "f83a686dd9a15e89e4554e78d51a3daaf76ef30bb6643bcab6b2b0f16f97d6ea",
+          "old_sha256": "fe207b9dccf082d1ba08646ce008ffcbd8e90694a6b34e0234bc0bef4faa9e42"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug"
+          ],
+          "artifact_path": "kitty-specs/014-mission-contract-cutover/status.events.jsonl",
+          "event_id": "01KNEYRGGCWFBM4DVJJGDCD8ED",
+          "line_number": 35,
+          "new_sha256": "7d12e5f693c469192dd018843bb4e80a7ff4830f64a959d4b0f0903f69c2289a",
+          "old_sha256": "99fd74ec492001a327e0ca77ce57f7d3739c41987ee44b8db78286a74442016b"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug"
+          ],
+          "artifact_path": "kitty-specs/014-mission-contract-cutover/status.events.jsonl",
+          "event_id": "01KNEYSSS47XZ546MS7TRAR26M",
+          "line_number": 36,
+          "new_sha256": "28adef83959733ab6685bca4429bd4d23fcd0309072b899d53d35e8c06225dad",
+          "old_sha256": "147ceb200f1c3440d29ec6a5afad5777f249aee2f4e838a6aad57bbbc6282341"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug"
+          ],
+          "artifact_path": "kitty-specs/014-mission-contract-cutover/status.events.jsonl",
+          "event_id": "01KNEYX2YDND6ADJG39N0X6B0G",
+          "line_number": 37,
+          "new_sha256": "5d1d2d16201670e7d6a6688ad16b1ff6ba792700aff68c977590dc78a2876640",
+          "old_sha256": "aecbfe2dbb9359deecf62fc4a6eeab0205d9370fc2eccb9d307ab72626ff33cb"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug"
+          ],
+          "artifact_path": "kitty-specs/014-mission-contract-cutover/status.events.jsonl",
+          "event_id": "01KNEYYQJSMTBPQGXY51PJD6QC",
+          "line_number": 38,
+          "new_sha256": "a6af6c0bd7a738c316670cc28d55bbe8ad76b21a018a165897f4a087f54e2def",
+          "old_sha256": "8f5fd8382662d26ab18836283b4c875b31a1ca9bd459bfb13bff7a802c1867d2"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug"
+          ],
+          "artifact_path": "kitty-specs/014-mission-contract-cutover/status.events.jsonl",
+          "event_id": "01KNEYYQNG5B9QGJJFC8WFJGAA",
+          "line_number": 39,
+          "new_sha256": "f37d109f563434e532f5dec2a0256ca921226f31ff1debe559dc478d25d5b905",
+          "old_sha256": "06a56bb98f9316de0af8150c5869fecbebd916622728efa9ab48202e500a1e3e"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug"
+          ],
+          "artifact_path": "kitty-specs/014-mission-contract-cutover/status.events.jsonl",
+          "event_id": "01KNEZ3AHV73ENSVYAHZVPZ9BB",
+          "line_number": 40,
+          "new_sha256": "2a6737a049f0b0e63ffc8415b0848f6fa16170a01564d776c152946608d32cf3",
+          "old_sha256": "e4b618e738b478562e88c8644b22f98751d2d01e41e9bd9e9bce89fe7e9dd1b8"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug"
+          ],
+          "artifact_path": "kitty-specs/014-mission-contract-cutover/status.events.jsonl",
+          "event_id": "01KNEZ43FXJ118SY71EGW7GREW",
+          "line_number": 41,
+          "new_sha256": "2feda2b1db51b12bd49500a63b591f8f358a28d81c81e294e92b8af549fdb284",
+          "old_sha256": "e8a36fc388e27f09dca8ca5665a956f053f4c411c3979ff3befde7807c1c433c"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug"
+          ],
+          "artifact_path": "kitty-specs/014-mission-contract-cutover/status.events.jsonl",
+          "event_id": "01KNEZ6MW2XJG6D540S18QHP3N",
+          "line_number": 42,
+          "new_sha256": "e71f7cd9fea47280f7f8a7a6982a66d0451b8f0c133cfa691d4bb4f2b89aa568",
+          "old_sha256": "b96b5aeebafc3ad8c9a9f46e30e7de79db767116b9c0ef9a978e970faab946e0"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug"
+          ],
+          "artifact_path": "kitty-specs/014-mission-contract-cutover/status.events.jsonl",
+          "event_id": "01KNEZ7DDZY5RST92WYKFFS5GR",
+          "line_number": 43,
+          "new_sha256": "b1715ad7d3982b688302dd15241988bb48ed8ac4432a1d0aa089d4256000573e",
+          "old_sha256": "a2dc89ea1f029ffa336f67c4bdf1594ba302bb57b4222df62e9282eaf9076af4"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug"
+          ],
+          "artifact_path": "kitty-specs/014-mission-contract-cutover/status.events.jsonl",
+          "event_id": "01KNEZ7DH6KAYXWZ6QYQ32RC7Z",
+          "line_number": 44,
+          "new_sha256": "718c517ff598b6576d3bc8131b15b5cc8ed28b172bc9fe12df52e34af48590f5",
+          "old_sha256": "e9b9c436805a09b99b9da07d285730dc6a3857e8a3eaf8328172b210a8584e23"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug"
+          ],
+          "artifact_path": "kitty-specs/014-mission-contract-cutover/status.events.jsonl",
+          "event_id": "01KNEZR4NFCDFEHJAKQ4XF56R0",
+          "line_number": 45,
+          "new_sha256": "394998e8d020720f863303874dfd871ce73bd2156b339074d467da6cd281a4ce",
+          "old_sha256": "7aff6842e1b59a9956aeb2fb039b80d997951ca83e238943c064776062628586"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug"
+          ],
+          "artifact_path": "kitty-specs/014-mission-contract-cutover/status.events.jsonl",
+          "event_id": "01KNEZS0N6ZFDKDV5DP4N9QZT5",
+          "line_number": 46,
+          "new_sha256": "fee71418459d2e40611f3603bc011e2be115bdcedf23ae70e47c7b32d9fd787d",
+          "old_sha256": "410d024e478dcf532a1005a4f9d6a95d916de4f1f459751f85cbd6c8af508cae"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug"
+          ],
+          "artifact_path": "kitty-specs/014-mission-contract-cutover/status.events.jsonl",
+          "event_id": "01KNEZVTRQ8523HEG7A0K3WJVY",
+          "line_number": 47,
+          "new_sha256": "4e649c32be6c1ca364b405a72b017ecbdf09e12c50d0cbb3f56d2467f20c0cdb",
+          "old_sha256": "f8ba84475002e10a83e3357f9dc671b4fa8402c964589161e17d35998936da42"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug"
+          ],
+          "artifact_path": "kitty-specs/014-mission-contract-cutover/status.events.jsonl",
+          "event_id": "01KNF00AD53XPHNPZ4MZCVXFJS",
+          "line_number": 48,
+          "new_sha256": "75abd6336067484fce1f0fe1ef8d08c50aac86b18065d4a9591029ed37b3f1f9",
+          "old_sha256": "278f2e542b5272b4677fa45223e616e561842bb40648815fcb36c0728ac249a5"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug"
+          ],
+          "artifact_path": "kitty-specs/014-mission-contract-cutover/status.events.jsonl",
+          "event_id": "01KNF00AGBRJXET0XKXW1P3MNF",
+          "line_number": 49,
+          "new_sha256": "66ab5e2d1e6e452facc7c36f83147c42a20571e25f650be0d0066cafe4412744",
+          "old_sha256": "ec4880a7bc1da124dc82e6c25dbd0539eb1f5d7189248654fd6471f140d6d2dc"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug"
+          ],
+          "artifact_path": "kitty-specs/014-mission-contract-cutover/status.events.jsonl",
+          "event_id": "01KNF04NNV0PP4474VETP6GKE1",
+          "line_number": 50,
+          "new_sha256": "2250273ea62e0e429db0e45e319416a923a6cbd09f943ec9f32440ae0ac5ad8d",
+          "old_sha256": "ce943b7678492e629818383a33f5ec4d09d92c3e76c63e26bd325412e357dcd2"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug"
+          ],
+          "artifact_path": "kitty-specs/014-mission-contract-cutover/status.events.jsonl",
+          "event_id": "01KNF059H1VTB5Z12V2TY1FTHB",
+          "line_number": 51,
+          "new_sha256": "f429eaec4bb4e0faa4893e9db8aace28798ed22413fa8b2a9b9f08981c736de3",
+          "old_sha256": "a7da28126738f4f1bb5e491f268efbece537dca1abfdc937bb40f56c706f6d2d"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug"
+          ],
+          "artifact_path": "kitty-specs/014-mission-contract-cutover/status.events.jsonl",
+          "event_id": "01KNF061861EGMG8AYS99K0QNJ",
+          "line_number": 52,
+          "new_sha256": "69dd8dc5ecec16015d6c04ce03ccdef9355eb2c3d34116e52dcf38e2908ae6e8",
+          "old_sha256": "1c8ad5a092e9af052824fffd753bdec05bbf8a09a5f1a8a57369eda405f28a49"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug"
+          ],
+          "artifact_path": "kitty-specs/014-mission-contract-cutover/status.events.jsonl",
+          "event_id": "01KNF061GC5QACVHV831BBBFGF",
+          "line_number": 53,
+          "new_sha256": "6cea43ccb44640fb1e9b3bd6c72c933be5e9dc0b8169d9ac2ba979b8f66acfed",
+          "old_sha256": "6b0dd21aa0d482da9a4a12612ef2b444522100b80f019e434a10e3f9b126be67"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug"
+          ],
+          "artifact_path": "kitty-specs/014-mission-contract-cutover/status.events.jsonl",
+          "event_id": "01KNF06JZY45NBFAZVYB5NGDBF",
+          "line_number": 54,
+          "new_sha256": "0e685a4d36a3157b3c2eac7a1cde9cc58d8737a62ce7c8165fa124855ba8b0d0",
+          "old_sha256": "f8b12420cd26a8f303ef1785e74ceef4013b4e33f4c9ab3898d3ae91be9df374"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug"
+          ],
+          "artifact_path": "kitty-specs/014-mission-contract-cutover/status.events.jsonl",
+          "event_id": "01KNF06K2HAKB1PKVSCPYJNPHE",
+          "line_number": 55,
+          "new_sha256": "a898f20af80d66f330302ed72d44c1a1c9f84b75b833c258e75f116ed3f20f1a",
+          "old_sha256": "823bef517eeddc29a2f8d121b5754a93a06b26407b9fab962ab63a73ae79b50e"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug"
+          ],
+          "artifact_path": "kitty-specs/014-mission-contract-cutover/status.events.jsonl",
+          "event_id": "01KNF0FVGQ4TNVZD4ETBMQA6A0",
+          "line_number": 56,
+          "new_sha256": "5ecdfef45f59bd1e256969f4cf51c2ac104322ae59d9d58e5cc17ffa4c31dee0",
+          "old_sha256": "97942a675c2eeb09496c121e1e12c34f1e7db37e7aed839996a6fc78c8f6e691"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug"
+          ],
+          "artifact_path": "kitty-specs/014-mission-contract-cutover/status.events.jsonl",
+          "event_id": "01KNF0G46WF3Z034C31MTAGS4M",
+          "line_number": 57,
+          "new_sha256": "6cc4dd8f92a9c350c36833081ed4f3809411d3e47e06eb98c939efdab715fd3f",
+          "old_sha256": "836274b3855b0f9e4a46e931cd639a2bbe50446cca46aefcef4b7364641a81f3"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug"
+          ],
+          "artifact_path": "kitty-specs/014-mission-contract-cutover/status.events.jsonl",
+          "event_id": "01KNF0GN2YKV695821JED91E37",
+          "line_number": 58,
+          "new_sha256": "483c241bd229b88aab7dd9a2d31fd3ab657d9774356f888ed5a3ed73e63e66d0",
+          "old_sha256": "ea9bb97e20d73c21162d345b1ac15a77c3ace41dcbe3017656e7a4bf2e9eb086"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug"
+          ],
+          "artifact_path": "kitty-specs/014-mission-contract-cutover/status.events.jsonl",
+          "event_id": "01KNF0GNBFGG0S1EQ4QWWAF0NM",
+          "line_number": 59,
+          "new_sha256": "85b3d06bd0e356bb1cdb25a740de3bb2ac6257c5dd3923da7ee6251cccf1b0af",
+          "old_sha256": "54d22cd31013de09c84986868fa7854e46336762f5a728644365634f2aac51b1"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug"
+          ],
+          "artifact_path": "kitty-specs/014-mission-contract-cutover/status.events.jsonl",
+          "event_id": "01KNF0HAFBXR3BVVP1919ACGKZ",
+          "line_number": 60,
+          "new_sha256": "dc931fceb8357c4c92e52330e89af3a12e9c1c4e78bdf81007a3c70f0d70e665",
+          "old_sha256": "a0c947123f1d40f970231f392eb76b062b24ad2934afbf70160dbae796d9ad49"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug"
+          ],
+          "artifact_path": "kitty-specs/014-mission-contract-cutover/status.events.jsonl",
+          "event_id": "01KNF0HAJYH5EQPS3GXFPFDPQW",
+          "line_number": 61,
+          "new_sha256": "681fa63f0e042491edea88130f15099100d13a250d72bbbdf4039e1690d2bad8",
+          "old_sha256": "1e384e1c910007c8d0039fa5bb2cd27eb220a0bc698f01384d6aa60669ea51f4"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug"
+          ],
+          "artifact_path": "kitty-specs/014-mission-contract-cutover/status.events.jsonl",
+          "event_id": "01KNF1FCJNE92JX61A1AQ9SP97",
+          "line_number": 62,
+          "new_sha256": "e4f2ab73862f186b9460d7f82cd96509329a8a92fc5ed46b2cfd98647d50f1d8",
+          "old_sha256": "2096848f82e4767e18e89143edd9be720247521eb717f8e510de62456ea12e59"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug"
+          ],
+          "artifact_path": "kitty-specs/014-mission-contract-cutover/status.events.jsonl",
+          "event_id": "01KNF1FSFXF48VWCACN5T0BGMV",
+          "line_number": 63,
+          "new_sha256": "41d7b506e5f034f06f0c98a47dadf92bd9d033457157e862defd205f8e31cddc",
+          "old_sha256": "d1f78e5ff6e6317ea2fe4a61de770ccd22659cdfd57341a1e9c449c0d33a92fe"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug"
+          ],
+          "artifact_path": "kitty-specs/014-mission-contract-cutover/status.events.jsonl",
+          "event_id": "01KNF1G87S7606AF5PA6Q3PV4J",
+          "line_number": 64,
+          "new_sha256": "dcf6df66f98a8973310119ce46ba09f67c7b2c09e4d9686dcc250cda0c804d1f",
+          "old_sha256": "e408d5950854d7fb5f02a7ef80c33abdaeb93cf7ad2e7bf9f827f383877f2b7c"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug"
+          ],
+          "artifact_path": "kitty-specs/014-mission-contract-cutover/status.events.jsonl",
+          "event_id": "01KNF1G8GEVR3BGM5S2CV2DZR4",
+          "line_number": 65,
+          "new_sha256": "632bebbd2c9565ac85ab9b628df0e27397fb9f5a80e1c57478f4eecdc5cd68b5",
+          "old_sha256": "a9165983e63075c0f31ece9f873e03aaee29cd0f72e50106c7d01e729b3147dc"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug"
+          ],
+          "artifact_path": "kitty-specs/014-mission-contract-cutover/status.events.jsonl",
+          "event_id": "01KNF1GEJGFAA3QVG4ZYKKGT83",
+          "line_number": 66,
+          "new_sha256": "355154020b68a36e19b4587c3b113c59357440ef101e9f3a5e7f4873372ac540",
+          "old_sha256": "3b58b7b2d424e6cf123582ef63a87b14df769533d30a2c4915dfe99a1b102dd3"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug"
+          ],
+          "artifact_path": "kitty-specs/014-mission-contract-cutover/status.events.jsonl",
+          "event_id": "01KNF1GEN3NA4HGZG6ZH4QBB5Q",
+          "line_number": 67,
+          "new_sha256": "e9ae2ac89208712d3c1a0296934a83fc204a3d5255d1b05ba8b5662d69aa196c",
+          "old_sha256": "baf1e3365b438ea6e7eed6b3a592d22b80005627b8eb0d9751be98cf5edd0ab3"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug"
+          ],
+          "artifact_path": "kitty-specs/014-mission-contract-cutover/status.events.jsonl",
+          "event_id": "01KNF1PQ212KJXMCX92QQXT2SD",
+          "line_number": 68,
+          "new_sha256": "a6a960a215ebaaa1f13fd18a1d5defa5a14652b400f785e05ae84f13a1ac4751",
+          "old_sha256": "8c1956d92589ad3e155b7ab36d1b5354667c127989c7693c5c77c9cb45f22e8d"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug"
+          ],
+          "artifact_path": "kitty-specs/014-mission-contract-cutover/status.events.jsonl",
+          "event_id": "01KNF1PYDZQSCZW8N9T74Y949B",
+          "line_number": 69,
+          "new_sha256": "e29e74ba978c049a08bde3f5db4e271d20bdf114017364d09fcaf8e41911dcac",
+          "old_sha256": "b1bfcef53259708ace4c8791798eafbbecf73d4733c7eecf18ebbf2dd0d7c3d5"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug"
+          ],
+          "artifact_path": "kitty-specs/014-mission-contract-cutover/status.events.jsonl",
+          "event_id": "01KNF1QE7N35RKKPPHBWFBFZM6",
+          "line_number": 70,
+          "new_sha256": "4d1d84aa91ae206ee9c920b9afd64c0a55651381c0358d9785fae340668cc49d",
+          "old_sha256": "b3c30fde6ebcf19586d151bea4d7aaa9922994b7b5435914ca7161d258e3dabc"
+        },
+        {
+          "actions": [
+            "renamed_key:feature_slug->mission_slug"
+          ],
+          "artifact_path": "kitty-specs/014-mission-contract-cutover/status.events.jsonl",
+          "event_id": "01KNF1QED81AJ7F2RVCH41Y5GD",
+          "line_number": 71,
+          "new_sha256": "5a28c5c5744cc217505e35a6651f790c9d8b6cfbda5753a1b4348e7c8f94e4f9",
+          "old_sha256": "1d2e9a5338b7a830a766ebddca9313389837e9cfe8c2ee0a960066b753f201c8"
+        }
+      ],
+      "status": "updated",
+      "validation_errors": []
+    },
+    {
+      "file_changes": [
+        {
+          "new_sha256": "e43053a341b0daf8088a522132f1571c76b2847dafc80b3e062c49a2e8468fe5",
+          "new_size": 22292,
+          "old_sha256": "c7ae64b96b4a75a9f45ccb744f340c1c9fd1b620099624a279b36e79693d3564",
+          "old_size": 25064,
+          "path": "kitty-specs/additive-event-contracts-charter-phase456-01KP343J/status.events.jsonl"
+        }
+      ],
+      "mission_id": "01KP343JBG2V7WSWSDJ0HD76BR",
+      "mission_slug": "additive-event-contracts-charter-phase456-01KP343J",
+      "quarantined_rows": 0,
+      "row_transformations": [
+        {
+          "actions": [
+            "removed_key:legacy_aggregate_id"
+          ],
+          "artifact_path": "kitty-specs/additive-event-contracts-charter-phase456-01KP343J/status.events.jsonl",
+          "event_id": "01KP35811ZG8SE41XBW0B0A3YV",
+          "line_number": 1,
+          "new_sha256": "46a7c2a6708182d7ee115f6b52735bd9aa12f33eb40d8b3673598e5302b36352",
+          "old_sha256": "febfa47045069df7b938229c5652e53b28ee015c897272737ee3076fcd47c14e"
+        },
+        {
+          "actions": [
+            "removed_key:legacy_aggregate_id"
+          ],
+          "artifact_path": "kitty-specs/additive-event-contracts-charter-phase456-01KP343J/status.events.jsonl",
+          "event_id": "01KP35815MNZBX4ZG9YM3X5QW8",
+          "line_number": 2,
+          "new_sha256": "38d49e7699fc6d0578ecd6d7818579116923ed71edd19cfe0846c6da5b9e7927",
+          "old_sha256": "64c7bc26a1ae2a639d83e2adecf4d68e07fc3b0abbbf2015a95149243afd2a95"
+        },
+        {
+          "actions": [
+            "removed_key:legacy_aggregate_id"
+          ],
+          "artifact_path": "kitty-specs/additive-event-contracts-charter-phase456-01KP343J/status.events.jsonl",
+          "event_id": "01KP35815SKXMJ65FX6MBNP6FK",
+          "line_number": 3,
+          "new_sha256": "08cb0378e032ab7613ef8fa58850cee0f94f0ffd0d643c268a783ac2484ac3f5",
+          "old_sha256": "7db938db6d4f3496de958cf4f44a7f8b4fc0943deecf509ac62f7a086c2f85d2"
+        },
+        {
+          "actions": [
+            "removed_key:legacy_aggregate_id"
+          ],
+          "artifact_path": "kitty-specs/additive-event-contracts-charter-phase456-01KP343J/status.events.jsonl",
+          "event_id": "01KP35815WHHGJC1G2BMTEMVBW",
+          "line_number": 4,
+          "new_sha256": "8f1b4e4c18d17f465efbe17b2897ea3d5afe78688a1349ea12bc313e5dfc091d",
+          "old_sha256": "1124eb37abd5e5ebaac81627228936f064705b973e950c7bcd2a3bb0bda3d328"
+        },
+        {
+          "actions": [
+            "removed_key:legacy_aggregate_id"
+          ],
+          "artifact_path": "kitty-specs/additive-event-contracts-charter-phase456-01KP343J/status.events.jsonl",
+          "event_id": "01KP3593C6P6FZV85GPQRWRECE",
+          "line_number": 5,
+          "new_sha256": "de630b0e2cd7cca4e115458d123bfacabeb25e0260aea7d8c3e6b5e91d2f5efd",
+          "old_sha256": "5ded06d83550e49ffce2970321e4cae8c7e4fc2b27789ffe4536b6332d066577"
+        },
+        {
+          "actions": [
+            "removed_key:legacy_aggregate_id"
+          ],
+          "artifact_path": "kitty-specs/additive-event-contracts-charter-phase456-01KP343J/status.events.jsonl",
+          "event_id": "01KP3593J19MRT4QEY44PBJM75",
+          "line_number": 6,
+          "new_sha256": "607ac5260989c5de68980941286342990088dcb3af92a68ead51d6acaa612e29",
+          "old_sha256": "e6007e5d09efae0dc02ee29d8550fc74edf6e3a6de4a031bf1c71d27f4f37f27"
+        },
+        {
+          "actions": [
+            "removed_key:legacy_aggregate_id"
+          ],
+          "artifact_path": "kitty-specs/additive-event-contracts-charter-phase456-01KP343J/status.events.jsonl",
+          "event_id": "01KP35G4FZQ74AXGAMA9PX4S43",
+          "line_number": 7,
+          "new_sha256": "6c3a811a258ab8e38685966cf079c1141e7fdac73785195a316053f245530978",
+          "old_sha256": "4970c19a0fbf40ce040962c369dd982596b84339e056f20d9b92f38079c7a883"
+        },
+        {
+          "actions": [
+            "removed_key:legacy_aggregate_id"
+          ],
+          "artifact_path": "kitty-specs/additive-event-contracts-charter-phase456-01KP343J/status.events.jsonl",
+          "event_id": "01KP35GN872Q5JADTZAFGP813C",
+          "line_number": 8,
+          "new_sha256": "a65edcc8ffa944a2e2635f56bc85dde156949b1ab72085fe1c8b5202254d58c2",
+          "old_sha256": "b7e0c2a77d6c928196bb3882ee1668e302d096d7920fa0df6e1f4214e9ba1219"
+        },
+        {
+          "actions": [
+            "removed_key:legacy_aggregate_id"
+          ],
+          "artifact_path": "kitty-specs/additive-event-contracts-charter-phase456-01KP343J/status.events.jsonl",
+          "event_id": "01KP35KF0KWC5CQ85WNCAVW3DR",
+          "line_number": 9,
+          "new_sha256": "b726a87bde1cb5891915eda00c3a5538fad5c3815bebada26d18db67105e6690",
+          "old_sha256": "f08347d85a7ef9aac6596398fd289dd5982824fd25efca98edee0336c90e770e"
+        },
+        {
+          "actions": [
+            "removed_key:legacy_aggregate_id"
+          ],
+          "artifact_path": "kitty-specs/additive-event-contracts-charter-phase456-01KP343J/status.events.jsonl",
+          "event_id": "01KP35KF6FY2HT4NN8GQ9TJK21",
+          "line_number": 10,
+          "new_sha256": "b784b4c159be450047235e7ead780501b91dc07bf6f6d67d01fa51973f31575d",
+          "old_sha256": "d0b77a6138a0302e9c4c9b20a20583127eaa49d97b43d6a876dbdee7accda75a"
+        },
+        {
+          "actions": [
+            "removed_key:legacy_aggregate_id"
+          ],
+          "artifact_path": "kitty-specs/additive-event-contracts-charter-phase456-01KP343J/status.events.jsonl",
+          "event_id": "01KP35KF7ZVPHM6FX8Y4JGE7WK",
+          "line_number": 11,
+          "new_sha256": "ffd4f39a294297ab95c07028b10c6c565cce1e133c3424644b6adfeaba63ede8",
+          "old_sha256": "ba14e1a187b4e4570d1f9ced175ebd52164ff6784f2556cba70bc2301e7c320e"
+        },
+        {
+          "actions": [
+            "removed_key:legacy_aggregate_id"
+          ],
+          "artifact_path": "kitty-specs/additive-event-contracts-charter-phase456-01KP343J/status.events.jsonl",
+          "event_id": "01KP35KWYJM0X010DFGQNMP1DG",
+          "line_number": 12,
+          "new_sha256": "88be7cc90653899e2991d47a3ebf7628f989059d5e2484b58bb7426f5a236b36",
+          "old_sha256": "18c6b7013e1c5095e1289faf70f5d5bf1b010135f5b83eb873fd4dddcf45de9a"
+        },
+        {
+          "actions": [
+            "removed_key:legacy_aggregate_id"
+          ],
+          "artifact_path": "kitty-specs/additive-event-contracts-charter-phase456-01KP343J/status.events.jsonl",
+          "event_id": "01KP35KX1YZT3572KW1S1KNQT7",
+          "line_number": 13,
+          "new_sha256": "6b93165d69f5098656ede221d53c229f226eaa489eab3fc7711b32d1ae07645d",
+          "old_sha256": "6aabcea64aeb8ad9cfed35d5877fa9e2d259814a1b36283c79dc98bbe5fcc93f"
+        },
+        {
+          "actions": [
+            "removed_key:legacy_aggregate_id"
+          ],
+          "artifact_path": "kitty-specs/additive-event-contracts-charter-phase456-01KP343J/status.events.jsonl",
+          "event_id": "01KP35R47X5A827ARM84BG0PEB",
+          "line_number": 14,
+          "new_sha256": "249ed7a7cd588f3bcbfc073108e0532db23810a332712ba5070dfa603cea42b0",
+          "old_sha256": "f4d4574c2dc148ab5c2ab911bd639103c2259399a213c709e07c98da25c15087"
+        },
+        {
+          "actions": [
+            "removed_key:legacy_aggregate_id"
+          ],
+          "artifact_path": "kitty-specs/additive-event-contracts-charter-phase456-01KP343J/status.events.jsonl",
+          "event_id": "01KP35RNYCENM3TK5KEEBZ8WZZ",
+          "line_number": 15,
+          "new_sha256": "e48b9bed849bd47be2b2e16f563c73c8f5f21a52f6a85d0b2e5e6ec0398b55a5",
+          "old_sha256": "a3bb33d6626a4e0f0506bf1186ea07d32807b2161bf632692bbadda972ad37e8"
+        },
+        {
+          "actions": [
+            "removed_key:legacy_aggregate_id"
+          ],
+          "artifact_path": "kitty-specs/additive-event-contracts-charter-phase456-01KP343J/status.events.jsonl",
+          "event_id": "01KP35W8NMAZFWFXBZS9JFSAA8",
+          "line_number": 16,
+          "new_sha256": "79a3bbda4194a605014a1cbfc3ae0e97ce32445a0e73d1a0b62de99e4ce81adf",
+          "old_sha256": "2c29e9963507c663022c6aa69c472f92c9cbfecc529a9981db60455b28814ece"
+        },
+        {
+          "actions": [
+            "removed_key:legacy_aggregate_id"
+          ],
+          "artifact_path": "kitty-specs/additive-event-contracts-charter-phase456-01KP343J/status.events.jsonl",
+          "event_id": "01KP35W8THABRGHPA95XCN8NNG",
+          "line_number": 17,
+          "new_sha256": "6150d30263c1eddabe03b20a941c5b17cd972c448fb42b9c2d462fa1276a83c7",
+          "old_sha256": "dbd45d211f124b8b07a6da6fd3bbb397359153d77d7863632a8a445668575ac3"
+        },
+        {
+          "actions": [
+            "removed_key:legacy_aggregate_id"
+          ],
+          "artifact_path": "kitty-specs/additive-event-contracts-charter-phase456-01KP343J/status.events.jsonl",
+          "event_id": "01KP35W8VRC6AW8Y06HSBVV4KX",
+          "line_number": 18,
+          "new_sha256": "163316b9f5357feb88ecdb92d17baa6169aa203e61658ba38192758c23be9708",
+          "old_sha256": "b1bdfde15aea692106c17747f00de6108348a8a8641eb70aea3cf36e46b953b8"
+        },
+        {
+          "actions": [
+            "removed_key:legacy_aggregate_id"
+          ],
+          "artifact_path": "kitty-specs/additive-event-contracts-charter-phase456-01KP343J/status.events.jsonl",
+          "event_id": "01KP35WN87K21AZPY86E5NW5VK",
+          "line_number": 19,
+          "new_sha256": "eba257317b004e2b9b98a51bbb08ceae781fe3d30f4a928a5200c6397ca96b58",
+          "old_sha256": "97064ca858f83ce4a5f4503e82c7cf267e97f5276f7b36ce8229fb2883d40112"
+        },
+        {
+          "actions": [
+            "removed_key:legacy_aggregate_id"
+          ],
+          "artifact_path": "kitty-specs/additive-event-contracts-charter-phase456-01KP343J/status.events.jsonl",
+          "event_id": "01KP35WNAQF7K2FMQ5PDJ0BECD",
+          "line_number": 20,
+          "new_sha256": "08e842cc079ab0247ee95268ee46a8ad9a0902ed100a3b812c1eba33482fc980",
+          "old_sha256": "6025460c49b26a2f5daecf2191efcd06abbf987d84e23cfa8f36a4598d5c507e"
+        },
+        {
+          "actions": [
+            "removed_key:legacy_aggregate_id"
+          ],
+          "artifact_path": "kitty-specs/additive-event-contracts-charter-phase456-01KP343J/status.events.jsonl",
+          "event_id": "01KP362B9AHN2ARB3Z5TY3K835",
+          "line_number": 21,
+          "new_sha256": "957c52c503d67ac87b1c9c7d06e4282ddd5a6e8eefbd5c2109912aca52f84bb5",
+          "old_sha256": "88665ac658677c158abd3cebe820bab75e375c0a2a72d2165375b8f836f6ff68"
+        },
+        {
+          "actions": [
+            "removed_key:legacy_aggregate_id"
+          ],
+          "artifact_path": "kitty-specs/additive-event-contracts-charter-phase456-01KP343J/status.events.jsonl",
+          "event_id": "01KP362WWE0JV3SGXGQ067PQ2V",
+          "line_number": 22,
+          "new_sha256": "db4de12be280b5defe85f408e00ef82c52fc9d021d1826cf77fc16c7a94880ae",
+          "old_sha256": "e9a2cca2d494e7ff12508a94af00412b671c640ac86d880a7bfc1b9fded50900"
+        },
+        {
+          "actions": [
+            "removed_key:legacy_aggregate_id"
+          ],
+          "artifact_path": "kitty-specs/additive-event-contracts-charter-phase456-01KP343J/status.events.jsonl",
+          "event_id": "01KP366J8EB7MZSEW4MFX33C58",
+          "line_number": 23,
+          "new_sha256": "5cdb4923140dfbbf46b83dc2865eee345c53f17b8b2c5536401603eb6f590247",
+          "old_sha256": "b39adf654d31139c9d3b2c708d9fcbfd1915de698eb1f7a1fa94f2965f5f41f9"
+        },
+        {
+          "actions": [
+            "removed_key:legacy_aggregate_id"
+          ],
+          "artifact_path": "kitty-specs/additive-event-contracts-charter-phase456-01KP343J/status.events.jsonl",
+          "event_id": "01KP366JDJ8RMANNM9XC1J9J22",
+          "line_number": 24,
+          "new_sha256": "df0549d3f31dcbe2530b3da6521efd8a668b6ae5ab1e4a7ff85586c293d25f9e",
+          "old_sha256": "abf979e72a16a7afd9d2db5a84c8858a564342b5f26d5dc6b0c27795c7dfb8dc"
+        },
+        {
+          "actions": [
+            "removed_key:legacy_aggregate_id"
+          ],
+          "artifact_path": "kitty-specs/additive-event-contracts-charter-phase456-01KP343J/status.events.jsonl",
+          "event_id": "01KP366JER6VNA4J527KV0XEG5",
+          "line_number": 25,
+          "new_sha256": "a10442ba157e32ad5a26200b950a95fc76ee9b67f2354297d89dc44d037a70e8",
+          "old_sha256": "1bd4f0aa1b591dff618956f6a6a7bd9124762542332ac6665fb437ae7806b3e3"
+        },
+        {
+          "actions": [
+            "removed_key:legacy_aggregate_id"
+          ],
+          "artifact_path": "kitty-specs/additive-event-contracts-charter-phase456-01KP343J/status.events.jsonl",
+          "event_id": "01KP366YW4KEV1J1MGS1253EGK",
+          "line_number": 26,
+          "new_sha256": "f39067ffa9d12846e735a82cddc297a18da796a92a3bba3c4a6e31528847da10",
+          "old_sha256": "ff196b04937d45df9605f21546a74f703efbd7f9f2073b336a78091367e7ba19"
+        },
+        {
+          "actions": [
+            "removed_key:legacy_aggregate_id"
+          ],
+          "artifact_path": "kitty-specs/additive-event-contracts-charter-phase456-01KP343J/status.events.jsonl",
+          "event_id": "01KP366YYTSC7DVHRK67WEDGYE",
+          "line_number": 27,
+          "new_sha256": "9036f1a8d676a088228a9ea71f8152f3ba78acb18fce1a69b47f7c5eb89a21f8",
+          "old_sha256": "3f8a0ccea6f36cb28e64d577d12b82b5b31628f01db754d6babf088808ae3a87"
+        },
+        {
+          "actions": [
+            "removed_key:legacy_aggregate_id"
+          ],
+          "artifact_path": "kitty-specs/additive-event-contracts-charter-phase456-01KP343J/status.events.jsonl",
+          "event_id": "01KP36G8J2M67HTMCY5GAG4JNV",
+          "line_number": 28,
+          "new_sha256": "f6f57c78d88da0f9404c1840e60f98f21d6009be653d891a0065ee7e9c4062c4",
+          "old_sha256": "8f2dbb56e694aa7a628705b8243baeec9b6f14cb9de7ff2995287fdcc7d56372"
+        },
+        {
+          "actions": [
+            "removed_key:legacy_aggregate_id"
+          ],
+          "artifact_path": "kitty-specs/additive-event-contracts-charter-phase456-01KP343J/status.events.jsonl",
+          "event_id": "01KP36GRYQGZ459BF68D4NQE2E",
+          "line_number": 29,
+          "new_sha256": "a83985f4027a0894463cc89dc0c82025c3c9859260f55cdfa035d0fcfa973277",
+          "old_sha256": "388dd40e1ea309f283f4cae53d5365866d7cba5abfc6b6b80041ce5830517fa2"
+        },
+        {
+          "actions": [
+            "removed_key:legacy_aggregate_id"
+          ],
+          "artifact_path": "kitty-specs/additive-event-contracts-charter-phase456-01KP343J/status.events.jsonl",
+          "event_id": "01KP36MWZ3DZ81DJM7JZ18DJRN",
+          "line_number": 30,
+          "new_sha256": "26eb10fc2e8e9ea950dcfc6e458781899f66c1980ee2ac8617b309fe464c68b1",
+          "old_sha256": "d790cca8ebc1169eb633a5ee3989eae14a7e6baaa18db5d8998e30af4a32f065"
+        },
+        {
+          "actions": [
+            "removed_key:legacy_aggregate_id"
+          ],
+          "artifact_path": "kitty-specs/additive-event-contracts-charter-phase456-01KP343J/status.events.jsonl",
+          "event_id": "01KP36MX42WD2SPQS39MJGEZ0B",
+          "line_number": 31,
+          "new_sha256": "8eb153a2e00a96efb64ca6d4867f85531198de2c8f5f1da4ff6651626ec5a45a",
+          "old_sha256": "df743d2815e7d9202fa564ba3cfbcd3cafb96bf0e08dd545e99797c49d2388b5"
+        },
+        {
+          "actions": [
+            "removed_key:legacy_aggregate_id"
+          ],
+          "artifact_path": "kitty-specs/additive-event-contracts-charter-phase456-01KP343J/status.events.jsonl",
+          "event_id": "01KP36MX5SZV3WJGZNX8HJQZ86",
+          "line_number": 32,
+          "new_sha256": "662ea1c147b49d6a8dea47f89ec48201626a9c667d43fc819e303d655944c841",
+          "old_sha256": "64e4caa9a04fba94c71eb207c4a4f186123abcb19ac5d90b84d1244c26aeea4b"
+        },
+        {
+          "actions": [
+            "removed_key:legacy_aggregate_id"
+          ],
+          "artifact_path": "kitty-specs/additive-event-contracts-charter-phase456-01KP343J/status.events.jsonl",
+          "event_id": "01KP36NHJP1AA82N3Z24SPT2YD",
+          "line_number": 33,
+          "new_sha256": "6ffa990f6b20d22ac0c1933591e7875c379262e04ce47f6daea6b32d057b0d7b",
+          "old_sha256": "8a9ed3bc7bd6c9824589939a65037dcc317f75c6973ce6cd9ad9fd846d7e72de"
+        },
+        {
+          "actions": [
+            "removed_key:legacy_aggregate_id"
+          ],
+          "artifact_path": "kitty-specs/additive-event-contracts-charter-phase456-01KP343J/status.events.jsonl",
+          "event_id": "01KP36NHR2VP23BGBCDYBAPKH2",
+          "line_number": 34,
+          "new_sha256": "8c5fd2746cb34fd0b1d2c833d5ae4745bb2a5a8076cd3c5956f9ab419c0387b0",
+          "old_sha256": "b7a6fd1ea63308b7ab2c7f72165ead27c64cc2a436841450f2620c1e526bb806"
+        },
+        {
+          "actions": [
+            "removed_key:legacy_aggregate_id"
+          ],
+          "artifact_path": "kitty-specs/additive-event-contracts-charter-phase456-01KP343J/status.events.jsonl",
+          "event_id": "01KP36NHSHWM21KCEA93KK50Z7",
+          "line_number": 35,
+          "new_sha256": "9feccaf197806f2ed6701380a6bbf8877f038b1e9bec2f477dfe233926b2f89b",
+          "old_sha256": "f6730f6c691343c63023df68fa9e2d8a2e900b5e3fd6e9af5d6ca047cb46825b"
+        },
+        {
+          "actions": [
+            "removed_key:legacy_aggregate_id"
+          ],
+          "artifact_path": "kitty-specs/additive-event-contracts-charter-phase456-01KP343J/status.events.jsonl",
+          "event_id": "01KP36NHTYYVJSVAV2C37SFTBK",
+          "line_number": 36,
+          "new_sha256": "e5e741b3a4b2e9e8e4c40823a71af54889e04cff517bc015253226fffdc9a7f5",
+          "old_sha256": "1db74837ac5436ca9f5c715d40d60f0472c155cb6db1bac83ef363dc74fd9c86"
+        }
+      ],
+      "status": "updated",
+      "validation_errors": []
+    },
+    {
+      "file_changes": [],
+      "mission_id": "01KPWT82MV1YTXRKCZVNBYXDJM",
+      "mission_slug": "cli-interview-decision-moments-01KPWT82",
+      "quarantined_rows": 0,
+      "row_transformations": [],
+      "status": "unchanged",
+      "validation_errors": []
+    },
+    {
+      "file_changes": [],
+      "mission_id": "01KPWA0N4DX047S3NX734YRFVW",
+      "mission_slug": "decision-moment-v1-contract-freeze-01KPWA0N",
+      "quarantined_rows": 0,
+      "row_transformations": [],
+      "status": "unchanged",
+      "validation_errors": []
+    },
+    {
+      "file_changes": [],
+      "mission_id": "01KQHDE43F53RJJ5824QB544XD",
+      "mission_slug": "teamspace-event-contract-foundation-01KQHDE4",
+      "quarantined_rows": 0,
+      "row_transformations": [],
+      "status": "unchanged",
+      "validation_errors": []
+    }
+  ],
+  "repo_head": "81746a6f1cc2976c987334c1c4bf90fdb8b5afa0",
+  "run_id": "3e99f5e7764a1821",
+  "schema_version": "1.0.0",
+  "summary": {
+    "missions_error": 0,
+    "missions_total": 18,
+    "missions_unchanged": 3,
+    "missions_updated": 15,
+    "quarantined_rows": 0
+  },
+  "target_missions": [
+    "001-event-model-project-identity",
+    "002-github-gate-observability-contracts",
+    "003-status-state-model-contracts",
+    "004-canonical-event-contract",
+    "005-event-contract-conformance-suite",
+    "006-mission-collaboration-soft-coordination-contracts",
+    "007-glossary-semantic-integrity-contracts",
+    "008-mission-dossier-parity-event-contracts",
+    "009-dossier-contracts-remote-baseline-release",
+    "010-mission-audit-lifecycle-contracts",
+    "011-wp03-decisionpoint-lifecycle-contracts",
+    "012-wp04-events-connector-sync-contracts",
+    "013-per-user-identity-connector-events",
+    "014-mission-contract-cutover",
+    "additive-event-contracts-charter-phase456-01KP343J",
+    "cli-interview-decision-moments-01KPWT82",
+    "decision-moment-v1-contract-freeze-01KPWA0N",
+    "teamspace-event-contract-foundation-01KQHDE4"
+  ]
+}
