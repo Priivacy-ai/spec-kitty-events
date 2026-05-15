@@ -28,8 +28,8 @@ subtasks:
 - T004
 phase: Phase 1 - Contract
 assignee: ''
-agent: "claude:opus-4-7:implementer-ivan:implementer"
-shell_pid: "29923"
+agent: "claude:opus-4-7:reviewer:reviewer"
+shell_pid: "35870"
 history:
 - timestamp: '2026-05-15T11:00:00Z'
   lane: planned
@@ -206,3 +206,4 @@ Reviewer checks:
 - 2026-05-15T11:00:00Z – system – lane=planned – Prompt created
 - 2026-05-15T11:05:29Z – claude:opus-4-7:implementer-ivan:implementer – shell_pid=29923 – Assigned agent via action command
 - 2026-05-15T11:09:58Z – claude:opus-4-7:implementer-ivan:implementer – shell_pid=29923 – WP01 complete: Event.timestamp docstring strengthened + JSON schemas regenerated (lane branch) + canonical contract doc updated with R-T-01/02/03 (main branch directly, per spec-kitty planning-artifact guard) + CHANGELOG entry added. Charter gates: 1912 pytest passed, mypy --strict clean on models.py, schema drift check passes.
+- 2026-05-15T11:11:02Z – claude:opus-4-7:reviewer:reviewer – shell_pid=35870 – Started review via action command
