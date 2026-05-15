@@ -34,10 +34,10 @@ description: "Work packages for executable-event-timestamp-semantics-01KRNME2"
 **Prompt**: `tasks/WP01-contract-surface-strengthening.md`
 
 ### Included Subtasks
-- [ ] T001 Strengthen `Event.timestamp` Pydantic docstring/description text (WP01)
-- [ ] T002 Regenerate committed JSON Schemas so the timestamp description matches the new text (WP01)
-- [ ] T003 Update canonical contract document with Rule R-T-01/R-T-02/R-T-03 and `received_at` convention (WP01)
-- [ ] T004 Add CHANGELOG entry (WP01)
+- [x] T001 Strengthen `Event.timestamp` Pydantic docstring/description text (WP01)
+- [x] T002 Regenerate committed JSON Schemas so the timestamp description matches the new text (WP01)
+- [x] T003 Update canonical contract document with Rule R-T-01/R-T-02/R-T-03 and `received_at` convention (WP01)
+- [x] T004 Add CHANGELOG entry (WP01)
 
 ### Implementation Notes
 
