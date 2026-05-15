@@ -28,8 +28,8 @@ subtasks:
 - T004
 phase: Phase 1 - Contract
 assignee: ''
-agent: claude
-shell_pid: '29923'
+agent: "claude:opus-4-7:implementer-ivan:implementer"
+shell_pid: "29923"
 history:
 - timestamp: '2026-05-15T11:00:00Z'
   lane: planned
@@ -204,3 +204,4 @@ Reviewer checks:
 ## Activity Log
 
 - 2026-05-15T11:00:00Z – system – lane=planned – Prompt created
+- 2026-05-15T11:05:29Z – claude:opus-4-7:implementer-ivan:implementer – shell_pid=29923 – Assigned agent via action command
