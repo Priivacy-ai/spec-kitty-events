@@ -1,0 +1,21 @@
+{
+  "fixture_kind": "timestamp_semantics",
+  "notes": "Producer timestamp is 2026-01-01 (start of year); a synthetic consumer-side receipt time is 2026-05-15 (~134 days later). A correct consumer persists the producer's timestamp unchanged. This is the canonical 'old producer, recent receipt' scenario that exposed the original Teamspace Pulse bug.",
+  "expectation": "valid",
+  "envelope": {
+    "event_id": "01J6XW9KQT7M0YB3N4R5CQZ2EX",
+    "event_type": "WPStatusChanged",
+    "aggregate_id": "wp-historical-001",
+    "payload": {},
+    "timestamp": "2026-01-01T00:00:00+00:00",
+    "build_id": "build-historical-import-fixture",
+    "node_id": "node-fixture-producer-1",
+    "lamport_clock": 1,
+    "correlation_id": "01J6XW9KQT7M0YB3N4R5CQZ2EX",
+    "project_uuid": "00000000-0000-0000-0000-000000000001"
+  },
+  "consumer_simulation": {
+    "received_at": "2026-05-15T10:00:00+00:00",
+    "persisted_occurrence_time": "2026-01-01T00:00:00+00:00"
+  }
+}

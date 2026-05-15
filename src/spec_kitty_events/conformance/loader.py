@@ -31,6 +31,7 @@ _REPLAY_STREAM_TYPE = "replay_stream"
 _SPECIAL_FIXTURE_TYPES: frozenset[str] = frozenset({
     "replay_stream",
     "reducer_output",
+    "timestamp_semantics",
 })
 
 
