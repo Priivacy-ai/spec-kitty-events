@@ -1,0 +1,10 @@
+{
+  "mission_slug": "mission-001",
+  "mission_number": 1,
+  "wp_id": "WP01",
+  "wp_title": "Define canonical contracts and reducer semantics",
+  "wp_path": "kitty-specs/mission-001/tasks/WP01.md",
+  "depends_on": [],
+  "actor": "claude",
+  "created_at": "2026-05-15T12:15:30Z"
+}

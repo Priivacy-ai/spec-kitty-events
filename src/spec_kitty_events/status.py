@@ -107,6 +107,33 @@ LANE_ALIASES: Dict[str, Lane] = {"doing": Lane.IN_PROGRESS}
 WP_STATUS_CHANGED: str = "WPStatusChanged"
 
 
+def is_bootstrap_planned_event(payload: "StatusTransitionPayload") -> bool:
+    """Return True for forced bootstrap-planned status events.
+
+    A *bootstrap planned* event is a forced WPStatusChanged event whose
+    declared transition seeds initial ``PLANNED`` state for a work-package:
+
+    * ``force == True``
+    * ``to_lane == Lane.PLANNED``
+    * ``from_lane`` is ``None`` or ``Lane.PLANNED``
+
+    These events are emitted by producers such as Spec Kitty's
+    ``finalize-tasks`` bootstrap path when the local canonical event log is
+    empty for a WP. They are **initialize-only**: when reduced against state
+    that already records a later lane (claimed, in_progress, approved, done,
+    etc.), the reducer must ignore them rather than regress the WP.
+
+    Legitimate forced repair paths (e.g. ``approved -> planned`` with a real
+    review_ref) are distinguished by carrying a non-PLANNED ``from_lane`` and
+    are therefore *not* matched by this predicate.
+    """
+    return (
+        payload.force
+        and payload.to_lane == Lane.PLANNED
+        and payload.from_lane in (None, Lane.PLANNED)
+    )
+
+
 def normalize_lane(value: str) -> Lane:
     """Resolve a string to a Lane, handling aliases.
 
@@ -583,6 +610,29 @@ def reduce_status_events(events: Sequence[Event]) -> ReducedStatus:
         for event, payload in group:
             wp_id = payload.wp_id
             snapped = snapshot[wp_id]
+
+            # Bootstrap-planned events are initialize-only. They may seed
+            # initial PLANNED state but must never regress a WP that already
+            # has a later lane recorded (issue spec-kitty-events#25).
+            if is_bootstrap_planned_event(payload) and snapped is not None:
+                current_lane_value = (
+                    snapped.current_lane.value
+                    if isinstance(snapped.current_lane, Lane)
+                    else str(snapped.current_lane)
+                )
+                anomalies.append(
+                    TransitionAnomaly(
+                        event_id=event.event_id,
+                        wp_id=wp_id,
+                        from_lane=payload.from_lane,
+                        to_lane=payload.to_lane,
+                        reason=(
+                            "bootstrap planned ignored: WP already "
+                            f"initialized at {current_lane_value}"
+                        ),
+                    )
+                )
+                continue
 
             # Check from_lane matches state at group start
             expected_lane = snapped.current_lane if snapped else None

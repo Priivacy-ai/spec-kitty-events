@@ -90,6 +90,86 @@
       "min_version": "3.0.0"
     },
     {
+      "id": "project-initialized-valid",
+      "path": "events/valid/project_initialized.json",
+      "expected_result": "valid",
+      "event_type": "ProjectInitialized",
+      "notes": "Valid ProjectInitializedPayload with project_uuid, actor, runtime_version",
+      "min_version": "5.1.0"
+    },
+    {
+      "id": "specify-started-valid",
+      "path": "events/valid/specify_started.json",
+      "expected_result": "valid",
+      "event_type": "SpecifyStarted",
+      "notes": "Valid SpecifyStartedPayload",
+      "min_version": "5.1.0"
+    },
+    {
+      "id": "specify-completed-valid",
+      "path": "events/valid/specify_completed.json",
+      "expected_result": "valid",
+      "event_type": "SpecifyCompleted",
+      "notes": "Valid SpecifyCompletedPayload with artifact path",
+      "min_version": "5.1.0"
+    },
+    {
+      "id": "plan-started-valid",
+      "path": "events/valid/plan_started.json",
+      "expected_result": "valid",
+      "event_type": "PlanStarted",
+      "notes": "Valid PlanStartedPayload",
+      "min_version": "5.1.0"
+    },
+    {
+      "id": "plan-completed-valid",
+      "path": "events/valid/plan_completed.json",
+      "expected_result": "valid",
+      "event_type": "PlanCompleted",
+      "notes": "Valid PlanCompletedPayload with artifact path",
+      "min_version": "5.1.0"
+    },
+    {
+      "id": "tasks-started-valid",
+      "path": "events/valid/tasks_started.json",
+      "expected_result": "valid",
+      "event_type": "TasksStarted",
+      "notes": "Valid TasksStartedPayload",
+      "min_version": "5.1.0"
+    },
+    {
+      "id": "tasks-completed-valid",
+      "path": "events/valid/tasks_completed.json",
+      "expected_result": "valid",
+      "event_type": "TasksCompleted",
+      "notes": "Valid TasksCompletedPayload with wp_count",
+      "min_version": "5.1.0"
+    },
+    {
+      "id": "wp-created-valid",
+      "path": "events/valid/wp_created.json",
+      "expected_result": "valid",
+      "event_type": "WPCreated",
+      "notes": "Valid WPCreatedPayload with title, path, dependencies",
+      "min_version": "5.1.0"
+    },
+    {
+      "id": "wp-created-missing-title-invalid",
+      "path": "events/invalid/wp_created_missing_title.json",
+      "expected_result": "invalid",
+      "event_type": "WPCreated",
+      "notes": "WPCreatedPayload missing required wp_title",
+      "min_version": "5.1.0"
+    },
+    {
+      "id": "project-initialized-missing-actor-invalid",
+      "path": "events/invalid/project_initialized_missing_actor.json",
+      "expected_result": "invalid",
+      "event_type": "ProjectInitialized",
+      "notes": "ProjectInitializedPayload missing required actor",
+      "min_version": "5.1.0"
+    },
+    {
       "id": "event-missing-correlation-id",
       "path": "events/invalid/event_missing_correlation_id.json",
       "expected_result": "invalid",

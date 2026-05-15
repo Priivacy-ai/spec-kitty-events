@@ -59,6 +59,14 @@ VALID_EVENT_FILES = [
     ("events/valid/mission_cancelled.json", "MissionCancelled"),
     ("events/valid/phase_entered.json", "PhaseEntered"),
     ("events/valid/review_rollback.json", "ReviewRollback"),
+    ("events/valid/project_initialized.json", "ProjectInitialized"),
+    ("events/valid/specify_started.json", "SpecifyStarted"),
+    ("events/valid/specify_completed.json", "SpecifyCompleted"),
+    ("events/valid/plan_started.json", "PlanStarted"),
+    ("events/valid/plan_completed.json", "PlanCompleted"),
+    ("events/valid/tasks_started.json", "TasksStarted"),
+    ("events/valid/tasks_completed.json", "TasksCompleted"),
+    ("events/valid/wp_created.json", "WPCreated"),
 ]
 
 
@@ -94,10 +102,15 @@ class TestValidEventFixtures:
             f"Conformance failure for {path}: {result.model_violations}"
         )
 
-    def test_thirteen_valid_event_fixtures_exist(self) -> None:
+    def test_canonical_valid_event_fixtures_exist(self) -> None:
         valid_dir = _FIXTURES_DIR / "events" / "valid"
         files = sorted(valid_dir.glob("*.json"))
-        assert len(files) == 13, f"Expected 13 valid event fixtures, got {len(files)}"
+        # 13 historical fixtures (envelope variants, status, gates, mission, phase, rollback)
+        # + 8 canonical lifecycle fixtures (project init / specify / plan / tasks / WP created).
+        assert len(files) == 21, (
+            f"Expected 21 valid event fixtures (13 historical + 8 canonical lifecycle), "
+            f"got {len(files)}"
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -115,6 +128,8 @@ INVALID_EVENT_FILES = [
     # an invalid case. Fixture cleanup is owned by WP05.
     ("events/invalid/wp_status_changed_force_no_reason.json", "WPStatusChanged"),
     ("events/invalid/gate_failed_invalid_conclusion.json", "GateFailed"),
+    ("events/invalid/wp_created_missing_title.json", "WPCreated"),
+    ("events/invalid/project_initialized_missing_actor.json", "ProjectInitialized"),
 ]
 
 CUTOVER_INVALID_EVENT_FILES = [
@@ -437,12 +452,15 @@ class TestLoadFixtures:
     def test_events_valid_cases_expected_valid_true(self) -> None:
         cases = load_fixtures("events")
         valid_cases = [c for c in cases if c.expected_valid]
-        assert len(valid_cases) == 13
+        # 13 historical fixtures + 8 canonical lifecycle fixtures
+        # (project init, specify/plan/tasks lifecycle, WPCreated).
+        assert len(valid_cases) == 21
 
     def test_events_invalid_cases_expected_valid_false(self) -> None:
         cases = load_fixtures("events")
         invalid_cases = [c for c in cases if not c.expected_valid]
-        assert len(invalid_cases) == 10
+        # 10 historical invalid fixtures + 2 new lifecycle invalid fixtures.
+        assert len(invalid_cases) == 12
 
     def test_fixture_case_has_payload(self) -> None:
         cases = load_fixtures("events")

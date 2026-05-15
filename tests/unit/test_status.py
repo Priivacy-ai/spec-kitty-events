@@ -1373,3 +1373,208 @@ class TestStatusTransitionPayloadActor:
                 actor={},
                 execution_mode=ExecutionMode.WORKTREE,
             )
+
+
+# ---------------------------------------------------------------------------
+# Section 8: Bootstrap planned events are initialize-only (spec-kitty-events#25)
+# ---------------------------------------------------------------------------
+
+
+class TestBootstrapPlannedInitializeOnly:
+    """Forced bootstrap planned events must never regress known later state.
+
+    Producers (e.g. Spec Kitty's ``finalize-tasks`` bootstrap path) emit
+    forced ``planned`` events to seed initial WP state when the local
+    canonical event log is empty. When such an event arrives *late* —
+    e.g. via a merged-in stream from another worktree — the reducer must
+    treat it as initialize-only and leave already-known approved/done
+    state intact.
+    """
+
+    @staticmethod
+    def _approved_pair(
+        wp_id: str = "WP01",
+        base_t: datetime | None = None,
+    ) -> list[Event]:
+        base_t = base_t or datetime(2026, 1, 1, tzinfo=timezone.utc)
+        evidence = DoneEvidence(
+            repos=[RepoEvidence(repo="r", branch="main", commit="abc")],
+            verification=[],
+            review=ReviewVerdict(reviewer="alice", verdict="approved"),
+        )
+        return [
+            _make_event("01HV0000000000000000B00001", wp_id, None, Lane.PLANNED, 1, timestamp=base_t),
+            _make_event("01HV0000000000000000B00002", wp_id, Lane.PLANNED, Lane.CLAIMED, 2, timestamp=base_t + timedelta(seconds=1)),
+            _make_event("01HV0000000000000000B00003", wp_id, Lane.CLAIMED, Lane.IN_PROGRESS, 3, timestamp=base_t + timedelta(seconds=2)),
+            _make_event("01HV0000000000000000B00004", wp_id, Lane.IN_PROGRESS, Lane.APPROVED, 4, timestamp=base_t + timedelta(seconds=3), evidence=evidence),
+        ]
+
+    def test_late_bootstrap_planned_planned_does_not_regress_approved(self) -> None:
+        base_t = datetime(2026, 1, 1, tzinfo=timezone.utc)
+        approved = self._approved_pair("WP01", base_t)
+        # Late bootstrap event arriving with a higher lamport clock.
+        late_bootstrap = _make_event(
+            "01HV0000000000000000B00099",
+            "WP01",
+            Lane.PLANNED,
+            Lane.PLANNED,
+            10,
+            timestamp=base_t + timedelta(hours=1),
+            force=True,
+            reason="canonical bootstrap",
+        )
+        result = reduce_status_events(approved + [late_bootstrap])
+        assert result.wp_states["WP01"].current_lane == Lane.APPROVED
+        assert result.wp_states["WP01"].last_event_id == "01HV0000000000000000B00004"
+        # The ignored bootstrap is surfaced as an anomaly for observability.
+        assert any(
+            a.event_id == "01HV0000000000000000B00099"
+            and "bootstrap planned ignored" in a.reason
+            for a in result.anomalies
+        )
+
+    def test_late_bootstrap_none_planned_does_not_regress_approved(self) -> None:
+        """A forced bootstrap that uses ``from_lane=None`` is also initialize-only."""
+        base_t = datetime(2026, 1, 1, tzinfo=timezone.utc)
+        approved = self._approved_pair("WP01", base_t)
+        late_bootstrap = _make_event(
+            "01HV0000000000000000B0009A",
+            "WP01",
+            None,
+            Lane.PLANNED,
+            11,
+            timestamp=base_t + timedelta(hours=1),
+            force=True,
+            reason="canonical bootstrap",
+        )
+        result = reduce_status_events(approved + [late_bootstrap])
+        assert result.wp_states["WP01"].current_lane == Lane.APPROVED
+
+    def test_late_bootstrap_does_not_regress_done(self) -> None:
+        base_t = datetime(2026, 1, 1, tzinfo=timezone.utc)
+        evidence = DoneEvidence(
+            repos=[RepoEvidence(repo="r", branch="main", commit="abc")],
+            verification=[],
+            review=ReviewVerdict(reviewer="alice", verdict="approved"),
+        )
+        prior = [
+            _make_event("01HV0000000000000000C00001", "WP01", None, Lane.PLANNED, 1, timestamp=base_t),
+            _make_event("01HV0000000000000000C00002", "WP01", Lane.PLANNED, Lane.CLAIMED, 2, timestamp=base_t + timedelta(seconds=1)),
+            _make_event("01HV0000000000000000C00003", "WP01", Lane.CLAIMED, Lane.IN_PROGRESS, 3, timestamp=base_t + timedelta(seconds=2)),
+            _make_event("01HV0000000000000000C00004", "WP01", Lane.IN_PROGRESS, Lane.FOR_REVIEW, 4, timestamp=base_t + timedelta(seconds=3)),
+            _make_event("01HV0000000000000000C00005", "WP01", Lane.FOR_REVIEW, Lane.DONE, 5, timestamp=base_t + timedelta(seconds=4), evidence=evidence),
+        ]
+        late_bootstrap = _make_event(
+            "01HV0000000000000000C00099",
+            "WP01",
+            Lane.PLANNED,
+            Lane.PLANNED,
+            20,
+            timestamp=base_t + timedelta(hours=1),
+            force=True,
+            reason="canonical bootstrap",
+        )
+        result = reduce_status_events(prior + [late_bootstrap])
+        assert result.wp_states["WP01"].current_lane == Lane.DONE
+
+    def test_initial_bootstrap_still_establishes_planned_when_no_prior_state(self) -> None:
+        """When the WP has no prior state, the bootstrap seeds PLANNED cleanly."""
+        base_t = datetime(2026, 1, 1, tzinfo=timezone.utc)
+        bootstrap = _make_event(
+            "01HV0000000000000000D00001",
+            "WP02",
+            Lane.PLANNED,
+            Lane.PLANNED,
+            1,
+            timestamp=base_t,
+            force=True,
+            reason="canonical bootstrap",
+        )
+        result = reduce_status_events([bootstrap])
+        assert result.wp_states["WP02"].current_lane == Lane.PLANNED
+        assert result.anomalies == []
+
+    def test_initial_bootstrap_none_to_planned_establishes_planned(self) -> None:
+        base_t = datetime(2026, 1, 1, tzinfo=timezone.utc)
+        bootstrap = _make_event(
+            "01HV0000000000000000D00002",
+            "WP03",
+            None,
+            Lane.PLANNED,
+            1,
+            timestamp=base_t,
+            force=True,
+            reason="canonical bootstrap",
+        )
+        result = reduce_status_events([bootstrap])
+        assert result.wp_states["WP03"].current_lane == Lane.PLANNED
+        assert result.anomalies == []
+
+    def test_legitimate_forced_repair_from_approved_to_planned_still_applies(self) -> None:
+        """Forced rollback from APPROVED to PLANNED is not 'bootstrap planned'.
+
+        The distinguishing feature is ``from_lane != PLANNED``. A forced
+        rollback that knowingly cites the WP's real prior lane is a
+        legitimate repair path and the reducer applies it.
+        """
+        base_t = datetime(2026, 1, 1, tzinfo=timezone.utc)
+        approved = self._approved_pair("WP01", base_t)
+        forced_repair = _make_event(
+            "01HV0000000000000000E00001",
+            "WP01",
+            Lane.APPROVED,
+            Lane.PLANNED,
+            10,
+            timestamp=base_t + timedelta(hours=1),
+            force=True,
+            reason="reviewer requested redo",
+            review_ref="PR#42",
+        )
+        result = reduce_status_events(approved + [forced_repair])
+        assert result.wp_states["WP01"].current_lane == Lane.PLANNED
+
+    def test_bootstrap_to_intermediate_lane_still_applies(self) -> None:
+        """A forced bootstrap to IN_PROGRESS (frontmatter migration) still applies.
+
+        Only PLANNED bootstraps are initialize-only. Forced events that
+        migrate a WP to a mid-lifecycle lane (e.g. ``planned -> in_progress``
+        with ``force=True``) remain legitimate state-establishing events,
+        even when prior state exists, because they explicitly carry the
+        intended lane.
+        """
+        base_t = datetime(2026, 1, 1, tzinfo=timezone.utc)
+        approved = self._approved_pair("WP01", base_t)
+        forced_mid = _make_event(
+            "01HV0000000000000000E00002",
+            "WP01",
+            Lane.PLANNED,
+            Lane.IN_PROGRESS,
+            10,
+            timestamp=base_t + timedelta(hours=1),
+            force=True,
+            reason="historical_frontmatter_to_jsonl:v1",
+        )
+        result = reduce_status_events(approved + [forced_mid])
+        assert result.wp_states["WP01"].current_lane == Lane.IN_PROGRESS
+
+    def test_predicate_signatures(self) -> None:
+        """is_bootstrap_planned_event matches structural discriminator only."""
+        from spec_kitty_events import is_bootstrap_planned_event
+
+        def _p(from_lane: Lane | None, to_lane: Lane, force: bool) -> StatusTransitionPayload:
+            return StatusTransitionPayload(
+                mission_slug="m",
+                wp_id="WP01",
+                from_lane=from_lane,
+                to_lane=to_lane,
+                actor="test",
+                execution_mode=ExecutionMode.WORKTREE,
+                force=force,
+                reason="canonical bootstrap" if force else None,
+            )
+
+        assert is_bootstrap_planned_event(_p(None, Lane.PLANNED, True))
+        assert is_bootstrap_planned_event(_p(Lane.PLANNED, Lane.PLANNED, True))
+        assert not is_bootstrap_planned_event(_p(None, Lane.PLANNED, False))
+        assert not is_bootstrap_planned_event(_p(Lane.CLAIMED, Lane.PLANNED, True))
+        assert not is_bootstrap_planned_event(_p(Lane.PLANNED, Lane.CLAIMED, True))

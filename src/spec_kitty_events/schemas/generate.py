@@ -27,6 +27,16 @@ from spec_kitty_events.lifecycle import (
     PhaseEnteredPayload,
     ReviewRollbackPayload,
 )
+from spec_kitty_events.project_lifecycle import (
+    PlanCompletedPayload,
+    PlanStartedPayload,
+    ProjectInitializedPayload,
+    SpecifyCompletedPayload,
+    SpecifyStartedPayload,
+    TasksCompletedPayload,
+    TasksStartedPayload,
+    WPCreatedPayload,
+)
 from spec_kitty_events.cutover import CutoverArtifact
 from spec_kitty_events.gates import (
     GatePassedPayload,
@@ -161,6 +171,15 @@ PYDANTIC_MODELS: List[tuple[str, Type[BaseModel]]] = [
     ("mission_cancelled_payload", MissionCancelledPayload),
     ("phase_entered_payload", PhaseEnteredPayload),
     ("review_rollback_payload", ReviewRollbackPayload),
+    # Canonical project / artifact / WP lifecycle event contracts
+    ("project_initialized_payload", ProjectInitializedPayload),
+    ("specify_started_payload", SpecifyStartedPayload),
+    ("specify_completed_payload", SpecifyCompletedPayload),
+    ("plan_started_payload", PlanStartedPayload),
+    ("plan_completed_payload", PlanCompletedPayload),
+    ("tasks_started_payload", TasksStartedPayload),
+    ("tasks_completed_payload", TasksCompletedPayload),
+    ("wp_created_payload", WPCreatedPayload),
     # Collaboration identity models (V1: ParticipantIdentity gains external_refs)
     ("participant_identity", ParticipantIdentity),
     ("participant_external_refs", ParticipantExternalRefs),
