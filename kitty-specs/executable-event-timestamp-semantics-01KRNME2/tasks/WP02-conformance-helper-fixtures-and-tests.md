@@ -26,7 +26,8 @@ subtasks:
 - T009
 phase: Phase 2 - Conformance
 assignee: ''
-agent: claude
+agent: "claude:opus-4-7:implementer-ivan:implementer"
+shell_pid: "36118"
 history:
 - timestamp: '2026-05-15T11:00:00Z'
   lane: planned
@@ -230,3 +231,4 @@ Reviewer checks:
 ## Activity Log
 
 - 2026-05-15T11:00:00Z – system – lane=planned – Prompt created
+- 2026-05-15T11:11:54Z – claude:opus-4-7:implementer-ivan:implementer – shell_pid=36118 – Started implementation via action command
