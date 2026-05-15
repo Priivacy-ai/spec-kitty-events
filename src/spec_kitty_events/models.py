@@ -58,7 +58,23 @@ def normalize_event_id(v: object) -> str:
 
 
 class Event(BaseModel):
-    """Immutable event with causal metadata for distributed conflict detection."""
+    """Immutable event with causal metadata for distributed conflict detection.
+
+    Timestamp semantics
+    -------------------
+
+    The ``timestamp`` field is the producer-assigned wall-clock occurrence time
+    of the modelled event. Consumers (SaaS ingestion, dashboards, audit, sync
+    drains, projections, scorecards) MUST preserve this value end-to-end and
+    MUST NOT substitute server-receipt, import, drain, or replay time for it.
+    Consumer-side receipt/import time, if persisted, MUST be stored under a
+    distinct field name — the recommended name is ``received_at``.
+
+    See ``kitty-specs/teamspace-event-contract-foundation-01KQHDE4/data-model.md``
+    (Timestamp Semantics: Rules R-T-01, R-T-02, R-T-03) for the authoritative
+    rules, and ``spec_kitty_events.conformance.assert_producer_occurrence_preserved``
+    for an executable consumer-side conformance helper.
+    """
 
     model_config = ConfigDict(frozen=True)
 
@@ -85,7 +101,17 @@ class Event(BaseModel):
     )
     timestamp: datetime = Field(
         ...,
-        description="Wall-clock timestamp (human-readable, not used for ordering)"
+        description=(
+            "Producer-assigned wall-clock occurrence time (ISO-8601 UTC). "
+            "Records when the modelled event actually happened on the producing "
+            "system (CLI machine, runtime worker, tracker subsystem). Consumers "
+            "MUST preserve this value through ingestion, persistence, projection, "
+            "reduction, and serialization, and MUST NOT substitute "
+            "receipt/import/server time for this field. Consumer receipt time, "
+            "if persisted, MUST be stored under a distinct field "
+            "(recommended: 'received_at'). Not used for ordering — Lamport "
+            "clock and node_id own ordering."
+        ),
     )
     build_id: str = Field(
         ...,

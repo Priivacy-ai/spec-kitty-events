@@ -1717,6 +1717,33 @@
       "event_type": "<lane-mapping>",
       "notes": "WP05 class taxonomy: legacy 'awaiting-review' synonym is currently unmapped; must reject with UNKNOWN_LANE.",
       "min_version": "5.0.0"
+    },
+    {
+      "id": "timestamp-semantics-old-producer-recent-receipt",
+      "path": "timestamp_semantics/valid/old_producer_recent_receipt.json",
+      "expected_result": "valid",
+      "event_type": "<timestamp-semantics>",
+      "fixture_type": "timestamp_semantics",
+      "notes": "Mission executable-event-timestamp-semantics-01KRNME2: producer timestamp older than fixture's synthetic receipt time by ~134 days; correct consumer preserves producer time.",
+      "min_version": "5.1.0"
+    },
+    {
+      "id": "timestamp-semantics-live-event-producer-equals-receipt",
+      "path": "timestamp_semantics/valid/live_event_producer_equals_receipt.json",
+      "expected_result": "valid",
+      "event_type": "<timestamp-semantics>",
+      "fixture_type": "timestamp_semantics",
+      "notes": "Mission executable-event-timestamp-semantics-01KRNME2: live event where producer time equals receipt time; helper MUST accept equality edge case.",
+      "min_version": "5.1.0"
+    },
+    {
+      "id": "timestamp-semantics-consumer-substituted-receipt-time",
+      "path": "timestamp_semantics/invalid/consumer_substituted_receipt_time.json",
+      "expected_result": "invalid",
+      "event_type": "<timestamp-semantics>",
+      "fixture_type": "timestamp_semantics",
+      "notes": "Mission executable-event-timestamp-semantics-01KRNME2: consumer persisted receipt time instead of producer time; helper MUST raise TimestampSubstitutionError.",
+      "min_version": "5.1.0"
     }
   ],
   "classes": {

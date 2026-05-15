@@ -1,0 +1,35 @@
+{
+  "event_count": 14,
+  "last_event_id": "01KRNNRQEPW1XG4QSFRKWEC8XP",
+  "materialized_at": "2026-05-15T11:18:54.166388+00:00",
+  "mission_number": "",
+  "mission_slug": "executable-event-timestamp-semantics-01KRNME2",
+  "mission_type": "software-dev",
+  "summary": {
+    "approved": 0,
+    "blocked": 0,
+    "canceled": 0,
+    "claimed": 0,
+    "done": 2,
+    "for_review": 0,
+    "in_progress": 0,
+    "in_review": 0,
+    "planned": 0
+  },
+  "work_packages": {
+    "WP01": {
+      "actor": "user",
+      "force_count": 2,
+      "lane": "done",
+      "last_event_id": "01KRNNRNCNEAB3T2AMDYZBGY0E",
+      "last_transition_at": "2026-05-15T11:18:52.053203+00:00"
+    },
+    "WP02": {
+      "actor": "user",
+      "force_count": 2,
+      "lane": "done",
+      "last_event_id": "01KRNNRQEPW1XG4QSFRKWEC8XP",
+      "last_transition_at": "2026-05-15T11:18:54.166388+00:00"
+    }
+  }
+}

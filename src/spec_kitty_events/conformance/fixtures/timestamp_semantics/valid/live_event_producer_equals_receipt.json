@@ -1,0 +1,21 @@
+{
+  "fixture_kind": "timestamp_semantics",
+  "notes": "Live (near-real-time) event: producer timestamp equals receipt time within the synthetic fixture. The helper MUST accept this edge case; conformance asserts equality of canonical occurrence time, not inequality of producer vs receipt time.",
+  "expectation": "valid",
+  "envelope": {
+    "event_id": "01J6XW9KQT7M0YB3N4R5CQZ2FY",
+    "event_type": "WPStatusChanged",
+    "aggregate_id": "wp-live-001",
+    "payload": {},
+    "timestamp": "2026-05-15T10:00:00+00:00",
+    "build_id": "build-live-fixture",
+    "node_id": "node-fixture-producer-1",
+    "lamport_clock": 2,
+    "correlation_id": "01J6XW9KQT7M0YB3N4R5CQZ2FY",
+    "project_uuid": "00000000-0000-0000-0000-000000000001"
+  },
+  "consumer_simulation": {
+    "received_at": "2026-05-15T10:00:00+00:00",
+    "persisted_occurrence_time": "2026-05-15T10:00:00+00:00"
+  }
+}

@@ -19,7 +19,7 @@ The TeamSpace 3.0.x event wrapper. Every event accepted by the contract package 
 | `event_type` | string (enum) | yes | One of the canonical event types: `MissionCreated`, `WPStatusChanged`, `MissionClosed`, plus the existing event-type catalog |
 | `aggregate_id` | string | yes | Identifier of the entity this event modifies |
 | `payload` | object (Typed Payload) | yes | Per-event-type payload, validated against the corresponding typed payload schema |
-| `timestamp` | string (ISO-8601 UTC) | yes | Producer-assigned wall-clock timestamp |
+| `timestamp` | string (ISO-8601 UTC) | yes | Producer-assigned wall-clock **occurrence** time. See *Timestamp Semantics* below (Rules R-T-01, R-T-02, R-T-03) — consumers MUST preserve and MUST NOT substitute receipt/import/server time. |
 | `build_id` | string | yes | Canonical checkout or worktree identity that produced this event |
 | `node_id` | string | yes | Causal emitter identity used for Lamport ordering |
 | `lamport_clock` | integer (>= 0) | yes | Lamport logical clock value (monotonically increasing) |
@@ -37,6 +37,20 @@ The TeamSpace 3.0.x event wrapper. Every event accepted by the contract package 
 - `schema_version` must match the package's cutover-contract version on accept (the cutover artifact's `cutover_contract_version` constant — `3.0.0` on first ship of this mission). The package version (e.g. `5.0.0`) is *separate* from the envelope schema version on the wire.
 
 **Source of truth**: `src/spec_kitty_events/models.py` (`Event` Pydantic model) plus the typed payload models in `src/spec_kitty_events/lifecycle.py` and `src/spec_kitty_events/status.py`, with committed JSON Schemas under `src/spec_kitty_events/schemas/`.
+
+---
+
+### Timestamp Semantics
+
+The `Event.timestamp` field is the canonical producer occurrence time. Three rules govern its use across all consumers.
+
+**Rule R-T-01 — Producer wins**: The producer assigns `timestamp` to the wall-clock moment the modelled event actually occurred on the producing system (CLI machine, runtime worker, tracker subsystem, internal services). There is no automatic fallback to a server clock. Consumers MUST preserve this value through ingestion, persistence, projection, reduction, replay, and serialization.
+
+**Rule R-T-02 — No name collision**: Consumers MUST NOT store receipt, import, ingest, drain, or server-clock time under any field whose unqualified name is `timestamp`. Consumer storage of receipt/import time MUST use a clearly distinct field name. The recommended consumer-owned name is `received_at`. `received_at` is NOT a field on the canonical envelope; it is a separate, consumer-owned concept.
+
+**Rule R-T-03 — Ordering invariance**: Reducer ordering and replay ordering continue to rely on `lamport_clock` / `node_id`. The producer `timestamp` is human-readable provenance, not an ordering key. Strengthening producer-occurrence semantics does NOT change ordering behaviour.
+
+**Executable enforcement**: Consumers SHOULD assert these rules in their own test suites using `spec_kitty_events.conformance.assert_producer_occurrence_preserved` and the committed fixtures under `src/spec_kitty_events/conformance/fixtures/timestamp_semantics/`. The helper raises `TimestampSubstitutionError` when a consumer substitutes receipt time for canonical occurrence time. See `kitty-specs/executable-event-timestamp-semantics-01KRNME2/contracts/timestamp-semantics.md` for the contract.
 
 ---
 

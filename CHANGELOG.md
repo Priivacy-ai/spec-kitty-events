@@ -5,6 +5,46 @@ All notable changes to spec-kitty-events will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+
+- **Executable timestamp semantics** (additive, wire-compatible). The
+  `Event.timestamp` field's documentation, model docstring, and committed
+  JSON Schema description now explicitly state that the value is the
+  producer-assigned wall-clock occurrence time, and that consumers MUST NOT
+  substitute server-receipt, import, drain, or replay time for it. The wire
+  identifier (`timestamp`) is unchanged. Mission:
+  `executable-event-timestamp-semantics-01KRNME2`.
+  Canonical authority: `kitty-specs/teamspace-event-contract-foundation-01KQHDE4/data-model.md`
+  (Timestamp Semantics: Rules R-T-01 producer wins, R-T-02 no name collision,
+  R-T-03 ordering invariance).
+
+### Added
+
+- `spec_kitty_events.conformance.assert_producer_occurrence_preserved` and
+  `spec_kitty_events.conformance.TimestampSubstitutionError` — reusable
+  consumer-side conformance helper and typed error for asserting that a
+  consumer's persisted occurrence-time value equals the producer's canonical
+  `timestamp`. Consumers SHOULD add a regression test calling this helper
+  against the new committed fixtures in
+  `src/spec_kitty_events/conformance/fixtures/timestamp_semantics/`.
+
+### Migration Note
+
+Consumers that previously stored server-receipt, import, drain, or replay
+time under a column or field literally named `timestamp` (and used that value
+as canonical event occurrence time in projections, scorecards, audit logs,
+or activity feeds) must:
+
+1. Add a separately named slot for receipt time (recommended: `received_at`).
+2. Preserve the producer's `timestamp` end-to-end through ingestion and
+   projection.
+3. Add a regression test calling
+   `assert_producer_occurrence_preserved(envelope, persisted_occurrence_time)`
+   against the "old producer / recent receipt" fixture to prove the ingestion
+   path does not collapse the two values.
+
 ## [5.0.0] - 2026-05-01
 
 > **Package 5.0.0; envelope schema remains 3.0.0.** This release is a

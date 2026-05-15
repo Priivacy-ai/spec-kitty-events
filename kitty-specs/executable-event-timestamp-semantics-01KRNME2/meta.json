@@ -1,0 +1,14 @@
+{
+  "created_at": "2026-05-15T10:55:36.474139+00:00",
+  "friendly_name": "Executable Event Timestamp Semantics",
+  "mission_id": "01KRNME2GSD7XZAS4Y0AGH8MPJ",
+  "mission_number": null,
+  "mission_slug": "executable-event-timestamp-semantics-01KRNME2",
+  "mission_type": "software-dev",
+  "purpose_context": "A SaaS bug exposed that the canonical event contract treats 'timestamp' as the producer's occurrence time, but consumers were able to drift into using server receipt time, causing old historical events to appear as recent activity in dashboards. This mission strengthens the event contract with executable schemas, named receipt-time concepts, conformance fixtures, and reusable consumer-side conformance checks that fail loudly if a consumer reassigns the canonical timestamp.",
+  "purpose_tldr": "Make 'event timestamp = producer occurrence time' executable so consumers cannot substitute receipt or import time.",
+  "slug": "executable-event-timestamp-semantics-01KRNME2",
+  "target_branch": "main",
+  "vcs": "git",
+  "vcs_locked_at": "2026-05-15T11:05:28.111260+00:00"
+}

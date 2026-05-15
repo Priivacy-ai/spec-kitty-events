@@ -1,0 +1,52 @@
+{
+  "version": 1,
+  "mission_slug": "executable-event-timestamp-semantics-01KRNME2",
+  "mission_id": "01KRNME2GSD7XZAS4Y0AGH8MPJ",
+  "mission_branch": "kitty/mission-executable-event-timestamp-semantics-01KRNME2",
+  "target_branch": "main",
+  "lanes": [
+    {
+      "lane_id": "lane-a",
+      "wp_ids": [
+        "WP01",
+        "WP02"
+      ],
+      "write_scope": [
+        "CHANGELOG.md",
+        "kitty-specs/teamspace-event-contract-foundation-01KQHDE4/data-model.md",
+        "src/spec_kitty_events/conformance/__init__.py",
+        "src/spec_kitty_events/conformance/fixtures/manifest.json",
+        "src/spec_kitty_events/conformance/fixtures/timestamp_semantics/**",
+        "src/spec_kitty_events/conformance/tests/test_timestamp_semantics.py",
+        "src/spec_kitty_events/conformance/timestamp_semantics.py",
+        "src/spec_kitty_events/models.py",
+        "src/spec_kitty_events/schemas/**"
+      ],
+      "predicted_surfaces": [
+        "api",
+        "artifact-rendering",
+        "tests"
+      ],
+      "depends_on_lanes": [],
+      "parallel_group": 0
+    }
+  ],
+  "computed_at": "2026-05-15T11:04:20.692993+00:00",
+  "computed_from": "dependency_graph+ownership",
+  "planning_artifact_wps": [],
+  "collapse_report": {
+    "events": [
+      {
+        "wp_a": "WP02",
+        "wp_b": "WP01",
+        "rule": "dependency",
+        "evidence": "WP02 depends on WP01"
+      }
+    ],
+    "total_merges": 1,
+    "independent_wps_collapsed": 0,
+    "by_rule": {
+      "dependency": 1
+    }
+  }
+}
