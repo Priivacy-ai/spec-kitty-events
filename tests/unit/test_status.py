@@ -1385,8 +1385,8 @@ class TestBootstrapPlannedInitializeOnly:
 
     Producers (e.g. Spec Kitty's ``finalize-tasks`` bootstrap path) emit
     forced ``planned`` events to seed initial WP state when the local
-    canonical event log is empty. When such an event arrives *late* —
-    e.g. via a merged-in stream from another worktree — the reducer must
+    canonical event log is empty. When such an event arrives *late*,
+    e.g. via a merged-in stream from another worktree, the reducer must
     treat it as initialize-only and leave already-known approved/done
     state intact.
     """

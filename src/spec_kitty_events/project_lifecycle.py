@@ -24,7 +24,7 @@ Ordering, idempotency, and replay
   ``lamport_clock`` and ``event_id`` keys (see :mod:`spec_kitty_events.status`).
 * Each contract is *idempotent on replay*: re-applying the same event by
   ``event_id`` is a no-op for consumers that keep an ``event_id`` ledger. The
-  payloads are intentionally minimal and additive — they never carry derived
+  payloads are intentionally minimal and additive; they never carry derived
   state that conflicts with later events.
 * Consumers are expected to materialize state as follows:
 
@@ -34,7 +34,7 @@ Ordering, idempotency, and replay
      mission aggregate. SpecifyStarted/PlanStarted/TasksStarted events for
      that mission MUST follow ``MissionCreated``.
   3. For each artifact phase the canonical order is
-     ``<Phase>Started`` → ``<Phase>Completed``. Re-running a phase emits a
+     ``<Phase>Started`` then ``<Phase>Completed``. Re-running a phase emits a
      fresh ``<Phase>Started`` with a higher ``lamport_clock``; replay is
      order-preserving so the latest ``<Phase>Completed`` wins.
   4. ``WPCreated`` events MUST precede the first ``WPStatusChanged`` event for
@@ -60,7 +60,7 @@ from typing import FrozenSet, List, Optional
 from pydantic import BaseModel, ConfigDict, Field
 
 
-# ── Event type string constants ─────────────────────────────────────────────
+# Event type string constants
 
 PROJECT_INITIALIZED: str = "ProjectInitialized"
 
@@ -100,7 +100,7 @@ CANONICAL_LIFECYCLE_EVENT_TYPES: FrozenSet[str] = (
 )
 
 
-# ── Enums ───────────────────────────────────────────────────────────────────
+# Enums
 
 
 class ArtifactPhase(str, Enum):
@@ -111,7 +111,7 @@ class ArtifactPhase(str, Enum):
     TASKS = "tasks"
 
 
-# ── Payload models ──────────────────────────────────────────────────────────
+# Payload models
 
 
 class ProjectInitializedPayload(BaseModel):
