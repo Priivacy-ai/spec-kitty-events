@@ -1,7 +1,7 @@
 {
   "$id": "spec-kitty-events/event",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "description": "Immutable event with causal metadata for distributed conflict detection.",
+  "description": "Immutable event with causal metadata for distributed conflict detection.\n\nTimestamp semantics\n-------------------\n\nThe ``timestamp`` field is the producer-assigned wall-clock occurrence time\nof the modelled event. Consumers (SaaS ingestion, dashboards, audit, sync\ndrains, projections, scorecards) MUST preserve this value end-to-end and\nMUST NOT substitute server-receipt, import, drain, or replay time for it.\nConsumer-side receipt/import time, if persisted, MUST be stored under a\ndistinct field name \u2014 the recommended name is ``received_at``.\n\nSee ``kitty-specs/teamspace-event-contract-foundation-01KQHDE4/data-model.md``\n(Timestamp Semantics: Rules R-T-01, R-T-02, R-T-03) for the authoritative\nrules, and ``spec_kitty_events.conformance.assert_producer_occurrence_preserved``\nfor an executable consumer-side conformance helper.",
   "properties": {
     "aggregate_id": {
       "description": "Identifier of the entity this event modifies",
@@ -106,7 +106,7 @@
       "type": "string"
     },
     "timestamp": {
-      "description": "Wall-clock timestamp (human-readable, not used for ordering)",
+      "description": "Producer-assigned wall-clock occurrence time (ISO-8601 UTC). Records when the modelled event actually happened on the producing system (CLI machine, runtime worker, tracker subsystem). Consumers MUST preserve this value through ingestion, persistence, projection, reduction, and serialization, and MUST NOT substitute receipt/import/server time for this field. Consumer receipt time, if persisted, MUST be stored under a distinct field (recommended: 'received_at'). Not used for ordering \u2014 Lamport clock and node_id own ordering.",
       "format": "date-time",
       "title": "Timestamp",
       "type": "string"
