@@ -26,8 +26,8 @@ subtasks:
 - T009
 phase: Phase 2 - Conformance
 assignee: ''
-agent: "claude:opus-4-7:implementer-ivan:implementer"
-shell_pid: "36118"
+agent: "claude:opus-4-7:reviewer:reviewer"
+shell_pid: "37599"
 history:
 - timestamp: '2026-05-15T11:00:00Z'
   lane: planned
@@ -233,3 +233,4 @@ Reviewer checks:
 - 2026-05-15T11:00:00Z – system – lane=planned – Prompt created
 - 2026-05-15T11:11:54Z – claude:opus-4-7:implementer-ivan:implementer – shell_pid=36118 – Started implementation via action command
 - 2026-05-15T11:17:16Z – claude:opus-4-7:implementer-ivan:implementer – shell_pid=36118 – WP02 complete: timestamp_semantics.py (helper + TimestampSubstitutionError), conformance package __init__ re-exports, 3 fixtures (old_producer_recent_receipt, live_event_producer_equals_receipt, consumer_substituted_receipt_time), manifest entries, loader/entrypoint filters updated, 10 pytest cases. Charter gates: pytest 1922 passed, mypy --strict clean, schema drift check passes.
+- 2026-05-15T11:17:24Z – claude:opus-4-7:reviewer:reviewer – shell_pid=37599 – Started review via action command
