@@ -68,11 +68,11 @@ description: "Work packages for executable-event-timestamp-semantics-01KRNME2"
 **Prompt**: `tasks/WP02-conformance-helper-fixtures-and-tests.md`
 
 ### Included Subtasks
-- [ ] T005 Add `src/spec_kitty_events/conformance/timestamp_semantics.py` (helper + typed `TimestampSubstitutionError`) (WP02)
-- [ ] T006 Re-export helper and error from `src/spec_kitty_events/conformance/__init__.py` (WP02)
-- [ ] T007 Add three committed fixtures under `src/spec_kitty_events/conformance/fixtures/timestamp_semantics/` (WP02)
-- [ ] T008 Add `src/spec_kitty_events/conformance/tests/test_timestamp_semantics.py` covering good-consumer, equality-edge, and bad-consumer paths (WP02)
-- [ ] T009 Run charter quality gates (pytest, schema drift, mypy --strict) (WP02)
+- [x] T005 Add `src/spec_kitty_events/conformance/timestamp_semantics.py` (helper + typed `TimestampSubstitutionError`) (WP02)
+- [x] T006 Re-export helper and error from `src/spec_kitty_events/conformance/__init__.py` (WP02)
+- [x] T007 Add three committed fixtures under `src/spec_kitty_events/conformance/fixtures/timestamp_semantics/` (WP02)
+- [x] T008 Add `src/spec_kitty_events/conformance/tests/test_timestamp_semantics.py` covering good-consumer, equality-edge, and bad-consumer paths (WP02)
+- [x] T009 Run charter quality gates (pytest, schema drift, mypy --strict) (WP02)
 
 ### Implementation Notes
 
