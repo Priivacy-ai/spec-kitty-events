@@ -1,0 +1,21 @@
+{
+  "fixture_kind": "timestamp_semantics",
+  "notes": "Bad consumer scenario: producer timestamp is 2026-01-01 (old), but the simulated consumer persisted the receipt time (2026-05-15) as canonical occurrence time. The helper MUST raise TimestampSubstitutionError on this fixture.",
+  "expectation": "invalid",
+  "envelope": {
+    "event_id": "01J6XW9KQT7M0YB3N4R5CQZ2GZ",
+    "event_type": "WPStatusChanged",
+    "aggregate_id": "wp-bad-consumer-001",
+    "payload": {},
+    "timestamp": "2026-01-01T00:00:00+00:00",
+    "build_id": "build-bad-consumer-fixture",
+    "node_id": "node-fixture-producer-1",
+    "lamport_clock": 3,
+    "correlation_id": "01J6XW9KQT7M0YB3N4R5CQZ2GZ",
+    "project_uuid": "00000000-0000-0000-0000-000000000001"
+  },
+  "consumer_simulation": {
+    "received_at": "2026-05-15T10:00:00+00:00",
+    "persisted_occurrence_time": "2026-05-15T10:00:00+00:00"
+  }
+}

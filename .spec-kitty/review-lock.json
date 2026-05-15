@@ -1,7 +1,7 @@
 {
-  "worktree_path": "/Users/robert/spec-kitty-dev/spec-kitty-20260423-061619/spec-kitty-events/.worktrees/decision-moment-v1-contract-freeze-01KPWA0N-lane-c",
-  "wp_id": "WP03",
-  "agent": "claude:sonnet-4-7:python-reviewer:reviewer",
-  "started_at": "2026-04-23T05:42:16.764552+00:00",
-  "pid": 16432
+  "worktree_path": "/Users/robert/spec-kitty-dev/spec-kitty-20260515-122103-ytwNyX/spec-kitty-events/.worktrees/executable-event-timestamp-semantics-01KRNME2-lane-a",
+  "wp_id": "WP02",
+  "agent": "claude:opus-4-7:reviewer:reviewer",
+  "started_at": "2026-05-15T11:17:25.360418+00:00",
+  "pid": 37601
 }
