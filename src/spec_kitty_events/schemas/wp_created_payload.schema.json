@@ -1,0 +1,90 @@
+{
+  "$id": "spec-kitty-events/wp_created_payload",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Typed payload for ``WPCreated`` events.\n\nEmitted once per work-package, immediately after the WP task file is\nmaterialized on disk. Establishes the WP aggregate so that subsequent\n``WPStatusChanged`` events have a known parent. The first status event\nfor a WP MUST follow ``WPCreated`` for the same ``mission_slug`` /\n``wp_id`` pair.",
+  "properties": {
+    "actor": {
+      "description": "Actor that created the WP.",
+      "minLength": 1,
+      "title": "Actor",
+      "type": "string"
+    },
+    "created_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Wall-clock timestamp of WP creation.",
+      "title": "Created At"
+    },
+    "depends_on": {
+      "description": "IDs of work-packages this WP depends on.",
+      "items": {
+        "type": "string"
+      },
+      "title": "Depends On",
+      "type": "array"
+    },
+    "mission_number": {
+      "anyOf": [
+        {
+          "minimum": 1,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Canonical mission number; ``None`` pre-merge.",
+      "title": "Mission Number"
+    },
+    "mission_slug": {
+      "description": "Canonical mission slug owning this WP.",
+      "minLength": 1,
+      "title": "Mission Slug",
+      "type": "string"
+    },
+    "wp_id": {
+      "description": "Work-package identifier (e.g. ``WP01``).",
+      "minLength": 1,
+      "title": "Wp Id",
+      "type": "string"
+    },
+    "wp_path": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Repo-relative path to the WP task file, if persisted on disk.",
+      "title": "Wp Path"
+    },
+    "wp_title": {
+      "description": "Human-readable WP title.",
+      "minLength": 1,
+      "title": "Wp Title",
+      "type": "string"
+    }
+  },
+  "required": [
+    "mission_slug",
+    "wp_id",
+    "wp_title",
+    "actor"
+  ],
+  "title": "WPCreatedPayload",
+  "type": "object"
+}

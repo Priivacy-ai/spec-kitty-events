@@ -1,0 +1,54 @@
+{
+  "$id": "spec-kitty-events/specify_started_payload",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Specify phase started for a mission.",
+  "properties": {
+    "actor": {
+      "description": "Actor driving the phase transition.",
+      "minLength": 1,
+      "title": "Actor",
+      "type": "string"
+    },
+    "at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Wall-clock timestamp for the phase transition.",
+      "title": "At"
+    },
+    "mission_number": {
+      "anyOf": [
+        {
+          "minimum": 1,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Canonical mission number; ``None`` pre-merge.",
+      "title": "Mission Number"
+    },
+    "mission_slug": {
+      "description": "Canonical mission slug.",
+      "minLength": 1,
+      "title": "Mission Slug",
+      "type": "string"
+    }
+  },
+  "required": [
+    "mission_slug",
+    "actor"
+  ],
+  "title": "SpecifyStartedPayload",
+  "type": "object"
+}

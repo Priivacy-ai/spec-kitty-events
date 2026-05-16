@@ -27,6 +27,16 @@ from spec_kitty_events.lifecycle import (
     ReviewRollbackPayload,
 )
 from spec_kitty_events.models import Event
+from spec_kitty_events.project_lifecycle import (
+    PlanCompletedPayload,
+    PlanStartedPayload,
+    ProjectInitializedPayload,
+    SpecifyCompletedPayload,
+    SpecifyStartedPayload,
+    TasksCompletedPayload,
+    TasksStartedPayload,
+    WPCreatedPayload,
+)
 from spec_kitty_events.status import StatusTransitionPayload
 from spec_kitty_events.collaboration import (
     ParticipantInvitedPayload,
@@ -163,6 +173,15 @@ _EVENT_TYPE_TO_MODEL: Dict[str, Any] = {
     "MissionCancelled": MissionCancelledPayload,
     "PhaseEntered": PhaseEnteredPayload,
     "ReviewRollback": ReviewRollbackPayload,
+    # Canonical project / artifact / WP lifecycle event contracts
+    "ProjectInitialized": ProjectInitializedPayload,
+    "SpecifyStarted": SpecifyStartedPayload,
+    "SpecifyCompleted": SpecifyCompletedPayload,
+    "PlanStarted": PlanStartedPayload,
+    "PlanCompleted": PlanCompletedPayload,
+    "TasksStarted": TasksStartedPayload,
+    "TasksCompleted": TasksCompletedPayload,
+    "WPCreated": WPCreatedPayload,
     # Collaboration event contracts
     "ParticipantInvited": ParticipantInvitedPayload,
     "ParticipantJoined": ParticipantJoinedPayload,
@@ -256,6 +275,15 @@ _EVENT_TYPE_TO_SCHEMA: Dict[str, str] = {
     "MissionCancelled": "mission_cancelled_payload",
     "PhaseEntered": "phase_entered_payload",
     "ReviewRollback": "review_rollback_payload",
+    # Canonical project / artifact / WP lifecycle event contracts
+    "ProjectInitialized": "project_initialized_payload",
+    "SpecifyStarted": "specify_started_payload",
+    "SpecifyCompleted": "specify_completed_payload",
+    "PlanStarted": "plan_started_payload",
+    "PlanCompleted": "plan_completed_payload",
+    "TasksStarted": "tasks_started_payload",
+    "TasksCompleted": "tasks_completed_payload",
+    "WPCreated": "wp_created_payload",
     # Collaboration event contracts
     "ParticipantInvited": "participant_invited_payload",
     "ParticipantJoined": "participant_joined_payload",

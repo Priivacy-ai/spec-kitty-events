@@ -1,0 +1,8 @@
+{
+  "mission_slug": "mission-001",
+  "mission_number": 1,
+  "actor": "claude",
+  "at": "2026-05-15T12:05:00Z",
+  "artifact_path": "kitty-specs/mission-001/spec.md",
+  "summary": "Canonical lifecycle contracts spec"
+}

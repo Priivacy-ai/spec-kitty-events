@@ -1,0 +1,68 @@
+{
+  "$id": "spec-kitty-events/project_initialized_payload",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Typed payload for ``ProjectInitialized`` events.\n\nEmitted exactly once when a project is first initialized via\n``spec-kitty init`` (or equivalent). Establishes the project aggregate\nthat subsequent mission/artifact/WP events join.",
+  "properties": {
+    "actor": {
+      "description": "Actor that initialized the project (e.g. CLI user or agent).",
+      "minLength": 1,
+      "title": "Actor",
+      "type": "string"
+    },
+    "initialized_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Wall-clock timestamp when the project was initialized.",
+      "title": "Initialized At"
+    },
+    "project_slug": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Human-readable project slug, if any.",
+      "title": "Project Slug"
+    },
+    "project_uuid": {
+      "description": "Canonical machine identity for the project (UUID string).",
+      "minLength": 1,
+      "title": "Project Uuid",
+      "type": "string"
+    },
+    "runtime_version": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "CLI / runtime version recorded at init time.",
+      "title": "Runtime Version"
+    }
+  },
+  "required": [
+    "project_uuid",
+    "actor"
+  ],
+  "title": "ProjectInitializedPayload",
+  "type": "object"
+}

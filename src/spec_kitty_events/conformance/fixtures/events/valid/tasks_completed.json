@@ -1,0 +1,9 @@
+{
+  "mission_slug": "mission-001",
+  "mission_number": 1,
+  "actor": "claude",
+  "at": "2026-05-15T12:15:00Z",
+  "artifact_path": "kitty-specs/mission-001/tasks.md",
+  "wp_count": 3,
+  "summary": "Three WPs produced"
+}
