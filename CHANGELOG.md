@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.1.0] - 2026-05-17
+
 ### Changed
 
 - **Executable timestamp semantics** (additive, wire-compatible). The
@@ -21,6 +23,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   R-T-03 ordering invariance).
 
 ### Added
+
+- **Backward-transition replay conformance fixture** (additive,
+  wire-compatible). Added the review-rejection cycle replay fixture under
+  `conformance/fixtures/edge_cases/replay/` and included it in package data so
+  consumers can exercise forced backward-transition handling directly from the
+  wheel.
 
 - `spec_kitty_events.conformance.assert_producer_occurrence_preserved` and
   `spec_kitty_events.conformance.TimestampSubstitutionError` — reusable

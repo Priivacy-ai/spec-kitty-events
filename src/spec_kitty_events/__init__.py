@@ -1,4 +1,4 @@
-"""Public package exports for the canonical 5.0.0 TeamSpace migration release.
+"""Public package exports for the canonical 5.x TeamSpace migration release.
 
 This release publishes the fail-closed cutover surface for:
 
@@ -13,7 +13,7 @@ This release publishes the fail-closed cutover surface for:
   historical-shape conformance fixtures.
 """
 
-__version__ = "5.0.0"
+__version__ = "5.1.0"
 
 from spec_kitty_events.cutover import (
     CUTOVER_ARTIFACT,
