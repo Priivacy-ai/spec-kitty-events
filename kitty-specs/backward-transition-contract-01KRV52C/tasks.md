@@ -73,10 +73,10 @@ The `[P]` marker in the Parallel column indicates the subtask can be authored in
 **Independent test**: `uv run pytest tests/unit/test_status.py tests/unit/test_fixtures.py -q` exit code is 0. The full unit suite `uv run pytest tests/unit/ -q` also exits 0. `uv run mypy --strict src/spec_kitty_events/` exits 0. Schema diff produces zero changes after `python -m spec_kitty_events.schemas.generate` (or equivalent).
 
 **Included subtasks**:
-- [ ] T005 Register new edge_cases fixtures in `tests/unit/test_fixtures.py` (add entries to the parametrize lists for valid + invalid; add a replay-stream loader test for the cycle JSONL)
-- [ ] T006 Add review-rejection family tests in `tests/unit/test_status.py` — parametrized over `{(in_progress, planned), (for_review, planned), (in_review, planned), (approved, planned)}`, asserting accept with `force=True + reason`, reject with `force=False`, reject with `force=True + empty reason`
-- [ ] T009 Run schema generation, confirm zero diff against committed `*.schema.json` files (charter quality gate)
-- [ ] T010 Run `uv run pytest tests/unit/ -q` and `uv run mypy --strict src/spec_kitty_events/` — verify both pass (charter quality gates)
+- [x] T005 Register new edge_cases fixtures in `tests/unit/test_fixtures.py` (add entries to the parametrize lists for valid + invalid; add a replay-stream loader test for the cycle JSONL)
+- [x] T006 Add review-rejection family tests in `tests/unit/test_status.py` — parametrized over `{(in_progress, planned), (for_review, planned), (in_review, planned), (approved, planned)}`, asserting accept with `force=True + reason`, reject with `force=False`, reject with `force=True + empty reason`
+- [x] T009 Run schema generation, confirm zero diff against committed `*.schema.json` files (charter quality gate)
+- [x] T010 Run `uv run pytest tests/unit/ -q` and `uv run mypy --strict src/spec_kitty_events/` — verify both pass (charter quality gates)
 
 **Implementation sketch**:
 1. Read existing `tests/unit/test_fixtures.py` parametrize lists (`VALID_EVENT_FILES` and the equivalent invalid list) and append new entries with the matching tuple shape.
