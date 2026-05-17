@@ -93,7 +93,7 @@ The conformance fixture system already supports `edge_cases/valid/` and `edge_ca
    - `invalid/wp_status_changed_unforced_in_review_to_planned.json` — single `WPStatusChanged` payload with `from_lane=in_review, to_lane=planned, force=False` (FR-006). Validator must reject.
 2. **Register the three fixtures** in `src/spec_kitty_events/conformance/fixtures/manifest.json` and in the parametrize lists of `tests/unit/test_fixtures.py` (FR-008).
 3. **Add explicit family tests** in `tests/unit/test_status.py` (FR-007): a parametrized test that walks the four family members (`in_review→planned, approved→planned, for_review→planned, in_progress→planned`) and asserts:
-   - `force=True + reason` accepted by `validate_status_transition()`
+   - `force=True + reason` accepted by `validate_transition()`
    - `force=False` rejected with a graph-violation diagnostic
    - `force=True + reason=""` or `reason=None` rejected with the existing `force=True requires a non-empty reason` error
 4. **Extend the `status.py` module docstring** with a normative section titled "Review-Rejection Transition Family" that enumerates the family, states the `force=True + reason` requirement, declares unforced backward transitions invalid, and recommends the canonical `reason` shape (`"backward rewind: <from> -> <to>[: <feedback-ref>]"`). Cross-link to the new fixture filenames and to the docs section (FR-001, FR-002, FR-003, FR-010, FR-013).
@@ -115,7 +115,7 @@ The conformance fixture system already supports `edge_cases/valid/` and `edge_ca
 | Risk | Likelihood | Impact | Mitigation |
 |---|---|---|---|
 | The review-rejection cycle fixture (list shape) is not supported by the existing loader | Low | Medium — fixture format would need adaptation | Phase 0 research validates loader behavior against existing list fixtures before committing to the list shape. If unsupported, split into per-event fixtures and parametrize tests over them. |
-| `validate_status_transition()` already rejects unforced backward but the rejection message changes meaningfully for in_review→planned | Low | Low | Phase 0 research reads the validator code path; if a gap is found, fix is in-scope as FR-007 completeness. |
+| `validate_transition()` already rejects unforced backward but the rejection message changes meaningfully for in_review→planned | Low | Low | Phase 0 research reads the validator code path; if a gap is found, fix is in-scope as FR-007 completeness. |
 | Schema generation produces a non-empty diff after adding fixtures | Low | Medium — would break NFR-004 / NFR-005 | Schemas are generated from Pydantic models, not fixtures; adding fixture files does not regenerate schemas. Confirm during implement. |
 | `mypy --strict` over `tests/unit/` fails on new parametrize tuples | Low | Low | Match the existing parametrize tuple type signatures already in `test_fixtures.py`. |
 | Sibling missions cite a path that later moves | Medium | Low | Phase 1 design pins the anchor at module docstring (stable) plus a heading in `docs/consumer-contract-dossier-v2.4.0.md` (versioned filename → already stable across releases). |

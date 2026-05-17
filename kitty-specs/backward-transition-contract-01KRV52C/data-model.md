@@ -5,7 +5,7 @@
 
 ## Existing Entities (Unchanged)
 
-### `WPStatusChangedPayload`
+### `StatusTransitionPayload`
 
 **Source**: `src/spec_kitty_events/status.py:236`
 
@@ -27,7 +27,7 @@ Public Pydantic model describing a lane transition for one work package. Frozen,
 Invariants enforced by the model validator (`status.py:318-321`):
 - `force=True ⇒ reason ≠ None and reason.strip() ≠ ""`
 
-Invariants enforced by `validate_status_transition()` (`status.py:392-420`):
+Invariants enforced by `validate_transition()` (`status.py:392-420`):
 - Terminal-lane exit requires `force=True`.
 - Matrix-listed backward transitions require `force=True`.
 - `force=True` bypasses the matrix check (audit trail is provided by `force_metadata` / `reason`).
@@ -43,7 +43,7 @@ Invariants enforced by `validate_status_transition()` (`status.py:392-420`):
 | `actor` | `str` (min_length=1) | Yes | Who forced the transition. |
 | `reason` | `str` (min_length=1) | Yes | Why. |
 
-When present alongside a `WPStatusChangedPayload` (the canonical attachment site is the carrying `Event` envelope's metadata block), this carries the audit trail. The plan does not require `ForceMetadata` to be attached to every family-member event — the carrying envelope's `force=True + reason` in the payload is sufficient. `ForceMetadata` remains the canonical place for structured audit context when consumers want to record it separately.
+When present alongside a `StatusTransitionPayload` (the canonical attachment site is the carrying `Event` envelope's metadata block), this carries the audit trail. The plan does not require `ForceMetadata` to be attached to every family-member event — the carrying envelope's `force=True + reason` in the payload is sufficient. `ForceMetadata` remains the canonical place for structured audit context when consumers want to record it separately.
 
 ### `Lane`
 

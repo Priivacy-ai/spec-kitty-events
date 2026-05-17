@@ -40,7 +40,7 @@ The JSONL will contain canonical `Event` envelopes (matching `events/valid/event
 
 ---
 
-## R-002 — Current Behavior of `validate_status_transition()` for the Family
+## R-002 — Current Behavior of `validate_transition()` for the Family
 
 ### Decision
 
@@ -60,7 +60,7 @@ The existing validator already rejects unforced backward transitions in the matr
 
 | Alternative | Rejected because |
 |---|---|
-| Refactor `validate_status_transition()` to surface "review-rejection family" as a typed enum return | Out of scope — wire shape and validator API stay frozen per C-003 / C-006. |
+| Refactor `validate_transition()` to surface "review-rejection family" as a typed enum return | Out of scope — wire shape and validator API stay frozen per C-003 / C-006. |
 | Add a `is_review_rejection()` helper function | Premature abstraction. The plan's parametrized test enumerates the four family members directly; a helper would be tested only by the same enumeration. Re-evaluate if a sibling repo asks for it. |
 
 ---

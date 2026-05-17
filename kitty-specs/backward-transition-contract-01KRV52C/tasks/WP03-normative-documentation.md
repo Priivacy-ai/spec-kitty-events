@@ -109,7 +109,7 @@ For every event in the family, the emitting agent MUST set:
 
   1. `force = True`
   2. `reason` — a non-empty string. Enforced by the existing
-     WPStatusChangedPayload model validator ("force=True requires a
+     StatusTransitionPayload model validator ("force=True requires a
      non-empty reason").
 
 Recommended canonical `reason` shape:
@@ -123,7 +123,7 @@ is `feedback://<mission-slug>/<wp-id>/<timestamp>-<hash>.md`.
 
 A WPStatusChanged event with a `from_lane → to_lane` pair drawn from the
 family table but `force = False` is contract-invalid. The existing
-`validate_status_transition()` rejects such events via the lane matrix
+`validate_transition()` rejects such events via the lane matrix
 check. Consumers MAY reject them as graph violations and SHOULD classify
 them as business-rule rejections, not transient infrastructure failures.
 
@@ -213,7 +213,7 @@ For every event in the family:
 
 1. `force = True` — explicit acknowledgement that the transition is a
    user-deliberate rewind, not a forward step.
-2. `reason` — non-empty. Enforced by the `WPStatusChangedPayload` model
+2. `reason` — non-empty. Enforced by the `StatusTransitionPayload` model
    validator.
 
 Recommended canonical `reason` shape:
@@ -225,7 +225,7 @@ Recommended canonical `reason` shape:
 ### Unforced backward transitions are contract-invalid
 
 `force = False` for any family-member transition is contract-invalid. The
-existing `validate_status_transition()` rejects such events via the lane
+existing `validate_transition()` rejects such events via the lane
 matrix check. Consumers (materializers, projection engines, durable drain
 workers) MAY reject these events as graph violations and SHOULD classify
 them as business-rule rejections, not transient infrastructure failures.
@@ -258,8 +258,8 @@ used to bypass forward guards.
 ### Cross-references
 
 - Module docstring: `src/spec_kitty_events/status.py` (mirror of this section).
-- Pydantic model: `WPStatusChangedPayload`.
-- Validator: `validate_status_transition()`.
+- Pydantic model: `StatusTransitionPayload`.
+- Validator: `validate_transition()`.
 - Bootstrap discriminator: `is_bootstrap_planned_event()`.
 - Mission-level intent event: `ReviewRollbackPayload` (`src/spec_kitty_events/lifecycle.py`).
 - Planning issue: `Priivacy-ai/spec-kitty-planning#16`.

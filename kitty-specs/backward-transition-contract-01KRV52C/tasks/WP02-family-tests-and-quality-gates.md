@@ -59,7 +59,7 @@ Read first:
 - Mission spec: `kitty-specs/backward-transition-contract-01KRV52C/spec.md` (FR-007, FR-008, FR-012)
 - Contract draft: `kitty-specs/backward-transition-contract-01KRV52C/contracts/backward-transition-family.md`
 - Existing test file structure: `tests/unit/test_fixtures.py` (parametrize list pattern: `VALID_EVENT_FILES = [(path, event_type), ...]`)
-- Existing tests for `WPStatusChangedPayload` validation: `tests/unit/test_status.py` (TestForceMetadata, force_must_be_true, force_requires_reason, force_with_reason_valid, force_with_empty_reason_rejected, forced_done_still_requires_evidence, forced_done_with_evidence_valid)
+- Existing tests for `StatusTransitionPayload` validation: `tests/unit/test_status.py` (TestForceMetadata, force_must_be_true, force_requires_reason, force_with_reason_valid, force_with_empty_reason_rejected, forced_done_still_requires_evidence, forced_done_with_evidence_valid)
 
 ## Branch Strategy
 
@@ -76,9 +76,9 @@ Read first:
 **Steps**:
 
 1. Read the existing `test_fixtures.py` to confirm the parametrize-list patterns (search `VALID_EVENT_FILES`, `INVALID_*`, or whichever lists enumerate fixtures).
-2. Append to the appropriate valid-fixtures list:
+2. Append to the `VALID_EVENT_FILES` list (defined at `tests/unit/test_fixtures.py:~84` and consumed by `TestValidEventFixtures.test_valid_fixture_is_valid_json`, `..._passes_model`, and `..._passes_conformance`):
    - `("edge_cases/valid/wp_status_changed_approved_rewind.json", "WPStatusChanged")`
-3. Append to the appropriate invalid-fixtures list (look for tests that assert `validate_event(...)` returns invalid — that list, not the JSON-syntax-only list):
+3. Append to the `INVALID_EVENT_FILES` list (defined at `tests/unit/test_fixtures.py:121` and consumed by `test_invalid_fixture_fails_model` and `test_invalid_fixture_fails_conformance`):
    - `("edge_cases/invalid/wp_status_changed_unforced_in_review_to_planned.json", "WPStatusChanged")`
 4. Add a new test class `TestReviewRejectionCycle` that calls `load_replay_stream("wp-review-rejection-cycle-replay")` and:
    - Asserts the stream has exactly 11 events.
@@ -99,16 +99,16 @@ Read first:
 
 ### T006 — Add `TestReviewRejectionFamily` class in `tests/unit/test_status.py`
 
-**Purpose**: Codify the review-rejection family (`{in_progress, for_review, in_review, approved} → planned`) as parametrized contract behavior of `validate_status_transition()` and `WPStatusChangedPayload`.
+**Purpose**: Codify the review-rejection family (`{in_progress, for_review, in_review, approved} → planned`) as parametrized contract behavior of `validate_transition()` and `StatusTransitionPayload`.
 
 **Steps**:
 
 1. Read `tests/unit/test_status.py` to confirm imports and `VALID_TRANSITION_DATA` (or equivalent) base dict structure.
-2. Add a new class `TestReviewRejectionFamily` with these parametrized tests (use `@pytest.mark.parametrize("from_lane", ["in_progress", "for_review", "in_review", "approved"])`):
+2. Add a new class `TestReviewRejectionFamily` with these parametrized tests (use `@pytest.mark.parametrize("from_lane", ["in_progress", "for_review", "in_review", "approved"])`). The validator returns a frozen `TransitionValidationResult` dataclass with two fields: `valid: bool` and `violations: tuple[str, ...]` (defined at `src/spec_kitty_events/status.py:372`). The assertion shape is:
 
-   - `test_forced_backward_with_reason_accepted(from_lane)` — build a payload with that from_lane → `planned`, `force=True`, `reason="backward rewind: <from> -> planned"`. Assert `validate_status_transition(payload)` returns no violations (or whatever sentinel the existing tests use for "valid").
-   - `test_unforced_backward_rejected(from_lane)` — same shape but `force=False, reason=None`. Assert validator returns a non-empty violation list (or whatever shape signals invalid). The diagnostic should mention either the lane pair or "force".
-   - `test_forced_backward_without_reason_rejected(from_lane)` — Pydantic ValidationError expected because `force=True` requires non-empty reason. Use `pytest.raises(pydantic.ValidationError, match="force=True requires")` (matches existing test at line 438-440 of test_status.py).
+   - `test_forced_backward_with_reason_accepted(from_lane)` — build a `StatusTransitionPayload` with `from_lane → planned`, `force=True`, `reason="backward rewind: <from> -> planned"`. Call `result = validate_transition(payload)`. Assert `result.valid is True` and `result.violations == ()`.
+   - `test_unforced_backward_rejected(from_lane)` — same payload shape but `force=False, reason=None`. Call `result = validate_transition(payload)`. Assert `result.valid is False` and `len(result.violations) >= 1`. (Diagnostic strings can include the lane pair or the word "force"; do not over-specify the exact wording in the assertion — match a substring like `assert any("force" in v or from_lane in v for v in result.violations)`.)
+   - `test_forced_backward_without_reason_rejected(from_lane)` — Pydantic `ValidationError` expected at model construction time because the `StatusTransitionPayload` model validator enforces `force=True requires a non-empty reason`. Use `pytest.raises(pydantic.ValidationError, match="force=True requires")` (matches existing test at line 438-440 of `test_status.py`).
    - `test_forced_backward_with_empty_reason_rejected(from_lane)` — same as above but with `reason=""`.
 
 3. Cross-link the contract anchor in a class docstring:
@@ -139,17 +139,24 @@ class TestReviewRejectionFamily:
 
 **Steps**:
 
-1. Run the schema generation entry point. The plan asserts it lives at `src/spec_kitty_events/schemas/generate.py`. Run as:
+1. Run the schema generator in CI/check mode (the generator at `src/spec_kitty_events/schemas/generate.py` accepts a `--check` flag that detects drift without writing files):
 
 ```bash
-python -m spec_kitty_events.schemas.generate
+uv run python src/spec_kitty_events/schemas/generate.py --check
 ```
 
-   (If the module is not directly runnable, look for a Make target or invoke `python src/spec_kitty_events/schemas/generate.py`. Use whichever the repo conventionally uses; check `CONTRIBUTING.md` or top-level `Makefile` if present.)
+   Expected exit code: 0. A non-zero exit indicates schema drift.
 
-2. Run `git diff --stat src/spec_kitty_events/schemas/`. Expected output: **empty** (zero lines, no files changed).
+2. As a redundant verification, run without `--check` and confirm zero working-tree changes:
 
-3. If diff is non-empty: the change reveals a previously hidden coupling. Investigate by examining the diff — most likely a Pydantic model picked up an indirect change. Surface this in the activity log and resolve with WP01 author before continuing.
+```bash
+uv run python src/spec_kitty_events/schemas/generate.py
+git diff --stat src/spec_kitty_events/schemas/
+```
+
+   Expected output of `git diff --stat`: **empty** (zero lines, no files changed).
+
+3. If `--check` exits non-zero or `git diff --stat` is non-empty: the change reveals a previously hidden coupling. Investigate by examining the diff — most likely a Pydantic model picked up an indirect change. Surface this in the activity log and resolve with WP01 author before continuing.
 
 **Files**:
 
@@ -229,7 +236,7 @@ git diff --stat src/spec_kitty_events/schemas/  # SC-005 — must be empty
 | Risk | Mitigation |
 |---|---|
 | Existing `test_fixtures.py` has multiple parametrize lists for different validation steps — picking the wrong one | Read carefully; the file currently has at least 3 parametrize lists per fixture (valid JSON, passes model, passes conformance). Append to each that enumerates fixtures by path. |
-| `validate_status_transition()` signature differs from what the test assumes | Cross-check the existing tests at `test_status.py:438+` for the actual signature and assertion style; mirror that exactly. |
+| `validate_transition()` signature differs from what the test assumes | Cross-check the existing tests at `test_status.py:438+` for the actual signature and assertion style; mirror that exactly. |
 | Schema-diff non-empty reveals coupling | Loop back to WP01 author. Do not "fix" by committing the new schema diff — the change reveals a bug. |
 | mypy --strict failure on parametrize tuple types | Existing `test_fixtures.py` uses simple `(str, str)` tuples without explicit annotation — mirror that. |
 | Replay-stream loader returns the raw envelope dicts, not just payloads | Confirmed from research.md: `load_replay_stream` returns `List[Dict[str, Any]]` where each dict is the full envelope. Access `event["payload"]["force"]` etc. |

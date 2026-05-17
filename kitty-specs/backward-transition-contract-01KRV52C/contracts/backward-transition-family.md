@@ -30,7 +30,7 @@ These transitions arise from user-deliberate rewinds in the work-package lifecyc
 For every event in the family, the emitting agent MUST set:
 
 1. `force = True` — explicit acknowledgement that the transition is a user-deliberate rewind, not a forward step.
-2. `reason` — a non-empty string. Enforced by the existing `WPStatusChangedPayload` model validator: `force=True requires a non-empty reason`.
+2. `reason` — a non-empty string. Enforced by the existing `StatusTransitionPayload` model validator: `force=True requires a non-empty reason`.
 
 Recommended canonical `reason` shape:
 
@@ -45,13 +45,13 @@ Optional but recommended:
 - `review_ref` — URI-shaped pointer to the review feedback artifact. Same value as `<feedback-ref>` above when both are populated.
 - A separate `ForceMetadata` record carrying the structured `(actor, reason)` audit pair, attached at the carrying `Event` envelope level. Consumers MAY rely on payload `reason` alone; `ForceMetadata` is for structured audit pipelines.
 
-The wire payload shape is otherwise unchanged from `WPStatusChangedPayload`. No new fields, no removed fields.
+The wire payload shape is otherwise unchanged from `StatusTransitionPayload`. No new fields, no removed fields.
 
 ## Section 3 — Unforced Backward Transitions Are Contract-Invalid
 
 A `WPStatusChanged` event with a `from_lane → to_lane` pair drawn from the family table but `force = False` is **contract-invalid**.
 
-- The existing `validate_status_transition()` validator rejects such events via the lane matrix check.
+- The existing `validate_transition()` validator rejects such events via the lane matrix check.
 - Consumers (materializers, projection engines, drain workers) MAY reject these events as graph violations and SHOULD classify them as **business-rule rejections**, not transient infrastructure failures. See `spec-kitty-saas` for the drain/readiness implications.
 - The CLI emit path in `spec-kitty` MUST NOT produce unforced backward transitions. Either fail locally with a guidance message, or auto-promote `force=True` and synthesize a canonical `reason` per the recommended shape.
 
@@ -94,8 +94,8 @@ Forward-transition guard semantics — including but not limited to `planned →
 ## Cross-References
 
 - Module docstring: `src/spec_kitty_events/status.py` (mirror of this content).
-- Pydantic model: `WPStatusChangedPayload` (`status.py:236`).
-- Validator: `validate_status_transition` (`status.py:392`).
+- Pydantic model: `StatusTransitionPayload` (`status.py:236`).
+- Validator: `validate_transition` (`status.py:392`).
 - Bootstrap distinction: `is_bootstrap_planned_event` (`status.py:110`).
 - Mission-level rollback event: `ReviewRollbackPayload` (`lifecycle.py:196`).
 - Planning issue: `Priivacy-ai/spec-kitty-planning#16`.

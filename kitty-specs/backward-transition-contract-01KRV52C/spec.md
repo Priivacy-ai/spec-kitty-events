@@ -14,7 +14,7 @@ Document and codify forced backward lane transitions (the review-rejection famil
 
 Cross-repo planning issue `Priivacy-ai/spec-kitty-planning#16` reported a contradiction: the CLI emits `WPStatusChanged` events with `force=False` for user-deliberate backward lane moves (review rejections), SaaS rejects them as graph-invalid transitions, and the durable drain then parks them as `terminal_failed` infrastructure debris that poisons `/health/ready/`. The evidence pack at `~/spec-kitty-dev/terminal-failed-evidence-2026-05-17.json` (22 stuck events, 17 per-target WP histories) shows the wire shape: `from_lane=approved → to_lane=planned`, `force=False`, `reason="move-task: approved -> planned"`.
 
-The contract layer already supports `force=True + reason` semantics in `WPStatusChangedPayload` and `ForceMetadata`; what is missing is a normative statement enumerating the review-rejection transition family, a recommended `reason` field shape, and conformance fixtures the sibling repos can reference.
+The contract layer already supports `force=True + reason` semantics in `StatusTransitionPayload` and `ForceMetadata`; what is missing is a normative statement enumerating the review-rejection transition family, a recommended `reason` field shape, and conformance fixtures the sibling repos can reference.
 
 This mission is the foundation. Two sibling missions in `spec-kitty` (CLI emit path) and `spec-kitty-saas` (materializer + drain/readiness) consume what this mission lands. A fourth mission in `spec-kitty-planning` closes out tracking after all three code repos merge.
 
@@ -34,9 +34,9 @@ This mission is the foundation. Two sibling missions in `spec-kitty` (CLI emit p
 
 ### Exception Path — Unforced Backward Transition
 
-**Actor**: A consumer running `validate_status_transition()` against an event with `from_lane=in_review, to_lane=planned, force=False`.
+**Actor**: A consumer running `validate_transition()` against an event with `from_lane=in_review, to_lane=planned, force=False`.
 **Trigger**: The CLI emit path emits an unforced backward transition (today's bug).
-**Outcome**: `validate_status_transition()` rejects the event as graph-invalid. The negative conformance fixture proves this behavior. Consumers that reject such events (SaaS materializer) are contract-conformant, not buggy.
+**Outcome**: `validate_transition()` rejects the event as graph-invalid. The negative conformance fixture proves this behavior. Consumers that reject such events (SaaS materializer) are contract-conformant, not buggy.
 
 ### Acceptance Rule (must always hold)
 
@@ -68,7 +68,7 @@ Synonyms to avoid: "rewind", "revert", "undo", "rollback". The contract uses "ba
 | FR-003 | The contract documentation states explicitly that **unforced backward transitions are contract-invalid** and consumers MAY reject them as graph violations. This validates current SaaS materializer rejection behavior. | Required |
 | FR-004 | A positive conformance fixture for the **review-rejection cycle** exists: a full minimal lifecycle including one review rejection (`planned → claimed → in_progress → for_review → in_review → planned (force=True) → claimed → in_progress → for_review → in_review → approved`). Fixture lives under `tests/unit/` or the equivalent fixture surface. | Required |
 | FR-005 | A positive conformance fixture for the **approved-rewind case** exists (`approved → planned (force=True)`), matching the shape seen in the planning#16 evidence pack but written as a synthetic minimal fixture. No copying of any of the 22 dev evidence events. | Required |
-| FR-006 | A negative conformance fixture exists for an unforced `in_review → planned` event, with an assertion that `validate_status_transition()` (or the equivalent public validator) classifies it as invalid. | Required |
+| FR-006 | A negative conformance fixture exists for an unforced `in_review → planned` event, with an assertion that `validate_transition()` (or the equivalent public validator) classifies it as invalid. | Required |
 | FR-007 | `tests/unit/test_status.py` covers: (a) review-rejection family is accepted with `force=True + reason`; (b) review-rejection family is rejected with `force=False`; (c) `reason` is required when `force=True` for backward transitions. | Required |
 | FR-008 | `tests/unit/test_fixtures.py` (or the file the plan identifies) loads the new positive fixtures and asserts they parse cleanly through the public `WPStatusChanged` model. | Required |
 | FR-009 | The contract does NOT introduce a new event type. Review rejection is expressed entirely through existing `WPStatusChanged` events with `force=True + reason`. | Required |
@@ -93,7 +93,7 @@ Synonyms to avoid: "rewind", "revert", "undo", "rollback". The contract uses "ba
 |---|---|---|
 | C-001 | Target branch is `main`; all work merges back to `main`. | Required |
 | C-002 | This repo does not depend on `spec-kitty` or `spec-kitty-saas`. Dependency direction is downstream-only. | Required |
-| C-003 | Wire shape of `WPStatusChangedPayload` MUST NOT change. No new required fields, no removed fields, no renamed fields. Documentation, normative recommendations, fixtures, and tests are the deliverables. | Required |
+| C-003 | Wire shape of `StatusTransitionPayload` MUST NOT change. No new required fields, no removed fields, no renamed fields. Documentation, normative recommendations, fixtures, and tests are the deliverables. | Required |
 | C-004 | `SPEC_KITTY_ENABLE_SAAS_SYNC=1` must be set for any CLI invocation in this working tree. | Required |
 | C-005 | No mutation of any of the 22 dev evidence events in `~/spec-kitty-dev/terminal-failed-evidence-2026-05-17.json`. Fixtures are synthetic minimal sequences written from scratch. | Required |
 | C-006 | All public-model surface changes are additive. No breaking changes to existing `WPStatusChanged` consumers. | Required |
@@ -112,15 +112,15 @@ Synonyms to avoid: "rewind", "revert", "undo", "rollback". The contract uses "ba
 
 | Entity | Notes |
 |---|---|
-| `WPStatusChangedPayload` | Existing Pydantic model in `src/spec_kitty_events/status.py`. Wire-shape unchanged. |
+| `StatusTransitionPayload` | Existing Pydantic model in `src/spec_kitty_events/status.py`. Wire-shape unchanged. |
 | `ForceMetadata` | Existing Pydantic model representing `force=True + actor + reason`. Wire-shape unchanged. |
-| `validate_status_transition()` | Existing validator. Documented behavior reaffirmed; no behavior change unless the analyze phase surfaces a gap. |
+| `validate_transition()` | Existing validator. Documented behavior reaffirmed; no behavior change unless the analyze phase surfaces a gap. |
 | Review-rejection family | Named conceptual set documented in module docstring. Not a new class. |
 | Conformance fixtures | New test-only artifacts under `tests/unit/` (or where the plan resolves). Loaded via existing fixture mechanism. |
 
 ## Assumptions
 
-- The existing `validate_status_transition()` already correctly rejects unforced backward transitions in the matrix check. Plan phase will verify; if a gap is found, FR-007(b) test will surface it and the gap is in-scope as a contract-completeness fix.
+- The existing `validate_transition()` already correctly rejects unforced backward transitions in the matrix check. Plan phase will verify; if a gap is found, FR-007(b) test will surface it and the gap is in-scope as a contract-completeness fix.
 - The committed JSON schema generation, mypy --strict gate, and pytest are the standing quality gates the charter requires. No new gates are introduced by this mission.
 - The phrase "or equivalent" in FR-001/FR-008 is left for the plan phase to resolve to a concrete path; the spec does not pre-commit to a specific markdown filename.
 - Forward-transition guard semantics in any consumer are out of scope for this mission. This mission documents a backward-transition family; forward-transition guard preservation is enforced by the sibling missions in `spec-kitty` and `spec-kitty-saas`.
@@ -143,4 +143,4 @@ Synonyms to avoid: "rewind", "revert", "undo", "rollback". The contract uses "ba
 - Cross-repo planning issue: https://github.com/Priivacy-ai/spec-kitty-planning/issues/16
 - Evidence pack (read-only): `~/spec-kitty-dev/terminal-failed-evidence-2026-05-17.json`
 - Implementation prompt: `/Users/robert/spec-kitty-dev/spec-kitty-20260517-161351-nNtfEd/IMPLEMENTATION_PROMPT_planning16.md`
-- Existing contract surface: `src/spec_kitty_events/status.py` (`WPStatusChangedPayload`, `ForceMetadata`, `validate_status_transition`, `is_bootstrap_planned_event`).
+- Existing contract surface: `src/spec_kitty_events/status.py` (`StatusTransitionPayload`, `ForceMetadata`, `validate_transition`, `is_bootstrap_planned_event`).

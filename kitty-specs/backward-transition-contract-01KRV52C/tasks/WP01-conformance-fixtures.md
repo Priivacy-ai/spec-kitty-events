@@ -55,7 +55,7 @@ This WP is the foundation. WP02 (Family Tests) loads these fixtures; WP03 (Docs)
 
 ## Context — Why this WP exists
 
-Cross-repo planning issue `Priivacy-ai/spec-kitty-planning#16` surfaced that CLI, SaaS materializer, and durable drain disagree about how a review-rejection (e.g. `in_review → planned` or `approved → planned`) appears on the wire. The contract layer already supports `force=True + reason` semantics in `WPStatusChangedPayload`, but lacks canonical fixtures showing what a *correct* review-rejection event looks like vs an *unforced backward-transition bug* event.
+Cross-repo planning issue `Priivacy-ai/spec-kitty-planning#16` surfaced that CLI, SaaS materializer, and durable drain disagree about how a review-rejection (e.g. `in_review → planned` or `approved → planned`) appears on the wire. The contract layer already supports `force=True + reason` semantics in `StatusTransitionPayload`, but lacks canonical fixtures showing what a *correct* review-rejection event looks like vs an *unforced backward-transition bug* event.
 
 Read these references before writing fixtures:
 
@@ -64,7 +64,7 @@ Read these references before writing fixtures:
 - Research (loader behavior, replay-stream precedent): `kitty-specs/backward-transition-contract-01KRV52C/research.md`
 - Contract draft (Sections 1–7): `kitty-specs/backward-transition-contract-01KRV52C/contracts/backward-transition-family.md`
 - Data model recap: `kitty-specs/backward-transition-contract-01KRV52C/data-model.md`
-- Existing model: `src/spec_kitty_events/status.py` (search for `class WPStatusChangedPayload`)
+- Existing model: `src/spec_kitty_events/status.py` (search for `class StatusTransitionPayload`)
 - Existing happy-path fixture (shape to mirror): `src/spec_kitty_events/conformance/fixtures/events/valid/wp_status_changed.json`
 - Existing canonical event envelope shape: `src/spec_kitty_events/conformance/fixtures/events/valid/event.json`
 - Replay-stream precedents:
@@ -87,7 +87,7 @@ Read these references before writing fixtures:
 **Steps**:
 
 1. Create directory if it does not exist: `src/spec_kitty_events/conformance/fixtures/edge_cases/replay/`.
-2. Open `src/spec_kitty_events/conformance/fixtures/events/valid/event.json` and `src/spec_kitty_events/conformance/fixtures/events/valid/wp_status_changed.json` to confirm the canonical Event envelope shape and the `WPStatusChangedPayload` keys.
+2. Open `src/spec_kitty_events/conformance/fixtures/events/valid/event.json` and `src/spec_kitty_events/conformance/fixtures/events/valid/wp_status_changed.json` to confirm the canonical Event envelope shape and the `StatusTransitionPayload` keys.
 3. Write 11 JSON-on-one-line records to `wp_review_rejection_cycle.jsonl`, in this order:
 
    | Lamport | Event id (synthetic) | from_lane | to_lane | force | reason | actor |
@@ -114,7 +114,7 @@ Read these references before writing fixtures:
    - `event_id`: as in the table
    - `timestamp`: monotonically increasing ISO-8601 UTC timestamps starting `2026-05-17T14:00:00.000000+00:00` (+1 second per event)
    - `origin`: `null`
-   - `payload`: a `WPStatusChangedPayload` dict with fields from the table plus:
+   - `payload`: a `StatusTransitionPayload` dict with fields from the table plus:
      - `execution_mode`: `"worktree"`
      - `wp_id`: `"WP01"`
      - `mission_slug`: `"mission-backward-transition-demo"`
@@ -160,8 +160,8 @@ Read these references before writing fixtures:
 
 **Validation**:
 
-- [ ] Loads via `WPStatusChangedPayload.model_validate(json.load(open(<path>)))` without error.
-- [ ] `validate_status_transition(...)` (or whichever validator the test invokes) classifies it as VALID.
+- [ ] Loads via `StatusTransitionPayload.model_validate(json.load(open(<path>)))` without error.
+- [ ] `validate_transition(...)` (or whichever validator the test invokes) classifies it as VALID.
 - [ ] Field set is exactly the keys present in `wp_status_changed.json` (no surplus, no missing).
 
 ### T003 — Author `edge_cases/invalid/wp_status_changed_unforced_in_review_to_planned.json`
@@ -188,7 +188,7 @@ Read these references before writing fixtures:
 
 **Validation**:
 
-- [ ] `WPStatusChangedPayload.model_validate(...)` may or may not parse (the model itself allows force=False); but `validate_status_transition(...)` MUST return invalid for this payload.
+- [ ] `StatusTransitionPayload.model_validate(...)` may or may not parse (the model itself allows force=False); but `validate_transition(...)` MUST return invalid for this payload.
 - [ ] The fixture is loaded by `load_fixtures("edge_cases")` and the resulting `FixtureCase.expected_valid == False`.
 
 ### T004 — Register all three fixtures in `manifest.json`

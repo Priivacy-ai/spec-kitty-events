@@ -50,10 +50,10 @@ assert emitted["payload"]["to_lane"] == "planned"
 ### In `spec-kitty-saas` (materializer)
 
 ```python
-from spec_kitty_events.status import WPStatusChangedPayload
+from spec_kitty_events.status import StatusTransitionPayload
 
 # Forced backward transition materializes cleanly.
-payload = WPStatusChangedPayload.model_validate(approved_rewind.payload)
+payload = StatusTransitionPayload.model_validate(approved_rewind.payload)
 assert payload.force is True
 result = materialize_status_event(payload)
 assert result.status == "applied"
