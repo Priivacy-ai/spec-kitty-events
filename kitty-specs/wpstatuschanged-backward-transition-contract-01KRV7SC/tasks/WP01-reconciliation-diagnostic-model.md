@@ -23,8 +23,8 @@ subtasks:
 - T004
 - T005
 phase: Phase 1 - Contract model
-agent: claude
-shell_pid: '1077'
+agent: "claude:opus-4-7:python-pedro:implementer"
+shell_pid: "1077"
 history:
 - timestamp: '2026-05-17T15:25:00Z'
   lane: planned
@@ -268,3 +268,7 @@ Mission requirements covered: FR-006, FR-010, FR-013 (enum part), NFR-002, C-001
 - Verify the committed schema and the model agree (re-run the drift test locally).
 - Verify the module docstring names the contract path and the five decisions.
 - Confirm no new dependencies were added to `pyproject.toml`.
+
+## Activity Log
+
+- 2026-05-17T15:25:32Z – claude:opus-4-7:python-pedro:implementer – shell_pid=1077 – Assigned agent via action command
