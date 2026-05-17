@@ -119,11 +119,11 @@ Total subtasks: 13. All WPs are within the 3–7 subtask ideal range.
 **Risks**: Manifest schema drift if the existing manifest expects fields not yet documented. Mitigated by reading a few existing entries before appending and matching their shape.
 
 **Included subtasks**:
-- [ ] T009 Create `wp_status_changed/` fixture directory with six JSON files
-- [ ] T010 Append six manifest entries with `outcome` and `reason_code`
-- [ ] T011 Write `tests/test_wp_status_changed_contract_fixtures.py`
-- [ ] T012 Add reason_code coverage assertion to the fixture test
-- [ ] T013 Run full `uv run pytest` and `mypy --strict` to confirm no regressions
+- [x] T009 Create `wp_status_changed/` fixture directory with six JSON files
+- [x] T010 Append six manifest entries with `outcome` and `reason_code`
+- [x] T011 Write `tests/test_wp_status_changed_contract_fixtures.py`
+- [x] T012 Add reason_code coverage assertion to the fixture test
+- [x] T013 Run full `uv run pytest` and `mypy --strict` to confirm no regressions
 
 ## Parallelization
 
