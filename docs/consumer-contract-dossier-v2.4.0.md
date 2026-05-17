@@ -166,3 +166,133 @@ Both downstream repos should:
 1. Add `spec-kitty-events>=2.4.0,<3.0.0` to their dependencies
 2. Import and use the `reduce_mission_dossier()` reducer for event processing
 3. Run the canonical fixture verification above as a CI smoke test
+
+---
+
+## 7. Backward Transitions: The Review-Rejection Family
+
+The **review-rejection transition family** is the named set of legitimate
+forced backward lane transitions in `WPStatusChanged` events:
+
+| `from_lane`   | `to_lane` |
+|---------------|-----------|
+| `in_progress` | `planned` |
+| `for_review`  | `planned` |
+| `in_review`   | `planned` |
+| `approved`    | `planned` |
+
+These transitions arise from user-deliberate rewinds in the work-package
+lifecycle — most commonly a review rejection that returns a WP to `planned`
+for re-implementation. They are not infrastructure events and they are not
+graph errors.
+
+### Wire requirements
+
+For every event in the family, the emitting agent MUST set:
+
+1. `force = True` — explicit acknowledgement that the transition is a
+   user-deliberate rewind, not a forward step.
+2. `reason` — a non-empty string. Enforced by the existing
+   `StatusTransitionPayload` model validator
+   (`force=True requires a non-empty reason`).
+
+Recommended canonical `reason` shape:
+
+```
+backward rewind: <from_lane> -> <to_lane>[: <feedback-ref>]
+```
+
+- `<from_lane>` / `<to_lane>` are the literal `Lane` enum values.
+- `<feedback-ref>` is optional. When present, the recommended URI shape is
+  `feedback://<mission-slug>/<wp-id>/<timestamp>-<hash>.md`.
+
+Optional but recommended:
+
+- `review_ref` — URI-shaped pointer to the review feedback artifact. Same
+  value as `<feedback-ref>` above when both are populated.
+- A separate `ForceMetadata` record carrying the structured
+  `(actor, reason)` audit pair, attached at the carrying `Event` envelope
+  level. Consumers MAY rely on payload `reason` alone; `ForceMetadata` is
+  for structured audit pipelines.
+
+The wire payload shape is otherwise unchanged from
+`StatusTransitionPayload`. No new fields, no removed fields.
+
+### Unforced backward transitions are contract-invalid
+
+A `WPStatusChanged` event with a `from_lane → to_lane` pair drawn from the
+family table but `force = False` is **contract-invalid**.
+
+- The existing `validate_transition()` validator rejects such events via
+  the lane matrix check.
+- Consumers (materializers, projection engines, durable drain workers) MAY
+  reject these events as graph violations and SHOULD classify them as
+  **business-rule rejections**, not transient infrastructure failures.
+- The CLI emit path in `spec-kitty` MUST NOT produce unforced backward
+  transitions: either fail locally with a guidance message, or
+  auto-promote `force=True` and synthesize a canonical `reason` per the
+  recommended shape.
+
+### Relationship to `ReviewRollback`
+
+`ReviewRollbackPayload` (declared in `src/spec_kitty_events/lifecycle.py`)
+is a **mission-level** event recording the higher-level intent of a review
+rejection (`mission_id`, `review_ref`, `target_phase`, `affected_wp_ids`,
+`actor`). It is NOT a substitute for the per-WP `WPStatusChanged` events
+in the family. The two are complementary records:
+
+- `ReviewRollback` = "the mission rolled back to phase X because of review
+  Y, affecting WPs [A, B, C]".
+- `WPStatusChanged(force=True, ...)` per affected WP = "WP-A moved from
+  `in_review` to `planned` as part of that rollback".
+
+Consumers projecting state should reduce both event streams. Emitters MAY
+emit only the per-WP `WPStatusChanged` events when no mission-level
+rollback occurred (e.g. a single reviewer rejecting a single WP).
+
+### Distinction from bootstrap-planned events
+
+A forced `* → planned` transition with `from_lane = None` is a
+**bootstrap-planned event**, not a review-rejection. The contract
+distinguishes them:
+
+- Bootstrap-planned: `from_lane is None`, `to_lane = planned`,
+  `force = True`, `reason` typically explains initial seeding. Identified
+  by `is_bootstrap_planned_event()`.
+- Review-rejection family member:
+  `from_lane in {in_progress, for_review, in_review, approved}`,
+  `to_lane = planned`, `force = True`, `reason` follows the recommended
+  backward-rewind shape.
+
+A consumer must not classify a bootstrap-planned event as a review
+rejection or vice versa.
+
+### Forward-transition guards unaffected
+
+Forward-transition guard semantics — including but not limited to
+`planned → claimed`, `in_progress → for_review`, `in_review → approved` —
+are unchanged by this contract section. `force = True` is reserved for
+documented backward families and terminal-lane exits. It MUST NOT be used
+to bypass forward guards or evidence requirements.
+
+### Conformance fixtures
+
+| Manifest id | Path | Purpose |
+|---|---|---|
+| `wp-review-rejection-cycle-replay` | `src/spec_kitty_events/conformance/fixtures/edge_cases/replay/wp_review_rejection_cycle.jsonl` | Full lifecycle replay stream including one review-rejection round-trip (`planned → claimed → in_progress → for_review → in_review → planned → claimed → in_progress → for_review → in_review → approved`). |
+| `wp-status-changed-approved-rewind-valid` | `src/spec_kitty_events/conformance/fixtures/edge_cases/valid/wp_status_changed_approved_rewind.json` | Positive single-event `approved → planned` with `force=True` + reason (synthetic minimal mirror of the planning#16 evidence-pack shape). |
+| `wp-status-changed-unforced-in-review-to-planned-invalid` | `src/spec_kitty_events/conformance/fixtures/edge_cases/invalid/wp_status_changed_unforced_in_review_to_planned.json` | Negative single-event `in_review → planned` with `force=False`. Validator MUST reject. |
+
+Sibling missions cite these by manifest id when authoring regression
+tests.
+
+### Cross-references
+
+- Mirror section: `src/spec_kitty_events/status.py` module docstring —
+  "Review-Rejection Transition Family".
+- Pydantic model: `StatusTransitionPayload`.
+- Validator: `validate_transition()`.
+- Bootstrap discriminator: `is_bootstrap_planned_event()`.
+- Mission-level rollback event: `ReviewRollbackPayload`
+  (`src/spec_kitty_events/lifecycle.py`).
+- Planning issue: `Priivacy-ai/spec-kitty-planning#16`.

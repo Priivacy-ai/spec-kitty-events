@@ -1824,6 +1824,31 @@
       "fixture_type": "timestamp_semantics",
       "notes": "Mission executable-event-timestamp-semantics-01KRNME2: consumer persisted receipt time instead of producer time; helper MUST raise TimestampSubstitutionError.",
       "min_version": "5.1.0"
+    },
+    {
+      "id": "wp-status-changed-approved-rewind-valid",
+      "path": "edge_cases/valid/wp_status_changed_approved_rewind.json",
+      "expected_result": "valid",
+      "event_type": "WPStatusChanged",
+      "notes": "Valid forced backward transition approved->planned per the review-rejection family; synthetic mirror of planning#16 evidence-pack shape.",
+      "min_version": "3.0.0"
+    },
+    {
+      "id": "wp-status-changed-unforced-in-review-to-planned-invalid",
+      "path": "edge_cases/invalid/wp_status_changed_unforced_in_review_to_planned.json",
+      "expected_result": "invalid",
+      "event_type": "WPStatusChanged",
+      "notes": "Unforced backward transition in_review->planned; contract-invalid (matches planning#16 wire bug).",
+      "min_version": "3.0.0"
+    },
+    {
+      "id": "wp-review-rejection-cycle-replay",
+      "path": "edge_cases/replay/wp_review_rejection_cycle.jsonl",
+      "fixture_type": "replay_stream",
+      "event_type": "mixed",
+      "expected_result": "valid",
+      "notes": "Full 11-event review-rejection lifecycle: planned -> claimed -> in_progress -> for_review -> in_review -> planned (force=True) -> claimed -> in_progress -> for_review -> in_review -> approved.",
+      "min_version": "3.0.0"
     }
   ],
   "classes": {

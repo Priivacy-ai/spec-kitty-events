@@ -1,0 +1,12 @@
+{
+  "wp_id": "WP07",
+  "from_lane": "approved",
+  "to_lane": "planned",
+  "actor": "user",
+  "force": true,
+  "reason": "backward rewind: approved -> planned: feedback://mission-backward-transition-demo/WP07/20260517T141000Z-bbbb.md",
+  "execution_mode": "worktree",
+  "review_ref": "feedback://mission-backward-transition-demo/WP07/20260517T141000Z-bbbb.md",
+  "evidence": null,
+  "mission_slug": "mission-backward-transition-demo"
+}
