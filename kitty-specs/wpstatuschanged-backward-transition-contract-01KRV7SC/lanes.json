@@ -1,0 +1,66 @@
+{
+  "version": 1,
+  "mission_slug": "wpstatuschanged-backward-transition-contract-01KRV7SC",
+  "mission_id": "01KRV7SC4AS4SGM7HGN93HGP0W",
+  "mission_branch": "kitty/mission-wpstatuschanged-backward-transition-contract-01KRV7SC",
+  "target_branch": "main",
+  "lanes": [
+    {
+      "lane_id": "lane-a",
+      "wp_ids": [
+        "WP01",
+        "WP03"
+      ],
+      "write_scope": [
+        "src/spec_kitty_events/conformance/fixtures/manifest.json",
+        "src/spec_kitty_events/conformance/fixtures/wp_status_changed/**",
+        "src/spec_kitty_events/schemas/reconciliation_diagnostic.schema.json",
+        "src/spec_kitty_events/status.py",
+        "tests/test_reconciliation_diagnostic_model.py",
+        "tests/test_reconciliation_diagnostic_schema_drift.py",
+        "tests/test_wp_status_changed_contract_fixtures.py"
+      ],
+      "predicted_surfaces": [
+        "api",
+        "artifact-rendering"
+      ],
+      "depends_on_lanes": [],
+      "parallel_group": 0
+    },
+    {
+      "lane_id": "lane-b",
+      "wp_ids": [
+        "WP02"
+      ],
+      "write_scope": [
+        "README.md",
+        "docs/contracts/wp-status-changed.md",
+        "tests/test_contract_docstring_links.py"
+      ],
+      "predicted_surfaces": [
+        "api",
+        "tracker-integration"
+      ],
+      "depends_on_lanes": [],
+      "parallel_group": 0
+    }
+  ],
+  "computed_at": "2026-05-17T15:24:02.693625+00:00",
+  "computed_from": "dependency_graph+ownership",
+  "planning_artifact_wps": [],
+  "collapse_report": {
+    "events": [
+      {
+        "wp_a": "WP03",
+        "wp_b": "WP01",
+        "rule": "dependency",
+        "evidence": "WP03 depends on WP01"
+      }
+    ],
+    "total_merges": 1,
+    "independent_wps_collapsed": 0,
+    "by_rule": {
+      "dependency": 1
+    }
+  }
+}
