@@ -8,5 +8,7 @@
   "purpose_context": "Cross-repo planning issue #16 surfaced that CLI emit, SaaS materializer, and durable drain disagree about how a review-rejection (in_review/approved -> planned) appears on the wire. This mission lands the contract source of truth — docstring, normative reason-shape recommendation, and conformance fixtures — so sibling missions in spec-kitty and spec-kitty-saas have a stable anchor to cite.",
   "purpose_tldr": "Document and codify forced backward lane transitions (review-rejection family) in the canonical WPStatusChanged contract.",
   "slug": "backward-transition-contract-01KRV52C",
-  "target_branch": "main"
+  "target_branch": "main",
+  "vcs": "git",
+  "vcs_locked_at": "2026-05-17T14:45:01.955648+00:00"
 }
