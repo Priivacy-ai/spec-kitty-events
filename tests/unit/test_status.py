@@ -1578,3 +1578,96 @@ class TestBootstrapPlannedInitializeOnly:
         assert not is_bootstrap_planned_event(_p(None, Lane.PLANNED, False))
         assert not is_bootstrap_planned_event(_p(Lane.CLAIMED, Lane.PLANNED, True))
         assert not is_bootstrap_planned_event(_p(Lane.PLANNED, Lane.CLAIMED, True))
+
+
+# ---------------------------------------------------------------------------
+# Review-rejection family (backward-transition-contract-01KRV52C, WP02)
+# ---------------------------------------------------------------------------
+
+
+_REVIEW_REJECTION_FAMILY_LANES = ["in_progress", "for_review", "in_review", "approved"]
+
+
+@pytest.mark.parametrize("from_lane", _REVIEW_REJECTION_FAMILY_LANES)
+class TestReviewRejectionFamily:
+    """Contract behavior for the review-rejection transition family.
+
+    See: src/spec_kitty_events/status.py module docstring
+         docs/consumer-contract-dossier-v2.4.0.md § "Backward Transitions: The Review-Rejection Family"
+         kitty-specs/backward-transition-contract-01KRV52C/contracts/backward-transition-family.md
+    """
+
+    def test_forced_backward_with_reason_accepted(self, from_lane: str) -> None:
+        """force=True + non-empty reason MUST yield a valid transition result.
+
+        Some family members (for_review, in_review, approved) carry an
+        additional ``review_ref`` guard on the backward edge; supplying a
+        canonical feedback URI keeps the guard satisfied so the test
+        isolates the force+reason contract rather than re-asserting the
+        review_ref guard, which is already exercised by
+        :class:`TestGuardConditions`.
+        """
+        payload = StatusTransitionPayload(
+            **{
+                **VALID_TRANSITION_DATA,
+                "from_lane": from_lane,
+                "to_lane": "planned",
+                "force": True,
+                "reason": f"backward rewind: {from_lane} -> planned",
+                "review_ref": (
+                    f"feedback://mission-backward-transition-demo/WP01/"
+                    f"20260517T140000Z-{from_lane}.md"
+                ),
+            }
+        )
+        result = validate_transition(payload)
+        assert result.valid is True, (
+            f"Expected forced {from_lane} -> planned to be valid; "
+            f"violations: {result.violations}"
+        )
+        assert result.violations == ()
+
+    def test_unforced_backward_rejected(self, from_lane: str) -> None:
+        """force=False backward into planned MUST be rejected by validate_transition()."""
+        payload = StatusTransitionPayload(
+            **{
+                **VALID_TRANSITION_DATA,
+                "from_lane": from_lane,
+                "to_lane": "planned",
+                "force": False,
+                "reason": None,
+            }
+        )
+        result = validate_transition(payload)
+        assert result.valid is False
+        assert len(result.violations) >= 1
+        assert any("force" in v or from_lane in v for v in result.violations), (
+            f"Expected violation to mention 'force' or '{from_lane}'; "
+            f"got: {result.violations}"
+        )
+
+    def test_forced_backward_without_reason_rejected(self, from_lane: str) -> None:
+        """force=True + reason=None MUST raise Pydantic ValidationError at model time."""
+        with pytest.raises(pydantic.ValidationError, match="force=True requires"):
+            StatusTransitionPayload.model_validate(
+                {
+                    **VALID_TRANSITION_DATA,
+                    "from_lane": from_lane,
+                    "to_lane": "planned",
+                    "force": True,
+                    "reason": None,
+                }
+            )
+
+    def test_forced_backward_with_empty_reason_rejected(self, from_lane: str) -> None:
+        """force=True + reason="" MUST raise Pydantic ValidationError at model time."""
+        with pytest.raises(pydantic.ValidationError, match="force=True requires"):
+            StatusTransitionPayload.model_validate(
+                {
+                    **VALID_TRANSITION_DATA,
+                    "from_lane": from_lane,
+                    "to_lane": "planned",
+                    "force": True,
+                    "reason": "",
+                }
+            )

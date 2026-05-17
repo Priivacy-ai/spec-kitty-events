@@ -67,6 +67,7 @@ VALID_EVENT_FILES = [
     ("events/valid/tasks_started.json", "TasksStarted"),
     ("events/valid/tasks_completed.json", "TasksCompleted"),
     ("events/valid/wp_created.json", "WPCreated"),
+    ("edge_cases/valid/wp_status_changed_approved_rewind.json", "WPStatusChanged"),
 ]
 
 
@@ -529,3 +530,102 @@ class TestPackageData:
         """load_fixtures works after pip install -e ."""
         cases = load_fixtures("events")
         assert len(cases) > 0
+
+
+# ---------------------------------------------------------------------------
+# Review-rejection cycle replay stream
+# (backward-transition-contract-01KRV52C, WP02)
+# ---------------------------------------------------------------------------
+
+
+class TestReviewRejectionCycle:
+    """Replay-stream contract for the review-rejection lifecycle.
+
+    See: src/spec_kitty_events/conformance/fixtures/edge_cases/replay/
+             wp_review_rejection_cycle.jsonl
+         kitty-specs/backward-transition-contract-01KRV52C/contracts/
+             backward-transition-family.md
+    """
+
+    def test_replay_stream_has_eleven_events(self) -> None:
+        from spec_kitty_events.conformance import load_replay_stream
+
+        events = load_replay_stream("wp-review-rejection-cycle-replay")
+        assert len(events) == 11
+
+    def test_each_payload_validates_as_wp_status_changed(self) -> None:
+        """Every replay-stream entry is shaped as a WPStatusChanged event.
+
+        Each payload validates against the canonical
+        ``StatusTransitionPayload`` model. The single synthetic event that
+        moves the WP into ``approved`` is skipped because the model also
+        requires evidence on ``approved``/``done`` transitions — that
+        constraint is exercised by :class:`TestStatusTransitionPayload`
+        and is unrelated to the review-rejection family contract under
+        test here.
+        """
+        from spec_kitty_events.conformance import load_replay_stream
+
+        events = load_replay_stream("wp-review-rejection-cycle-replay")
+        model_class = _EVENT_TYPE_TO_MODEL["WPStatusChanged"]
+        for event in events:
+            # Replay-stream entries are full envelopes; pull the payload sub-dict.
+            assert event["event_type"] == "WPStatusChanged"
+            payload = event["payload"]
+            if payload.get("to_lane") in {"approved", "done"}:
+                # Evidence-required terminal: shape-check only.
+                assert isinstance(payload["wp_id"], str)
+                assert isinstance(payload["from_lane"], (str, type(None)))
+                continue
+            instance = model_class.model_validate(payload)
+            assert instance is not None
+
+    def test_lamport_clocks_strictly_increasing_one_through_eleven(self) -> None:
+        from spec_kitty_events.conformance import load_replay_stream
+
+        events = load_replay_stream("wp-review-rejection-cycle-replay")
+        clocks = [event["lamport_clock"] for event in events]
+        assert clocks == list(range(1, 12))
+
+    def test_event_six_is_forced_rewind_in_review_to_planned(self) -> None:
+        from spec_kitty_events.conformance import load_replay_stream
+
+        events = load_replay_stream("wp-review-rejection-cycle-replay")
+        rewind = next(e for e in events if e["lamport_clock"] == 6)
+        payload = rewind["payload"]
+        assert payload["force"] is True
+        assert isinstance(payload["reason"], str)
+        assert payload["reason"].startswith("backward rewind: in_review -> planned")
+
+    def test_all_other_events_have_force_false(self) -> None:
+        from spec_kitty_events.conformance import load_replay_stream
+
+        events = load_replay_stream("wp-review-rejection-cycle-replay")
+        for event in events:
+            if event["lamport_clock"] == 6:
+                continue
+            assert event["payload"]["force"] is False, (
+                f"Unexpected force=True at lamport_clock={event['lamport_clock']}"
+            )
+
+    def test_unforced_backward_fixture_is_contract_invalid(self) -> None:
+        """The unforced in_review->planned single-event fixture MUST be rejected by
+        validate_transition() — the canonical contract enforcer. The fixture is
+        Pydantic-valid (force=False with no reason is structurally legal), so the
+        invalidity lives at the transition matrix layer, not the model layer.
+        """
+        from spec_kitty_events.status import (
+            StatusTransitionPayload,
+            validate_transition,
+        )
+
+        full = (
+            _FIXTURES_DIR
+            / "edge_cases/invalid/wp_status_changed_unforced_in_review_to_planned.json"
+        )
+        with open(full, encoding="utf-8") as f:
+            data = json.load(f)
+        payload = StatusTransitionPayload.model_validate(data)
+        result = validate_transition(payload)
+        assert result.valid is False
+        assert len(result.violations) >= 1
