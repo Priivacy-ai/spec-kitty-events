@@ -18,8 +18,8 @@ created_at: '2026-05-17T14:45:28.186817+00:00'
 subtasks:
 - T007
 - T008
-agent: claude
-shell_pid: '40431'
+agent: "claude:opus:curator-carla:implementer"
+shell_pid: "40431"
 history:
 - timestamp: '2026-05-17T14:30:00Z'
   actor: planner
@@ -328,3 +328,7 @@ A reviewer should:
 4. Confirm cross-links use stable paths (no NN-prefixed paths from kitty-specs, no version-pinned URLs other than the existing `v2.4.0` dossier filename).
 5. Confirm no behavior change in `status.py` — only the docstring is modified.
 6. Confirm no existing dossier content is deleted or paraphrased — additive only.
+
+## Activity Log
+
+- 2026-05-17T14:45:30Z – claude:opus:curator-carla:implementer – shell_pid=40431 – Assigned agent via action command
