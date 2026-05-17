@@ -36,7 +36,7 @@ Use a **`replay_stream` JSONL fixture** at `src/spec_kitty_events/conformance/fi
 
 ### Implementation Note
 
-The JSONL will contain canonical `Event` envelopes (matching `events/valid/event.json` shape) wrapping `WPStatusChangedPayload`. Lamport clocks are strictly monotonic. Each event has a unique deterministic `event_id` (`01KCYCLE000…000XX`).
+The JSONL will contain canonical `Event` envelopes (matching `events/valid/event.json` shape) wrapping `StatusTransitionPayload`. Lamport clocks are strictly monotonic. Each event has a unique deterministic `event_id` (`01KCYCLE000…000XX`).
 
 ---
 
@@ -48,7 +48,7 @@ The existing validator already rejects unforced backward transitions in the matr
 
 - Line 395: `if payload.from_lane is not None and payload.from_lane in TERMINAL_LANES and not payload.force` — handles terminal-lane exits (e.g. `approved` is terminal in some interpretations).
 - Lines 400-401: `if not payload.force: # Force check — if force is True, skip matrix check` — the matrix check on lines that follow returns "invalid transition" for backward moves.
-- The `force=True + reason` requirement is already enforced via `WPStatusChangedPayload` model validator (lines 318-321: `force=True requires a non-empty reason`).
+- The `force=True + reason` requirement is already enforced via `StatusTransitionPayload` model validator (lines 318-321: `force=True requires a non-empty reason`).
 
 **Conclusion**: No validator behavior change is required. FR-007 tests will codify *currently passing* behavior as a contract-stable property. The single gap is **documentation** (FR-001/-002/-003/-010) and **conformance fixtures** (FR-004/-005/-006).
 
@@ -105,7 +105,7 @@ Recommended canonical form: `"backward rewind: <from_lane> -> <to_lane>[: <feedb
 
 | Alternative | Rejected because |
 |---|---|
-| Enforce a regex inside `WPStatusChangedPayload` field validator | Tightens the wire contract — would break existing consumers (including the current CLI emit path before mission 2 lands). |
+| Enforce a regex inside `StatusTransitionPayload` field validator | Tightens the wire contract — would break existing consumers (including the current CLI emit path before mission 2 lands). |
 | Require a structured `reason_metadata` object instead of free text | New wire field — C-003 forbids. |
 | Leave reason shape unspecified | Defeats FR-010; sibling missions would each invent their own conventions. |
 
