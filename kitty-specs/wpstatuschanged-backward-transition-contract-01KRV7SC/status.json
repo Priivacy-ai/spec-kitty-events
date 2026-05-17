@@ -1,7 +1,7 @@
 {
-  "event_count": 13,
-  "last_event_id": "01KRV94122KG9XD8D96JRENFPK",
-  "materialized_at": "2026-05-17T15:33:19.554557+00:00",
+  "event_count": 15,
+  "last_event_id": "01KRV94SPY85SM8KQV3AJS2PTT",
+  "materialized_at": "2026-05-17T15:33:44.798705+00:00",
   "mission_number": "",
   "mission_slug": "wpstatuschanged-backward-transition-contract-01KRV7SC",
   "mission_type": "software-dev",
@@ -12,9 +12,9 @@
     "claimed": 0,
     "done": 0,
     "for_review": 0,
-    "in_progress": 0,
+    "in_progress": 1,
     "in_review": 0,
-    "planned": 1
+    "planned": 0
   },
   "work_packages": {
     "WP01": {
@@ -32,11 +32,11 @@
       "last_transition_at": "2026-05-17T15:31:12.629526+00:00"
     },
     "WP03": {
-      "actor": "finalize-tasks",
+      "actor": "claude:opus-4-7:python-pedro:implementer",
       "force_count": 1,
-      "lane": "planned",
-      "last_event_id": "01KRV8K16VJEPBCJ6N9GQS6228",
-      "last_transition_at": "2026-05-17T15:24:02.651953+00:00"
+      "lane": "in_progress",
+      "last_event_id": "01KRV94SPY85SM8KQV3AJS2PTT",
+      "last_transition_at": "2026-05-17T15:33:44.798705+00:00"
     }
   }
 }
