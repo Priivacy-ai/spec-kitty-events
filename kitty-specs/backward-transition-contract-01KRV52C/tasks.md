@@ -107,8 +107,8 @@ The `[P]` marker in the Parallel column indicates the subtask can be authored in
 **Independent test**: A reviewer who has never read the planning#16 issue can read `src/spec_kitty_events/status.py`'s top-of-file docstring plus the new section in `docs/consumer-contract-dossier-v2.4.0.md` and answer the question "what does a legitimate review-rejection event look like on the wire?" in under two minutes (FR-011, SC-001).
 
 **Included subtasks**:
-- [ ] T007 Add normative "Review-Rejection Transition Family" section to `src/spec_kitty_events/status.py` module docstring — section content drawn from `contracts/backward-transition-family.md` (Sections 1–7), cross-link to docs file and fixture filenames
-- [ ] T008 Add normative section "Backward Transitions: The Review-Rejection Family" to `docs/consumer-contract-dossier-v2.4.0.md` — same Sections 1–7 content as the docstring, cross-link back to `status.py` and fixture paths
+- [x] T007 Add normative "Review-Rejection Transition Family" section to `src/spec_kitty_events/status.py` module docstring — section content drawn from `contracts/backward-transition-family.md` (Sections 1–7), cross-link to docs file and fixture filenames
+- [x] T008 Add normative section "Backward Transitions: The Review-Rejection Family" to `docs/consumer-contract-dossier-v2.4.0.md` — same Sections 1–7 content as the docstring, cross-link back to `status.py` and fixture paths
 
 **Implementation sketch**:
 1. Use `contracts/backward-transition-family.md` as the source-of-truth draft for both anchors. The docstring version is markdown-with-`>>>`-style indentation if needed; the docs file gets the markdown verbatim.
