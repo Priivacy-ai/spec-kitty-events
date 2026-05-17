@@ -290,3 +290,4 @@ A reviewer should:
 ## Activity Log
 
 - 2026-05-17T14:45:04Z – claude:opus:python-pedro:implementer – shell_pid=33682 – Assigned agent via action command
+- 2026-05-17T14:50:43Z – claude:opus:python-pedro:implementer – shell_pid=33682 – Fixtures + manifest landed; loader + replay loader validations pass
