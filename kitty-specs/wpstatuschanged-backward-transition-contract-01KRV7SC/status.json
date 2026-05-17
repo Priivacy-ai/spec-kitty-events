@@ -1,19 +1,19 @@
 {
-  "event_count": 17,
-  "last_event_id": "01KRV9QXP9N8MHM3N845NCY0F7",
-  "materialized_at": "2026-05-17T15:44:11.465243+00:00",
+  "event_count": 18,
+  "last_event_id": "01KRV9WKXQNSVS0KEQ525B9051",
+  "materialized_at": "2026-05-17T15:46:45.303884+00:00",
   "mission_number": "",
   "mission_slug": "wpstatuschanged-backward-transition-contract-01KRV7SC",
   "mission_type": "software-dev",
   "summary": {
-    "approved": 2,
+    "approved": 3,
     "blocked": 0,
     "canceled": 0,
     "claimed": 0,
     "done": 0,
     "for_review": 0,
     "in_progress": 0,
-    "in_review": 1,
+    "in_review": 0,
     "planned": 0
   },
   "work_packages": {
@@ -32,11 +32,11 @@
       "last_transition_at": "2026-05-17T15:31:12.629526+00:00"
     },
     "WP03": {
-      "actor": "claude:opus-4-7:reviewer-renata:reviewer",
-      "force_count": 1,
-      "lane": "in_review",
-      "last_event_id": "01KRV9QXP9N8MHM3N845NCY0F7",
-      "last_transition_at": "2026-05-17T15:44:11.465243+00:00"
+      "actor": "user",
+      "force_count": 2,
+      "lane": "approved",
+      "last_event_id": "01KRV9WKXQNSVS0KEQ525B9051",
+      "last_transition_at": "2026-05-17T15:46:45.303884+00:00"
     }
   }
 }
