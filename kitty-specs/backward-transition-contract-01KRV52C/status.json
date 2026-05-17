@@ -1,7 +1,7 @@
 {
-  "event_count": 5,
-  "last_event_id": "01KRV6BKQ261RB0B3RPKWVVJ8J",
-  "materialized_at": "2026-05-17T14:45:02.306576+00:00",
+  "event_count": 7,
+  "last_event_id": "01KRV6CD0E594M03R929GFX410",
+  "materialized_at": "2026-05-17T14:45:28.205983+00:00",
   "mission_number": "",
   "mission_slug": "backward-transition-contract-01KRV52C",
   "mission_type": "software-dev",
@@ -12,9 +12,9 @@
     "claimed": 0,
     "done": 0,
     "for_review": 0,
-    "in_progress": 1,
+    "in_progress": 2,
     "in_review": 0,
-    "planned": 2
+    "planned": 1
   },
   "work_packages": {
     "WP01": {
@@ -32,11 +32,11 @@
       "last_transition_at": "2026-05-17T14:40:27.453578+00:00"
     },
     "WP03": {
-      "actor": "finalize-tasks",
+      "actor": "claude:opus:curator-carla:implementer",
       "force_count": 1,
-      "lane": "planned",
-      "last_event_id": "01KRV637BH5930P9ZSQP0JWNEN",
-      "last_transition_at": "2026-05-17T14:40:27.505182+00:00"
+      "lane": "in_progress",
+      "last_event_id": "01KRV6CD0E594M03R929GFX410",
+      "last_transition_at": "2026-05-17T14:45:28.205983+00:00"
     }
   }
 }
