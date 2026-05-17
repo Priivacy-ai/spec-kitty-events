@@ -100,9 +100,9 @@ Total subtasks: 13. All WPs are within the 3–7 subtask ideal range.
 **Risks**: README structure changes are sometimes contentious. Mitigated by inserting a minimal "Contracts" section without restructuring existing sections.
 
 **Included subtasks**:
-- [ ] T006 Copy contract draft to `docs/contracts/wp-status-changed.md`
-- [ ] T007 Add "Contracts" section to `README.md`
-- [ ] T008 Add `tests/test_contract_docstring_links.py`
+- [x] T006 Copy contract draft to `docs/contracts/wp-status-changed.md`
+- [x] T007 Add "Contracts" section to `README.md`
+- [x] T008 Add `tests/test_contract_docstring_links.py`
 
 ### WP03 — Conformance fixtures, manifest entries, and tests
 
