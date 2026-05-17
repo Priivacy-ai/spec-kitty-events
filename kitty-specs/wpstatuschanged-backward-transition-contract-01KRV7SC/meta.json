@@ -8,5 +8,7 @@
   "purpose_context": "Spec Kitty's MVP launch blocker (planning#17) showed that CLI emitted user-driven review rejections (in_review→planned) without force while SaaS rejected them as unforced backward transitions and dumped them into terminal_failed. The root cause is that no single source of truth defines what WPStatusChanged means for backward transitions, the role of actor=user, when force is required, and how reconciliation diagnostics are recorded. This mission defines that contract and provides conformance fixtures so every consumer implements the same semantics.",
   "purpose_tldr": "Lock the canonical WPStatusChanged event contract for backward transitions, force, actor, and reconciliation so CLI and SaaS share one interpretation.",
   "slug": "wpstatuschanged-backward-transition-contract-01KRV7SC",
-  "target_branch": "main"
+  "target_branch": "main",
+  "vcs": "git",
+  "vcs_locked_at": "2026-05-17T15:25:30.509734+00:00"
 }
