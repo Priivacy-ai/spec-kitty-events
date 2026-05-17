@@ -37,10 +37,10 @@ The `[P]` marker in the Parallel column indicates the subtask can be authored in
 - `python -c "from spec_kitty_events.conformance import load_fixtures; ids = {fc.id for fc in load_fixtures('edge_cases')}; print(set(['wp-status-changed-approved-rewind-valid','wp-status-changed-unforced-in-review-to-planned-invalid']).issubset(ids))"`
 
 **Included subtasks**:
-- [ ] T001 Author `edge_cases/replay/wp_review_rejection_cycle.jsonl` — full canonical Event-envelope JSONL with monotonic Lamport clocks, synthetic event ids, one full review-rejection round-trip
-- [ ] T002 Author `edge_cases/valid/wp_status_changed_approved_rewind.json` — single `WPStatusChanged` payload mirroring the planning#16 evidence shape but synthetic, with `force=True + reason` per FR-010 shape
-- [ ] T003 Author `edge_cases/invalid/wp_status_changed_unforced_in_review_to_planned.json` — single `WPStatusChanged` payload with `from_lane=in_review, to_lane=planned, force=False` (validator MUST reject)
-- [ ] T004 Register all three in `src/spec_kitty_events/conformance/fixtures/manifest.json` with stable `id` values
+- [x] T001 Author `edge_cases/replay/wp_review_rejection_cycle.jsonl` — full canonical Event-envelope JSONL with monotonic Lamport clocks, synthetic event ids, one full review-rejection round-trip
+- [x] T002 Author `edge_cases/valid/wp_status_changed_approved_rewind.json` — single `WPStatusChanged` payload mirroring the planning#16 evidence shape but synthetic, with `force=True + reason` per FR-010 shape
+- [x] T003 Author `edge_cases/invalid/wp_status_changed_unforced_in_review_to_planned.json` — single `WPStatusChanged` payload with `from_lane=in_review, to_lane=planned, force=False` (validator MUST reject)
+- [x] T004 Register all three in `src/spec_kitty_events/conformance/fixtures/manifest.json` with stable `id` values
 
 **Implementation sketch**:
 1. Match existing `wp_status_changed.json` field shape exactly for T002 and T003 (consistent wire shape).
