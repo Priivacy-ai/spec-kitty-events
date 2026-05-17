@@ -332,3 +332,4 @@ A reviewer should:
 ## Activity Log
 
 - 2026-05-17T14:45:30Z – claude:opus:curator-carla:implementer – shell_pid=40431 – Assigned agent via action command
+- 2026-05-17T14:49:35Z – claude:opus:curator-carla:implementer – shell_pid=40431 – Normative docs landed in both anchors; cross-links verified
