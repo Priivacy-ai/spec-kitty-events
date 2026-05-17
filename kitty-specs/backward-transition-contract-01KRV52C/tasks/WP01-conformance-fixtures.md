@@ -18,8 +18,8 @@ subtasks:
 - T002
 - T003
 - T004
-agent: claude
-shell_pid: '33682'
+agent: "claude:opus:python-pedro:implementer"
+shell_pid: "33682"
 history:
 - timestamp: '2026-05-17T14:30:00Z'
   actor: planner
@@ -286,3 +286,7 @@ A reviewer should:
 4. Verify the unforced-invalid fixture has `force=False, reason=null` (the planning#16 bug shape).
 5. Verify manifest.json parses cleanly and ids are unique across the file.
 6. Confirm no copy of any of the 22 dev evidence events from `~/spec-kitty-dev/terminal-failed-evidence-2026-05-17.json` (all identifiers must be synthetic).
+
+## Activity Log
+
+- 2026-05-17T14:45:04Z – claude:opus:python-pedro:implementer – shell_pid=33682 – Assigned agent via action command
