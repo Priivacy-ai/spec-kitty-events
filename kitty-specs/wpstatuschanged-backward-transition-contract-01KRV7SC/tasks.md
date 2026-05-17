@@ -79,11 +79,11 @@ Total subtasks: 13. All WPs are within the 3–7 subtask ideal range.
 **Risks**: 1) Drift between committed schema and model. Mitigated by T005 drift test. 2) Importing `StrEnum` requires Python 3.11; project supports 3.10+. Mitigated by importing from `enum` and using `str, Enum` pattern instead of `StrEnum` if Python 3.10 compatibility is needed (verify in pyproject `requires-python`).
 
 **Included subtasks**:
-- [ ] T001 Add `ReconciliationReasonCode` enum + `RECONCILIATION_REASON_CODES` tuple
-- [ ] T002 Add `ReconciliationDiagnostic` Pydantic frozen model
-- [ ] T003 Generate `reconciliation_diagnostic.schema.json` and commit it
-- [ ] T004 Update `status.py` module docstring to link the contract document
-- [ ] T005 Add model and schema-drift tests
+- [x] T001 Add `ReconciliationReasonCode` enum + `RECONCILIATION_REASON_CODES` tuple
+- [x] T002 Add `ReconciliationDiagnostic` Pydantic frozen model
+- [x] T003 Generate `reconciliation_diagnostic.schema.json` and commit it
+- [x] T004 Update `status.py` module docstring to link the contract document
+- [x] T005 Add model and schema-drift tests
 
 ### WP02 — Contract document and README integration
 
