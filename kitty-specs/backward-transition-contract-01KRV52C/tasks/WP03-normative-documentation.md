@@ -18,8 +18,8 @@ created_at: '2026-05-17T14:45:28.186817+00:00'
 subtasks:
 - T007
 - T008
-agent: "claude:opus:curator-carla:implementer"
-shell_pid: "40431"
+agent: "claude:opus:reviewer-renata:reviewer"
+shell_pid: "8837"
 history:
 - timestamp: '2026-05-17T14:30:00Z'
   actor: planner
@@ -333,3 +333,4 @@ A reviewer should:
 
 - 2026-05-17T14:45:30Z – claude:opus:curator-carla:implementer – shell_pid=40431 – Assigned agent via action command
 - 2026-05-17T14:49:35Z – claude:opus:curator-carla:implementer – shell_pid=40431 – Normative docs landed in both anchors; cross-links verified
+- 2026-05-17T14:51:48Z – claude:opus:reviewer-renata:reviewer – shell_pid=8837 – Started review via action command
