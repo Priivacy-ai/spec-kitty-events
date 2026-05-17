@@ -26,8 +26,8 @@ subtasks:
 - T007
 - T008
 phase: Phase 1 - Contract document
-agent: claude
-shell_pid: '1154'
+agent: "claude:opus-4-7:curator-carla:implementer"
+shell_pid: "1154"
 history:
 - timestamp: '2026-05-17T15:25:00Z'
   lane: planned
@@ -184,3 +184,7 @@ Mission requirements covered: FR-001, FR-002, FR-003, FR-004, FR-005, FR-010 (lo
 - `grep -c "wp-status-changed.md" README.md` ≥ 1.
 - Spot-check the transition table against `_ALLOWED_TRANSITIONS` in `status.py:342-368`.
 - Verify the four required reason codes appear in the doc's enum table.
+
+## Activity Log
+
+- 2026-05-17T15:25:52Z – claude:opus-4-7:curator-carla:implementer – shell_pid=1154 – Assigned agent via action command
