@@ -18,11 +18,22 @@ requirement_refs:
 planning_base_branch: main
 merge_target_branch: main
 branch_strategy: Planning artifacts for this mission were generated on main. During /spec-kitty.implement this WP may branch from a dependency-specific base, but completed changes must merge back into main unless the human explicitly redirects the landing branch.
+base_branch: kitty/mission-wpstatuschanged-backward-transition-contract-01KRV7SC
+base_commit: e670502aa049450b83cb2506a54d3cb2a3ab34fb
+created_at: '2026-05-17T15:25:51.288891+00:00'
 subtasks:
 - T006
 - T007
 - T008
 phase: Phase 1 - Contract document
+agent: claude
+shell_pid: '1154'
+history:
+- timestamp: '2026-05-17T15:25:00Z'
+  lane: planned
+  agent: system
+  shell_pid: ''
+  action: Prompt generated via /spec-kitty.tasks
 agent_profile: curator-carla
 authoritative_surface: docs/contracts/
 execution_mode: code_change
@@ -34,14 +45,7 @@ owned_files:
 review_status: ''
 reviewed_by: ''
 role: implementer
-agent: claude
 tags: []
-history:
-- timestamp: '2026-05-17T15:25:00Z'
-  lane: planned
-  agent: system
-  shell_pid: ''
-  action: Prompt generated via /spec-kitty.tasks
 ---
 
 # Work Package Prompt: WP02 – Contract Document and README Integration
