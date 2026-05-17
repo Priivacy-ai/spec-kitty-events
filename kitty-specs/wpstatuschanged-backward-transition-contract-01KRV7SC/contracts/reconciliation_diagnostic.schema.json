@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spec-kitty.dev/schemas/reconciliation_diagnostic.schema.json",
+  "title": "ReconciliationDiagnostic",
+  "description": "A consumer-emitted diagnostic recording a deterministic business-rule outcome for a WPStatusChanged event. MUST NOT be counted toward infra-failure metrics. See contracts/wp-status-changed.contract.md.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "mission_slug",
+    "wp_id",
+    "event_id",
+    "reason_code",
+    "actor",
+    "detected_at"
+  ],
+  "properties": {
+    "mission_slug": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Mission identifier."
+    },
+    "wp_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Work-package identifier."
+    },
+    "event_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "event_id of the WPStatusChanged event that triggered the diagnostic."
+    },
+    "expected_from_lane": {
+      "type": ["string", "null"],
+      "enum": ["planned", "claimed", "in_progress", "for_review", "in_review", "approved", "done", "blocked", "canceled", null],
+      "description": "from_lane on the offending event (null permitted for bootstrap edge cases)."
+    },
+    "actual_projected_lane": {
+      "type": ["string", "null"],
+      "enum": ["planned", "claimed", "in_progress", "for_review", "in_review", "approved", "done", "blocked", "canceled", null],
+      "description": "Lane the consumer's projection had for this WP at receipt."
+    },
+    "reason_code": {
+      "type": "string",
+      "enum": [
+        "from_lane_mismatch_replay",
+        "from_lane_mismatch_drift",
+        "terminal_replay_skipped",
+        "unforced_rollback_without_review_ref"
+      ],
+      "description": "Closed-enum reason. Adding a value requires a contract doc update and at least one conformance fixture."
+    },
+    "actor": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Audit identity of the consumer that produced the diagnostic (not the producer's actor)."
+    },
+    "detected_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "UTC timestamp the consumer made the determination."
+    }
+  }
+}

@@ -1,0 +1,180 @@
+# Contract: WPStatusChanged Event Semantics
+
+**Status**: Canonical (locked by mission `wpstatuschanged-backward-transition-contract-01KRV7SC`).
+**Owners**: `spec-kitty-events` maintainers.
+**Consumers**: `spec-kitty` CLI, `spec-kitty-saas` materializer, `spec-kitty-saas` durable drain worker.
+**Binding artefacts**: this document + `src/spec_kitty_events/conformance/fixtures/wp_status_changed/`. When this document and the fixtures disagree, the fixtures win.
+
+> This document is the canonical interpretation of `WPStatusChanged`. Any code path that handles a `WPStatusChanged` event in any repo MUST behave consistently with this contract. Drift between this document and a consumer's behaviour is a defect.
+
+---
+
+## 1. Event shape
+
+`WPStatusChanged` wraps a `StatusTransitionPayload` (`src/spec_kitty_events/status.py`):
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| `mission_slug` | str (non-empty) | yes | |
+| `wp_id` | str (non-empty) | yes | |
+| `from_lane` | `Lane \| null` | no | `null` allowed only for the canonical bootstrap transition `(null → planned)` with `force=true`. |
+| `to_lane` | `Lane` | yes | |
+| `actor` | str \| dict | yes | Audit-only. **Does not modify validation.** See §4. |
+| `force` | bool | yes (default `false`) | See §3 for the exact cases that require `force=true`. |
+| `reason` | str \| null | conditional | Required when `force=true` (non-empty). Required when `from_lane=in_progress` and `to_lane=planned` (non-empty). |
+| `execution_mode` | `ExecutionMode` | yes | |
+| `review_ref` | str \| null | conditional | Required for review-rollback transitions; see §3.2. |
+| `evidence` | `DoneEvidence \| null` | conditional | Required when `to_lane in {approved, done}`. |
+
+The wire envelope adds `event_id` (ULID), `event_type` (`"WPStatusChanged"`), and standard envelope metadata. `event_id` is treated as the canonical replay key (§6).
+
+## 2. Lane set and the allowed-transition matrix
+
+The `Lane` enum has these values: `planned`, `claimed`, `in_progress`, `for_review`, `in_review`, `approved`, `done`, `blocked`, `canceled`.
+
+The canonical allowed-without-force transition matrix is the frozenset literal at `src/spec_kitty_events/status.py:342-368`. Reproduced here as a table (any drift between this table and the source code is a defect in this document):
+
+| from_lane | to_lane | Notes |
+|---|---|---|
+| `null` | `planned` | Bootstrap (also requires `force=true`; see §3) |
+| `planned` | `claimed` | Forward |
+| `claimed` | `in_progress` | Forward |
+| `in_progress` | `for_review` | Forward |
+| `in_progress` | `approved` | Forward (uncommon) |
+| `for_review` | `in_review` | Forward |
+| `for_review` | `approved` | Forward |
+| `for_review` | `done` | Forward |
+| `in_review` | `approved` | Forward |
+| `in_review` | `done` | Forward |
+| `approved` | `done` | Forward |
+| `for_review` | `in_progress` | **Review rollback** — requires `review_ref` (§3.2) |
+| `for_review` | `planned` | **Review rollback** — requires `review_ref` |
+| `in_review` | `in_progress` | **Review rollback** — requires `review_ref` |
+| `in_review` | `for_review` | **Review rollback** — requires `review_ref` |
+| `in_review` | `planned` | **Review rollback** — requires `review_ref` |
+| `approved` | `in_progress` | **Review rollback** — requires `review_ref` |
+| `approved` | `planned` | **Review rollback** — requires `review_ref` |
+| `in_progress` | `planned` | Abandon/reassign — requires non-empty `reason` |
+| `blocked` | `in_progress` | Unblock |
+
+Plus the always-allowed sinks:
+- `* → blocked` from any non-terminal lane.
+- `* → canceled` from any non-terminal lane.
+
+`done` and `canceled` are **terminal**. Exiting either requires `force=true` (§3.1).
+
+## 3. When `force=true` is required
+
+### 3.1 Terminal exit
+
+Any transition where `from_lane in {done, canceled}` requires `force=true` AND a non-empty `reason`. There is no exception.
+
+### 3.2 Outside-matrix transitions
+
+Any `(from_lane, to_lane)` pair not in §2 requires `force=true` (and the same `reason` requirement). Examples: `done → done`, `planned → done` (sketch flows skip lanes), etc.
+
+### 3.3 Review rollback DOES NOT require `force=true`
+
+This is the locked decision the contract exists to enforce.
+
+> **Review-rollback transitions** — the eight pairs listed as "Review rollback" in §2 — are NORMAL transitions in the matrix. They MUST be accepted without `force=true`, provided `review_ref` is present and non-empty.
+
+A consumer that rejects an unforced review-rollback as "invalid backward transition" is **non-conformant**. The correct rejection condition is "review-rollback without `review_ref`" (which surfaces as `reason_code = unforced_rollback_without_review_ref`; see §6).
+
+### 3.4 Reason field
+
+`reason` is required (non-empty) in these cases:
+- `force=true` (always).
+- `from_lane=in_progress` AND `to_lane=planned` (abandon).
+
+`reason` is optional otherwise. Producers MAY set `reason` for clarity even when not required.
+
+## 4. `actor` is audit-only
+
+`actor` is a free-form audit-identity field. It may be a non-empty string (e.g. `"user"`, `"claude"`, `"codex"`, `"migration"`) or a non-empty dict (e.g. `{"role": "reviewer", "profile": "python-pedro"}`).
+
+**`actor` MUST NOT modify validation.** Specifically:
+
+- `actor="user"` is NOT an implicit `force=true`. A consumer that sees a backward transition with `actor="user"` MUST evaluate the same matrix + guards as for any other actor.
+- `actor="migration"` is NOT a policy escape hatch. Migration code that needs to bypass the matrix MUST set `force=true` explicitly and provide a non-empty `reason`.
+- Future structured-actor schemes (`{"profile": …, "role": …}`) MUST NOT be wired into validation. They are observability only.
+
+## 5. `from_lane` mismatch and reconciliation
+
+A consumer maintains a projection of the current lane for each `wp_id`. When a `WPStatusChanged` event arrives with `from_lane != projection`, the consumer MUST treat the event as a reconciliation case, NOT as an infra failure.
+
+Two sub-cases distinguished by `reason_code` (closed enum; see §7):
+
+### 5.1 `from_lane_mismatch_replay`
+
+The event's `from_lane` matches a prior projection state that the consumer has already advanced past (i.e. the event has effectively already been applied via a subsequent event). The consumer SHOULD:
+
+1. Emit a `ReconciliationDiagnostic` with `reason_code=from_lane_mismatch_replay`.
+2. SKIP re-application of the event.
+3. NOT count the event toward infra failures.
+
+### 5.2 `from_lane_mismatch_drift`
+
+The event's `from_lane` does not match any prior projection state in the consumer's event log for that `wp_id`. The consumer MUST:
+
+1. Emit a `ReconciliationDiagnostic` with `reason_code=from_lane_mismatch_drift`.
+2. HOLD the event (do not apply, do not retry, do not infra-fail).
+3. Surface the diagnostic on a dedicated drift surface (see §9) for operator review.
+
+## 6. Replay
+
+### 6.1 Detection
+
+Replay is detected at the consumer BEFORE invoking `validate_transition`. The replay key is:
+
+1. `event_id` (preferred; present on every emitted event today).
+2. `(mission_slug, wp_id, sequence)` (fallback, used only if `event_id` is missing).
+
+A replay hit is logged at debug level and produces no `ReconciliationDiagnostic`.
+
+### 6.2 Terminal replay
+
+A `terminal replay` is the special case where an event targets a terminal lane (`done`, `canceled`) that the projection is already in. Consumers MAY emit a `ReconciliationDiagnostic` with `reason_code=terminal_replay_skipped` for visibility, but MUST NOT infra-fail and MUST NOT apply the event a second time.
+
+## 7. `ReconciliationDiagnostic` shape
+
+The Pydantic model is defined in `src/spec_kitty_events/status.py` and its JSON Schema in `src/spec_kitty_events/schemas/reconciliation_diagnostic.schema.json`. See [data-model.md](../data-model.md) for the full field set. The `reason_code` field is a closed enum:
+
+| Code | Meaning |
+|---|---|
+| `from_lane_mismatch_replay` | The event was effectively already applied; consumer skipped re-application. |
+| `from_lane_mismatch_drift` | The event's `from_lane` does not match any prior projection state. Held for operator review. |
+| `terminal_replay_skipped` | Optional diagnostic when a replay targets a terminal lane the projection is already in. |
+| `unforced_rollback_without_review_ref` | Producer emitted a review-rollback transition without `review_ref`. Consumer correctly rejected; logged for producer-side debugging. |
+
+Adding a new `reason_code` REQUIRES updating this document AND adding at least one conformance fixture (D-6 / FR-013).
+
+## 8. Consumer responsibilities
+
+| Consumer | Responsibility | Mission/issue |
+|---|---|---|
+| `spec-kitty` CLI (producer) | Emit review-rollback events with `force=false` and a non-empty `review_ref`. Emit terminal-exit events with `force=true` and `reason`. Never emit a backward transition with `actor` carrying policy intent. | spec-kitty#1089, spec-kitty#1087 |
+| `spec-kitty-saas` materializer | Accept review-rollback events without `force=true` per §3.3. Detect replay per §6 and emit `ReconciliationDiagnostic` per §5/§6 instead of `terminal_failed`. | spec-kitty-saas#205 |
+| `spec-kitty-saas` durable drain worker | Classify `ReconciliationDiagnostic` outcomes as reconciliation, not as infra terminal failure. Report on a separate drift/diagnostic surface from infra readiness. | spec-kitty-saas#204, spec-kitty-saas#206 |
+
+## 9. Diagnostic surface separation
+
+`ReconciliationDiagnostic` events MUST be reported on a SEPARATE health surface from infra-failure events. Conflating reconciliation with infra failure (as the 2026-05-17 incident did) is the failure mode this contract exists to prevent.
+
+Specifically:
+
+- `/health/ready/` (or equivalent) MUST report `reconciliation_pending` count separately from `infra_terminal_failed` count.
+- A non-zero `reconciliation_pending` count is operator-actionable but does NOT degrade readiness.
+- A non-zero `infra_terminal_failed` count MAY degrade readiness per the consumer's policy.
+
+This requirement is the contract-side floor that `spec-kitty-saas#204` and `spec-kitty-saas#206` consume.
+
+## 10. Conformance
+
+The binding artefact is the fixture set at `src/spec_kitty_events/conformance/fixtures/wp_status_changed/` plus the manifest entries in `src/spec_kitty_events/conformance/fixtures/manifest.json`.
+
+A consumer claims conformance by exercising every fixture and producing the declared `outcome` and (where applicable) `reason_code`. Conformance is a single binary: any deviation on any fixture is non-conformance.
+
+## 11. Versioning
+
+This contract is versioned with the `spec-kitty-events` package. Backward-incompatible changes to this contract MUST bump the package major version and provide a migration runbook for consumers.
