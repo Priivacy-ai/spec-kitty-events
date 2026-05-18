@@ -33,7 +33,11 @@ from spec_kitty_events import (
     SpecKittyEventsError,
     ValidationError,
 )
-from spec_kitty_events.status import _ALLOWED_TRANSITIONS, _is_review_rejection_pair
+from spec_kitty_events.status import (
+    _ALLOWED_TRANSITIONS,
+    _REVIEW_REJECTION_FAMILY,
+    _is_review_rejection_pair,
+)
 
 
 # ---------------------------------------------------------------------------
@@ -1770,3 +1774,21 @@ def test_is_review_rejection_pair_helper() -> None:
     assert _is_review_rejection_pair(Lane.FOR_REVIEW, Lane.PLANNED) is True
     assert _is_review_rejection_pair(Lane.IN_REVIEW, Lane.PLANNED) is True
     assert _is_review_rejection_pair(Lane.APPROVED, Lane.PLANNED) is True
+
+
+def test_review_rejection_family_has_exactly_four_pairs() -> None:
+    """FR-004: the family is exactly these four ordered pairs, no more, no fewer.
+
+    A new pair being added without explicit spec amendment widens the
+    contract silently; this assertion makes that drift visible at test time.
+    """
+    assert len(_REVIEW_REJECTION_FAMILY) == 4, (
+        f"FR-004 says exactly 4 pairs; got {len(_REVIEW_REJECTION_FAMILY)}: "
+        f"{sorted(_REVIEW_REJECTION_FAMILY)}"
+    )
+    assert _REVIEW_REJECTION_FAMILY == frozenset({
+        (Lane.IN_PROGRESS, Lane.PLANNED),
+        (Lane.FOR_REVIEW, Lane.PLANNED),
+        (Lane.IN_REVIEW, Lane.PLANNED),
+        (Lane.APPROVED, Lane.PLANNED),
+    })
