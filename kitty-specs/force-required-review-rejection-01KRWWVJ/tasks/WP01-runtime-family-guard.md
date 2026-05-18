@@ -401,3 +401,7 @@ with no diff. Paste the last lines of each into the commit message.
 ```bash
 spec-kitty agent action implement WP01 --agent <name>
 ```
+
+## Activity Log
+
+- 2026-05-18T07:30:07Z – claude – Done override: Status sync after mission merge (commit 78d01d4); WP01 actually completed and merged on 2026-05-18 but status.json on main captured pre-transition snapshot.
