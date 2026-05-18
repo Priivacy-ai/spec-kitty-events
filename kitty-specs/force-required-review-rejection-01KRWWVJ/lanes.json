@@ -1,0 +1,58 @@
+{
+  "version": 1,
+  "mission_slug": "force-required-review-rejection-01KRWWVJ",
+  "mission_id": "01KRWWVJM6FSH9GW2GNC8VF1QW",
+  "mission_branch": "kitty/mission-force-required-review-rejection-01KRWWVJ",
+  "target_branch": "fix/events-32-force-required-wpstatuschanged",
+  "lanes": [
+    {
+      "lane_id": "lane-a",
+      "wp_ids": [
+        "WP01",
+        "WP02"
+      ],
+      "write_scope": [
+        "docs/consumer-contract-dossier-v2.4.0.md",
+        "src/spec_kitty_events/conformance/fixtures/edge_cases/invalid/wp_status_changed_unforced_approved_to_planned.json",
+        "src/spec_kitty_events/conformance/fixtures/edge_cases/invalid/wp_status_changed_unforced_for_review_to_planned.json",
+        "src/spec_kitty_events/conformance/fixtures/edge_cases/invalid/wp_status_changed_unforced_in_progress_to_planned.json",
+        "src/spec_kitty_events/conformance/fixtures/edge_cases/invalid/wp_status_changed_unforced_in_review_to_planned.json",
+        "src/spec_kitty_events/conformance/fixtures/edge_cases/valid/wp_status_changed_approved_rewind.json",
+        "src/spec_kitty_events/conformance/fixtures/edge_cases/valid/wp_status_changed_forced_for_review_to_planned.json",
+        "src/spec_kitty_events/conformance/fixtures/edge_cases/valid/wp_status_changed_forced_in_progress_to_planned.json",
+        "src/spec_kitty_events/conformance/fixtures/edge_cases/valid/wp_status_changed_forced_in_review_to_planned.json",
+        "src/spec_kitty_events/conformance/fixtures/manifest.json",
+        "src/spec_kitty_events/status.py",
+        "tests/unit/test_fixtures.py",
+        "tests/unit/test_status.py"
+      ],
+      "predicted_surfaces": [
+        "api",
+        "artifact-rendering",
+        "legacy-cleanup",
+        "tests",
+        "workspace"
+      ],
+      "depends_on_lanes": [],
+      "parallel_group": 0
+    }
+  ],
+  "computed_at": "2026-05-18T06:49:23.674248+00:00",
+  "computed_from": "dependency_graph+ownership",
+  "planning_artifact_wps": [],
+  "collapse_report": {
+    "events": [
+      {
+        "wp_a": "WP02",
+        "wp_b": "WP01",
+        "rule": "dependency",
+        "evidence": "WP02 depends on WP01"
+      }
+    ],
+    "total_merges": 1,
+    "independent_wps_collapsed": 0,
+    "by_rule": {
+      "dependency": 1
+    }
+  }
+}

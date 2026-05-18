@@ -1,0 +1,12 @@
+{
+  "wp_id": "WP21",
+  "from_lane": "for_review",
+  "to_lane": "planned",
+  "actor": "user",
+  "force": true,
+  "reason": "backward rewind: for_review -> planned: intake rejected",
+  "execution_mode": "worktree",
+  "review_ref": "feedback://mission-backward-transition-demo/WP21/intake-rejected.md",
+  "evidence": null,
+  "mission_slug": "mission-backward-transition-demo"
+}

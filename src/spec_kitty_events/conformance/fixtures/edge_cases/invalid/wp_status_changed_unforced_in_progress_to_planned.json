@@ -1,0 +1,12 @@
+{
+  "wp_id": "WP10",
+  "from_lane": "in_progress",
+  "to_lane": "planned",
+  "actor": "user",
+  "force": false,
+  "reason": "abandoned: pivoting approach",
+  "execution_mode": "worktree",
+  "review_ref": "feedback://mission-backward-transition-demo/WP10/2026-05-18-rewind.md",
+  "evidence": null,
+  "mission_slug": "mission-backward-transition-demo"
+}

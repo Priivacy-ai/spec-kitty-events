@@ -1838,7 +1838,55 @@
       "path": "edge_cases/invalid/wp_status_changed_unforced_in_review_to_planned.json",
       "expected_result": "invalid",
       "event_type": "WPStatusChanged",
-      "notes": "Unforced backward transition in_review->planned; contract-invalid (matches planning#16 wire bug).",
+      "notes": "Unforced backward transition in_review->planned with review_ref and reason populated; isolates missing force=True as the failure mode. validate_transition() MUST emit a violation containing both 'force=True' and 'review-rejection' via the explicit review-rejection family guard.",
+      "min_version": "3.0.0"
+    },
+    {
+      "id": "wp-status-changed-unforced-in-progress-to-planned-invalid",
+      "path": "edge_cases/invalid/wp_status_changed_unforced_in_progress_to_planned.json",
+      "expected_result": "invalid",
+      "event_type": "WPStatusChanged",
+      "notes": "Unforced backward transition in_progress->planned with review_ref and reason populated. validate_transition() MUST emit a violation containing both 'force=True' and 'review-rejection' (substring 'in_progress' present in the family-guard message).",
+      "min_version": "3.0.0"
+    },
+    {
+      "id": "wp-status-changed-unforced-for-review-to-planned-invalid",
+      "path": "edge_cases/invalid/wp_status_changed_unforced_for_review_to_planned.json",
+      "expected_result": "invalid",
+      "event_type": "WPStatusChanged",
+      "notes": "Unforced backward transition for_review->planned with review_ref and reason populated. validate_transition() MUST emit a violation containing both 'force=True' and 'review-rejection' (substring 'for_review' present in the family-guard message).",
+      "min_version": "3.0.0"
+    },
+    {
+      "id": "wp-status-changed-unforced-approved-to-planned-invalid",
+      "path": "edge_cases/invalid/wp_status_changed_unforced_approved_to_planned.json",
+      "expected_result": "invalid",
+      "event_type": "WPStatusChanged",
+      "notes": "Unforced backward transition approved->planned with review_ref and reason populated. validate_transition() MUST emit a violation containing both 'force=True' and 'review-rejection' (substring 'approved' present in the family-guard message).",
+      "min_version": "3.0.0"
+    },
+    {
+      "id": "wp-status-changed-forced-in-progress-to-planned-valid",
+      "path": "edge_cases/valid/wp_status_changed_forced_in_progress_to_planned.json",
+      "expected_result": "valid",
+      "event_type": "WPStatusChanged",
+      "notes": "Valid forced backward transition in_progress->planned per the review-rejection family; force=true with non-empty reason and review_ref.",
+      "min_version": "3.0.0"
+    },
+    {
+      "id": "wp-status-changed-forced-for-review-to-planned-valid",
+      "path": "edge_cases/valid/wp_status_changed_forced_for_review_to_planned.json",
+      "expected_result": "valid",
+      "event_type": "WPStatusChanged",
+      "notes": "Valid forced backward transition for_review->planned per the review-rejection family; force=true with non-empty reason and review_ref.",
+      "min_version": "3.0.0"
+    },
+    {
+      "id": "wp-status-changed-forced-in-review-to-planned-valid",
+      "path": "edge_cases/valid/wp_status_changed_forced_in_review_to_planned.json",
+      "expected_result": "valid",
+      "event_type": "WPStatusChanged",
+      "notes": "Valid forced backward transition in_review->planned per the review-rejection family; force=true with non-empty reason and review_ref.",
       "min_version": "3.0.0"
     },
     {

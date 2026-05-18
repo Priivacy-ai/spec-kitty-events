@@ -223,8 +223,27 @@ The wire payload shape is otherwise unchanged from
 A `WPStatusChanged` event with a `from_lane → to_lane` pair drawn from the
 family table but `force = False` is **contract-invalid**.
 
-- The existing `validate_transition()` validator rejects such events via
-  the lane matrix check.
+The four family pairs enforced by the guard are:
+
+| `from_lane`   | `to_lane` |
+|---------------|-----------|
+| `in_progress` | `planned` |
+| `for_review`  | `planned` |
+| `in_review`   | `planned` |
+| `approved`    | `planned` |
+
+- `validate_transition()` rejects such events via the **explicit
+  review-rejection family guard**, which runs ahead of (and independent
+  of) the lane matrix check. The guard fires regardless of whether
+  `review_ref` or `reason` are populated, so the failure isolates to the
+  missing `force = True`.
+- The emitted violation message names the family explicitly. Consumers
+  MAY route on the canonical substrings ``force=True`` and
+  ``review-rejection`` in the violation list — both substrings are part
+  of the published contract.
+- Bootstrap-planned events (`from_lane = None`, `to_lane = planned`,
+  `force = True`) are NOT part of the review-rejection family and are
+  NOT subject to this guard; see the bootstrap-planned section below.
 - Consumers (materializers, projection engines, durable drain workers) MAY
   reject these events as graph violations and SHOULD classify them as
   **business-rule rejections**, not transient infrastructure failures.

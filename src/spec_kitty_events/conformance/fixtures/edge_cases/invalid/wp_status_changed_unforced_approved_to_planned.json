@@ -1,0 +1,12 @@
+{
+  "wp_id": "WP12",
+  "from_lane": "approved",
+  "to_lane": "planned",
+  "actor": "user",
+  "force": false,
+  "reason": "approval revoked: regression discovered post-approval",
+  "execution_mode": "worktree",
+  "review_ref": "feedback://mission-backward-transition-demo/WP12/2026-05-18-revoke.md",
+  "evidence": null,
+  "mission_slug": "mission-backward-transition-demo"
+}

@@ -1,0 +1,35 @@
+{
+  "event_count": 2,
+  "last_event_id": "01KRWXHCX5DTQQZF23CJJE0ZAP",
+  "materialized_at": "2026-05-18T06:49:23.621277+00:00",
+  "mission_number": "",
+  "mission_slug": "force-required-review-rejection-01KRWWVJ",
+  "mission_type": "software-dev",
+  "summary": {
+    "approved": 0,
+    "blocked": 0,
+    "canceled": 0,
+    "claimed": 0,
+    "done": 0,
+    "for_review": 0,
+    "in_progress": 0,
+    "in_review": 0,
+    "planned": 2
+  },
+  "work_packages": {
+    "WP01": {
+      "actor": "finalize-tasks",
+      "force_count": 1,
+      "lane": "planned",
+      "last_event_id": "01KRWXHCR77YA8HX5X6K4QRXG4",
+      "last_transition_at": "2026-05-18T06:49:23.463162+00:00"
+    },
+    "WP02": {
+      "actor": "finalize-tasks",
+      "force_count": 1,
+      "lane": "planned",
+      "last_event_id": "01KRWXHCX5DTQQZF23CJJE0ZAP",
+      "last_transition_at": "2026-05-18T06:49:23.621277+00:00"
+    }
+  }
+}
