@@ -432,3 +432,7 @@ violation tuple containing `force=True` and `review-rejection`.
 ```bash
 spec-kitty agent action implement WP02 --agent <name>
 ```
+
+## Activity Log
+
+- 2026-05-18T07:30:17Z – claude – Done override: Status sync after mission merge (commit 78d01d4); WP02 actually completed and merged on 2026-05-18.
