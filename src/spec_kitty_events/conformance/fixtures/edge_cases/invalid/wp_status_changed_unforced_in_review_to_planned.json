@@ -4,9 +4,9 @@
   "to_lane": "planned",
   "actor": "user",
   "force": false,
-  "reason": null,
+  "reason": "review rejected: needs rework on edge cases",
   "execution_mode": "worktree",
-  "review_ref": null,
+  "review_ref": "feedback://mission-backward-transition-demo/WP09/2026-05-18-review.md",
   "evidence": null,
   "mission_slug": "mission-backward-transition-demo"
 }

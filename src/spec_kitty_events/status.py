@@ -35,7 +35,7 @@ where ``<from_lane>`` / ``<to_lane>`` are the literal ``Lane`` enum values
 and ``<feedback-ref>`` is optional. When present, the recommended URI shape
 is ``feedback://<mission-slug>/<wp-id>/<timestamp>-<hash>.md``.
 
-Optional but recommended:
+Optional but recommended for the four-pair review-rejection family:
 
 * ``review_ref`` -- URI-shaped pointer to the review feedback artifact.
   Same value as ``<feedback-ref>`` above when both are populated.
@@ -51,7 +51,10 @@ The wire payload shape is otherwise unchanged from
 
 A WPStatusChanged event with a ``from_lane -> to_lane`` pair drawn from the
 family table but ``force = False`` is contract-invalid. The existing
-``validate_transition()`` rejects such events via the lane matrix check.
+``validate_transition()`` rejects such events via an explicit review-rejection family guard that runs before the lane matrix check; the violation message names ``force=True`` and the family name (``review-rejection``).
+
+Consumers MAY route on the substring ``force=True`` or the substring ``review-rejection`` in the violation list to detect this family of failures without re-deriving family membership.
+
 Consumers (materializers, projection engines, durable drain workers) MAY
 reject these events as graph violations and SHOULD classify them as
 business-rule rejections, not transient infrastructure failures. The CLI
@@ -506,6 +509,27 @@ _ALLOWED_TRANSITIONS: FrozenSet[Tuple[Optional[Lane], Lane]] = frozenset({
 })
 
 
+_REVIEW_REJECTION_FAMILY: FrozenSet[Tuple[Lane, Lane]] = frozenset({
+    (Lane.IN_PROGRESS, Lane.PLANNED),
+    (Lane.FOR_REVIEW, Lane.PLANNED),
+    (Lane.IN_REVIEW, Lane.PLANNED),
+    (Lane.APPROVED, Lane.PLANNED),
+})
+
+
+def _is_review_rejection_pair(
+    from_lane: Optional[Lane], to_lane: Lane
+) -> bool:
+    """Return True iff (from_lane, to_lane) is in the review-rejection family.
+
+    Bootstrap-planned (``from_lane is None``) is intentionally False so
+    initial WP creation is never misclassified as a rollback.
+    """
+    if from_lane is None:
+        return False
+    return (from_lane, to_lane) in _REVIEW_REJECTION_FAMILY
+
+
 @dataclass(frozen=True)
 class TransitionValidationResult:
     """Result of validating a proposed status transition."""
@@ -535,6 +559,19 @@ def validate_transition(payload: StatusTransitionPayload) -> TransitionValidatio
             f"{payload.from_lane.value} is terminal; requires force=True to exit"
         )
 
+    # Explicit review-rejection family guard.
+    # Fires regardless of review_ref / reason; isolates `force=True` as the
+    # missing element so consumers do not have to infer it.
+    if (
+        not payload.force
+        and payload.from_lane is not None
+        and _is_review_rejection_pair(payload.from_lane, payload.to_lane)
+    ):
+        violations.append(
+            f"review-rejection rollback {payload.from_lane.value} -> "
+            f"{payload.to_lane.value} requires force=True"
+        )
+
     # Force check — if force is True, skip matrix check
     if not payload.force:
         # Matrix check
@@ -555,14 +592,25 @@ def validate_transition(payload: StatusTransitionPayload) -> TransitionValidatio
                 f"Transition {payload.from_lane} -> {payload.to_lane} is not allowed"
             )
 
-    # Guard conditions (checked regardless of force)
-    if (
+    # Guard conditions (checked regardless of force). The force-required
+    # review-rejection family treats review_ref as optional when force=True;
+    # older review rollback edges such as for_review -> in_progress still
+    # require review_ref.
+    review_ref_required = (
         payload.from_lane in {Lane.FOR_REVIEW, Lane.IN_REVIEW, Lane.APPROVED}
         and payload.to_lane in {Lane.IN_PROGRESS, Lane.PLANNED}
+        and not (
+            payload.force
+            and _is_review_rejection_pair(payload.from_lane, payload.to_lane)
+        )
+    )
+    if (
+        review_ref_required
         and (payload.review_ref is None or payload.review_ref.strip() == "")
     ):
         violations.append(
-            f"{payload.from_lane.value} -> {payload.to_lane.value} requires review_ref"
+            f"{payload.from_lane.value if payload.from_lane is not None else 'None'} "
+            f"-> {payload.to_lane.value} requires review_ref"
         )
 
     if (

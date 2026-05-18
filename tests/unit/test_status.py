@@ -33,7 +33,11 @@ from spec_kitty_events import (
     SpecKittyEventsError,
     ValidationError,
 )
-from spec_kitty_events.status import _ALLOWED_TRANSITIONS
+from spec_kitty_events.status import (
+    _ALLOWED_TRANSITIONS,
+    _REVIEW_REJECTION_FAMILY,
+    _is_review_rejection_pair,
+)
 
 
 # ---------------------------------------------------------------------------
@@ -671,7 +675,11 @@ class TestTransitionMatrix:
             (
                 Lane.FOR_REVIEW,
                 Lane.PLANNED,
-                {"review_ref": "feedback://WP01"},
+                {
+                    "review_ref": "feedback://WP01",
+                    "force": True,
+                    "reason": "backward rewind: for_review -> planned",
+                },
             ),
             (
                 Lane.APPROVED,
@@ -681,12 +689,16 @@ class TestTransitionMatrix:
             (
                 Lane.APPROVED,
                 Lane.PLANNED,
-                {"review_ref": "feedback://WP01"},
+                {
+                    "review_ref": "feedback://WP01",
+                    "force": True,
+                    "reason": "backward rewind: approved -> planned",
+                },
             ),
             (
                 Lane.IN_PROGRESS,
                 Lane.PLANNED,
-                {"reason": "Reassigning"},
+                {"force": True, "reason": "Reassigning"},
             ),
             (Lane.BLOCKED, Lane.IN_PROGRESS, {}),
             (Lane.PLANNED, Lane.BLOCKED, {}),
@@ -837,6 +849,7 @@ class TestGuardConditions:
         payload = _make_payload(
             from_lane=Lane.IN_PROGRESS,
             to_lane=Lane.PLANNED,
+            force=True,
             reason="Reassigning to another agent",
         )
         result = validate_transition(payload)
@@ -1581,7 +1594,7 @@ class TestBootstrapPlannedInitializeOnly:
 
 
 # ---------------------------------------------------------------------------
-# Review-rejection family (backward-transition-contract-01KRV52C, WP02)
+# Review-rejection family (force-required-review-rejection-01KRWWVJ)
 # ---------------------------------------------------------------------------
 
 
@@ -1600,12 +1613,8 @@ class TestReviewRejectionFamily:
     def test_forced_backward_with_reason_accepted(self, from_lane: str) -> None:
         """force=True + non-empty reason MUST yield a valid transition result.
 
-        Some family members (for_review, in_review, approved) carry an
-        additional ``review_ref`` guard on the backward edge; supplying a
-        canonical feedback URI keeps the guard satisfied so the test
-        isolates the force+reason contract rather than re-asserting the
-        review_ref guard, which is already exercised by
-        :class:`TestGuardConditions`.
+        ``review_ref`` is optional for the force-required review-rejection
+        family when ``force=True`` and ``reason`` is populated.
         """
         payload = StatusTransitionPayload(
             **{
@@ -1614,10 +1623,6 @@ class TestReviewRejectionFamily:
                 "to_lane": "planned",
                 "force": True,
                 "reason": f"backward rewind: {from_lane} -> planned",
-                "review_ref": (
-                    f"feedback://mission-backward-transition-demo/WP01/"
-                    f"20260517T140000Z-{from_lane}.md"
-                ),
             }
         )
         result = validate_transition(payload)
@@ -1671,3 +1676,110 @@ class TestReviewRejectionFamily:
                     "reason": "",
                 }
             )
+
+    def test_unforced_rollback_rejects_with_force_violation_even_with_review_ref_and_reason(
+        self, from_lane: str
+    ) -> None:
+        """The family guard MUST fire on force=False rollbacks even when
+        ``reason`` and ``review_ref`` are populated. The violation MUST name
+        ``force=True`` AND the family name ``review-rejection`` so consumers
+        can route on either substring.
+        """
+        payload = StatusTransitionPayload(
+            **{
+                **VALID_TRANSITION_DATA,
+                "from_lane": from_lane,
+                "to_lane": "planned",
+                "force": False,
+                "reason": f"backward rewind: {from_lane} -> planned",
+                "review_ref": (
+                    f"feedback://mission-review-rejection-family/WP01/"
+                    f"20260518T120000Z-{from_lane}.md"
+                ),
+            }
+        )
+        result = validate_transition(payload)
+        assert result.valid is False, (
+            f"Expected unforced {from_lane} -> planned to be invalid; "
+            f"violations: {result.violations}"
+        )
+        assert any(
+            "force=True" in v and "review-rejection" in v
+            for v in result.violations
+        ), (
+            f"Expected a violation containing both 'force=True' and "
+            f"'review-rejection'; got: {result.violations}"
+        )
+
+    def test_forced_rollback_with_reason_is_accepted(self, from_lane: str) -> None:
+        """force=True + reason + review_ref is valid for every family member.
+        """
+        payload = StatusTransitionPayload(
+            **{
+                **VALID_TRANSITION_DATA,
+                "from_lane": from_lane,
+                "to_lane": "planned",
+                "force": True,
+                "reason": f"backward rewind: {from_lane} -> planned",
+                "review_ref": (
+                    f"feedback://mission-review-rejection-family/WP01/"
+                    f"20260518T120000Z-{from_lane}.md"
+                ),
+            }
+        )
+        result = validate_transition(payload)
+        assert result.valid is True, (
+            f"Expected forced {from_lane} -> planned to be valid; "
+            f"violations: {result.violations}"
+        )
+
+
+def test_bootstrap_planned_is_not_review_rejection() -> None:
+    """Bootstrap-planned (from_lane=None, to_lane=planned, force=True) MUST
+    remain valid and MUST NOT surface a ``force=True`` family-guard violation.
+    """
+    payload = StatusTransitionPayload(
+        **{
+            **VALID_TRANSITION_DATA,
+            "from_lane": None,
+            "to_lane": "planned",
+            "force": True,
+            "reason": "bootstrap-planned: initial seeding",
+        }
+    )
+    result = validate_transition(payload)
+    assert result.valid is True, (
+        f"Bootstrap-planned must validate; violations: {result.violations}"
+    )
+    assert not any("force=True" in v for v in result.violations), (
+        f"Bootstrap-planned must not surface a force=True family violation; "
+        f"got: {result.violations}"
+    )
+
+
+def test_is_review_rejection_pair_helper() -> None:
+    """Predicate sanity: family members True, bootstrap and forward pairs False."""
+    assert _is_review_rejection_pair(None, Lane.PLANNED) is False
+    assert _is_review_rejection_pair(Lane.PLANNED, Lane.CLAIMED) is False
+    assert _is_review_rejection_pair(Lane.IN_PROGRESS, Lane.PLANNED) is True
+    assert _is_review_rejection_pair(Lane.FOR_REVIEW, Lane.PLANNED) is True
+    assert _is_review_rejection_pair(Lane.IN_REVIEW, Lane.PLANNED) is True
+    assert _is_review_rejection_pair(Lane.APPROVED, Lane.PLANNED) is True
+
+
+def test_review_rejection_family_has_exactly_four_pairs() -> None:
+    """FR-004: the family is exactly these four ordered pairs, no more, no fewer.
+
+    A new pair being added without explicit spec amendment widens the
+    contract silently; this assertion makes that drift visible at test time.
+    """
+    assert len(_REVIEW_REJECTION_FAMILY) == 4, (
+        f"FR-004 says exactly 4 pairs; got {len(_REVIEW_REJECTION_FAMILY)}: "
+        f"{sorted(_REVIEW_REJECTION_FAMILY)}"
+    )
+    assert _REVIEW_REJECTION_FAMILY == frozenset({
+        (Lane.IN_PROGRESS, Lane.PLANNED),
+        (Lane.FOR_REVIEW, Lane.PLANNED),
+        (Lane.IN_REVIEW, Lane.PLANNED),
+        (Lane.APPROVED, Lane.PLANNED),
+    })

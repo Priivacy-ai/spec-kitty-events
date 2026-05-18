@@ -1,10 +1,10 @@
 {
-  "wp_id": "WP07",
-  "from_lane": "approved",
+  "wp_id": "WP21",
+  "from_lane": "for_review",
   "to_lane": "planned",
   "actor": "user",
   "force": true,
-  "reason": "backward rewind: approved -> planned: review revoked",
+  "reason": "backward rewind: for_review -> planned: intake rejected",
   "execution_mode": "worktree",
   "review_ref": null,
   "evidence": null,

@@ -1,11 +1,11 @@
-# Contract: WPStatusChanged Event Semantics
+# Superseded Contract: WPStatusChanged Event Semantics
 
-**Status**: Canonical (locked by mission `wpstatuschanged-backward-transition-contract-01KRV7SC`).
+**Status**: Superseded by mission `force-required-review-rejection-01KRWWVJ`.
 **Owners**: `spec-kitty-events` maintainers.
 **Consumers**: `spec-kitty` CLI, `spec-kitty-saas` materializer, `spec-kitty-saas` durable drain worker.
-**Binding artefacts**: this document + `src/spec_kitty_events/conformance/fixtures/wp_status_changed/`. When this document and the fixtures disagree, the fixtures win.
+**Binding artefacts**: Historical reference only. The current binding contract is the `src/spec_kitty_events/status.py` review-rejection family docstring, `validate_transition()` behavior, `docs/consumer-contract-dossier-v2.4.0.md` review-rejection section, and the registered conformance fixtures.
 
-> This document is the canonical interpretation of `WPStatusChanged`. Any code path that handles a `WPStatusChanged` event in any repo MUST behave consistently with this contract. Drift between this document and a consumer's behaviour is a defect.
+> This artifact is no longer canonical. The superseding doctrine requires `force=true` plus a non-empty `reason` for the four review-rejection family pairs into `planned`: `in_progress -> planned`, `for_review -> planned`, `in_review -> planned`, and `approved -> planned`. `review_ref` is optional/recommended for those forced family members.
 
 ---
 
@@ -23,7 +23,7 @@
 | `force` | bool | yes (default `false`) | See §3 for the exact cases that require `force=true`. |
 | `reason` | str \| null | conditional | Required when `force=true` (non-empty). Required when `from_lane=in_progress` and `to_lane=planned` (non-empty). |
 | `execution_mode` | `ExecutionMode` | yes | |
-| `review_ref` | str \| null | conditional | Required for review-rollback transitions; see §3.2. |
+| `review_ref` | str \| null | optional/conditional | Optional/recommended for forced review-rejection family members into `planned`; still required for older non-planned review-rollback paths such as `for_review -> in_progress`. |
 | `evidence` | `DoneEvidence \| null` | conditional | Required when `to_lane in {approved, done}`. |
 
 The wire envelope adds `event_id` (ULID), `event_type` (`"WPStatusChanged"`), and standard envelope metadata. `event_id` is treated as the canonical replay key (§6).
@@ -32,7 +32,7 @@ The wire envelope adds `event_id` (ULID), `event_type` (`"WPStatusChanged"`), an
 
 The `Lane` enum has these values: `planned`, `claimed`, `in_progress`, `for_review`, `in_review`, `approved`, `done`, `blocked`, `canceled`.
 
-The canonical allowed-without-force transition matrix is the frozenset literal at `src/spec_kitty_events/status.py:342-368`. Reproduced here as a table (any drift between this table and the source code is a defect in this document):
+The historical transition matrix is the frozenset literal in `src/spec_kitty_events/status.py`. The four review-rejection family pairs into `planned` remain in the matrix for forced acceptance, but the explicit family guard rejects them unless `force=true`.
 
 | from_lane | to_lane | Notes |
 |---|---|---|
@@ -47,14 +47,14 @@ The canonical allowed-without-force transition matrix is the frozenset literal a
 | `in_review` | `approved` | Forward |
 | `in_review` | `done` | Forward |
 | `approved` | `done` | Forward |
-| `for_review` | `in_progress` | **Review rollback** — requires `review_ref` (§3.2) |
-| `for_review` | `planned` | **Review rollback** — requires `review_ref` |
+| `for_review` | `in_progress` | **Review rollback** — requires `review_ref` (§3.3) |
+| `for_review` | `planned` | **Review-rejection family** — requires `force=true` + non-empty `reason`; `review_ref` optional/recommended |
 | `in_review` | `in_progress` | **Review rollback** — requires `review_ref` |
-| `in_review` | `for_review` | **Review rollback** — requires `review_ref` |
-| `in_review` | `planned` | **Review rollback** — requires `review_ref` |
+| `in_review` | `for_review` | **Review rollback** |
+| `in_review` | `planned` | **Review-rejection family** — requires `force=true` + non-empty `reason`; `review_ref` optional/recommended |
 | `approved` | `in_progress` | **Review rollback** — requires `review_ref` |
-| `approved` | `planned` | **Review rollback** — requires `review_ref` |
-| `in_progress` | `planned` | Abandon/reassign — requires non-empty `reason` |
+| `approved` | `planned` | **Review-rejection family** — requires `force=true` + non-empty `reason`; `review_ref` optional/recommended |
+| `in_progress` | `planned` | **Review-rejection family** — requires `force=true` + non-empty `reason`; `review_ref` optional/recommended |
 | `blocked` | `in_progress` | Unblock |
 
 Plus the always-allowed sinks:
@@ -73,19 +73,19 @@ Any transition where `from_lane in {done, canceled}` requires `force=true` AND a
 
 Any `(from_lane, to_lane)` pair not in §2 requires `force=true` (and the same `reason` requirement). Examples: `done → done`, `planned → done` (sketch flows skip lanes), etc.
 
-### 3.3 Review rollback DOES NOT require `force=true`
+### 3.3 Review-rejection family requires `force=true`
 
-This is the locked decision the contract exists to enforce.
+This section supersedes the original locked decision from this historical mission.
 
-> **Review-rollback transitions** — the eight pairs listed as "Review rollback" in §2 — are NORMAL transitions in the matrix. They MUST be accepted without `force=true`, provided `review_ref` is present and non-empty.
+> **Review-rejection family transitions** — `in_progress -> planned`, `for_review -> planned`, `in_review -> planned`, and `approved -> planned` — MUST NOT be accepted unless `force=true` and `reason` is non-empty.
 
-A consumer that rejects an unforced review-rollback as "invalid backward transition" is **non-conformant**. The correct rejection condition is "review-rollback without `review_ref`" (which surfaces as `reason_code = unforced_rollback_without_review_ref`; see §6).
+A consumer that accepts an unforced review-rejection family transition is non-conformant with the superseding contract. The correct validator violation contains both `force=True` and `review-rejection`.
 
 ### 3.4 Reason field
 
 `reason` is required (non-empty) in these cases:
 - `force=true` (always).
-- `from_lane=in_progress` AND `to_lane=planned` (abandon).
+- Any review-rejection family member into `planned`, because those transitions require `force=true`.
 
 `reason` is optional otherwise. Producers MAY set `reason` for clarity even when not required.
 
@@ -145,7 +145,7 @@ The Pydantic model is defined in `src/spec_kitty_events/status.py` and its JSON 
 | `from_lane_mismatch_replay` | The event was effectively already applied; consumer skipped re-application. |
 | `from_lane_mismatch_drift` | The event's `from_lane` does not match any prior projection state. Held for operator review. |
 | `terminal_replay_skipped` | Optional diagnostic when a replay targets a terminal lane the projection is already in. |
-| `unforced_rollback_without_review_ref` | Producer emitted a review-rollback transition without `review_ref`. Consumer correctly rejected; logged for producer-side debugging. |
+| `unforced_rollback_without_review_ref` | Historical compatibility code for older review-rollback handling; the superseding review-rejection family violation names missing `force=True`. |
 
 Adding a new `reason_code` REQUIRES updating this document AND adding at least one conformance fixture (D-6 / FR-013).
 
@@ -153,8 +153,8 @@ Adding a new `reason_code` REQUIRES updating this document AND adding at least o
 
 | Consumer | Responsibility | Mission/issue |
 |---|---|---|
-| `spec-kitty` CLI (producer) | Emit review-rollback events with `force=false` and a non-empty `review_ref`. Emit terminal-exit events with `force=true` and `reason`. Never emit a backward transition with `actor` carrying policy intent. | spec-kitty#1089, spec-kitty#1087 |
-| `spec-kitty-saas` materializer | Accept review-rollback events without `force=true` per §3.3. Detect replay per §6 and emit `ReconciliationDiagnostic` per §5/§6 instead of `terminal_failed`. | spec-kitty-saas#205 |
+| `spec-kitty` CLI (producer) | Emit review-rejection family events with `force=true` and a non-empty `reason`; include `review_ref` when a feedback artifact exists. Emit terminal-exit events with `force=true` and `reason`. Never emit a backward transition with `actor` carrying policy intent. | spec-kitty#1089, spec-kitty#1087 |
+| `spec-kitty-saas` materializer | Reject unforced review-rejection family events per §3.3. Detect replay per §6 and emit `ReconciliationDiagnostic` per §5/§6 instead of `terminal_failed`. | spec-kitty-saas#205 |
 | `spec-kitty-saas` durable drain worker | Classify `ReconciliationDiagnostic` outcomes as reconciliation, not as infra terminal failure. Report on a separate drift/diagnostic surface from infra readiness. | spec-kitty-saas#204, spec-kitty-saas#206 |
 
 ## 9. Diagnostic surface separation

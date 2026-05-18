@@ -355,6 +355,83 @@ class TestEdgeCaseFixtures:
         result = validate_event(data, "Event")
         assert result.valid is False
 
+    # ---------------------------------------------------------------------
+    # Review-rejection family fixtures (WP02 of
+    # force-required-review-rejection-01KRWWVJ)
+    # ---------------------------------------------------------------------
+    #
+    # For each of the four family pairs (in_progress, for_review, in_review,
+    # approved -> planned) we have:
+    #   - INVALID: force=False with review_ref+reason populated; the missing
+    #     `force=True` is the isolated failure. validate_transition() MUST
+    #     emit a violation containing both the substrings "force=True" and
+    #     "review-rejection".
+    #   - VALID:   force=True with non-empty reason and review_ref omitted;
+    #     validate_transition() MUST return valid=True.
+
+    REVIEW_REJECTION_INVALID_FIXTURES = [
+        "edge_cases/invalid/wp_status_changed_unforced_in_review_to_planned.json",
+        "edge_cases/invalid/wp_status_changed_unforced_in_progress_to_planned.json",
+        "edge_cases/invalid/wp_status_changed_unforced_for_review_to_planned.json",
+        "edge_cases/invalid/wp_status_changed_unforced_approved_to_planned.json",
+    ]
+
+    REVIEW_REJECTION_VALID_FIXTURES = [
+        "edge_cases/valid/wp_status_changed_approved_rewind.json",
+        "edge_cases/valid/wp_status_changed_forced_in_progress_to_planned.json",
+        "edge_cases/valid/wp_status_changed_forced_for_review_to_planned.json",
+        "edge_cases/valid/wp_status_changed_forced_in_review_to_planned.json",
+    ]
+
+    @pytest.mark.parametrize("rel_path", REVIEW_REJECTION_INVALID_FIXTURES)
+    def test_review_rejection_invalid_fixture_rejected(
+        self, rel_path: str
+    ) -> None:
+        from spec_kitty_events.status import (
+            StatusTransitionPayload,
+            validate_transition,
+        )
+
+        full = _FIXTURES_DIR / rel_path
+        with open(full, encoding="utf-8") as f:
+            data = json.load(f)
+        payload = StatusTransitionPayload.model_validate(data)
+        result = validate_transition(payload)
+
+        assert result.valid is False, (
+            f"Expected {rel_path} to be rejected by validate_transition()"
+        )
+        # At least one violation must name the canonical substrings of the
+        # explicit review-rejection family guard.
+        matching = [
+            v
+            for v in result.violations
+            if "force=True" in v and "review-rejection" in v
+        ]
+        assert matching, (
+            f"No violation in {result.violations!r} contained both "
+            f"'force=True' and 'review-rejection' for fixture {rel_path}"
+        )
+
+    @pytest.mark.parametrize("rel_path", REVIEW_REJECTION_VALID_FIXTURES)
+    def test_review_rejection_valid_fixture_accepted(
+        self, rel_path: str
+    ) -> None:
+        from spec_kitty_events.status import (
+            StatusTransitionPayload,
+            validate_transition,
+        )
+
+        full = _FIXTURES_DIR / rel_path
+        with open(full, encoding="utf-8") as f:
+            data = json.load(f)
+        payload = StatusTransitionPayload.model_validate(data)
+        result = validate_transition(payload)
+        assert result.valid is True, (
+            f"Expected {rel_path} to be accepted by validate_transition(); "
+            f"got violations={result.violations!r}"
+        )
+
 
 # ---------------------------------------------------------------------------
 # T026: Manifest

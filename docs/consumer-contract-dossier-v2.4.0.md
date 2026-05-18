@@ -223,8 +223,27 @@ The wire payload shape is otherwise unchanged from
 A `WPStatusChanged` event with a `from_lane → to_lane` pair drawn from the
 family table but `force = False` is **contract-invalid**.
 
-- The existing `validate_transition()` validator rejects such events via
-  the lane matrix check.
+The four family pairs enforced by the guard are:
+
+| `from_lane`   | `to_lane` |
+|---------------|-----------|
+| `in_progress` | `planned` |
+| `for_review`  | `planned` |
+| `in_review`   | `planned` |
+| `approved`    | `planned` |
+
+- `validate_transition()` rejects such events via the **explicit
+  review-rejection family guard**, which runs ahead of (and independent
+  of) the lane matrix check. The guard fires regardless of whether
+  `review_ref` or `reason` are populated, so the failure isolates to the
+  missing `force = True`.
+- The emitted violation message names the family explicitly. Consumers
+  MAY route on the canonical substrings ``force=True`` and
+  ``review-rejection`` in the violation list — both substrings are part
+  of the published contract.
+- Bootstrap-planned events (`from_lane = None`, `to_lane = planned`,
+  `force = True`) are NOT part of the review-rejection family and are
+  NOT subject to this guard; see the bootstrap-planned section below.
 - Consumers (materializers, projection engines, durable drain workers) MAY
   reject these events as graph violations and SHOULD classify them as
   **business-rule rejections**, not transient infrastructure failures.
@@ -280,7 +299,7 @@ to bypass forward guards or evidence requirements.
 | Manifest id | Path | Purpose |
 |---|---|---|
 | `wp-review-rejection-cycle-replay` | `src/spec_kitty_events/conformance/fixtures/edge_cases/replay/wp_review_rejection_cycle.jsonl` | Full lifecycle replay stream including one review-rejection round-trip (`planned → claimed → in_progress → for_review → in_review → planned → claimed → in_progress → for_review → in_review → approved`). |
-| `wp-status-changed-approved-rewind-valid` | `src/spec_kitty_events/conformance/fixtures/edge_cases/valid/wp_status_changed_approved_rewind.json` | Positive single-event `approved → planned` with `force=True` + reason (synthetic minimal mirror of the planning#16 evidence-pack shape). |
+| `wp-status-changed-approved-rewind-valid` | `src/spec_kitty_events/conformance/fixtures/edge_cases/valid/wp_status_changed_approved_rewind.json` | Positive single-event `approved → planned` with `force=True` + reason and no `review_ref`; the forced family treats `review_ref` as optional/recommended. |
 | `wp-status-changed-unforced-in-review-to-planned-invalid` | `src/spec_kitty_events/conformance/fixtures/edge_cases/invalid/wp_status_changed_unforced_in_review_to_planned.json` | Negative single-event `in_review → planned` with `force=False`. Validator MUST reject. |
 
 Sibling missions cite these by manifest id when authoring regression

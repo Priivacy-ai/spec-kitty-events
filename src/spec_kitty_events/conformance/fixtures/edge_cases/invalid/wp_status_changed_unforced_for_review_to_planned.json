@@ -1,0 +1,12 @@
+{
+  "wp_id": "WP11",
+  "from_lane": "for_review",
+  "to_lane": "planned",
+  "actor": "user",
+  "force": false,
+  "reason": "review intake rejected: scope not ready",
+  "execution_mode": "worktree",
+  "review_ref": "feedback://mission-backward-transition-demo/WP11/2026-05-18-intake.md",
+  "evidence": null,
+  "mission_slug": "mission-backward-transition-demo"
+}

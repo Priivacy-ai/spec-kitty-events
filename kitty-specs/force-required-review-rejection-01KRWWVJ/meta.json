@@ -1,0 +1,13 @@
+{
+  "created_at": "2026-05-18T06:37:28.583739+00:00",
+  "friendly_name": "Force-Required Review-Rejection Contract",
+  "mission_id": "01KRWWVJM6FSH9GW2GNC8VF1QW",
+  "mission_number": 16,
+  "mission_slug": "force-required-review-rejection-01KRWWVJ",
+  "mission_type": "software-dev",
+  "purpose_context": "Today the runtime contradicts the docs: validate_transition() accepts unforced backward transitions (in_progress/for_review/in_review/approved → planned) when a review_ref is present, while the module docstring, dossier docs, and conformance manifest all say force=True is required. This split makes consumers infer behavior from missing-field side effects rather than the contract, blocks issue #32, and leaves #29/#31 unresolvable. This mission closes the gap so docs, runtime, fixtures, and tests describe one fail-closed contract.",
+  "purpose_tldr": "Make every layer of spec-kitty-events agree that the WPStatusChanged review-rejection family requires force=True.",
+  "slug": "force-required-review-rejection-01KRWWVJ",
+  "target_branch": "main",
+  "vcs": "git"
+}
