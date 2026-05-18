@@ -82,8 +82,9 @@ the published Pydantic models.
 - A payload with `force=True`, a review-rejection pair, a non-empty
   `reason`, and a `review_ref` is accepted.
 - A payload with `force=True`, a review-rejection pair, and a non-empty
-  `reason` but no `review_ref` is accepted (the existing wire contract
-  treats `review_ref` as recommended, not required, when `force=True`).
+  `reason` but no `review_ref` is accepted. The force-required
+  review-rejection family treats `review_ref` as recommended, not
+  required, when `force=True`.
 - Replay fixtures that include the documented "approved rewind"
   scenario continue to load and validate.
 
@@ -103,7 +104,7 @@ the published Pydantic models.
 |---------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------|
 | FR-001  | `validate_transition()` MUST reject every payload whose `(from_lane, to_lane)` is in the review-rejection family AND whose `force` is `False`, regardless of whether `review_ref` and `reason` are populated. | Required |
 | FR-002  | The violation produced by FR-001 MUST be a single, distinct, machine-greppable string that explicitly names `force=True` as the missing element. The required substring is `force=True` and the family name (`review-rejection`). | Required |
-| FR-003  | `validate_transition()` MUST accept every payload whose `(from_lane, to_lane)` is in the review-rejection family, whose `force` is `True`, whose `reason` is non-empty, and (where the existing model requires it) whose `review_ref` is non-empty. | Required |
+| FR-003  | `validate_transition()` MUST accept every payload whose `(from_lane, to_lane)` is in the review-rejection family, whose `force` is `True`, and whose `reason` is non-empty. `review_ref` is optional/recommended for these forced family members. | Required |
 | FR-004  | The review-rejection family predicate MUST treat exactly these four pairs as family members: `in_progress -> planned`, `for_review -> planned`, `in_review -> planned`, `approved -> planned`. No others.   | Required |
 | FR-005  | The bootstrap-planned transition (`from_lane=None, to_lane=planned, force=True`) MUST continue to validate as before. It MUST NOT be classified as a review-rejection.                                       | Required |
 | FR-006  | The module docstring of `status.py` and the consumer-contract dossier MUST describe the contract in one consistent way: family enumerated, `force=True` required, and the enforcement mechanism named (explicit family-guard, not "via the lane matrix check"). | Required |

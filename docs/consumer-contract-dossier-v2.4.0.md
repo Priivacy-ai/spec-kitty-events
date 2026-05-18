@@ -299,7 +299,7 @@ to bypass forward guards or evidence requirements.
 | Manifest id | Path | Purpose |
 |---|---|---|
 | `wp-review-rejection-cycle-replay` | `src/spec_kitty_events/conformance/fixtures/edge_cases/replay/wp_review_rejection_cycle.jsonl` | Full lifecycle replay stream including one review-rejection round-trip (`planned → claimed → in_progress → for_review → in_review → planned → claimed → in_progress → for_review → in_review → approved`). |
-| `wp-status-changed-approved-rewind-valid` | `src/spec_kitty_events/conformance/fixtures/edge_cases/valid/wp_status_changed_approved_rewind.json` | Positive single-event `approved → planned` with `force=True` + reason (synthetic minimal mirror of the planning#16 evidence-pack shape). |
+| `wp-status-changed-approved-rewind-valid` | `src/spec_kitty_events/conformance/fixtures/edge_cases/valid/wp_status_changed_approved_rewind.json` | Positive single-event `approved → planned` with `force=True` + reason and no `review_ref`; the forced family treats `review_ref` as optional/recommended. |
 | `wp-status-changed-unforced-in-review-to-planned-invalid` | `src/spec_kitty_events/conformance/fixtures/edge_cases/invalid/wp_status_changed_unforced_in_review_to_planned.json` | Negative single-event `in_review → planned` with `force=False`. Validator MUST reject. |
 
 Sibling missions cite these by manifest id when authoring regression

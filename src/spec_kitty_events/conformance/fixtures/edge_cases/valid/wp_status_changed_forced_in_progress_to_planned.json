@@ -6,7 +6,7 @@
   "force": true,
   "reason": "backward rewind: in_progress -> planned: scope changed",
   "execution_mode": "worktree",
-  "review_ref": "feedback://mission-backward-transition-demo/WP20/scope-change.md",
+  "review_ref": null,
   "evidence": null,
   "mission_slug": "mission-backward-transition-demo"
 }

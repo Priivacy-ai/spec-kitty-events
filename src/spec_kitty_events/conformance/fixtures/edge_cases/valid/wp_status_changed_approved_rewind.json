@@ -4,9 +4,9 @@
   "to_lane": "planned",
   "actor": "user",
   "force": true,
-  "reason": "backward rewind: approved -> planned: feedback://mission-backward-transition-demo/WP07/20260517T141000Z-bbbb.md",
+  "reason": "backward rewind: approved -> planned: review revoked",
   "execution_mode": "worktree",
-  "review_ref": "feedback://mission-backward-transition-demo/WP07/20260517T141000Z-bbbb.md",
+  "review_ref": null,
   "evidence": null,
   "mission_slug": "mission-backward-transition-demo"
 }

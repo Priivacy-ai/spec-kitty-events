@@ -366,8 +366,8 @@ class TestEdgeCaseFixtures:
     #     `force=True` is the isolated failure. validate_transition() MUST
     #     emit a violation containing both the substrings "force=True" and
     #     "review-rejection".
-    #   - VALID:   force=True with non-empty reason; validate_transition()
-    #     MUST return valid=True.
+    #   - VALID:   force=True with non-empty reason and review_ref omitted;
+    #     validate_transition() MUST return valid=True.
 
     REVIEW_REJECTION_INVALID_FIXTURES = [
         "edge_cases/invalid/wp_status_changed_unforced_in_review_to_planned.json",

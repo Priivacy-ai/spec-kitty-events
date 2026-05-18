@@ -1594,7 +1594,7 @@ class TestBootstrapPlannedInitializeOnly:
 
 
 # ---------------------------------------------------------------------------
-# Review-rejection family (backward-transition-contract-01KRV52C, WP02)
+# Review-rejection family (force-required-review-rejection-01KRWWVJ)
 # ---------------------------------------------------------------------------
 
 
@@ -1613,12 +1613,8 @@ class TestReviewRejectionFamily:
     def test_forced_backward_with_reason_accepted(self, from_lane: str) -> None:
         """force=True + non-empty reason MUST yield a valid transition result.
 
-        Some family members (for_review, in_review, approved) carry an
-        additional ``review_ref`` guard on the backward edge; supplying a
-        canonical feedback URI keeps the guard satisfied so the test
-        isolates the force+reason contract rather than re-asserting the
-        review_ref guard, which is already exercised by
-        :class:`TestGuardConditions`.
+        ``review_ref`` is optional for the force-required review-rejection
+        family when ``force=True`` and ``reason`` is populated.
         """
         payload = StatusTransitionPayload(
             **{
@@ -1627,10 +1623,6 @@ class TestReviewRejectionFamily:
                 "to_lane": "planned",
                 "force": True,
                 "reason": f"backward rewind: {from_lane} -> planned",
-                "review_ref": (
-                    f"feedback://mission-backward-transition-demo/WP01/"
-                    f"20260517T140000Z-{from_lane}.md"
-                ),
             }
         )
         result = validate_transition(payload)
@@ -1720,8 +1712,7 @@ class TestReviewRejectionFamily:
         )
 
     def test_forced_rollback_with_reason_is_accepted(self, from_lane: str) -> None:
-        """force=True + reason set MUST yield a valid transition result for
-        every member of the review-rejection family.
+        """force=True + reason + review_ref is valid for every family member.
         """
         payload = StatusTransitionPayload(
             **{

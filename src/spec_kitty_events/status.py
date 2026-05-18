@@ -35,7 +35,7 @@ where ``<from_lane>`` / ``<to_lane>`` are the literal ``Lane`` enum values
 and ``<feedback-ref>`` is optional. When present, the recommended URI shape
 is ``feedback://<mission-slug>/<wp-id>/<timestamp>-<hash>.md``.
 
-Optional but recommended:
+Optional but recommended for the four-pair review-rejection family:
 
 * ``review_ref`` -- URI-shaped pointer to the review feedback artifact.
   Same value as ``<feedback-ref>`` above when both are populated.
@@ -592,14 +592,25 @@ def validate_transition(payload: StatusTransitionPayload) -> TransitionValidatio
                 f"Transition {payload.from_lane} -> {payload.to_lane} is not allowed"
             )
 
-    # Guard conditions (checked regardless of force)
-    if (
+    # Guard conditions (checked regardless of force). The force-required
+    # review-rejection family treats review_ref as optional when force=True;
+    # older review rollback edges such as for_review -> in_progress still
+    # require review_ref.
+    review_ref_required = (
         payload.from_lane in {Lane.FOR_REVIEW, Lane.IN_REVIEW, Lane.APPROVED}
         and payload.to_lane in {Lane.IN_PROGRESS, Lane.PLANNED}
+        and not (
+            payload.force
+            and _is_review_rejection_pair(payload.from_lane, payload.to_lane)
+        )
+    )
+    if (
+        review_ref_required
         and (payload.review_ref is None or payload.review_ref.strip() == "")
     ):
         violations.append(
-            f"{payload.from_lane.value} -> {payload.to_lane.value} requires review_ref"
+            f"{payload.from_lane.value if payload.from_lane is not None else 'None'} "
+            f"-> {payload.to_lane.value} requires review_ref"
         )
 
     if (

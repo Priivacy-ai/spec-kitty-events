@@ -6,7 +6,7 @@
   "force": true,
   "reason": "backward rewind: in_review -> planned: review rejected",
   "execution_mode": "worktree",
-  "review_ref": "feedback://mission-backward-transition-demo/WP22/2026-05-18-review.md",
+  "review_ref": null,
   "evidence": null,
   "mission_slug": "mission-backward-transition-demo"
 }
