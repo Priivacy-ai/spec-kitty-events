@@ -10,7 +10,7 @@
 # breaks SaaS-side resolution assumptions, the unit suite turns red
 # and merge is blocked.
 #
-# Pinned SHA: 4d5206e08a30bf23ae4dabae532dc0e355078e16
+# Pinned SHA: 0be4372208f9ac1442c9b2dfae1ec57273cca430
 # SHA-bump procedure: see README.md > "Identity-Boundary CI Gate".
 
 name: cross-repo-harness-tests
@@ -40,7 +40,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: Priivacy-ai/spec-kitty-end-to-end-testing
-          ref: 4d5206e08a30bf23ae4dabae532dc0e355078e16
+          ref: 0be4372208f9ac1442c9b2dfae1ec57273cca430
           path: e2e
           ssh-key: ${{ secrets.SK_E2E_READ_DEPLOY_KEY }}
 
