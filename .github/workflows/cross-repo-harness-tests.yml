@@ -42,6 +42,7 @@ jobs:
           repository: Priivacy-ai/spec-kitty-end-to-end-testing
           ref: 4d5206e08a30bf23ae4dabae532dc0e355078e16
           path: e2e
+          ssh-key: ${{ secrets.SK_E2E_READ_DEPLOY_KEY }}
 
       - name: Install uv
         uses: astral-sh/setup-uv@v3
