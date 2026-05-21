@@ -151,6 +151,64 @@ pytest --pyargs spec_kitty_events.conformance -v
 - Do not rely on runtime translation of legacy mission-domain fields.
 - Use offline rewrite or migration jobs if you need to transform historical pre-cutover data.
 
+## Identity-Boundary CI Gate
+
+The `cross-repo-harness-tests` required check runs the
+[`spec-kitty-end-to-end-testing`](https://github.com/Priivacy-ai/spec-kitty-end-to-end-testing)
+harness's identity-boundary unit tests on every PR. The harness is checked
+out at a **pinned commit SHA** and the PR's HEAD copy of
+`spec_kitty_events` is installed over the harness's frozen lockfile via
+`uv pip install -e ../events`. If a PR breaks SaaS-side resolution
+assumptions (envelope shape, identity field names, recognition rules), the
+unit suite turns red and merge is blocked. Workflow file:
+[`.github/workflows/cross-repo-harness-tests.yml`](.github/workflows/cross-repo-harness-tests.yml).
+
+**Pinned e2e SHA**: `4d5206e08a30bf23ae4dabae532dc0e355078e16`
+
+### SHA-bump procedure
+
+When an intentional, breaking contract change ships in this repo that
+requires a matching harness update:
+
+1. Get the new e2e SHA after the harness update lands:
+   ```bash
+   unset GITHUB_TOKEN
+   gh api repos/Priivacy-ai/spec-kitty-end-to-end-testing/commits/main --jq .sha
+   ```
+2. Verify the new SHA still contains `tests/unit/identity_boundary/` and
+   `tests/identity_boundary/unit/`:
+   ```bash
+   gh api repos/Priivacy-ai/spec-kitty-end-to-end-testing/contents/tests/unit/identity_boundary --ref <NEW_SHA>
+   gh api repos/Priivacy-ai/spec-kitty-end-to-end-testing/contents/tests/identity_boundary/unit --ref <NEW_SHA>
+   ```
+3. Update the `ref:` field in
+   `.github/workflows/cross-repo-harness-tests.yml`.
+4. Open the bump PR; CI will exercise the new SHA against the new contract
+   before merge.
+
+### Sibling gates
+
+This is one of three coordinated CI gates tracked under
+[`Priivacy-ai/spec-kitty#1247`](https://github.com/Priivacy-ai/spec-kitty/issues/1247):
+
+- `cross-repo-harness-tests` here (this repo).
+- `drift-detector` in [`spec-kitty`](https://github.com/Priivacy-ai/spec-kitty) — workflow `.github/workflows/drift-detector.yml`.
+- `identity-boundary-canary` in [`spec-kitty-saas`](https://github.com/Priivacy-ai/spec-kitty-saas) — workflow `.github/workflows/canary-gate.yml`.
+
+### Admin action required (one-time)
+
+After this gate merges, a repo admin must register the check as required on
+`main`:
+
+1. Open https://github.com/Priivacy-ai/spec-kitty-events/settings/branches.
+2. Edit the rule for `main`.
+3. Under "Require status checks to pass before merging", add the exact name
+   `cross-repo-harness-tests`.
+4. Save.
+
+Until that step is done, the workflow still runs on every PR but its red
+status does not block merge.
+
 ## Versioning
 
 This package now publishes the TeamSpace migration release as package `5.0.0`.

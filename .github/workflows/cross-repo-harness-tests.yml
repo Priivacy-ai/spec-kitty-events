@@ -1,0 +1,84 @@
+# .github/workflows/cross-repo-harness-tests.yml
+#
+# Identity-Boundary CI Gate — spec-kitty-events repo
+#
+# Tracker: https://github.com/Priivacy-ai/spec-kitty/issues/1247
+#
+# Clones the e2e harness at a pinned SHA and runs the
+# identity-boundary unit tests with the PR's HEAD copy of
+# spec_kitty_events installed via `uv pip install -e`. If the PR
+# breaks SaaS-side resolution assumptions, the unit suite turns red
+# and merge is blocked.
+#
+# Pinned SHA: 0be4372208f9ac1442c9b2dfae1ec57273cca430
+# SHA-bump procedure: see README.md > "Identity-Boundary CI Gate".
+
+name: cross-repo-harness-tests
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+concurrency:
+  group: cross-repo-harness-tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  cross-repo-harness-tests:
+    name: cross-repo-harness-tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - name: Checkout spec-kitty-events (PR head)
+        uses: actions/checkout@v4
+        with:
+          path: events
+
+      - name: Checkout spec-kitty-end-to-end-testing (pinned SHA)
+        uses: actions/checkout@v4
+        with:
+          repository: Priivacy-ai/spec-kitty-end-to-end-testing
+          ref: 0be4372208f9ac1442c9b2dfae1ec57273cca430
+          path: e2e
+          ssh-key: ${{ secrets.SK_E2E_READ_DEPLOY_KEY }}
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          enable-cache: true
+
+      - name: Install harness dependencies (frozen)
+        working-directory: e2e
+        run: uv sync --frozen
+
+      - name: Override spec_kitty_events with PR head
+        working-directory: e2e
+        run: uv pip install -e ../events
+
+      - name: Install spec-kitty CLI on PATH
+        # The unit tests under tests/identity_boundary/unit/ instantiate
+        # the canary harness which captures cli_version by shelling out
+        # to the spec-kitty binary. Pinned to 3.2.0rc22 (matches the
+        # canary-gate workflow in spec-kitty-saas).
+        run: |
+          uv tool install --prerelease=allow 'spec-kitty-cli==3.2.0rc22'
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Run identity-boundary unit tests
+        working-directory: e2e
+        # Skipping tests/unit/identity_boundary/test_queue_seed_envelope.py:
+        # it imports a private constant (_CANONICAL_CONSTRUCT_PRELUDE) that
+        # was removed from queue_seed.py in e2e commit 3b90d7f; this is a
+        # pre-existing broken test in the e2e harness, not a defect of this gate.
+        # Track removal at: https://github.com/Priivacy-ai/spec-kitty-end-to-end-testing/issues
+        run: uv run pytest tests/unit/identity_boundary/ tests/identity_boundary/unit/ -v --ignore=tests/unit/identity_boundary/test_queue_seed_envelope.py
+
+      - name: Upload artifacts on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: identity-boundary-failure-artifacts
+          path: e2e/artifacts/sync_identity_boundary/
+          if-no-files-found: ignore
