@@ -162,3 +162,82 @@ This package now publishes the TeamSpace migration release as package `5.0.0`.
 ## License
 
 All rights reserved. This repository is owned by Priivacy AI.
+
+## Identity-boundary canary CI gate
+
+This repo participates in a three-repo CI gate that pins the
+identity-boundary canary protocol (closed
+[`spec-kitty-end-to-end-testing#41`](https://github.com/Priivacy-ai/spec-kitty-end-to-end-testing/issues/41))
+as a required check on every PR.
+
+**Workflow**: [`.github/workflows/cross-repo-harness-tests.yml`](.github/workflows/cross-repo-harness-tests.yml)
+**Job name (register this as the required check)**: `harness-unit-tests`
+
+### What it runs
+
+On every PR against `main`, the workflow:
+
+1. Checks out this repo at the PR commit.
+2. Checks out
+   [`Priivacy-ai/spec-kitty-end-to-end-testing`](https://github.com/Priivacy-ai/spec-kitty-end-to-end-testing)
+   at the pinned commit SHA (see `E2E_PINNED_SHA` in the workflow file).
+3. Installs the e2e harness via `uv sync`.
+4. **Installs this repo's events source as editable** into the e2e env
+   via `uv pip install -e ../events`. This is the key invariant — the
+   harness must exercise the PR's events code, not whatever e2e's
+   lockfile pinned, so an envelope-shape regression introduced by the
+   PR surfaces here.
+5. Runs `uv run pytest tests/unit/identity_boundary/ tests/identity_boundary/unit/`.
+
+If any test fails, the PR is blocked from merging (once the required
+check is enabled — see admin action below).
+
+### Pinned e2e SHA
+
+The workflow pins `Priivacy-ai/spec-kitty-end-to-end-testing` to a
+specific commit SHA via the `E2E_PINNED_SHA` env var at the top of
+`.github/workflows/cross-repo-harness-tests.yml`. This is intentional:
+it prevents drift where an unrelated change in e2e's main accidentally
+breaks (or unintentionally papers over) this repo's gate.
+
+**Current pin**: `03e4d3c04fcdf641cd564badfbc87bb19a2a0982`
+
+### Updating the pinned e2e SHA
+
+When an intentional contract change ships in e2e:
+
+1. Land the contract change in
+   [`spec-kitty-end-to-end-testing`](https://github.com/Priivacy-ai/spec-kitty-end-to-end-testing)
+   first.
+2. Open a PR in this repo that updates `E2E_PINNED_SHA` in
+   `.github/workflows/cross-repo-harness-tests.yml` and the "Current
+   pin" line in this README to the new SHA.
+3. Confirm the gate goes green on the bump PR before merging.
+
+If the e2e change is itself a breaking events-envelope change, this
+repo's PR introducing that change should ship together with the SHA
+bump in a single PR.
+
+### Local reproduction
+
+To exercise the gate locally, in a checkout of
+spec-kitty-end-to-end-testing at the pinned SHA:
+
+```bash
+cd /path/to/spec-kitty-end-to-end-testing
+uv sync
+uv pip install -e /path/to/spec-kitty-events
+uv run pytest tests/unit/identity_boundary/ tests/identity_boundary/unit/ -v
+```
+
+### Sibling-repo gates
+
+| Repo | Workflow | Job |
+|---|---|---|
+| `spec-kitty` | `.github/workflows/canary-gate.yml` | `drift-detector` |
+| `spec-kitty-saas` | `.github/workflows/canary-gate.yml` | `canary-gate` |
+
+### Tracking
+
+- Mission spec: [`Priivacy-ai/spec-kitty kitty-specs/identity-boundary-canary-ci-gate-01KS4XWV/`](https://github.com/Priivacy-ai/spec-kitty/tree/main/kitty-specs/identity-boundary-canary-ci-gate-01KS4XWV)
+- Tracker: [`Priivacy-ai/spec-kitty#1247`](https://github.com/Priivacy-ai/spec-kitty/issues/1247)

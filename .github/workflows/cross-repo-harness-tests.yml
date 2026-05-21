@@ -1,0 +1,81 @@
+name: Cross-Repo Harness Tests (identity-boundary)
+
+# This workflow is the spec-kitty-events side of the three-repo
+# identity-boundary canary CI gate. On every PR against `main` (and on
+# push to main), it clones spec-kitty-end-to-end-testing at a pinned
+# commit SHA and runs the harness's identity-boundary unit tests with
+# THIS PR's events source code installed as editable into the e2e
+# environment. That way an envelope-shape regression in events surfaces
+# as a red `harness-unit-tests` job at PR time — before the SaaS strict
+# gate sees it in production.
+#
+# Tracking: https://github.com/Priivacy-ai/spec-kitty/issues/1247
+# Mission:  spec-kitty kitty-specs/identity-boundary-canary-ci-gate-01KS4XWV/
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: harness-unit-tests-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  # Pinned head-of-spec-kitty-end-to-end-testing main at the time the
+  # canary-gate mission shipped. Bump this SHA in tandem with this
+  # README's "Updating the pinned e2e SHA" procedure when intentional
+  # contract changes ship in e2e.
+  E2E_PINNED_SHA: '03e4d3c04fcdf641cd564badfbc87bb19a2a0982'
+
+jobs:
+  harness-unit-tests:
+    name: harness-unit-tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout this repo (events)
+        uses: actions/checkout@v6
+        with:
+          path: events
+
+      - name: Checkout spec-kitty-end-to-end-testing at pinned SHA
+        uses: actions/checkout@v6
+        with:
+          repository: Priivacy-ai/spec-kitty-end-to-end-testing
+          ref: ${{ env.E2E_PINNED_SHA }}
+          path: e2e
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          enable-cache: true
+
+      - name: Install e2e harness
+        working-directory: e2e
+        run: |
+          uv sync
+
+      - name: Install THIS PR's events source as editable into the e2e env
+        # This is the key invariant: the harness must exercise the PR's
+        # events code, not whatever e2e's lockfile pinned. Otherwise an
+        # envelope-shape regression introduced in this PR would not
+        # surface here.
+        working-directory: e2e
+        run: |
+          uv pip install -e ../events
+
+      - name: Run identity-boundary harness unit tests
+        working-directory: e2e
+        run: |
+          uv run pytest \
+            tests/unit/identity_boundary/ \
+            tests/identity_boundary/unit/ \
+            -v --tb=short
