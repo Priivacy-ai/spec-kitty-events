@@ -68,12 +68,7 @@ jobs:
 
       - name: Run identity-boundary unit tests
         working-directory: e2e
-        # Skipping tests/unit/identity_boundary/test_queue_seed_envelope.py:
-        # it imports a private constant (_CANONICAL_CONSTRUCT_PRELUDE) that
-        # was removed from queue_seed.py in e2e commit 3b90d7f; this is a
-        # pre-existing broken test in the e2e harness, not a defect of this gate.
-        # Track removal at: https://github.com/Priivacy-ai/spec-kitty-end-to-end-testing/issues
-        run: uv run pytest tests/unit/identity_boundary/ tests/identity_boundary/unit/ -v --ignore=tests/unit/identity_boundary/test_queue_seed_envelope.py
+        run: uv run pytest tests/unit/identity_boundary/ tests/identity_boundary/unit/ -v
 
       - name: Upload artifacts on failure
         if: failure()
