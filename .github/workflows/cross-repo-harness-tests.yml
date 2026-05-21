@@ -1,0 +1,69 @@
+# .github/workflows/cross-repo-harness-tests.yml
+#
+# Identity-Boundary CI Gate — spec-kitty-events repo
+#
+# Tracker: https://github.com/Priivacy-ai/spec-kitty/issues/1247
+#
+# Clones the e2e harness at a pinned SHA and runs the
+# identity-boundary unit tests with the PR's HEAD copy of
+# spec_kitty_events installed via `uv pip install -e`. If the PR
+# breaks SaaS-side resolution assumptions, the unit suite turns red
+# and merge is blocked.
+#
+# Pinned SHA: 4d5206e08a30bf23ae4dabae532dc0e355078e16
+# SHA-bump procedure: see README.md > "Identity-Boundary CI Gate".
+
+name: cross-repo-harness-tests
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+concurrency:
+  group: cross-repo-harness-tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  cross-repo-harness-tests:
+    name: cross-repo-harness-tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - name: Checkout spec-kitty-events (PR head)
+        uses: actions/checkout@v4
+        with:
+          path: events
+
+      - name: Checkout spec-kitty-end-to-end-testing (pinned SHA)
+        uses: actions/checkout@v4
+        with:
+          repository: Priivacy-ai/spec-kitty-end-to-end-testing
+          ref: 4d5206e08a30bf23ae4dabae532dc0e355078e16
+          path: e2e
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          enable-cache: true
+
+      - name: Install harness dependencies (frozen)
+        working-directory: e2e
+        run: uv sync --frozen
+
+      - name: Override spec_kitty_events with PR head
+        working-directory: e2e
+        run: uv pip install -e ../events
+
+      - name: Run identity-boundary unit tests
+        working-directory: e2e
+        run: uv run pytest tests/unit/identity_boundary/ tests/identity_boundary/unit/ -v
+
+      - name: Upload artifacts on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: identity-boundary-failure-artifacts
+          path: e2e/artifacts/sync_identity_boundary/
+          if-no-files-found: ignore
