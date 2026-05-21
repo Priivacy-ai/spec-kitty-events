@@ -60,9 +60,10 @@ jobs:
       - name: Install spec-kitty CLI on PATH
         # The unit tests under tests/identity_boundary/unit/ instantiate
         # the canary harness which captures cli_version by shelling out
-        # to the spec-kitty binary. Install it explicitly into the runner.
+        # to the spec-kitty binary. Pinned to 3.2.0rc22 (matches the
+        # canary-gate workflow in spec-kitty-saas).
         run: |
-          uv tool install spec-kitty-cli
+          uv tool install --prerelease=allow 'spec-kitty-cli==3.2.0rc22'
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
       - name: Run identity-boundary unit tests
