@@ -163,7 +163,7 @@ assumptions (envelope shape, identity field names, recognition rules), the
 unit suite turns red and merge is blocked. Workflow file:
 [`.github/workflows/cross-repo-harness-tests.yml`](.github/workflows/cross-repo-harness-tests.yml).
 
-**Pinned e2e SHA**: `4d5206e08a30bf23ae4dabae532dc0e355078e16`
+**Pinned e2e SHA**: `193f5c0eb07c8fdb6943d91d205ab892b98d6dfc`
 
 ### SHA-bump procedure
 
