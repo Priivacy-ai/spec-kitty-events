@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Canonical event-type contracts for seven previously-uncontracted SaaS-bound events** (additive, wire-compatible). Added pydantic payload models and `_EVENT_TYPE_TO_MODEL` entries for `WPAssigned`, `BuildRegistered`, `BuildHeartbeat`, `HistoryAdded`, `ErrorLogged`, `DependencyResolved`, `MissionOriginBound`. Each model uses `ConfigDict(frozen=True, extra="forbid")`. Field shapes are derived from the canonical producer call sites in `spec-kitty/src/specify_cli/sync/emitter.py` (commit `43305c12c`, lines 720–1431). Mission: `canonical-producer-contracts-legacy-envelope-01KS7JM3`. Canonical authority: `kitty-specs/canonical-producer-contracts-legacy-envelope-01KS7JM3/data-model.md`.
+
+- **`LOCAL_ONLY_EVENT_TYPES` machine-readable classification surface** (additive). New `frozenset[str]` exported from the package root. Empty in this release — every CLI-emitted event audited as of `spec-kitty` `43305c12c` routes through `SpecKittyEventEmitter._emit()` (the SaaS-bound central path). The surface is published so downstream consumers (CLI canonical-producer lint, SaaS adapter) can import the set and adjust enforcement without re-shipping a contract.
+
+- **`legacy_envelope_v1` named compatibility contract** (additive). New `spec_kitty_events.legacy` module exporting `LegacyEnvelopeNormalizer`, `NormalizedEnvelope`, `UnnormalizableLegacyDiagnostic`, `NormalizationResult`, `LEGACY_ENVELOPE_CONTRACT_NAME`, and `RECOGNIZED_LEGACY_SHAPES`. Three named legacy shapes are recognized in v1: `pre_3_0_envelope` (pre-3.0 envelopes missing `project_uuid`; minted via deterministic `uuid5(NAMESPACE_URL || 'spec-kitty-events/legacy', f'{node_id}/{build_id}')`), `feature_keys_envelope` (retired `feature_slug` / `feature_number` keys mapped to `mission_slug` / `mission_number`), and `awaiting_review_synonym` (payload `to_lane = "awaiting-review"` mapped to canonical `"in_review"`). Un-normalizable rows surface as structured `UnnormalizableLegacyDiagnostic` rather than silent passes. Audit-preserving: both result variants carry the original `raw` dict. Phase 3 (`spec-kitty-saas#274`) consumes this contract to replace the implicit `_should_validate_strict_envelope()` carve-out. Canonical authority: `kitty-specs/canonical-producer-contracts-legacy-envelope-01KS7JM3/contracts/legacy-envelope-v1.md`.
+
+- **Legacy-envelope conformance fixtures**. Added `conformance/fixtures/legacy/pre_3_0_envelope_normalizes.json` (normalization-success) and `conformance/fixtures/legacy/unrecognized_legacy_diagnostic.json` (un-normalizable). Both registered in `manifest.json` under `event_type: "LegacyEnvelope"` with `fixture_type: "legacy_normalization"`.
+
+### Changed
+
+- **`validate_event()` enforces `validate_transition()` for `WPStatusChanged`** (semantically tighter, wire-compatible). When the pydantic shape layer accepts a `WPStatusChanged` payload, `validate_event()` now also runs the `status.validate_transition()` business-rule check. Unforced backward review-rejection transitions (the rc14→rc22 drift signature) now fail through the public conformance gate with `ModelViolation` entries that preserve the documented routing substrings `force=True` and `review-rejection`. The new behavior is gated behind a `_SEMANTIC_VALIDATORS` registry so future event types with business rules plug in additively. Mission: `canonical-producer-contracts-legacy-envelope-01KS7JM3`.
+
+- **Pyargs conformance entrypoint extracts `.input` from wrapper fixtures**. Fixtures whose on-disk shape is `{class, expected, input, notes, [expected_error_code]}` (class_taxonomy, historical_row_raw, lane_mapping_legacy, legacy normalization) are now correctly routed: the test extracts `entry["input"]` before calling `validate_event`. Lane-mapping and legacy-envelope fixtures are excluded from the `validate_event` parametrization via `event_type` / `fixture_type` filters and exercised by dedicated tests. Diagnostic-taxonomy fixtures whose `event_type` is a sentinel (e.g. `"<missing>"`) are also excluded.
+
+- **Stale `wp-status-changed-invalid-lane` fixture corrected**. The fixture's `to_lane` value was `"in_review"`, which has been canonical since 3.0. Replaced with `"in_reveiw"` (typo) so the Lane enum genuinely rejects it. Manifest notes updated.
+
+- **Stale `alias_doing_normalized` fixture corrected**. The fixture used `from_lane: planned, to_lane: doing` which after alias normalization (`doing → in_progress`) produced an illegal `planned → in_progress` transition. Changed `from_lane` to `claimed` so the resulting `claimed → in_progress` transition is legal under `_ALLOWED_TRANSITIONS`. The fixture's original intent (alias normalizes to canonical) is preserved.
+
 ## [5.1.0] - 2026-05-17
 
 ### Changed

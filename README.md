@@ -151,6 +151,68 @@ pytest --pyargs spec_kitty_events.conformance -v
 - Do not rely on runtime translation of legacy mission-domain fields.
 - Use offline rewrite or migration jobs if you need to transform historical pre-cutover data.
 
+## Legacy Envelope Normalization (`legacy_envelope_v1`)
+
+`spec_kitty_events.legacy` publishes a named, frozen contract for promoting
+known legacy event shapes to canonical 3.x envelopes. Three legacy shapes are
+recognized in v1: `pre_3_0_envelope`, `feature_keys_envelope`, and
+`awaiting_review_synonym`.
+
+```python
+from spec_kitty_events.legacy import (
+    LegacyEnvelopeNormalizer,
+    NormalizedEnvelope,
+    UnnormalizableLegacyDiagnostic,
+)
+from spec_kitty_events.conformance.validators import validate_event
+
+result = LegacyEnvelopeNormalizer().normalize(stored_legacy_row)
+
+match result:
+    case NormalizedEnvelope(canonical=canonical, raw=raw, legacy_shape=shape):
+        conformance = validate_event(canonical, canonical["event_type"], strict=True)
+        # ship to materializer, retain raw for audit
+    case UnnormalizableLegacyDiagnostic(reason=reason, shape_hints=hints, raw=raw):
+        # classify as legacy / business-rule diagnostic; never silent
+```
+
+Guarantees:
+
+- **Audit preservation**: both result variants carry the original `raw` dict.
+- **Determinism**: same input always yields the same output (including the
+  minted `project_uuid` via UUID5 over `(node_id, build_id)`).
+- **No silent aliases**: every field-name change is captured by the
+  `legacy_shape` identifier; un-normalizable rows surface as structured
+  diagnostics, never silent passes.
+- **Idempotency**: calling `normalize()` on an already-canonical envelope
+  returns `UnnormalizableLegacyDiagnostic(reason="unrecognized_legacy_shape")`.
+
+The contract is named `legacy_envelope_v1` and frozen. Future legacy shapes
+ship as `legacy_envelope_v2` alongside v1 for a deprecation window.
+
+Mission: `canonical-producer-contracts-legacy-envelope-01KS7JM3`.
+
+## Local-Only Event Classification (`LOCAL_ONLY_EVENT_TYPES`)
+
+`spec_kitty_events.LOCAL_ONLY_EVENT_TYPES` is a machine-readable
+`frozenset[str]` published so downstream consumers (CLI canonical-producer
+lint, SaaS adapter) can identify event types that are NOT routed through
+the SaaS-bound producer path.
+
+```python
+from spec_kitty_events import LOCAL_ONLY_EVENT_TYPES
+
+# Currently empty: every CLI-emitted event audited as of spec-kitty 43305c12c
+# routes through SpecKittyEventEmitter._emit() (the SaaS-bound central path).
+assert LOCAL_ONLY_EVENT_TYPES == frozenset()
+```
+
+Future event types that don't cross the SaaS boundary can be classified by
+adding them to this set; consumers do not need to re-ship a contract or
+update their lint exemption files.
+
+Mission: `canonical-producer-contracts-legacy-envelope-01KS7JM3`.
+
 ## Identity-Boundary CI Gate
 
 The `cross-repo-harness-tests` required check runs the
