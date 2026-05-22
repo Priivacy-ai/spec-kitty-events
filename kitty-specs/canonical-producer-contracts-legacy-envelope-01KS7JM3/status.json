@@ -1,0 +1,56 @@
+{
+  "event_count": 5,
+  "last_event_id": "01KS7M4CDR8NJEPDXT5WYAAM8C",
+  "materialized_at": "2026-05-22T10:36:38.712332+00:00",
+  "mission_number": "",
+  "mission_slug": "canonical-producer-contracts-legacy-envelope-01KS7JM3",
+  "mission_type": "software-dev",
+  "summary": {
+    "approved": 0,
+    "blocked": 0,
+    "canceled": 0,
+    "claimed": 0,
+    "done": 0,
+    "for_review": 0,
+    "in_progress": 0,
+    "in_review": 0,
+    "planned": 5
+  },
+  "work_packages": {
+    "WP01": {
+      "actor": "finalize-tasks",
+      "force_count": 1,
+      "lane": "planned",
+      "last_event_id": "01KS7M4C4BDF7ZST3R7J5FSV1T",
+      "last_transition_at": "2026-05-22T10:36:38.411787+00:00"
+    },
+    "WP02": {
+      "actor": "finalize-tasks",
+      "force_count": 1,
+      "lane": "planned",
+      "last_event_id": "01KS7M4C9CCASFSKER85J5VTDZ",
+      "last_transition_at": "2026-05-22T10:36:38.572232+00:00"
+    },
+    "WP03": {
+      "actor": "finalize-tasks",
+      "force_count": 1,
+      "lane": "planned",
+      "last_event_id": "01KS7M4CAS9VA5XJNS2H9E6CJP",
+      "last_transition_at": "2026-05-22T10:36:38.617267+00:00"
+    },
+    "WP04": {
+      "actor": "finalize-tasks",
+      "force_count": 1,
+      "lane": "planned",
+      "last_event_id": "01KS7M4CC87E5S1FWFSR5TW5AV",
+      "last_transition_at": "2026-05-22T10:36:38.664685+00:00"
+    },
+    "WP05": {
+      "actor": "finalize-tasks",
+      "force_count": 1,
+      "lane": "planned",
+      "last_event_id": "01KS7M4CDR8NJEPDXT5WYAAM8C",
+      "last_transition_at": "2026-05-22T10:36:38.712332+00:00"
+    }
+  }
+}
