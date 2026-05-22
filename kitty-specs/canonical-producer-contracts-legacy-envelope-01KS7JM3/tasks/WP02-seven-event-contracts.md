@@ -24,7 +24,8 @@ subtasks:
 - T011
 - T012
 phase: Phase 2 - Canonical contracts
-shell_pid: '65579'
+shell_pid: "65579"
+agent: "claude:opus-4-7:python-pedro:implementer"
 history:
 - timestamp: '2026-05-22T10:22:16Z'
   lane: planned
@@ -449,3 +450,7 @@ Same as WP01.
 - **Risk**: Fixtures drift from models. **Mitigation**: T011 specifies `model_dump(mode="json")` + `sort_keys=True`; T012's round-trip test catches drift.
 - **Risk**: A `ConfigDict(frozen=True, extra="forbid")` choice rejects valid future fields. **Mitigation**: spec C-004 explicitly accepts this trade — drift surfaces at the contract boundary, not silently downstream.
 - **Risk**: WP02 and WP01 both edit `validators.py`. **Mitigation**: WP01 edits are inside `validate_event()` body and add `_SEMANTIC_VALIDATORS`; WP02 edits add seven entries to `_EVENT_TYPE_TO_MODEL` (a different dict in the same file). Lane merge handles textually disjoint edits.
+
+## Activity Log
+
+- 2026-05-22T10:43:02Z – claude:opus-4-7:python-pedro:implementer – shell_pid=65579 – Assigned agent via action command
