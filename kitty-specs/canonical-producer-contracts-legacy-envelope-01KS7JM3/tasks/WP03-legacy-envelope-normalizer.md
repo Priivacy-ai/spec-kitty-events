@@ -25,7 +25,8 @@ subtasks:
 - T017
 - T018
 phase: Phase 2 - Legacy compatibility contract
-shell_pid: '71755'
+shell_pid: "71755"
+agent: "claude:opus-4-7:python-pedro:implementer"
 history:
 - timestamp: '2026-05-22T10:22:16Z'
   lane: planned
@@ -587,3 +588,7 @@ Same as WP01.
 - **Risk**: Manifest concurrent edit collision with WP02. **Mitigation**: WP02 appends to `fixtures` array, WP03 appends to the same array — lane merge handles textually disjoint entries.
 - **Risk**: `__init__.py` concurrent edit collision with WP02. **Mitigation**: same — distinct import blocks.
 - **Risk**: A future Phase 3 SaaS adapter assumes idempotent passthrough for canonical envelopes. **Mitigation**: contract explicitly documents that canonical envelopes surface as unrecognized; the quickstart shows the correct usage pattern (call `normalize` only on legacy candidates).
+
+## Activity Log
+
+- 2026-05-22T10:49:19Z – claude:opus-4-7:python-pedro:implementer – shell_pid=71755 – Assigned agent via action command
