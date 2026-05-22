@@ -27,7 +27,8 @@ subtasks:
 - T005
 - T009
 phase: Phase 2 - Semantic conformance
-shell_pid: '73578'
+shell_pid: "73578"
+agent: "claude:opus-4-7:python-pedro:implementer"
 history:
 - timestamp: '2026-05-22T10:22:16Z'
   lane: planned
@@ -419,3 +420,7 @@ Verify the diff contains:
 - **Risk**: A future producer changes the `StatusTransitionPayload` shape so `validate_transition()` raises rather than returning a violation. **Mitigation**: `validate_transition` is documented to never raise on business-rule violations (status.py docstring). If it ever did, the test suite would catch the unexpected exception.
 - **Risk**: Re-parsing the model inside `validate_event()` adds latency. **Mitigation**: only fires for `WPStatusChanged` events that already passed shape validation; one extra pydantic parse per event is well under the 10s NFR-002 budget.
 - **Risk**: The local `from spec_kitty_events.status import validate_transition` inside the validator function avoids a top-of-module circular-import problem. **Mitigation**: tested via T005.
+
+## Activity Log
+
+- 2026-05-22T10:51:57Z – claude:opus-4-7:python-pedro:implementer – shell_pid=73578 – Assigned agent via action command
