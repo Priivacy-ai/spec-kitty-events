@@ -71,3 +71,4 @@ uv.lock
 .kittify/charter/governance.yaml
 .kittify/charter/metadata.yaml
 .kittify/charter/references.yaml
+.worktrees/

@@ -22,6 +22,10 @@ from spec_kitty_events import (
     SPECIFY_STARTED,
     TASKS_COMPLETED,
     TASKS_STARTED,
+    DEPENDENCY_RESOLVED,
+    ERROR_LOGGED,
+    HISTORY_ADDED,
+    WP_ASSIGNED,
     WP_CREATED,
     WP_LIFECYCLE_EVENT_TYPES,
     PlanCompletedPayload,
@@ -46,7 +50,15 @@ class TestEventTypeConstants:
             TASKS_STARTED,
             TASKS_COMPLETED,
         }
-        assert WP_LIFECYCLE_EVENT_TYPES == {WP_CREATED}
+        # Mission canonical-producer-contracts-legacy-envelope-01KS7JM3 extended
+        # this set with four SaaS-bound WP-scoped events.
+        assert WP_LIFECYCLE_EVENT_TYPES == {
+            WP_CREATED,
+            WP_ASSIGNED,
+            HISTORY_ADDED,
+            ERROR_LOGGED,
+            DEPENDENCY_RESOLVED,
+        }
         assert CANONICAL_LIFECYCLE_EVENT_TYPES == (
             PROJECT_LIFECYCLE_EVENT_TYPES
             | ARTIFACT_LIFECYCLE_EVENT_TYPES

@@ -33,7 +33,8 @@ Recognized legacy shapes (v1)
   and/or ``feature_number`` keys. Maps to ``mission_slug`` / ``mission_number``
   and strips the legacy keys at top level and inside ``payload``.
 - ``awaiting_review_synonym`` — ``payload.to_lane == 'awaiting-review'`` →
-  canonical ``'in_review'``.
+  canonical ``Lane.IN_REVIEW.value`` (the only authoritative source for the
+  canonical lane vocabulary is :mod:`spec_kitty_events.status`).
 
 Fallthrough (no recognized markers) returns
 ``UnnormalizableLegacyDiagnostic(reason='unrecognized_legacy_shape')``.
@@ -62,6 +63,8 @@ import uuid
 from typing import Any, Dict, FrozenSet, List, Union
 
 from pydantic import BaseModel, ConfigDict, Field
+
+from spec_kitty_events.status import Lane
 
 LEGACY_ENVELOPE_CONTRACT_NAME: str = "legacy_envelope_v1"
 
@@ -199,7 +202,7 @@ class LegacyEnvelopeNormalizer:
         if isinstance(payload, dict) and payload.get("to_lane") == "awaiting-review":
             canonical = dict(raw_copy)
             new_payload = dict(payload)
-            new_payload["to_lane"] = "in_review"
+            new_payload["to_lane"] = Lane.IN_REVIEW.value
             canonical["payload"] = new_payload
             return NormalizedEnvelope(
                 canonical=canonical,
