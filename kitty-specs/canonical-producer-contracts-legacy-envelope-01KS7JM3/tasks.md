@@ -143,11 +143,11 @@ Total subtasks: 26. All WPs are within the 3–9 subtask range; WP04 is the larg
 **Risks**: 1) Field shapes might drift from the CLI emitter. Mitigated by basing the models on the pre-mission audit. 2) `extra="forbid"` could reject benign extra fields the producer wants to add later. Mitigated by the spec's explicit decision: drift becomes a hard error at the contract boundary. 3) Fixtures must round-trip through `model.model_dump(mode="json")` to stay canonical-shaped (per C-004). T011 enforces this.
 
 **Included subtasks**:
-- [ ] T006 Create `build_lifecycle.py` (WP02)
-- [ ] T007 Extend `project_lifecycle.py` (WP02)
-- [ ] T008 Extend `lifecycle.py` (WP02)
-- [ ] T011 Author seven canonical fixture JSON files (WP02)
-- [ ] T012 Add `tests/unit/test_seven_event_contracts.py` (WP02; model-only tests, no registry assertions)
+- [x] T006 Create `build_lifecycle.py` (WP02)
+- [x] T007 Extend `project_lifecycle.py` (WP02)
+- [x] T008 Extend `lifecycle.py` (WP02)
+- [x] T011 Author seven canonical fixture JSON files (WP02)
+- [x] T012 Add `tests/unit/test_seven_event_contracts.py` (WP02; model-only tests, no registry assertions)
 
 ### WP03 — `legacy_envelope_v1` normalizer
 
