@@ -20,8 +20,8 @@ subtasks:
 - T023
 - T024
 phase: Phase 4 - Documentation
-agent: "claude:opus-4-7:curator-carla:implementer"
-shell_pid: "77089"
+agent: "claude:opus-4-7:reviewer-renata:reviewer"
+shell_pid: "77324"
 history:
 - timestamp: '2026-05-22T10:22:16Z'
   lane: planned
@@ -192,3 +192,4 @@ Same as other WPs. Land last.
 
 - 2026-05-22T11:00:52Z – claude:opus-4-7:curator-carla:implementer – shell_pid=77089 – Started implementation via action command
 - 2026-05-22T11:02:18Z – claude:opus-4-7:curator-carla:implementer – shell_pid=77089 – WP05 ready
+- 2026-05-22T11:02:25Z – claude:opus-4-7:reviewer-renata:reviewer – shell_pid=77324 – Started review via action command
