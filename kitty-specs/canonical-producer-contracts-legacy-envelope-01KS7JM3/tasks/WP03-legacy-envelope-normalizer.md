@@ -25,8 +25,8 @@ subtasks:
 - T017
 - T018
 phase: Phase 2 - Legacy compatibility contract
-shell_pid: "71755"
-agent: "claude:opus-4-7:python-pedro:implementer"
+shell_pid: "73330"
+agent: "claude:opus-4-7:reviewer-renata:reviewer"
 history:
 - timestamp: '2026-05-22T10:22:16Z'
   lane: planned
@@ -593,3 +593,4 @@ Same as WP01.
 
 - 2026-05-22T10:49:19Z – claude:opus-4-7:python-pedro:implementer – shell_pid=71755 – Assigned agent via action command
 - 2026-05-22T10:51:21Z – claude:opus-4-7:python-pedro:implementer – shell_pid=71755 – WP03 ready
+- 2026-05-22T10:51:36Z – claude:opus-4-7:reviewer-renata:reviewer – shell_pid=73330 – Started review via action command
