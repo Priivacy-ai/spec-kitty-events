@@ -230,7 +230,7 @@
       "path": "events/invalid/wp_status_changed_invalid_lane.json",
       "expected_result": "invalid",
       "event_type": "WPStatusChanged",
-      "notes": "StatusTransitionPayload with invalid to_lane value 'in_review'",
+      "notes": "StatusTransitionPayload with invalid to_lane value 'in_reveiw' (typo); fails the Lane enum. Updated by mission canonical-producer-contracts-legacy-envelope-01KS7JM3 — the prior value 'in_review' became canonical in 3.0 so the fixture no longer exercised the invalid-lane path.",
       "min_version": "2.0.0"
     },
     {
@@ -1952,6 +1952,24 @@
       "expected_result": "valid",
       "event_type": "MissionOriginBound",
       "notes": "Canonical MissionOriginBoundPayload binding a mission to a GitHub issue.",
+      "min_version": "5.2.0"
+    },
+    {
+      "id": "legacy-envelope-v1-pre30-normalizes",
+      "path": "legacy/pre_3_0_envelope_normalizes.json",
+      "expected_result": "valid",
+      "event_type": "LegacyEnvelope",
+      "fixture_type": "legacy_normalization",
+      "notes": "Pre-3.0 envelope without project_uuid; normalizer promotes to canonical shape.",
+      "min_version": "5.2.0"
+    },
+    {
+      "id": "legacy-envelope-v1-unrecognized-diagnostic",
+      "path": "legacy/unrecognized_legacy_diagnostic.json",
+      "expected_result": "invalid",
+      "event_type": "LegacyEnvelope",
+      "fixture_type": "legacy_normalization",
+      "notes": "Envelope with no recognized legacy markers; normalizer surfaces UnnormalizableLegacyDiagnostic.",
       "min_version": "5.2.0"
     }
   ],
