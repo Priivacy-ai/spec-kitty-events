@@ -29,6 +29,7 @@ MISSION_CLOSED: str = "MissionClosed"
 MISSION_STARTED: str = "MissionStarted"
 MISSION_COMPLETED: str = "MissionCompleted"
 MISSION_CANCELLED: str = "MissionCancelled"
+MISSION_ORIGIN_BOUND: str = "MissionOriginBound"
 PHASE_ENTERED: str = "PhaseEntered"
 REVIEW_ROLLBACK: str = "ReviewRollback"
 
@@ -172,6 +173,25 @@ class MissionCancelledPayload(BaseModel):
         default_factory=list,
         description="WP IDs affected by cancellation",
     )
+
+
+class MissionOriginBoundPayload(BaseModel):
+    """Typed payload for ``MissionOriginBound`` events.
+
+    Records that a mission is bound to an external tracker issue (GitHub,
+    Linear, Jira, etc.). Observational telemetry: the binding is a
+    correlation hint, not an authority for mission state.
+    """
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    mission_slug: str = Field(..., min_length=1, description="Canonical mission slug.")
+    provider: str = Field(..., min_length=1, description="External tracker provider (e.g. 'github', 'linear').")
+    external_issue_id: str = Field(..., min_length=1, description="Provider-native issue identifier.")
+    external_issue_key: str = Field(..., min_length=1, description="Display key (e.g. 'PROJ-123').")
+    external_issue_url: str = Field(..., min_length=1, description="Browser URL to the external issue.")
+    title: str = Field(..., min_length=1, description="External issue title.")
+    mission_id: Optional[str] = Field(None, min_length=1, description="Canonical mission ULID (when known).")
 
 
 class PhaseEnteredPayload(BaseModel):
