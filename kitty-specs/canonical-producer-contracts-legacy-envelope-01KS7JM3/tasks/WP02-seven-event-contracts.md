@@ -24,8 +24,8 @@ subtasks:
 - T011
 - T012
 phase: Phase 2 - Canonical contracts
-shell_pid: "65579"
-agent: "claude:opus-4-7:python-pedro:implementer"
+shell_pid: "68494"
+agent: "claude:opus-4-7:reviewer-renata:reviewer"
 history:
 - timestamp: '2026-05-22T10:22:16Z'
   lane: planned
@@ -455,3 +455,4 @@ Same as WP01.
 
 - 2026-05-22T10:43:02Z – claude:opus-4-7:python-pedro:implementer – shell_pid=65579 – Assigned agent via action command
 - 2026-05-22T10:47:45Z – claude:opus-4-7:python-pedro:implementer – shell_pid=65579 – WP02 ready: seven models + fixtures + manifest entries + bumped fixture count
+- 2026-05-22T10:48:23Z – claude:opus-4-7:reviewer-renata:reviewer – shell_pid=68494 – Started review via action command
