@@ -31,7 +31,8 @@ subtasks:
 - T021
 - T022
 phase: Phase 3 - Conformance suite health
-shell_pid: '74710'
+shell_pid: "74710"
+agent: "claude:opus-4-7:python-pedro:implementer"
 history:
 - timestamp: '2026-05-22T10:22:16Z'
   lane: planned
@@ -367,3 +368,7 @@ If any fixtures still fail, iterate on T020's filter. The goal is zero red, not 
 - **Risk**: An unaudited fixture type fails after the filter change. **Mitigation**: T022 explicitly re-runs the pyargs suite and iterates until 0 failures.
 - **Risk**: The wrapper-detection helper is too permissive and extracts `input` from a non-wrapper fixture. **Mitigation**: the `obj.keys() <= _WRAPPER_KEYS` check is strict — only fixtures whose keys are a subset of the wrapper key set match.
 - **Risk**: A reviewer-time question whether the legacy fixtures should also go through the wrapper extraction. **Mitigation**: no — legacy fixtures are exercised by `tests/unit/test_legacy_normalizer.py` (in WP03) which reads `entry["input"]` directly. Excluding them from the pyargs entrypoint is correct.
+
+## Activity Log
+
+- 2026-05-22T10:56:01Z – claude:opus-4-7:python-pedro:implementer – shell_pid=74710 – Assigned agent via action command
