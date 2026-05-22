@@ -1,0 +1,11 @@
+{
+  "ahead_of_remote": 0,
+  "behind_remote": 0,
+  "git_branch": "main",
+  "head_commit_sha": "abc1234567890abc1234567890abc1234567890a",
+  "recent_commits": [
+    "abc1234567890abc1234567890abc1234567890a"
+  ],
+  "remote_head": "abc1234567890abc1234567890abc1234567890a",
+  "repo_slug": "Priivacy-ai/spec-kitty-events"
+}

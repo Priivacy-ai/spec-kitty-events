@@ -11,23 +11,31 @@ strict=True is specified.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Dict, Tuple, Type, Union
+from typing import Any, Callable, Dict, Tuple, Type, Union
 
-from pydantic import ValidationError as PydanticValidationError
+from pydantic import BaseModel, ValidationError as PydanticValidationError
 from spec_kitty_events.cutover import assert_canonical_cutover_signal
 
+from spec_kitty_events.build_lifecycle import (
+    BuildHeartbeatPayload,
+    BuildRegisteredPayload,
+)
 from spec_kitty_events.gates import GateFailedPayload, GatePassedPayload
 from spec_kitty_events.lifecycle import (
     MissionClosedPayload,
     MissionCancelledPayload,
     MissionCompletedPayload,
     MissionCreatedPayload,
+    MissionOriginBoundPayload,
     MissionStartedPayload,
     PhaseEnteredPayload,
     ReviewRollbackPayload,
 )
 from spec_kitty_events.models import Event
 from spec_kitty_events.project_lifecycle import (
+    DependencyResolvedPayload,
+    ErrorLoggedPayload,
+    HistoryAddedPayload,
     PlanCompletedPayload,
     PlanStartedPayload,
     ProjectInitializedPayload,
@@ -35,9 +43,10 @@ from spec_kitty_events.project_lifecycle import (
     SpecifyStartedPayload,
     TasksCompletedPayload,
     TasksStartedPayload,
+    WPAssignedPayload,
     WPCreatedPayload,
 )
-from spec_kitty_events.status import StatusTransitionPayload
+from spec_kitty_events.status import StatusTransitionPayload, validate_transition
 from spec_kitty_events.collaboration import (
     ParticipantInvitedPayload,
     ParticipantJoinedPayload,
@@ -260,6 +269,18 @@ _EVENT_TYPE_TO_MODEL: Dict[str, Any] = {
     # Legacy retrospective terminal contracts (3.1.0)
     "RetrospectiveCompleted": RetrospectiveCompletedPayload,
     "RetrospectiveSkipped": RetrospectiveSkippedPayload,
+    # Seven previously-uncontracted SaaS-bound event types (5.2.0)
+    # Mission: canonical-producer-contracts-legacy-envelope-01KS7JM3.
+    # Producer call sites: spec-kitty/src/specify_cli/sync/emitter.py
+    # (commit 43305c12c, lines 720–1431). All seven route through
+    # SpecKittyEventEmitter._emit() and are SaaS-bound.
+    "WPAssigned": WPAssignedPayload,
+    "BuildRegistered": BuildRegisteredPayload,
+    "BuildHeartbeat": BuildHeartbeatPayload,
+    "HistoryAdded": HistoryAddedPayload,
+    "ErrorLogged": ErrorLoggedPayload,
+    "DependencyResolved": DependencyResolvedPayload,
+    "MissionOriginBound": MissionOriginBoundPayload,
 }
 
 # Event type to JSON Schema name mapping (used with load_schema())
@@ -362,6 +383,55 @@ _EVENT_TYPE_TO_SCHEMA: Dict[str, str] = {
     # Legacy retrospective terminal contracts (3.1.0)
     "RetrospectiveCompleted": "retrospective_completed_payload",
     "RetrospectiveSkipped": "retrospective_skipped_payload",
+}
+
+
+def _semantic_validate_wp_status_changed(
+    model: BaseModel,
+    payload: Dict[str, Any],
+) -> Tuple["ModelViolation", ...]:
+    """Run status.validate_transition() and wrap violations as ModelViolation.
+
+    Called after pydantic shape validation succeeds for ``WPStatusChanged``.
+    Each violation string is preserved verbatim so downstream consumers can
+    continue routing on the documented substrings ``force=True`` and
+    ``review-rejection`` (see status.py module docstring).
+
+    Mission: canonical-producer-contracts-legacy-envelope-01KS7JM3.
+    """
+    # Imported at module scope (status.validate_transition).
+    result = validate_transition(model)  # type: ignore[arg-type]
+    if result.valid:
+        return ()
+    return tuple(
+        ModelViolation(
+            field="transition",
+            message=violation,
+            violation_type="transition_rule",
+            input_value=payload,
+        )
+        for violation in result.violations
+    )
+
+
+# Registry of semantic (business-rule) validators that run AFTER pydantic
+# shape validation succeeds. Each entry maps event_type -> a callable that
+# takes the parsed pydantic model and the raw payload dict, and returns a
+# tuple of ModelViolation instances (empty tuple if the model satisfies the
+# semantic rule).
+#
+# Mission: canonical-producer-contracts-legacy-envelope-01KS7JM3.
+#
+# Why a registry: shape validation is per-field; semantic validation is
+# cross-field business rules (transition matrix, force-required families,
+# guard-condition checks). Registry keeps validate_event() unchanged for
+# event types without semantic rules and lets future event types plug in
+# with one line.
+_SEMANTIC_VALIDATORS: Dict[
+    str,
+    Callable[[BaseModel, Dict[str, Any]], Tuple["ModelViolation", ...]],
+] = {
+    "WPStatusChanged": _semantic_validate_wp_status_changed,
 }
 
 
@@ -519,6 +589,19 @@ def validate_event(
 
     # Layer 1: Pydantic validation
     model_violations = cutover_violations + _validate_with_model(model_payload, model_class)
+
+    # Layer 1.5: Semantic (business-rule) validation. Run only when:
+    #   (a) pydantic shape validation produced no violations (so the model
+    #       parsed cleanly — semantic checks need a valid model instance), and
+    #   (b) the event type has a registered semantic validator.
+    # Synthesized semantic violations are appended to model_violations so they
+    # surface through the existing ConformanceResult.model_violations channel
+    # without API churn for downstream consumers.
+    # Mission: canonical-producer-contracts-legacy-envelope-01KS7JM3.
+    if not model_violations and event_type in _SEMANTIC_VALIDATORS:
+        parsed_model = model_class.model_validate(model_payload)
+        semantic_violations = _SEMANTIC_VALIDATORS[event_type](parsed_model, model_payload)
+        model_violations = model_violations + semantic_violations
 
     # Layer 2: JSON Schema validation (skip if no schema mapping exists)
     if schema_name is not None:

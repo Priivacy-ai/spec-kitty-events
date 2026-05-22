@@ -1,0 +1,25 @@
+{
+  "class": "legacy_envelope_v1",
+  "expected": "normalized",
+  "input": {
+    "aggregate_id": "mission/01J0000000000000000000MS1",
+    "build_id": "build-2026-01-01-fixture",
+    "event_id": "01J0000000000000000000F001",
+    "event_type": "MissionCreated",
+    "lamport_clock": 1,
+    "node_id": "fixture-node",
+    "payload": {
+      "friendly_name": "Fixture Mission",
+      "mission_number": 1,
+      "mission_slug": "fixture-mission",
+      "mission_type": "software-dev",
+      "purpose_context": "Pre-3.0 envelope missing project_uuid.",
+      "purpose_tldr": "Pinned canonical baseline.",
+      "target_branch": "main",
+      "wp_count": 3
+    },
+    "timestamp": "2026-01-01T00:00:00+00:00"
+  },
+  "legacy_shape": "pre_3_0_envelope",
+  "notes": "Pre-3.0 envelope missing project_uuid. Normalizer mints project_uuid via uuid5(NAMESPACE_URL || 'spec-kitty-events/legacy', f'{node_id}/{build_id}') and sets schema_version=3.0.0 and correlation_id=event_id."
+}

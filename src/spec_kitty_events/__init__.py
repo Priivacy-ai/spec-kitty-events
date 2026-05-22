@@ -13,7 +13,7 @@ This release publishes the fail-closed cutover surface for:
   historical-shape conformance fixtures.
 """
 
-__version__ = "5.1.0"
+__version__ = "5.2.0"
 
 from spec_kitty_events.cutover import (
     CUTOVER_ARTIFACT,
@@ -94,6 +94,7 @@ from spec_kitty_events.lifecycle import (
     MISSION_STARTED,
     MISSION_COMPLETED,
     MISSION_CANCELLED,
+    MISSION_ORIGIN_BOUND,
     PHASE_ENTERED,
     REVIEW_ROLLBACK,
     MISSION_EVENT_TYPES,
@@ -104,6 +105,7 @@ from spec_kitty_events.lifecycle import (
     MissionStartedPayload,
     MissionCompletedPayload,
     MissionCancelledPayload,
+    MissionOriginBoundPayload,
     PhaseEnteredPayload,
     ReviewRollbackPayload,
     LifecycleAnomaly,
@@ -121,6 +123,10 @@ from spec_kitty_events.project_lifecycle import (
     TASKS_STARTED,
     TASKS_COMPLETED,
     WP_CREATED,
+    WP_ASSIGNED,
+    HISTORY_ADDED,
+    ERROR_LOGGED,
+    DEPENDENCY_RESOLVED,
     PROJECT_LIFECYCLE_EVENT_TYPES,
     ARTIFACT_LIFECYCLE_EVENT_TYPES,
     WP_LIFECYCLE_EVENT_TYPES,
@@ -134,7 +140,42 @@ from spec_kitty_events.project_lifecycle import (
     TasksStartedPayload,
     TasksCompletedPayload,
     WPCreatedPayload,
+    WPAssignedPayload,
+    HistoryAddedPayload,
+    ErrorLoggedPayload,
+    DependencyResolvedPayload,
 )
+
+# Build-aggregate event contracts (shipped by mission
+# canonical-producer-contracts-legacy-envelope-01KS7JM3).
+from spec_kitty_events.build_lifecycle import (
+    BUILD_REGISTERED,
+    BUILD_HEARTBEAT,
+    BUILD_LIFECYCLE_EVENT_TYPES,
+    BuildRegisteredPayload,
+    BuildHeartbeatPayload,
+)
+
+# Legacy envelope compatibility contract (legacy_envelope_v1, shipped by
+# mission canonical-producer-contracts-legacy-envelope-01KS7JM3).
+from spec_kitty_events import legacy
+from spec_kitty_events.legacy import (
+    LEGACY_ENVELOPE_CONTRACT_NAME,
+    RECOGNIZED_LEGACY_SHAPES,
+    NormalizedEnvelope,
+    UnnormalizableLegacyDiagnostic,
+    NormalizationResult,
+    LegacyEnvelopeNormalizer,
+)
+
+# Machine-readable classification surface for event types that are NOT
+# routed through the SaaS-bound producer path. Empty in this release —
+# every CLI-emitted event audited as of spec-kitty 43305c12c routes
+# through SpecKittyEventEmitter._emit(). The surface is published so
+# downstream consumers (CLI canonical-producer lint, SaaS adapter) can
+# import the set and adjust enforcement without re-shipping a contract.
+# Mission: canonical-producer-contracts-legacy-envelope-01KS7JM3.
+LOCAL_ONLY_EVENT_TYPES: frozenset[str] = frozenset()
 
 # Status state model contracts
 from spec_kitty_events.status import (
@@ -845,4 +886,31 @@ __all__ = [
     "RetrospectiveCompletedPayload",
     "RetrospectiveSkippedPayload",
     "TriggerSourceT",
+    # Seven canonical contracts shipped by
+    # canonical-producer-contracts-legacy-envelope-01KS7JM3 (5.2.0).
+    "WP_ASSIGNED",
+    "HISTORY_ADDED",
+    "ERROR_LOGGED",
+    "DEPENDENCY_RESOLVED",
+    "WPAssignedPayload",
+    "HistoryAddedPayload",
+    "ErrorLoggedPayload",
+    "DependencyResolvedPayload",
+    "MISSION_ORIGIN_BOUND",
+    "MissionOriginBoundPayload",
+    "BUILD_REGISTERED",
+    "BUILD_HEARTBEAT",
+    "BUILD_LIFECYCLE_EVENT_TYPES",
+    "BuildRegisteredPayload",
+    "BuildHeartbeatPayload",
+    # Legacy envelope compatibility (legacy_envelope_v1).
+    "legacy",
+    "LEGACY_ENVELOPE_CONTRACT_NAME",
+    "RECOGNIZED_LEGACY_SHAPES",
+    "NormalizedEnvelope",
+    "UnnormalizableLegacyDiagnostic",
+    "NormalizationResult",
+    "LegacyEnvelopeNormalizer",
+    # Machine-readable classification surface.
+    "LOCAL_ONLY_EVENT_TYPES",
 ]

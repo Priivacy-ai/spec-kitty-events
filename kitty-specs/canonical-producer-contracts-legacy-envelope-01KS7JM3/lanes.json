@@ -1,0 +1,114 @@
+{
+  "version": 1,
+  "mission_slug": "canonical-producer-contracts-legacy-envelope-01KS7JM3",
+  "mission_id": "01KS7JM3HSNXGCWV2E9X3JGAEP",
+  "mission_branch": "kitty/mission-canonical-producer-contracts-legacy-envelope-01KS7JM3",
+  "target_branch": "kitty/pr/1198-canonical-producer-contracts",
+  "lanes": [
+    {
+      "lane_id": "lane-a",
+      "wp_ids": [
+        "WP01"
+      ],
+      "write_scope": [
+        "src/spec_kitty_events/conformance/validators.py",
+        "tests/unit/test_conformance_semantic.py"
+      ],
+      "predicted_surfaces": [
+        "api",
+        "tests"
+      ],
+      "depends_on_lanes": [],
+      "parallel_group": 0
+    },
+    {
+      "lane_id": "lane-b",
+      "wp_ids": [
+        "WP02"
+      ],
+      "write_scope": [
+        "src/spec_kitty_events/build_lifecycle.py",
+        "src/spec_kitty_events/conformance/fixtures/events/valid/build_heartbeat.json",
+        "src/spec_kitty_events/conformance/fixtures/events/valid/build_registered.json",
+        "src/spec_kitty_events/conformance/fixtures/events/valid/dependency_resolved.json",
+        "src/spec_kitty_events/conformance/fixtures/events/valid/error_logged.json",
+        "src/spec_kitty_events/conformance/fixtures/events/valid/history_added.json",
+        "src/spec_kitty_events/conformance/fixtures/events/valid/mission_origin_bound.json",
+        "src/spec_kitty_events/conformance/fixtures/events/valid/wp_assigned.json",
+        "src/spec_kitty_events/lifecycle.py",
+        "src/spec_kitty_events/project_lifecycle.py",
+        "tests/unit/test_seven_event_contracts.py"
+      ],
+      "predicted_surfaces": [
+        "api",
+        "artifact-rendering",
+        "tracker-integration"
+      ],
+      "depends_on_lanes": [],
+      "parallel_group": 0
+    },
+    {
+      "lane_id": "lane-c",
+      "wp_ids": [
+        "WP03"
+      ],
+      "write_scope": [
+        "src/spec_kitty_events/conformance/fixtures/legacy/pre_3_0_envelope_normalizes.json",
+        "src/spec_kitty_events/conformance/fixtures/legacy/unrecognized_legacy_diagnostic.json",
+        "src/spec_kitty_events/legacy.py",
+        "tests/unit/test_legacy_normalizer.py"
+      ],
+      "predicted_surfaces": [
+        "api",
+        "legacy-cleanup",
+        "tracker-integration"
+      ],
+      "depends_on_lanes": [],
+      "parallel_group": 0
+    },
+    {
+      "lane_id": "lane-d",
+      "wp_ids": [
+        "WP04"
+      ],
+      "write_scope": [
+        "src/spec_kitty_events/__init__.py",
+        "src/spec_kitty_events/conformance/fixtures/events/invalid/wp_status_changed_invalid_lane.json",
+        "src/spec_kitty_events/conformance/fixtures/manifest.json",
+        "src/spec_kitty_events/conformance/test_pyargs_entrypoint.py"
+      ],
+      "predicted_surfaces": [
+        "api",
+        "legacy-cleanup",
+        "tracker-integration"
+      ],
+      "depends_on_lanes": [],
+      "parallel_group": 0
+    },
+    {
+      "lane_id": "lane-planning",
+      "wp_ids": [
+        "WP05"
+      ],
+      "write_scope": [
+        "CHANGELOG.md",
+        "README.md"
+      ],
+      "predicted_surfaces": [
+        "planning"
+      ],
+      "depends_on_lanes": [
+        "lane-a",
+        "lane-b",
+        "lane-c",
+        "lane-d"
+      ],
+      "parallel_group": 1
+    }
+  ],
+  "computed_at": "2026-05-22T10:36:38.759342+00:00",
+  "computed_from": "dependency_graph+ownership",
+  "planning_artifact_wps": [
+    "WP05"
+  ]
+}

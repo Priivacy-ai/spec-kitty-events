@@ -15,7 +15,10 @@ from spec_kitty_events.conformance.pytest_helpers import (
     assert_payload_conforms,
     assert_payload_fails,
 )
-from spec_kitty_events.conformance.validators import validate_event
+from spec_kitty_events.conformance.validators import (
+    _EVENT_TYPE_TO_MODEL,
+    validate_event,
+)
 from spec_kitty_events.schemas import list_schemas, load_schema
 from spec_kitty_events.status import Lane, SyncLaneV1, CANONICAL_TO_SYNC_V1
 
@@ -28,22 +31,63 @@ _MANIFEST: Dict[str, Any] = json.loads(
 )
 
 
+# Wrapper-shape detection (mission canonical-producer-contracts-legacy-envelope-01KS7JM3).
+# Class-taxonomy and historical-row fixtures use a wrapper schema
+# {class, expected, input, notes, [expected_error_code, expected_reason,
+# legacy_shape]}. The raw event lives under .input. The pyargs test must
+# extract input before calling validate_event; otherwise the wrapper keys
+# (class, expected, notes, ...) appear as extras on the model and cause false
+# failures.
+_WRAPPER_KEYS = frozenset({
+    "class",
+    "expected",
+    "input",
+    "notes",
+    "expected_error_code",
+    "expected_reason",
+    "legacy_shape",
+})
+
+
+def _is_wrapper_shape(obj: Any) -> bool:
+    """Return True if obj is a class_taxonomy / historical_row / legacy /
+    similar wrapper that nests the actual event envelope under ``.input``.
+    """
+    return (
+        isinstance(obj, dict)
+        and "input" in obj
+        and isinstance(obj["input"], dict)
+        and obj.keys() <= _WRAPPER_KEYS
+    )
+
+
 def _event_fixture_entries() -> List[Dict[str, Any]]:
     """Return manifest entries that are event-type fixtures.
 
     Excludes:
     - LaneMapping fixtures (handled by lane-mapping parametrized tests).
+    - LegacyEnvelope fixtures (exercised by tests/unit/test_legacy_normalizer.py,
+      not by validate_event). Mission:
+      canonical-producer-contracts-legacy-envelope-01KS7JM3.
     - Special fixture_type kinds (replay_stream, reducer_output,
-      timestamp_semantics) that are not raw envelope payloads to validate.
+      timestamp_semantics, legacy_normalization) that are not raw envelope
+      payloads to validate.
     """
     return [
         f for f in _MANIFEST["fixtures"]
-        if f["event_type"] != "LaneMapping"
+        if f["event_type"] not in ("LaneMapping", "LegacyEnvelope")
         and f.get("fixture_type") not in (
             "replay_stream",
             "reducer_output",
             "timestamp_semantics",
+            "legacy_normalization",
         )
+        # Skip diagnostic-taxonomy fixtures whose event_type is a sentinel
+        # (e.g. "<missing>", "<wrong>") used only to label the class. These
+        # are not real events; the class-taxonomy test suite asserts on them
+        # via a different code path. Mission:
+        # canonical-producer-contracts-legacy-envelope-01KS7JM3.
+        and f["event_type"] in _EVENT_TYPE_TO_MODEL
     ]
 
 
@@ -56,6 +100,8 @@ def _event_fixture_params() -> List[Dict[str, Any]]:
     for entry in _event_fixture_entries():
         fixture_path = _FIXTURES_DIR / entry["path"]
         payload: Any = json.loads(fixture_path.read_text(encoding="utf-8"))
+        if _is_wrapper_shape(payload):
+            payload = payload["input"]
         params.append({**entry, "payload": payload})
     return params
 
