@@ -1,7 +1,7 @@
 {
-  "worktree_path": "/Users/robert/spec-kitty-dev/spec-kitty-20260515-122103-ytwNyX/spec-kitty-events/.worktrees/executable-event-timestamp-semantics-01KRNME2-lane-a",
+  "worktree_path": "/Users/robert/spec-kitty-dev/spec-kitty-20260522-114105-jmsHua/spec-kitty-events/.worktrees/canonical-producer-contracts-legacy-envelope-01KS7JM3-lane-b",
   "wp_id": "WP02",
-  "agent": "claude:opus-4-7:reviewer:reviewer",
-  "started_at": "2026-05-15T11:17:25.360418+00:00",
-  "pid": 37601
+  "agent": "claude:opus-4-7:reviewer-renata:reviewer",
+  "started_at": "2026-05-22T10:48:24.381576+00:00",
+  "pid": 68496
 }
