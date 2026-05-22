@@ -219,8 +219,8 @@ Total subtasks: 26. All WPs are within the 3–9 subtask range; WP04 is the larg
 **Risks**: 1) README structure changes are sometimes contentious. Mitigated by inserting a minimal "Legacy normalization" subsection without restructuring existing sections. 2) CHANGELOG voice — match existing entries (e.g. the 5.1.0 entry uses "Changed" and "Added" subsections; this entry follows the same convention).
 
 **Included subtasks**:
-- [ ] T023 Add `[Unreleased]` CHANGELOG entry (WP05)
-- [ ] T024 Update README with `spec_kitty_events.legacy` and `LOCAL_ONLY_EVENT_TYPES` sections (WP05)
+- [x] T023 Add `[Unreleased]` CHANGELOG entry (WP05)
+- [x] T024 Update README with `spec_kitty_events.legacy` and `LOCAL_ONLY_EVENT_TYPES` sections (WP05)
 
 ## Parallelization
 
