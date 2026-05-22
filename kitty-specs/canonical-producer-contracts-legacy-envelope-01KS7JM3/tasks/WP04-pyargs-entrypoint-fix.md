@@ -374,3 +374,4 @@ If any fixtures still fail, iterate on T020's filter. The goal is zero red, not 
 - 2026-05-22T10:56:01Z – claude:opus-4-7:python-pedro:implementer – shell_pid=74710 – Assigned agent via action command
 - 2026-05-22T11:00:21Z – claude:opus-4-7:python-pedro:implementer – shell_pid=74710 – WP04 ready
 - 2026-05-22T11:00:28Z – claude:opus-4-7:reviewer-renata:reviewer – shell_pid=76882 – Started review via action command
+- 2026-05-22T11:00:45Z – claude:opus-4-7:reviewer-renata:reviewer – shell_pid=76882 – Approved: public surface + manifest + pyargs entrypoint green (320 passed); 395 tests across mission verification commands
