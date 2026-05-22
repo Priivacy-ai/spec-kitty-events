@@ -74,6 +74,10 @@ TASKS_STARTED: str = "TasksStarted"
 TASKS_COMPLETED: str = "TasksCompleted"
 
 WP_CREATED: str = "WPCreated"
+WP_ASSIGNED: str = "WPAssigned"
+HISTORY_ADDED: str = "HistoryAdded"
+ERROR_LOGGED: str = "ErrorLogged"
+DEPENDENCY_RESOLVED: str = "DependencyResolved"
 
 
 PROJECT_LIFECYCLE_EVENT_TYPES: FrozenSet[str] = frozenset({
@@ -91,6 +95,10 @@ ARTIFACT_LIFECYCLE_EVENT_TYPES: FrozenSet[str] = frozenset({
 
 WP_LIFECYCLE_EVENT_TYPES: FrozenSet[str] = frozenset({
     WP_CREATED,
+    WP_ASSIGNED,
+    HISTORY_ADDED,
+    ERROR_LOGGED,
+    DEPENDENCY_RESOLVED,
 })
 
 CANONICAL_LIFECYCLE_EVENT_TYPES: FrozenSet[str] = (
@@ -291,6 +299,69 @@ class WPCreatedPayload(BaseModel):
     )
 
 
+class WPAssignedPayload(BaseModel):
+    """Typed payload for ``WPAssigned`` events.
+
+    Emitted when a work-package is assigned to an agent for a specific
+    phase (e.g. implement, review). Establishes the assignment record so
+    later events (StatusChanged, HistoryAdded) can be correlated to the
+    responsible agent.
+    """
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    wp_id: str = Field(..., min_length=1, description="Work-package identifier.")
+    agent_id: str = Field(..., min_length=1, description="Agent that picked up the WP.")
+    phase: str = Field(..., min_length=1, description="Phase of work (e.g. 'implement', 'review').")
+    retry_count: int = Field(0, ge=0, description="Number of times the assignment has been retried.")
+
+
+class HistoryAddedPayload(BaseModel):
+    """Typed payload for ``HistoryAdded`` events.
+
+    Emitted when a free-form history entry is appended to a work-package's
+    audit trail (notes, decisions, signal events that don't fit the lane
+    state machine).
+    """
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    wp_id: str = Field(..., min_length=1, description="Work-package the history entry attaches to.")
+    entry_type: str = Field(..., min_length=1, description="Entry type code (e.g. 'note', 'decision').")
+    entry_content: str = Field(..., min_length=1, description="Entry body.")
+    author: str = Field(..., min_length=1, description="Who authored the entry.")
+
+
+class ErrorLoggedPayload(BaseModel):
+    """Typed payload for ``ErrorLogged`` events.
+
+    Emitted when a runtime error is captured during agent execution. The
+    error may be WP-scoped (``wp_id`` set) or mission-scoped (``wp_id`` None).
+    """
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    error_type: str = Field(..., min_length=1, description="Error class name or category.")
+    error_message: str = Field(..., min_length=1, description="Human-readable error message.")
+    wp_id: Optional[str] = Field(None, min_length=1, description="Work-package context, when known.")
+    stack_trace: Optional[str] = Field(None, description="Stack trace text.")
+    agent_id: Optional[str] = Field(None, min_length=1, description="Agent that observed the error.")
+
+
+class DependencyResolvedPayload(BaseModel):
+    """Typed payload for ``DependencyResolved`` events.
+
+    Emitted when a work-package's blocking dependency resolves (merge,
+    skip, cancellation).
+    """
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    wp_id: str = Field(..., min_length=1, description="WP whose dependency resolved.")
+    dependency_wp_id: str = Field(..., min_length=1, description="The dependency WP that resolved.")
+    resolution_type: str = Field(..., min_length=1, description="How it resolved (e.g. 'merged', 'skipped').")
+
+
 __all__ = [
     "PROJECT_INITIALIZED",
     "SPECIFY_STARTED",
@@ -300,6 +371,10 @@ __all__ = [
     "TASKS_STARTED",
     "TASKS_COMPLETED",
     "WP_CREATED",
+    "WP_ASSIGNED",
+    "HISTORY_ADDED",
+    "ERROR_LOGGED",
+    "DEPENDENCY_RESOLVED",
     "PROJECT_LIFECYCLE_EVENT_TYPES",
     "ARTIFACT_LIFECYCLE_EVENT_TYPES",
     "WP_LIFECYCLE_EVENT_TYPES",
@@ -313,4 +388,8 @@ __all__ = [
     "TasksStartedPayload",
     "TasksCompletedPayload",
     "WPCreatedPayload",
+    "WPAssignedPayload",
+    "HistoryAddedPayload",
+    "ErrorLoggedPayload",
+    "DependencyResolvedPayload",
 ]

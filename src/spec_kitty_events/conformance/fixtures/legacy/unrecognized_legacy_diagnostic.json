@@ -1,0 +1,10 @@
+{
+  "class": "legacy_envelope_v1",
+  "expected": "unnormalizable",
+  "expected_reason": "unrecognized_legacy_shape",
+  "input": {
+    "another_field": 42,
+    "some_random_field": "value"
+  },
+  "notes": "Envelope with no recognized legacy markers. Normalizer must surface UnnormalizableLegacyDiagnostic(reason='unrecognized_legacy_shape')."
+}

@@ -107,9 +107,12 @@ class TestValidEventFixtures:
         valid_dir = _FIXTURES_DIR / "events" / "valid"
         files = sorted(valid_dir.glob("*.json"))
         # 13 historical fixtures (envelope variants, status, gates, mission, phase, rollback)
-        # + 8 canonical lifecycle fixtures (project init / specify / plan / tasks / WP created).
-        assert len(files) == 21, (
-            f"Expected 21 valid event fixtures (13 historical + 8 canonical lifecycle), "
+        # + 8 canonical lifecycle fixtures (project init / specify / plan / tasks / WP created)
+        # + 7 new canonical contracts (WPAssigned, BuildRegistered, BuildHeartbeat,
+        #   HistoryAdded, ErrorLogged, DependencyResolved, MissionOriginBound) shipped
+        #   by mission canonical-producer-contracts-legacy-envelope-01KS7JM3 (WP02).
+        assert len(files) == 28, (
+            f"Expected 28 valid event fixtures (13 historical + 8 canonical lifecycle + 7 WP02), "
             f"got {len(files)}"
         )
 
@@ -531,8 +534,10 @@ class TestLoadFixtures:
         cases = load_fixtures("events")
         valid_cases = [c for c in cases if c.expected_valid]
         # 13 historical fixtures + 8 canonical lifecycle fixtures
-        # (project init, specify/plan/tasks lifecycle, WPCreated).
-        assert len(valid_cases) == 21
+        # (project init, specify/plan/tasks lifecycle, WPCreated)
+        # + 7 new canonical contracts shipped by mission
+        # canonical-producer-contracts-legacy-envelope-01KS7JM3 (WP02).
+        assert len(valid_cases) == 28
 
     def test_events_invalid_cases_expected_valid_false(self) -> None:
         cases = load_fixtures("events")

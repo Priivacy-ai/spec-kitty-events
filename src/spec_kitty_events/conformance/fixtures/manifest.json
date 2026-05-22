@@ -230,7 +230,7 @@
       "path": "events/invalid/wp_status_changed_invalid_lane.json",
       "expected_result": "invalid",
       "event_type": "WPStatusChanged",
-      "notes": "StatusTransitionPayload with invalid to_lane value 'in_review'",
+      "notes": "StatusTransitionPayload with invalid to_lane value 'in_reveiw' (typo); fails the Lane enum. Updated by mission canonical-producer-contracts-legacy-envelope-01KS7JM3 — the prior value 'in_review' became canonical in 3.0 so the fixture no longer exercised the invalid-lane path.",
       "min_version": "2.0.0"
     },
     {
@@ -1897,6 +1897,80 @@
       "expected_result": "valid",
       "notes": "Full 11-event review-rejection lifecycle: planned -> claimed -> in_progress -> for_review -> in_review -> planned (force=True) -> claimed -> in_progress -> for_review -> in_review -> approved.",
       "min_version": "3.0.0"
+    },
+    {
+      "id": "wp-assigned-valid",
+      "path": "events/valid/wp_assigned.json",
+      "expected_result": "valid",
+      "event_type": "WPAssigned",
+      "notes": "Canonical WPAssignedPayload with required fields.",
+      "min_version": "5.2.0"
+    },
+    {
+      "id": "build-registered-valid",
+      "path": "events/valid/build_registered.json",
+      "expected_result": "valid",
+      "event_type": "BuildRegistered",
+      "notes": "Canonical BuildRegisteredPayload with optional repo enrichment.",
+      "min_version": "5.2.0"
+    },
+    {
+      "id": "build-heartbeat-valid",
+      "path": "events/valid/build_heartbeat.json",
+      "expected_result": "valid",
+      "event_type": "BuildHeartbeat",
+      "notes": "Canonical BuildHeartbeatPayload with sync state vs remote.",
+      "min_version": "5.2.0"
+    },
+    {
+      "id": "history-added-valid",
+      "path": "events/valid/history_added.json",
+      "expected_result": "valid",
+      "event_type": "HistoryAdded",
+      "notes": "Canonical HistoryAddedPayload with required fields.",
+      "min_version": "5.2.0"
+    },
+    {
+      "id": "error-logged-valid",
+      "path": "events/valid/error_logged.json",
+      "expected_result": "valid",
+      "event_type": "ErrorLogged",
+      "notes": "Canonical ErrorLoggedPayload with wp_id and agent_id populated.",
+      "min_version": "5.2.0"
+    },
+    {
+      "id": "dependency-resolved-valid",
+      "path": "events/valid/dependency_resolved.json",
+      "expected_result": "valid",
+      "event_type": "DependencyResolved",
+      "notes": "Canonical DependencyResolvedPayload (merged resolution).",
+      "min_version": "5.2.0"
+    },
+    {
+      "id": "mission-origin-bound-valid",
+      "path": "events/valid/mission_origin_bound.json",
+      "expected_result": "valid",
+      "event_type": "MissionOriginBound",
+      "notes": "Canonical MissionOriginBoundPayload binding a mission to a GitHub issue.",
+      "min_version": "5.2.0"
+    },
+    {
+      "id": "legacy-envelope-v1-pre30-normalizes",
+      "path": "legacy/pre_3_0_envelope_normalizes.json",
+      "expected_result": "valid",
+      "event_type": "LegacyEnvelope",
+      "fixture_type": "legacy_normalization",
+      "notes": "Pre-3.0 envelope without project_uuid; normalizer promotes to canonical shape.",
+      "min_version": "5.2.0"
+    },
+    {
+      "id": "legacy-envelope-v1-unrecognized-diagnostic",
+      "path": "legacy/unrecognized_legacy_diagnostic.json",
+      "expected_result": "invalid",
+      "event_type": "LegacyEnvelope",
+      "fixture_type": "legacy_normalization",
+      "notes": "Envelope with no recognized legacy markers; normalizer surfaces UnnormalizableLegacyDiagnostic.",
+      "min_version": "5.2.0"
     }
   ],
   "classes": {
