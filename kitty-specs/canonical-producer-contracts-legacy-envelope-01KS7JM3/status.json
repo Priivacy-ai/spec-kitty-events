@@ -1,7 +1,7 @@
 {
-  "event_count": 10,
-  "last_event_id": "01KS7MV6TZ6DKY731CDC83DKMF",
-  "materialized_at": "2026-05-22T10:49:06.655049+00:00",
+  "event_count": 12,
+  "last_event_id": "01KS7MVHCSTQ2HP73KE9Z32DPN",
+  "materialized_at": "2026-05-22T10:49:17.464864+00:00",
   "mission_number": "",
   "mission_slug": "canonical-producer-contracts-legacy-envelope-01KS7JM3",
   "mission_type": "software-dev",
@@ -12,9 +12,9 @@
     "claimed": 0,
     "done": 0,
     "for_review": 0,
-    "in_progress": 0,
+    "in_progress": 1,
     "in_review": 0,
-    "planned": 4
+    "planned": 3
   },
   "work_packages": {
     "WP01": {
@@ -32,11 +32,11 @@
       "last_transition_at": "2026-05-22T10:49:06.655049+00:00"
     },
     "WP03": {
-      "actor": "finalize-tasks",
+      "actor": "claude:opus-4-7:python-pedro:implementer",
       "force_count": 1,
-      "lane": "planned",
-      "last_event_id": "01KS7M4CAS9VA5XJNS2H9E6CJP",
-      "last_transition_at": "2026-05-22T10:36:38.617267+00:00"
+      "lane": "in_progress",
+      "last_event_id": "01KS7MVHCSTQ2HP73KE9Z32DPN",
+      "last_transition_at": "2026-05-22T10:49:17.464864+00:00"
     },
     "WP04": {
       "actor": "finalize-tasks",
