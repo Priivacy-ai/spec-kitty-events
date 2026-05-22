@@ -110,12 +110,12 @@ Total subtasks: 26. All WPs are within the 3–9 subtask range; WP04 is the larg
 **Risks**: 1) Bootstrap-planned events must still pass. Mitigated by T004. 2) The semantic validator could fire on a payload whose pydantic model layer already rejected the shape, double-faulting. Mitigated by gating the dispatch on `len(model_violations) == 0`. 3) Violation message format must be preserved exactly so downstream consumers continue to route on `force=True` and `review-rejection` substrings. Mitigated by T004 substring assertion.
 
 **Included subtasks**:
-- [ ] T001 Add `_SEMANTIC_VALIDATORS` registry (WP01)
-- [ ] T002 Implement `_semantic_validate_wp_status_changed` (WP01)
-- [ ] T003 Wire dispatch into `validate_event()` (WP01)
-- [ ] T004 Add `tests/unit/test_conformance_semantic.py` (WP01)
-- [ ] T009 Register seven event types in `_EVENT_TYPE_TO_MODEL` (WP01, imports from WP02-shipped modules)
-- [ ] T005 Verify zero regressions (WP01)
+- [x] T001 Add `_SEMANTIC_VALIDATORS` registry (WP01)
+- [x] T002 Implement `_semantic_validate_wp_status_changed` (WP01)
+- [x] T003 Wire dispatch into `validate_event()` (WP01)
+- [x] T004 Add `tests/unit/test_conformance_semantic.py` (WP01)
+- [x] T009 Register seven event types in `_EVENT_TYPE_TO_MODEL` (WP01, imports from WP02-shipped modules)
+- [x] T005 Verify zero regressions (WP01)
 
 ### WP02 — Seven canonical event-type model classes + fixture files
 
