@@ -8,5 +8,7 @@
   "purpose_context": "spec-kitty-events is the single source of truth for SaaS-bound event contracts. Today, validate_event() does not call validate_transition() on WPStatusChanged, seven CLI-emitted event types have no published contracts, and there is no canonical legacy-envelope normalization surface. Without closing these gaps, Phase 2 (CLI canonical producer refactor) cannot be enforced and Phase 3 (SaaS explicit legacy normalization) cannot replace the silent strict-envelope carve-out. This mission ships the contracts so the next two phases can land safely.",
   "purpose_tldr": "Close the conformance and legacy-envelope gaps that block the CLI producer refactor and SaaS legacy adapter.",
   "slug": "canonical-producer-contracts-legacy-envelope-01KS7JM3",
-  "target_branch": "kitty/pr/1198-canonical-producer-contracts"
+  "target_branch": "kitty/pr/1198-canonical-producer-contracts",
+  "vcs": "git",
+  "vcs_locked_at": "2026-05-22T10:43:00.449313+00:00"
 }
