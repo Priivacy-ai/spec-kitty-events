@@ -372,3 +372,4 @@ If any fixtures still fail, iterate on T020's filter. The goal is zero red, not 
 ## Activity Log
 
 - 2026-05-22T10:56:01Z – claude:opus-4-7:python-pedro:implementer – shell_pid=74710 – Assigned agent via action command
+- 2026-05-22T11:00:21Z – claude:opus-4-7:python-pedro:implementer – shell_pid=74710 – WP04 ready
