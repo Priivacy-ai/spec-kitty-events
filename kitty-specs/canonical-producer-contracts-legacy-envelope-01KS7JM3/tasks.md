@@ -193,14 +193,14 @@ Total subtasks: 26. All WPs are within the 3–9 subtask range; WP04 is the larg
 **Risks**: 1) The lane_mapping fixtures embed `{legacy_lane, canonical_lane}` inside `.input` — they must be skipped, not routed to `validate_event`. T020 ensures this. 2) The fix to the stale `in_review` fixture must produce a value that still fails the existing pydantic Lane enum validation; T021 uses a typo (`in_reveiw`). 3) The 22-failure baseline is the pre-mission gold; after this WP all 22 should be resolved.
 
 **Included subtasks**:
-- [ ] T010 Add `LOCAL_ONLY_EVENT_TYPES = frozenset()` to `__init__.py` (WP04)
-- [ ] T011b Re-export seven payload models and the `spec_kitty_events.legacy` surface from `__init__.py` (WP04)
-- [ ] T016 Register seven new event-type fixtures in `manifest.json` (WP04)
-- [ ] T017b Register two legacy fixtures in `manifest.json` (WP04)
-- [ ] T019 Detect wrapper-shape fixtures; extract `.input` (WP04)
-- [ ] T020 Special-case lane_mapping + LegacyEnvelope fixtures (WP04)
-- [ ] T021 Fix stale `wp_status_changed_invalid_lane.json` (WP04)
-- [ ] T022 Verify pyargs entrypoint is green (WP04)
+- [x] T010 Add `LOCAL_ONLY_EVENT_TYPES = frozenset()` to `__init__.py` (WP04)
+- [x] T011b Re-export seven payload models and the `spec_kitty_events.legacy` surface from `__init__.py` (WP04)
+- [x] T016 Register seven new event-type fixtures in `manifest.json` (WP04)
+- [x] T017b Register two legacy fixtures in `manifest.json` (WP04)
+- [x] T019 Detect wrapper-shape fixtures; extract `.input` (WP04)
+- [x] T020 Special-case lane_mapping + LegacyEnvelope fixtures (WP04)
+- [x] T021 Fix stale `wp_status_changed_invalid_lane.json` (WP04)
+- [x] T022 Verify pyargs entrypoint is green (WP04)
 
 ### WP05 — CHANGELOG + README docs
 
