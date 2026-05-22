@@ -20,6 +20,8 @@ subtasks:
 - T023
 - T024
 phase: Phase 4 - Documentation
+agent: "claude:opus-4-7:curator-carla:implementer"
+shell_pid: "77089"
 history:
 - timestamp: '2026-05-22T10:22:16Z'
   lane: planned
@@ -185,3 +187,7 @@ Same as other WPs. Land last.
 
 - **Risk**: README restructure conflicts with concurrent edits. **Mitigation**: WP05 lands last and only edits two files; no conflict surface.
 - **Risk**: Future PyPI release inadvertently picks up `[Unreleased]` content. **Mitigation**: orchestrator's Phase 5 process re-titles `[Unreleased]` to the actual version at release time; this is the standard CHANGELOG convention.
+
+## Activity Log
+
+- 2026-05-22T11:00:52Z – claude:opus-4-7:curator-carla:implementer – shell_pid=77089 – Started implementation via action command
