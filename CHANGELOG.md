@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.2.0] - 2026-05-22
+
 ### Added
 
 - **Canonical event-type contracts for seven previously-uncontracted SaaS-bound events** (additive, wire-compatible). Added pydantic payload models and `_EVENT_TYPE_TO_MODEL` entries for `WPAssigned`, `BuildRegistered`, `BuildHeartbeat`, `HistoryAdded`, `ErrorLogged`, `DependencyResolved`, `MissionOriginBound`. Each model uses `ConfigDict(frozen=True, extra="forbid")`. Field shapes are derived from the canonical producer call sites in `spec-kitty/src/specify_cli/sync/emitter.py` (commit `43305c12c`, lines 720–1431). Mission: `canonical-producer-contracts-legacy-envelope-01KS7JM3`. Canonical authority: `kitty-specs/canonical-producer-contracts-legacy-envelope-01KS7JM3/data-model.md`.
