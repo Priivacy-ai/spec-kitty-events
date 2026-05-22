@@ -168,11 +168,11 @@ Total subtasks: 26. All WPs are within the 3–9 subtask range; WP04 is the larg
 **Risks**: 1) The detector order matters; first-match wins. T018 covers each branch independently. 2) `uuid5` minting must be deterministic. T018 asserts the same input always yields the same minted uuid. 3) The fallthrough `"unrecognized_legacy_shape"` diagnostic must surface for already-canonical envelopes (no silent passthrough). T018 asserts.
 
 **Included subtasks**:
-- [ ] T013 Create `legacy.py` with constants (WP03)
-- [ ] T014 Implement `NormalizedEnvelope`, `UnnormalizableLegacyDiagnostic`, `NormalizationResult` (WP03)
-- [ ] T015 Implement `LegacyEnvelopeNormalizer` with ordered detectors (WP03)
-- [ ] T017 Author success and un-normalizable fixture files (WP03; manifest registration is WP04 T017b)
-- [ ] T018 Add `tests/unit/test_legacy_normalizer.py` (WP03)
+- [x] T013 Create `legacy.py` with constants (WP03)
+- [x] T014 Implement `NormalizedEnvelope`, `UnnormalizableLegacyDiagnostic`, `NormalizationResult` (WP03)
+- [x] T015 Implement `LegacyEnvelopeNormalizer` with ordered detectors (WP03)
+- [x] T017 Author success and un-normalizable fixture files (WP03; manifest registration is WP04 T017b)
+- [x] T018 Add `tests/unit/test_legacy_normalizer.py` (WP03)
 
 ### WP04 — Public-surface integration, manifest registrations, pyargs entrypoint health
 
