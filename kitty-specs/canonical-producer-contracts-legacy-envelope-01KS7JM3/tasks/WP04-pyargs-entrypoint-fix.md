@@ -18,9 +18,9 @@ requirement_refs:
 planning_base_branch: kitty/pr/1198-canonical-producer-contracts
 merge_target_branch: kitty/pr/1198-canonical-producer-contracts
 branch_strategy: Planning artifacts for this mission were generated on kitty/pr/1198-canonical-producer-contracts. During /spec-kitty.implement this WP may branch from a dependency-specific base, but completed changes must merge back into kitty/pr/1198-canonical-producer-contracts unless the human explicitly redirects the landing branch.
-base_branch: kitty/pr/1198-canonical-producer-contracts
-base_commit: 2a0667a1131fbc9db3ff5dba4634f52521a5293c
-created_at: '2026-05-22T10:22:16+00:00'
+base_branch: kitty/mission-canonical-producer-contracts-legacy-envelope-01KS7JM3
+base_commit: 18c8835265ccfeda116172ba6db02af518fc89d4
+created_at: '2026-05-22T10:56:00.145236+00:00'
 subtasks:
 - T010
 - T011b
@@ -31,6 +31,7 @@ subtasks:
 - T021
 - T022
 phase: Phase 3 - Conformance suite health
+shell_pid: '74710'
 history:
 - timestamp: '2026-05-22T10:22:16Z'
   lane: planned
