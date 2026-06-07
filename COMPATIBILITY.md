@@ -121,6 +121,22 @@ The current package release is `5.0.0`. The on-wire envelope schema is `3.0.0`. 
 - `2.x` additive compatibility language no longer applies.
 - Future breaking contract changes require a new major **package** release; whether they also bump the envelope schema version depends on whether they change the wire format (the `5.0.0` package release intentionally did NOT bump the wire-format envelope version — it changed contract behaviour with the existing `3.0.0` envelope shape).
 
+### Genesis lane (6.0.0)
+
+The `6.0.0` package release adds the `genesis` canonical lane (a non-display,
+pre-finalize origin state; see `CHANGELOG.md`). Like `5.0.0`, this is a major
+**package** bump that intentionally does **not** bump the wire-format envelope
+version — it widens the set of accepted `Lane` values (`from_lane="genesis"` on
+`WPStatusChanged`) while keeping the existing `3.0.0` envelope shape. Consumers
+on `<6.0.0` will fail-closed (reject) a `from_lane="genesis"` payload; producers
+must therefore gate genesis fan-out on the installed package's lane capability
+until every consumer is on `>=6.0.0`.
+
+Display consumers must not derive board columns, summary chips, progress rows,
+or lane filters from every `Lane` member. Use `DISPLAY_LANES` for ordered
+display/summary surfaces and `NON_DISPLAY_LANES` for explicit exclusions;
+`Lane.GENESIS` is canonical for validation/replay but is not displayable.
+
 ## Decision Moment V1 (4.0.0)
 
 ### Scope

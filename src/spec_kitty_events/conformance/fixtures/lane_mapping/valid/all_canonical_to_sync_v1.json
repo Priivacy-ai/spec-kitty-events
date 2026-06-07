@@ -1,5 +1,9 @@
 [
   {
+    "canonical": "genesis",
+    "expected_sync": "planned"
+  },
+  {
     "canonical": "planned",
     "expected_sync": "planned"
   },

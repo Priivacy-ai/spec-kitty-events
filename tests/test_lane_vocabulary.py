@@ -30,6 +30,7 @@ from spec_kitty_events import Lane
 # set is treated as a contract violation by ``test_canonical_lane_set_is_pinned``.
 
 EXPECTED_CANONICAL_LANES: FrozenSet[str] = frozenset({
+    "genesis",
     "planned",
     "claimed",
     "in_progress",

@@ -7,12 +7,33 @@ import pytest
 from spec_kitty_events import (
     CANONICAL_TO_SYNC_V1,
     CANONICAL_TO_SYNC_V2,
+    DISPLAY_LANES,
+    NON_DISPLAY_LANES,
     SyncLaneV1,
     SyncLaneV2,
     canonical_to_sync_v1,
     canonical_to_sync_v2,
 )
 from spec_kitty_events.status import Lane
+
+
+class TestLaneDisplayClassification:
+    """Display consumers must not infer UI lanes from every canonical Lane."""
+
+    def test_genesis_is_not_a_display_lane(self) -> None:
+        assert NON_DISPLAY_LANES == frozenset({Lane.GENESIS})
+        assert Lane.GENESIS not in DISPLAY_LANES
+        assert tuple(lane.value for lane in DISPLAY_LANES) == (
+            "planned",
+            "claimed",
+            "in_progress",
+            "for_review",
+            "in_review",
+            "approved",
+            "done",
+            "blocked",
+            "canceled",
+        )
 
 
 class TestSyncLaneV1Enum:

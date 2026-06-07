@@ -13,7 +13,7 @@ This release publishes the fail-closed cutover surface for:
   historical-shape conformance fixtures.
 """
 
-__version__ = "5.2.0"
+__version__ = "6.0.0"
 
 from spec_kitty_events.cutover import (
     CUTOVER_ARTIFACT,
@@ -198,6 +198,8 @@ from spec_kitty_events.status import (
     normalize_lane,
     validate_transition,
     TERMINAL_LANES,
+    NON_DISPLAY_LANES,
+    DISPLAY_LANES,
     LANE_ALIASES,
     WP_STATUS_CHANGED,
     is_bootstrap_planned_event,
@@ -602,6 +604,8 @@ __all__ = [
     "normalize_lane",
     "validate_transition",
     "TERMINAL_LANES",
+    "NON_DISPLAY_LANES",
+    "DISPLAY_LANES",
     "LANE_ALIASES",
     "WP_STATUS_CHANGED",
     "is_bootstrap_planned_event",
