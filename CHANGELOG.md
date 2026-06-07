@@ -7,6 +7,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.0.0] - 2026-06-07
+
+### Breaking
+
+- **`genesis` added to the canonical `Lane` vocabulary** (major bump per
+  `contracts/lane-vocabulary.md`: adding a canonical lane is a contract change).
+  `genesis` is the non-display, pre-finalize **origin** lane: a work-package
+  with no recorded lane events derives as `genesis` until `finalize-tasks` seeds
+  it to `planned`. It is producer-side only — never a display/summary lane.
+  Consumers that exhaustively switch over `Lane` (or pin `len(Lane) == 9`) must
+  handle the new member. The on-wire envelope `schema_version` is **unchanged**
+  at `3.0.0` — this widens the accepted lane value set without changing the
+  wire-format shape.
+
+### Added
+
+- `Lane.GENESIS = "genesis"` enum member.
+- `(genesis -> planned)` as a first-class allowed transition (the finalize-tasks
+  seed; no `force` required). `genesis -> canceled` is allowed via the generic
+  non-terminal cancel rule. All other edges into/out of `genesis` are rejected.
+- `CANONICAL_TO_SYNC_V1[genesis] = planned` and
+  `CANONICAL_TO_SYNC_V2[genesis] = planned` (sync mappings remain total).
+- Regenerated `lane.schema.json` / `status_transition_payload.schema.json` to
+  include `genesis`.
+
+### Migration
+
+- Downstream consumers (CLI, `spec-kitty-saas`) must update their
+  `spec-kitty-events` constraint to `>=6.0.0` and accept `from_lane="genesis"`
+  on `WPStatusChanged`. Until they do, a genesis seed cannot fan out as a valid
+  payload — producers gate on the installed package's lane capability.
+
 ## [5.2.0] - 2026-05-22
 
 ### Added

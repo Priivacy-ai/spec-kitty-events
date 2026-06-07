@@ -156,8 +156,16 @@ logger = logging.getLogger(__name__)
 
 
 class Lane(str, Enum):
-    """Work-package lifecycle lanes."""
+    """Work-package lifecycle lanes.
 
+    ``GENESIS`` is the non-display, pre-finalize origin lane: a work-package
+    with no recorded lane events derives as ``genesis`` until ``finalize-tasks``
+    seeds it to ``planned``. It is a producer-side state only — it is never a
+    display/summary lane and the only legal edges out of it are
+    ``genesis -> planned`` (the seed) and ``genesis -> canceled``.
+    """
+
+    GENESIS = "genesis"
     PLANNED = "planned"
     CLAIMED = "claimed"
     IN_PROGRESS = "in_progress"
@@ -189,6 +197,7 @@ class SyncLaneV2(str, Enum):
 
 
 CANONICAL_TO_SYNC_V1: Mapping[Lane, SyncLaneV1] = MappingProxyType({
+    Lane.GENESIS: SyncLaneV1.PLANNED,
     Lane.PLANNED: SyncLaneV1.PLANNED,
     Lane.CLAIMED: SyncLaneV1.PLANNED,
     Lane.IN_PROGRESS: SyncLaneV1.DOING,
@@ -202,6 +211,7 @@ CANONICAL_TO_SYNC_V1: Mapping[Lane, SyncLaneV1] = MappingProxyType({
 
 
 CANONICAL_TO_SYNC_V2: Mapping[Lane, SyncLaneV2] = MappingProxyType({
+    Lane.GENESIS: SyncLaneV2.PLANNED,
     Lane.PLANNED: SyncLaneV2.PLANNED,
     Lane.CLAIMED: SyncLaneV2.PLANNED,
     Lane.IN_PROGRESS: SyncLaneV2.DOING,
@@ -483,6 +493,8 @@ class TransitionError(SpecKittyEventsError):
 _ALLOWED_TRANSITIONS: FrozenSet[Tuple[Optional[Lane], Lane]] = frozenset({
     # Initial
     (None, Lane.PLANNED),
+    # Genesis seed (unseeded WP -> planned at finalize-tasks)
+    (Lane.GENESIS, Lane.PLANNED),
     # Happy path
     (Lane.PLANNED, Lane.CLAIMED),
     (Lane.CLAIMED, Lane.IN_PROGRESS),

@@ -105,10 +105,13 @@ class TestLane:
     def test_in_review_value(self) -> None:
         assert Lane.IN_REVIEW.value == "in_review"
 
-    def test_all_nine_members(self) -> None:
+    def test_all_members(self) -> None:
         # IN_REVIEW was added to the canonical vocabulary in mission
         # teamspace-event-contract-foundation-01KQHDE4 (WP01).
-        assert len(Lane) == 9
+        # GENESIS (non-display pre-finalize origin lane) was added in the 6.0.0
+        # major release (mission wp-lane-state-machine-fsm-01KTGZAZ, WP04).
+        assert len(Lane) == 10
+        assert Lane.GENESIS.value == "genesis"
 
     def test_string_equality(self) -> None:
         assert Lane.PLANNED == "planned"
@@ -116,11 +119,12 @@ class TestLane:
 
     def test_iteration_yields_all(self) -> None:
         values = [m.value for m in Lane]
+        assert "genesis" in values
         assert "approved" in values
         assert "planned" in values
         assert "canceled" in values
         assert "in_review" in values
-        assert len(values) == 9
+        assert len(values) == 10
 
     def test_from_value(self) -> None:
         assert Lane("planned") is Lane.PLANNED
@@ -606,6 +610,62 @@ def _make_evidence() -> DoneEvidence:
         verification=[],
         review=ReviewVerdict(reviewer="alice", verdict="approved"),
     )
+
+
+class TestGenesisLane:
+    """The genesis non-display origin lane (added in 6.0.0).
+
+    An unseeded work-package derives as ``genesis`` until ``finalize-tasks``
+    seeds it to ``planned``. ``genesis`` is producer-side only; the only legal
+    edges out of it are ``genesis -> planned`` (the seed) and
+    ``genesis -> canceled``.
+    """
+
+    def test_genesis_is_an_enum_member(self) -> None:
+        assert Lane.GENESIS.value == "genesis"
+        assert Lane("genesis") is Lane.GENESIS
+
+    def test_genesis_is_not_terminal(self) -> None:
+        assert Lane.GENESIS not in TERMINAL_LANES
+
+    def test_genesis_to_planned_is_valid(self) -> None:
+        """The finalize-tasks seed is a first-class allowed transition."""
+        result = validate_transition(
+            _make_payload(from_lane=Lane.GENESIS, to_lane=Lane.PLANNED)
+        )
+        assert result.valid is True, result.violations
+        assert (Lane.GENESIS, Lane.PLANNED) in _ALLOWED_TRANSITIONS
+
+    def test_genesis_to_canceled_is_valid(self) -> None:
+        result = validate_transition(
+            _make_payload(from_lane=Lane.GENESIS, to_lane=Lane.CANCELED)
+        )
+        assert result.valid is True, result.violations
+
+    def test_genesis_to_claimed_is_rejected(self) -> None:
+        """Genesis may only be seeded to planned, never claimed directly."""
+        result = validate_transition(
+            _make_payload(from_lane=Lane.GENESIS, to_lane=Lane.CLAIMED)
+        )
+        assert result.valid is False
+
+    def test_transition_into_genesis_is_rejected(self) -> None:
+        """No lane transitions *into* genesis; it is an origin-only state."""
+        result = validate_transition(
+            _make_payload(from_lane=Lane.PLANNED, to_lane=Lane.GENESIS)
+        )
+        assert result.valid is False
+
+    def test_genesis_maps_to_planned_in_sync_v1_and_v2(self) -> None:
+        from spec_kitty_events.status import (
+            SyncLaneV1,
+            SyncLaneV2,
+            canonical_to_sync_v1,
+            canonical_to_sync_v2,
+        )
+
+        assert canonical_to_sync_v1(Lane.GENESIS) is SyncLaneV1.PLANNED
+        assert canonical_to_sync_v2(Lane.GENESIS) is SyncLaneV2.PLANNED
 
 
 # ---------------------------------------------------------------------------

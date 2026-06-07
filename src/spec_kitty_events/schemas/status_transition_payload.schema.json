@@ -42,8 +42,9 @@
       "type": "string"
     },
     "Lane": {
-      "description": "Work-package lifecycle lanes.",
+      "description": "Work-package lifecycle lanes.\n\n``GENESIS`` is the non-display, pre-finalize origin lane: a work-package\nwith no recorded lane events derives as ``genesis`` until ``finalize-tasks``\nseeds it to ``planned``. It is a producer-side state only \u2014 it is never a\ndisplay/summary lane and the only legal edges out of it are\n``genesis -> planned`` (the seed) and ``genesis -> canceled``.",
       "enum": [
+        "genesis",
         "planned",
         "claimed",
         "in_progress",
