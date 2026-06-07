@@ -253,6 +253,12 @@ class ExecutionMode(str, Enum):
 
 TERMINAL_LANES: FrozenSet[Lane] = frozenset({Lane.DONE, Lane.CANCELED})
 
+NON_DISPLAY_LANES: FrozenSet[Lane] = frozenset({Lane.GENESIS})
+
+DISPLAY_LANES: Tuple[Lane, ...] = tuple(
+    lane for lane in Lane if lane not in NON_DISPLAY_LANES
+)
+
 LANE_ALIASES: Dict[str, Lane] = {"doing": Lane.IN_PROGRESS}
 
 WP_STATUS_CHANGED: str = "WPStatusChanged"

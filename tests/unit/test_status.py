@@ -27,7 +27,9 @@ from spec_kitty_events import (
     reduce_status_events,
     status_event_sort_key,
     validate_transition,
+    DISPLAY_LANES,
     LANE_ALIASES,
+    NON_DISPLAY_LANES,
     TERMINAL_LANES,
     WP_STATUS_CHANGED,
     SpecKittyEventsError,
@@ -627,6 +629,11 @@ class TestGenesisLane:
 
     def test_genesis_is_not_terminal(self) -> None:
         assert Lane.GENESIS not in TERMINAL_LANES
+
+    def test_genesis_is_classified_non_display(self) -> None:
+        assert NON_DISPLAY_LANES == frozenset({Lane.GENESIS})
+        assert Lane.GENESIS not in DISPLAY_LANES
+        assert DISPLAY_LANES == tuple(lane for lane in Lane if lane is not Lane.GENESIS)
 
     def test_genesis_to_planned_is_valid(self) -> None:
         """The finalize-tasks seed is a first-class allowed transition."""

@@ -29,6 +29,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   non-terminal cancel rule. All other edges into/out of `genesis` are rejected.
 - `CANONICAL_TO_SYNC_V1[genesis] = planned` and
   `CANONICAL_TO_SYNC_V2[genesis] = planned` (sync mappings remain total).
+- `NON_DISPLAY_LANES = {Lane.GENESIS}` and ordered `DISPLAY_LANES` so consumers
+  do not infer board, summary, or UI lanes from every `Lane` member.
 - Regenerated `lane.schema.json` / `status_transition_payload.schema.json` to
   include `genesis`.
 
@@ -38,6 +40,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `spec-kitty-events` constraint to `>=6.0.0` and accept `from_lane="genesis"`
   on `WPStatusChanged`. Until they do, a genesis seed cannot fan out as a valid
   payload — producers gate on the installed package's lane capability.
+- Consumers that render board columns, lane filters, summary chips, or progress
+  rows must derive those surfaces from `DISPLAY_LANES`, not `Lane`, because
+  `genesis` is canonical on the wire but not user-displayable.
 
 ## [5.2.0] - 2026-05-22
 

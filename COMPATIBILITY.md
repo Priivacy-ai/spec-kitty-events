@@ -132,6 +132,11 @@ on `<6.0.0` will fail-closed (reject) a `from_lane="genesis"` payload; producers
 must therefore gate genesis fan-out on the installed package's lane capability
 until every consumer is on `>=6.0.0`.
 
+Display consumers must not derive board columns, summary chips, progress rows,
+or lane filters from every `Lane` member. Use `DISPLAY_LANES` for ordered
+display/summary surfaces and `NON_DISPLAY_LANES` for explicit exclusions;
+`Lane.GENESIS` is canonical for validation/replay but is not displayable.
+
 ## Decision Moment V1 (4.0.0)
 
 ### Scope
