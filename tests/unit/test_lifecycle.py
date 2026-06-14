@@ -8,21 +8,25 @@ from pydantic import ValidationError as PydanticValidationError
 from ulid import ULID
 
 from spec_kitty_events.lifecycle import (
+    FOLLOW_UP_RECORDED,
     MISSION_CLOSED,
     MISSION_CANCELLED,
     MISSION_COMPLETED,
     MISSION_CREATED,
     MISSION_EVENT_TYPES,
+    MISSION_REOPENED,
     MISSION_STARTED,
     PHASE_ENTERED,
     REVIEW_ROLLBACK,
     SCHEMA_VERSION,
     TERMINAL_MISSION_STATUSES,
+    FollowUpRecordedPayload,
     LifecycleAnomaly,
     MissionClosedPayload,
     MissionCancelledPayload,
     MissionCompletedPayload,
     MissionCreatedPayload,
+    MissionReopenedPayload,
     MissionStartedPayload,
     MissionStatus,
     PhaseEnteredPayload,
@@ -131,6 +135,12 @@ class TestConstants:
     def test_review_rollback(self) -> None:
         assert REVIEW_ROLLBACK == "ReviewRollback"
 
+    def test_mission_reopened(self) -> None:
+        assert MISSION_REOPENED == "MissionReopened"
+
+    def test_follow_up_recorded(self) -> None:
+        assert FOLLOW_UP_RECORDED == "FollowUpRecorded"
+
     def test_mission_event_types_contains_all(self) -> None:
         assert MISSION_CREATED in MISSION_EVENT_TYPES
         assert MISSION_CLOSED in MISSION_EVENT_TYPES
@@ -139,7 +149,9 @@ class TestConstants:
         assert MISSION_CANCELLED in MISSION_EVENT_TYPES
         assert PHASE_ENTERED in MISSION_EVENT_TYPES
         assert REVIEW_ROLLBACK in MISSION_EVENT_TYPES
-        assert len(MISSION_EVENT_TYPES) == 7
+        assert MISSION_REOPENED in MISSION_EVENT_TYPES
+        assert FOLLOW_UP_RECORDED in MISSION_EVENT_TYPES
+        assert len(MISSION_EVENT_TYPES) == 9
 
     def test_mission_event_types_frozen(self) -> None:
         assert isinstance(MISSION_EVENT_TYPES, frozenset)
@@ -1023,3 +1035,227 @@ class TestReduceLifecycleEvents:
         assert result.mission_id == "M001"  # First one wins
         assert len(result.anomalies) == 1
         assert "Duplicate" in result.anomalies[0].reason
+
+
+# ── MissionReopenedPayload ───────────────────────────────────────────────────
+
+
+class TestMissionReopenedPayload:
+    """Tests for MissionReopenedPayload model."""
+
+    def _valid(self, **overrides: object) -> dict:  # type: ignore[type-arg]
+        payload: dict = {  # type: ignore[type-arg]
+            "mission_id": "01KTESTMISSIONID0000000000",
+            "mission_slug": "mission-reopen-followup",
+            "reason": "Operator requested re-open to land follow-up fix",
+            "reopened_by": "stijn",
+            "reopened_at": "2026-06-14T12:00:00+00:00",
+        }
+        payload.update(overrides)
+        return payload
+
+    def test_valid_construction(self) -> None:
+        p = MissionReopenedPayload(**self._valid())
+        assert p.mission_id == "01KTESTMISSIONID0000000000"
+        assert p.mission_slug == "mission-reopen-followup"
+        assert p.reason.startswith("Operator")
+        assert p.reopened_by == "stijn"
+        assert p.cleared_merge is None
+
+    def test_optional_cleared_merge_accepted(self) -> None:
+        p = MissionReopenedPayload(
+            **self._valid(
+                cleared_merge={
+                    "merged_at": "2026-06-10T00:00:00+00:00",
+                    "merged_commit": "abc123",
+                }
+            )
+        )
+        assert p.cleared_merge == {
+            "merged_at": "2026-06-10T00:00:00+00:00",
+            "merged_commit": "abc123",
+        }
+
+    def test_missing_mission_id(self) -> None:
+        payload = self._valid()
+        del payload["mission_id"]
+        with pytest.raises(PydanticValidationError):
+            MissionReopenedPayload(**payload)  # type: ignore[arg-type]
+
+    def test_missing_reason(self) -> None:
+        payload = self._valid()
+        del payload["reason"]
+        with pytest.raises(PydanticValidationError):
+            MissionReopenedPayload(**payload)  # type: ignore[arg-type]
+
+    def test_empty_reason_rejected(self) -> None:
+        with pytest.raises(PydanticValidationError):
+            MissionReopenedPayload(**self._valid(reason=""))
+
+    def test_missing_reopened_by(self) -> None:
+        payload = self._valid()
+        del payload["reopened_by"]
+        with pytest.raises(PydanticValidationError):
+            MissionReopenedPayload(**payload)  # type: ignore[arg-type]
+
+    def test_rejects_extra_fields(self) -> None:
+        with pytest.raises(PydanticValidationError):
+            MissionReopenedPayload(**self._valid(unexpected="x"))
+
+    def test_frozen(self) -> None:
+        p = MissionReopenedPayload(**self._valid())
+        with pytest.raises(Exception):
+            setattr(p, "reason", "changed")
+
+    def test_round_trip(self) -> None:
+        p = MissionReopenedPayload(
+            **self._valid(cleared_merge={"merged_commit": "abc123"})
+        )
+        restored = MissionReopenedPayload(**p.model_dump(mode="json"))
+        assert restored == p
+
+
+# ── FollowUpRecordedPayload ──────────────────────────────────────────────────
+
+
+class TestFollowUpRecordedPayload:
+    """Tests for FollowUpRecordedPayload model."""
+
+    def _commit(self, **overrides: object) -> dict:  # type: ignore[type-arg]
+        payload: dict = {  # type: ignore[type-arg]
+            "mission_id": "01KTESTMISSIONID0000000000",
+            "mission_slug": "mission-reopen-followup",
+            "follow_up_type": "commit",
+            "commit_sha": "a" * 40,
+            "pr_number": None,
+            "recorded_by": "stijn",
+            "recorded_at": "2026-06-14T12:00:00+00:00",
+        }
+        payload.update(overrides)
+        return payload
+
+    def _pr(self, **overrides: object) -> dict:  # type: ignore[type-arg]
+        payload: dict = {  # type: ignore[type-arg]
+            "mission_id": "01KTESTMISSIONID0000000000",
+            "mission_slug": "mission-reopen-followup",
+            "follow_up_type": "pr",
+            "commit_sha": None,
+            "pr_number": 1926,
+            "recorded_by": "stijn",
+            "recorded_at": "2026-06-14T12:00:00+00:00",
+        }
+        payload.update(overrides)
+        return payload
+
+    def test_valid_commit(self) -> None:
+        p = FollowUpRecordedPayload(**self._commit())
+        assert p.follow_up_type == "commit"
+        assert p.commit_sha == "a" * 40
+        assert p.pr_number is None
+
+    def test_valid_pr(self) -> None:
+        p = FollowUpRecordedPayload(**self._pr())
+        assert p.follow_up_type == "pr"
+        assert p.pr_number == 1926
+        assert p.commit_sha is None
+
+    def test_invalid_follow_up_type_rejected(self) -> None:
+        with pytest.raises(PydanticValidationError):
+            FollowUpRecordedPayload(**self._commit(follow_up_type="branch"))
+
+    def test_commit_type_requires_commit_sha(self) -> None:
+        with pytest.raises(PydanticValidationError):
+            FollowUpRecordedPayload(**self._commit(commit_sha=None))
+
+    def test_pr_type_requires_pr_number(self) -> None:
+        with pytest.raises(PydanticValidationError):
+            FollowUpRecordedPayload(**self._pr(pr_number=None))
+
+    def test_pr_number_must_be_positive(self) -> None:
+        with pytest.raises(PydanticValidationError):
+            FollowUpRecordedPayload(**self._pr(pr_number=0))
+
+    def test_missing_mission_id(self) -> None:
+        payload = self._commit()
+        del payload["mission_id"]
+        with pytest.raises(PydanticValidationError):
+            FollowUpRecordedPayload(**payload)  # type: ignore[arg-type]
+
+    def test_missing_recorded_by(self) -> None:
+        payload = self._commit()
+        del payload["recorded_by"]
+        with pytest.raises(PydanticValidationError):
+            FollowUpRecordedPayload(**payload)  # type: ignore[arg-type]
+
+    def test_rejects_extra_fields(self) -> None:
+        with pytest.raises(PydanticValidationError):
+            FollowUpRecordedPayload(**self._commit(unexpected="x"))
+
+    def test_frozen(self) -> None:
+        p = FollowUpRecordedPayload(**self._commit())
+        with pytest.raises(Exception):
+            setattr(p, "follow_up_type", "pr")
+
+    def test_round_trip_commit(self) -> None:
+        p = FollowUpRecordedPayload(**self._commit())
+        restored = FollowUpRecordedPayload(**p.model_dump(mode="json"))
+        assert restored == p
+
+    def test_round_trip_pr(self) -> None:
+        p = FollowUpRecordedPayload(**self._pr())
+        restored = FollowUpRecordedPayload(**p.model_dump(mode="json"))
+        assert restored == p
+
+
+# ── Conformance registry presence ────────────────────────────────────────────
+
+
+class TestPostMissionRegistryPresence:
+    """The new events must be reachable through the conformance model map."""
+
+    def test_events_registered_in_model_map(self) -> None:
+        from spec_kitty_events.conformance.validators import _EVENT_TYPE_TO_MODEL
+
+        assert _EVENT_TYPE_TO_MODEL[MISSION_REOPENED] is MissionReopenedPayload
+        assert _EVENT_TYPE_TO_MODEL[FOLLOW_UP_RECORDED] is FollowUpRecordedPayload
+
+    def test_validate_event_accepts_valid_payloads(self) -> None:
+        from spec_kitty_events.conformance import validate_event
+
+        reopened = {
+            "mission_id": "01KTESTMISSIONID0000000000",
+            "mission_slug": "mission-reopen-followup",
+            "reason": "land follow-up",
+            "reopened_by": "stijn",
+            "reopened_at": "2026-06-14T12:00:00+00:00",
+            "cleared_merge": None,
+        }
+        result = validate_event(reopened, MISSION_REOPENED)
+        assert not result.model_violations
+
+        follow_up = {
+            "mission_id": "01KTESTMISSIONID0000000000",
+            "mission_slug": "mission-reopen-followup",
+            "follow_up_type": "pr",
+            "commit_sha": None,
+            "pr_number": 1926,
+            "recorded_by": "stijn",
+            "recorded_at": "2026-06-14T12:00:00+00:00",
+        }
+        result = validate_event(follow_up, FOLLOW_UP_RECORDED)
+        assert not result.model_violations
+
+    def test_validate_event_flags_invalid_discriminator(self) -> None:
+        from spec_kitty_events.conformance import validate_event
+
+        bad = {
+            "mission_id": "01KTESTMISSIONID0000000000",
+            "mission_slug": "mission-reopen-followup",
+            "follow_up_type": "commit",
+            "commit_sha": None,
+            "pr_number": None,
+            "recorded_by": "stijn",
+            "recorded_at": "2026-06-14T12:00:00+00:00",
+        }
+        result = validate_event(bad, FOLLOW_UP_RECORDED)
+        assert result.model_violations

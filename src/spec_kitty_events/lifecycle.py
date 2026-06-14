@@ -15,9 +15,9 @@ Sections:
 from __future__ import annotations
 
 from enum import Enum
-from typing import Dict, FrozenSet, List, Optional, Sequence, Tuple
+from typing import Any, Dict, FrozenSet, List, Literal, Optional, Sequence, Tuple
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 # ── Section 1: Constants ─────────────────────────────────────────────────────
 
@@ -33,6 +33,16 @@ MISSION_ORIGIN_BOUND: str = "MissionOriginBound"
 PHASE_ENTERED: str = "PhaseEntered"
 REVIEW_ROLLBACK: str = "ReviewRollback"
 
+# Post-mission lifecycle events. These record facts about a mission *after* it
+# has merged/closed: a re-open returning it to an actionable state, and a
+# follow-up commit/PR attributed to it. Producer call site:
+# spec-kitty/src/specify_cli/status/lifecycle_events.py
+# (emit_mission_reopened / emit_follow_up_recorded). Field shapes mirror the
+# producer payloads and the mission data-model
+# (kitty-specs/mission-lifecycle-dispatch-drg-closeout-01KV0S99/data-model.md).
+MISSION_REOPENED: str = "MissionReopened"
+FOLLOW_UP_RECORDED: str = "FollowUpRecorded"
+
 MISSION_EVENT_TYPES: FrozenSet[str] = frozenset({
     MISSION_CREATED,
     MISSION_CLOSED,
@@ -41,6 +51,8 @@ MISSION_EVENT_TYPES: FrozenSet[str] = frozenset({
     MISSION_CANCELLED,
     PHASE_ENTERED,
     REVIEW_ROLLBACK,
+    MISSION_REOPENED,
+    FOLLOW_UP_RECORDED,
 })
 
 # ── Section 2: MissionStatus Enum ────────────────────────────────────────────
@@ -192,6 +204,94 @@ class MissionOriginBoundPayload(BaseModel):
     external_issue_url: str = Field(..., min_length=1, description="Browser URL to the external issue.")
     title: str = Field(..., min_length=1, description="External issue title.")
     mission_id: Optional[str] = Field(None, min_length=1, description="Canonical mission ULID (when known).")
+
+
+class MissionReopenedPayload(BaseModel):
+    """Typed payload for ``MissionReopened`` events.
+
+    Records that a merged/closed mission was returned to an actionable state.
+    Appended *each* time (every re-open is a distinct fact — NOT deduped).
+    Attribution is via ``mission_id`` (ULID); ``cleared_merge`` is an optional
+    snapshot of the ``merged_*`` fields removed from ``meta.json`` by the
+    re-open command, retained for audit / reversibility.
+
+    Producer: ``spec-kitty/src/specify_cli/status/lifecycle_events.py``
+    ``emit_mission_reopened``. Data-model:
+    ``mission-lifecycle-dispatch-drg-closeout-01KV0S99/data-model.md``.
+    """
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    mission_id: str = Field(
+        ..., min_length=1, description="Canonical machine identity (ULID); lookup key."
+    )
+    mission_slug: str = Field(
+        ..., min_length=1, description="Human handle (display)."
+    )
+    reason: str = Field(
+        ..., min_length=1, description="Audit reason for the re-open (non-empty)."
+    )
+    reopened_by: str = Field(
+        ..., min_length=1, description="Detected actor who re-opened the mission."
+    )
+    reopened_at: str = Field(
+        ..., min_length=1, description="Event time (ISO-8601 UTC)."
+    )
+    cleared_merge: Optional[Dict[str, Any]] = Field(
+        None,
+        description="Snapshot of the merged_* fields cleared from meta.json "
+        "(for reversibility/audit); null when no merge metadata was cleared.",
+    )
+
+
+class FollowUpRecordedPayload(BaseModel):
+    """Typed payload for ``FollowUpRecorded`` events.
+
+    Records a follow-up commit or PR against an already-merged (or any-state)
+    mission. ``follow_up_type`` is the discriminator: ``"commit"`` requires
+    ``commit_sha``; ``"pr"`` requires ``pr_number``. Attribution is via
+    ``mission_id``. A commit and the PR that contains it are recorded as
+    distinct facts (no resolved-commit-of-PR lookup).
+
+    Producer: ``spec-kitty/src/specify_cli/status/lifecycle_events.py``
+    ``emit_follow_up_recorded``. Data-model:
+    ``mission-lifecycle-dispatch-drg-closeout-01KV0S99/data-model.md``.
+    """
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    mission_id: str = Field(
+        ..., min_length=1, description="Canonical machine identity (ULID); attribution key."
+    )
+    mission_slug: str = Field(
+        ..., min_length=1, description="Human handle (display)."
+    )
+    follow_up_type: Literal["commit", "pr"] = Field(
+        ..., description="Discriminator: 'commit' (requires commit_sha) or 'pr' (requires pr_number)."
+    )
+    commit_sha: Optional[str] = Field(
+        None, min_length=1, description="Commit SHA; required iff follow_up_type == 'commit'."
+    )
+    pr_number: Optional[int] = Field(
+        None, ge=1, description="PR number; required iff follow_up_type == 'pr'."
+    )
+    recorded_by: str = Field(
+        ..., min_length=1, description="Detected actor who recorded the follow-up."
+    )
+    recorded_at: str = Field(
+        ..., min_length=1, description="Event time (ISO-8601 UTC)."
+    )
+
+    @model_validator(mode="after")
+    def _check_discriminator(self) -> "FollowUpRecordedPayload":
+        """Enforce the commit-vs-pr conditional-required contract."""
+        if self.follow_up_type == "commit":
+            if not self.commit_sha:
+                raise ValueError("commit_sha is required when follow_up_type == 'commit'")
+        elif self.follow_up_type == "pr":
+            if self.pr_number is None:
+                raise ValueError("pr_number is required when follow_up_type == 'pr'")
+        return self
 
 
 class PhaseEnteredPayload(BaseModel):

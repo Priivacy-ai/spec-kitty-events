@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.1.0] - 2026-06-14
+
+### Added
+
+- **Canonical contracts for two post-mission lifecycle events** (`MissionReopened`,
+  `FollowUpRecorded`) — additive, wire-compatible. Added `MissionReopenedPayload`
+  and `FollowUpRecordedPayload` pydantic models (`ConfigDict(frozen=True,
+  extra="forbid")`), the `MISSION_REOPENED`/`FOLLOW_UP_RECORDED` type constants,
+  membership in `MISSION_EVENT_TYPES`, package-root re-exports, and
+  `_EVENT_TYPE_TO_MODEL` registry entries. Field shapes mirror the producer call
+  sites in `spec-kitty/src/specify_cli/status/lifecycle_events.py`
+  (`emit_mission_reopened` / `emit_follow_up_recorded`) and the mission
+  data-model `mission-lifecycle-dispatch-drg-closeout-01KV0S99/data-model.md`.
+  `MissionReopened` carries `mission_id`, `mission_slug`, `reason`, `reopened_by`,
+  `reopened_at`, and optional `cleared_merge`. `FollowUpRecorded` carries
+  `mission_id`, `mission_slug`, a `follow_up_type` discriminator (`"commit"`/`"pr"`),
+  conditional `commit_sha`/`pr_number`, `recorded_by`, and `recorded_at`; a
+  model-level validator enforces the commit-vs-pr conditional-required rule.
+  Consumer: spec-kitty mission `01KV0S99` (PR Priivacy-ai/spec-kitty#1926).
+  No JSON-schema entry yet (the schema layer is optional secondary).
+
 ## [6.0.0] - 2026-06-07
 
 ### Breaking
