@@ -13,7 +13,7 @@ This release publishes the fail-closed cutover surface for:
   historical-shape conformance fixtures.
 """
 
-__version__ = "6.0.0"
+__version__ = "6.1.0"
 
 from spec_kitty_events.cutover import (
     CUTOVER_ARTIFACT,
@@ -95,6 +95,8 @@ from spec_kitty_events.lifecycle import (
     MISSION_COMPLETED,
     MISSION_CANCELLED,
     MISSION_ORIGIN_BOUND,
+    MISSION_REOPENED,
+    FOLLOW_UP_RECORDED,
     PHASE_ENTERED,
     REVIEW_ROLLBACK,
     MISSION_EVENT_TYPES,
@@ -106,6 +108,8 @@ from spec_kitty_events.lifecycle import (
     MissionCompletedPayload,
     MissionCancelledPayload,
     MissionOriginBoundPayload,
+    MissionReopenedPayload,
+    FollowUpRecordedPayload,
     PhaseEnteredPayload,
     ReviewRollbackPayload,
     LifecycleAnomaly,
@@ -902,6 +906,12 @@ __all__ = [
     "DependencyResolvedPayload",
     "MISSION_ORIGIN_BOUND",
     "MissionOriginBoundPayload",
+    # Post-mission lifecycle events
+    # (mission-lifecycle-dispatch-drg-closeout-01KV0S99).
+    "MISSION_REOPENED",
+    "FOLLOW_UP_RECORDED",
+    "MissionReopenedPayload",
+    "FollowUpRecordedPayload",
     "BUILD_REGISTERED",
     "BUILD_HEARTBEAT",
     "BUILD_LIFECYCLE_EVENT_TYPES",

@@ -15,9 +15,9 @@ Sections:
 from __future__ import annotations
 
 from enum import Enum
-from typing import Dict, FrozenSet, List, Optional, Sequence, Tuple
+from typing import Any, Dict, FrozenSet, List, Literal, Optional, Sequence, Tuple
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 # ── Section 1: Constants ─────────────────────────────────────────────────────
 
@@ -33,6 +33,16 @@ MISSION_ORIGIN_BOUND: str = "MissionOriginBound"
 PHASE_ENTERED: str = "PhaseEntered"
 REVIEW_ROLLBACK: str = "ReviewRollback"
 
+# Post-mission lifecycle events. These record facts about a mission *after* it
+# has merged/closed: a re-open returning it to an actionable state, and a
+# follow-up commit/PR attributed to it. Producer call site:
+# spec-kitty/src/specify_cli/status/lifecycle_events.py
+# (emit_mission_reopened / emit_follow_up_recorded). Field shapes mirror the
+# producer payloads and the mission data-model
+# (kitty-specs/mission-lifecycle-dispatch-drg-closeout-01KV0S99/data-model.md).
+MISSION_REOPENED: str = "MissionReopened"
+FOLLOW_UP_RECORDED: str = "FollowUpRecorded"
+
 MISSION_EVENT_TYPES: FrozenSet[str] = frozenset({
     MISSION_CREATED,
     MISSION_CLOSED,
@@ -41,17 +51,28 @@ MISSION_EVENT_TYPES: FrozenSet[str] = frozenset({
     MISSION_CANCELLED,
     PHASE_ENTERED,
     REVIEW_ROLLBACK,
+    MISSION_REOPENED,
+    FOLLOW_UP_RECORDED,
 })
 
 # ── Section 2: MissionStatus Enum ────────────────────────────────────────────
 
 
 class MissionStatus(str, Enum):
-    """Mission lifecycle states."""
+    """Mission lifecycle states.
+
+    ``REOPENED`` is an *actionable* (non-terminal) state distinct from
+    ``ACTIVE``: it records that a previously-completed/cancelled mission was
+    returned to an actionable state by a ``MissionReopened`` event. It is
+    deliberately NOT in :data:`TERMINAL_MISSION_STATUSES`, so subsequent
+    lifecycle events (e.g. a fresh ``MissionCompleted``) are processed
+    normally rather than flagged as post-terminal anomalies.
+    """
 
     ACTIVE = "active"
     COMPLETED = "completed"
     CANCELLED = "cancelled"
+    REOPENED = "reopened"
 
 
 TERMINAL_MISSION_STATUSES: FrozenSet[MissionStatus] = frozenset({
@@ -192,6 +213,94 @@ class MissionOriginBoundPayload(BaseModel):
     external_issue_url: str = Field(..., min_length=1, description="Browser URL to the external issue.")
     title: str = Field(..., min_length=1, description="External issue title.")
     mission_id: Optional[str] = Field(None, min_length=1, description="Canonical mission ULID (when known).")
+
+
+class MissionReopenedPayload(BaseModel):
+    """Typed payload for ``MissionReopened`` events.
+
+    Records that a merged/closed mission was returned to an actionable state.
+    Appended *each* time (every re-open is a distinct fact — NOT deduped).
+    Attribution is via ``mission_id`` (ULID); ``cleared_merge`` is an optional
+    snapshot of the ``merged_*`` fields removed from ``meta.json`` by the
+    re-open command, retained for audit / reversibility.
+
+    Producer: ``spec-kitty/src/specify_cli/status/lifecycle_events.py``
+    ``emit_mission_reopened``. Data-model:
+    ``mission-lifecycle-dispatch-drg-closeout-01KV0S99/data-model.md``.
+    """
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    mission_id: str = Field(
+        ..., min_length=1, description="Canonical machine identity (ULID); lookup key."
+    )
+    mission_slug: str = Field(
+        ..., min_length=1, description="Human handle (display)."
+    )
+    reason: str = Field(
+        ..., min_length=1, description="Audit reason for the re-open (non-empty)."
+    )
+    reopened_by: str = Field(
+        ..., min_length=1, description="Detected actor who re-opened the mission."
+    )
+    reopened_at: str = Field(
+        ..., min_length=1, description="Event time (ISO-8601 UTC)."
+    )
+    cleared_merge: Optional[Dict[str, Any]] = Field(
+        None,
+        description="Snapshot of the merged_* fields cleared from meta.json "
+        "(for reversibility/audit); null when no merge metadata was cleared.",
+    )
+
+
+class FollowUpRecordedPayload(BaseModel):
+    """Typed payload for ``FollowUpRecorded`` events.
+
+    Records a follow-up commit or PR against an already-merged (or any-state)
+    mission. ``follow_up_type`` is the discriminator: ``"commit"`` requires
+    ``commit_sha``; ``"pr"`` requires ``pr_number``. Attribution is via
+    ``mission_id``. A commit and the PR that contains it are recorded as
+    distinct facts (no resolved-commit-of-PR lookup).
+
+    Producer: ``spec-kitty/src/specify_cli/status/lifecycle_events.py``
+    ``emit_follow_up_recorded``. Data-model:
+    ``mission-lifecycle-dispatch-drg-closeout-01KV0S99/data-model.md``.
+    """
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    mission_id: str = Field(
+        ..., min_length=1, description="Canonical machine identity (ULID); attribution key."
+    )
+    mission_slug: str = Field(
+        ..., min_length=1, description="Human handle (display)."
+    )
+    follow_up_type: Literal["commit", "pr"] = Field(
+        ..., description="Discriminator: 'commit' (requires commit_sha) or 'pr' (requires pr_number)."
+    )
+    commit_sha: Optional[str] = Field(
+        None, min_length=1, description="Commit SHA; required iff follow_up_type == 'commit'."
+    )
+    pr_number: Optional[int] = Field(
+        None, ge=1, description="PR number; required iff follow_up_type == 'pr'."
+    )
+    recorded_by: str = Field(
+        ..., min_length=1, description="Detected actor who recorded the follow-up."
+    )
+    recorded_at: str = Field(
+        ..., min_length=1, description="Event time (ISO-8601 UTC)."
+    )
+
+    @model_validator(mode="after")
+    def _check_discriminator(self) -> "FollowUpRecordedPayload":
+        """Enforce the commit-vs-pr conditional-required contract."""
+        if self.follow_up_type == "commit":
+            if not self.commit_sha:
+                raise ValueError("commit_sha is required when follow_up_type == 'commit'")
+        elif self.follow_up_type == "pr":
+            if self.pr_number is None:
+                raise ValueError("pr_number is required when follow_up_type == 'pr'")
+        return self
 
 
 class PhaseEnteredPayload(BaseModel):
@@ -337,6 +446,64 @@ def _process_mission_event(
                     reason="Invalid MissionClosed payload",
                 )
             )
+        return mission_id, mission_status, mission_type, current_phase
+
+    # Post-mission events (MissionReopened / FollowUpRecorded) are valid ONLY
+    # after the mission has reached a terminal/completed state. They must be
+    # handled BEFORE the generic terminal-state guard below — otherwise that
+    # guard would misfire and flag these by-design post-completion facts as
+    # "Event after terminal state" anomalies.
+    #
+    # The contract is symmetric: a post-mission event that arrives when the
+    # mission is NOT terminal (no prior completion/cancellation) is itself the
+    # anomaly ("post-mission event before completion").
+    if event.event_type == MISSION_REOPENED:
+        try:
+            MissionReopenedPayload(**event.payload)
+        except Exception:
+            anomalies.append(
+                LifecycleAnomaly(
+                    event_id=event.event_id,
+                    event_type=event.event_type,
+                    reason="Invalid MissionReopened payload",
+                )
+            )
+            return mission_id, mission_status, mission_type, current_phase
+        if mission_status not in TERMINAL_MISSION_STATUSES:
+            anomalies.append(
+                LifecycleAnomaly(
+                    event_id=event.event_id,
+                    event_type=event.event_type,
+                    reason="MissionReopened before completion (mission not terminal)",
+                )
+            )
+            return mission_id, mission_status, mission_type, current_phase
+        # Valid re-open: transition out of terminal back to an actionable state.
+        mission_status = MissionStatus.REOPENED
+        return mission_id, mission_status, mission_type, current_phase
+
+    if event.event_type == FOLLOW_UP_RECORDED:
+        try:
+            FollowUpRecordedPayload(**event.payload)
+        except Exception:
+            anomalies.append(
+                LifecycleAnomaly(
+                    event_id=event.event_id,
+                    event_type=event.event_type,
+                    reason="Invalid FollowUpRecorded payload",
+                )
+            )
+            return mission_id, mission_status, mission_type, current_phase
+        if mission_status not in TERMINAL_MISSION_STATUSES:
+            anomalies.append(
+                LifecycleAnomaly(
+                    event_id=event.event_id,
+                    event_type=event.event_type,
+                    reason="FollowUpRecorded before completion (mission not terminal)",
+                )
+            )
+            return mission_id, mission_status, mission_type, current_phase
+        # Valid follow-up: a recorded fact; mission_status is UNCHANGED.
         return mission_id, mission_status, mission_type, current_phase
 
     # Check: event after terminal state

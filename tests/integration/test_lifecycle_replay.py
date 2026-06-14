@@ -17,17 +17,20 @@ from ulid import ULID
 
 from spec_kitty_events.decisionpoint import reduce_decision_point_events
 from spec_kitty_events.lifecycle import (
+    FOLLOW_UP_RECORDED,
     MISSION_CANCELLED,
     MISSION_COMPLETED,
+    MISSION_REOPENED,
     MISSION_STARTED,
     PHASE_ENTERED,
     REVIEW_ROLLBACK,
+    FollowUpRecordedPayload,
     MissionCancelledPayload,
     MissionCompletedPayload,
+    MissionReopenedPayload,
     MissionStartedPayload,
     MissionStatus,
     PhaseEnteredPayload,
-    ReducedMissionState,
     ReviewRollbackPayload,
     reduce_lifecycle_events,
 )
@@ -409,6 +412,128 @@ class TestFullLifecycleAllEventTypes:
         assert state.mission_status == MissionStatus.COMPLETED
         assert len(state.anomalies) == 1
         assert "terminal" in state.anomalies[0].reason.lower()
+
+    def test_completed_then_reopened_leaves_terminal(self) -> None:
+        """Post-completion MissionReopened is valid and exits terminal."""
+        corr_id = str(ULID())
+        events = [
+            _make_event(
+                MISSION_STARTED,
+                MissionStartedPayload(
+                    mission_id="M001",
+                    mission_type="software-dev",
+                    initial_phase="specify",
+                    actor="user-1",
+                ).model_dump(),
+                lamport_clock=1,
+                corr_id=corr_id,
+            ),
+            _make_event(
+                MISSION_COMPLETED,
+                MissionCompletedPayload(
+                    mission_id="M001",
+                    mission_type="software-dev",
+                    final_phase="review",
+                    actor="user-1",
+                ).model_dump(),
+                lamport_clock=2,
+                corr_id=corr_id,
+            ),
+            _make_event(
+                MISSION_REOPENED,
+                MissionReopenedPayload(
+                    mission_id="M001",
+                    mission_slug="mission-reopen-followup",
+                    reason="Land a follow-up fix",
+                    reopened_by="stijn",
+                    reopened_at="2026-06-14T12:00:00+00:00",
+                ).model_dump(),
+                lamport_clock=3,
+                corr_id=corr_id,
+            ),
+        ]
+        state = reduce_lifecycle_events(events)
+        assert state.mission_status == MissionStatus.REOPENED
+        assert len(state.anomalies) == 0
+        # Replay determinism.
+        assert reduce_lifecycle_events(list(events)) == state
+
+    def test_completed_then_follow_up_keeps_status(self) -> None:
+        """Post-completion FollowUpRecorded is valid; status unchanged."""
+        corr_id = str(ULID())
+        events = [
+            _make_event(
+                MISSION_STARTED,
+                MissionStartedPayload(
+                    mission_id="M001",
+                    mission_type="software-dev",
+                    initial_phase="specify",
+                    actor="user-1",
+                ).model_dump(),
+                lamport_clock=1,
+                corr_id=corr_id,
+            ),
+            _make_event(
+                MISSION_COMPLETED,
+                MissionCompletedPayload(
+                    mission_id="M001",
+                    mission_type="software-dev",
+                    final_phase="review",
+                    actor="user-1",
+                ).model_dump(),
+                lamport_clock=2,
+                corr_id=corr_id,
+            ),
+            _make_event(
+                FOLLOW_UP_RECORDED,
+                FollowUpRecordedPayload(
+                    mission_id="M001",
+                    mission_slug="mission-reopen-followup",
+                    follow_up_type="pr",
+                    pr_number=1926,
+                    recorded_by="stijn",
+                    recorded_at="2026-06-14T12:00:00+00:00",
+                ).model_dump(),
+                lamport_clock=3,
+                corr_id=corr_id,
+            ),
+        ]
+        state = reduce_lifecycle_events(events)
+        assert state.mission_status == MissionStatus.COMPLETED
+        assert len(state.anomalies) == 0
+
+    def test_reopen_before_completion_is_anomaly(self) -> None:
+        """Pre-completion MissionReopened is the anomaly (inverse contract)."""
+        corr_id = str(ULID())
+        events = [
+            _make_event(
+                MISSION_STARTED,
+                MissionStartedPayload(
+                    mission_id="M001",
+                    mission_type="software-dev",
+                    initial_phase="specify",
+                    actor="user-1",
+                ).model_dump(),
+                lamport_clock=1,
+                corr_id=corr_id,
+            ),
+            _make_event(
+                MISSION_REOPENED,
+                MissionReopenedPayload(
+                    mission_id="M001",
+                    mission_slug="mission-reopen-followup",
+                    reason="Premature re-open",
+                    reopened_by="stijn",
+                    reopened_at="2026-06-14T12:00:00+00:00",
+                ).model_dump(),
+                lamport_clock=2,
+                corr_id=corr_id,
+            ),
+        ]
+        state = reduce_lifecycle_events(events)
+        assert state.mission_status == MissionStatus.ACTIVE
+        assert len(state.anomalies) == 1
+        assert "before completion" in state.anomalies[0].reason
 
 
 # ── V1 DecisionPoint golden replay tests ─────────────────────────────────────

@@ -22,11 +22,13 @@ from spec_kitty_events.build_lifecycle import (
 )
 from spec_kitty_events.gates import GateFailedPayload, GatePassedPayload
 from spec_kitty_events.lifecycle import (
+    FollowUpRecordedPayload,
     MissionClosedPayload,
     MissionCancelledPayload,
     MissionCompletedPayload,
     MissionCreatedPayload,
     MissionOriginBoundPayload,
+    MissionReopenedPayload,
     MissionStartedPayload,
     PhaseEnteredPayload,
     ReviewRollbackPayload,
@@ -281,6 +283,13 @@ _EVENT_TYPE_TO_MODEL: Dict[str, Any] = {
     "ErrorLogged": ErrorLoggedPayload,
     "DependencyResolved": DependencyResolvedPayload,
     "MissionOriginBound": MissionOriginBoundPayload,
+    # Post-mission lifecycle events (mission
+    # mission-lifecycle-dispatch-drg-closeout-01KV0S99). Producer call sites:
+    # spec-kitty/src/specify_cli/status/lifecycle_events.py
+    # (emit_mission_reopened / emit_follow_up_recorded). Model-layer only —
+    # no JSON schema entry yet (the schema layer is optional secondary).
+    "MissionReopened": MissionReopenedPayload,
+    "FollowUpRecorded": FollowUpRecordedPayload,
 }
 
 # Event type to JSON Schema name mapping (used with load_schema())
