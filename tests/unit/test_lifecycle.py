@@ -1037,6 +1037,163 @@ class TestReduceLifecycleEvents:
         assert "Duplicate" in result.anomalies[0].reason
 
 
+# ── Post-mission reducer semantics (MissionReopened / FollowUpRecorded) ───────
+
+
+class TestPostMissionReducerSemantics:
+    """reduce_lifecycle_events() post-completion semantics.
+
+    Contract: MissionReopened and FollowUpRecorded are valid ONLY after the
+    mission reached a terminal state. Post-completion → no anomaly; a re-open
+    leaves terminal (REOPENED), a follow-up is a recorded fact (status
+    unchanged). Pre-completion → the event itself is the anomaly.
+    """
+
+    def _started(self, lamport: int = 1) -> Event:
+        return _make_mission_event(
+            MISSION_STARTED,
+            MissionStartedPayload(
+                mission_id="M001",
+                mission_type="software-dev",
+                initial_phase="specify",
+                actor="user-1",
+            ).model_dump(),
+            lamport_clock=lamport,
+        )
+
+    def _completed(self, lamport: int = 2) -> Event:
+        return _make_mission_event(
+            MISSION_COMPLETED,
+            MissionCompletedPayload(
+                mission_id="M001",
+                mission_type="software-dev",
+                final_phase="review",
+                actor="user-1",
+            ).model_dump(),
+            lamport_clock=lamport,
+        )
+
+    def _reopened(self, lamport: int = 3) -> Event:
+        return _make_mission_event(
+            MISSION_REOPENED,
+            MissionReopenedPayload(
+                mission_id="M001",
+                mission_slug="mission-reopen-followup",
+                reason="Operator requested re-open to land follow-up fix",
+                reopened_by="stijn",
+                reopened_at="2026-06-14T12:00:00+00:00",
+            ).model_dump(),
+            lamport_clock=lamport,
+        )
+
+    def _follow_up(self, lamport: int = 3) -> Event:
+        return _make_mission_event(
+            FOLLOW_UP_RECORDED,
+            FollowUpRecordedPayload(
+                mission_id="M001",
+                mission_slug="mission-reopen-followup",
+                follow_up_type="commit",
+                commit_sha="a" * 40,
+                recorded_by="stijn",
+                recorded_at="2026-06-14T12:00:00+00:00",
+            ).model_dump(),
+            lamport_clock=lamport,
+        )
+
+    def test_reopen_after_completion_is_not_anomaly(self) -> None:
+        result = reduce_lifecycle_events(
+            [self._started(), self._completed(), self._reopened()]
+        )
+        assert result.anomalies == ()
+        # Re-open transitions the mission OUT of terminal.
+        assert result.mission_status == MissionStatus.REOPENED
+        assert result.mission_status not in TERMINAL_MISSION_STATUSES
+        assert result.event_count == 3
+
+    def test_follow_up_after_completion_is_not_anomaly_and_status_unchanged(
+        self,
+    ) -> None:
+        result = reduce_lifecycle_events(
+            [self._started(), self._completed(), self._follow_up()]
+        )
+        assert result.anomalies == ()
+        # FollowUpRecorded is a recorded fact: status stays terminal.
+        assert result.mission_status == MissionStatus.COMPLETED
+        assert result.event_count == 3
+
+    def test_reopen_before_completion_is_anomaly(self) -> None:
+        result = reduce_lifecycle_events([self._started(), self._reopened(lamport=2)])
+        assert result.mission_status == MissionStatus.ACTIVE
+        assert len(result.anomalies) == 1
+        assert result.anomalies[0].event_type == MISSION_REOPENED
+        assert "before completion" in result.anomalies[0].reason
+
+    def test_follow_up_before_completion_is_anomaly(self) -> None:
+        result = reduce_lifecycle_events(
+            [self._started(), self._follow_up(lamport=2)]
+        )
+        assert result.mission_status == MissionStatus.ACTIVE
+        assert len(result.anomalies) == 1
+        assert result.anomalies[0].event_type == FOLLOW_UP_RECORDED
+        assert "before completion" in result.anomalies[0].reason
+
+    def test_reopen_then_complete_again_processes_normally(self) -> None:
+        """After a valid re-open, status is non-terminal so a fresh
+        MissionCompleted is applied without a post-terminal anomaly."""
+        result = reduce_lifecycle_events(
+            [
+                self._started(),
+                self._completed(lamport=2),
+                self._reopened(lamport=3),
+                self._completed(lamport=4),
+            ]
+        )
+        assert result.anomalies == ()
+        assert result.mission_status == MissionStatus.COMPLETED
+        assert result.event_count == 4
+
+    def test_invalid_reopen_payload_after_completion_is_anomaly(self) -> None:
+        bad = _make_mission_event(
+            MISSION_REOPENED,
+            {"mission_id": "M001"},  # missing required fields
+            lamport_clock=3,
+        )
+        result = reduce_lifecycle_events([self._started(), self._completed(), bad])
+        assert result.mission_status == MissionStatus.COMPLETED
+        assert len(result.anomalies) == 1
+        assert "Invalid MissionReopened payload" == result.anomalies[0].reason
+
+    def test_invalid_follow_up_payload_after_completion_is_anomaly(self) -> None:
+        bad = _make_mission_event(
+            FOLLOW_UP_RECORDED,
+            {"mission_id": "M001", "follow_up_type": "commit"},  # missing commit_sha
+            lamport_clock=3,
+        )
+        result = reduce_lifecycle_events([self._started(), self._completed(), bad])
+        assert result.mission_status == MissionStatus.COMPLETED
+        assert len(result.anomalies) == 1
+        assert "Invalid FollowUpRecorded payload" == result.anomalies[0].reason
+
+    def test_follow_up_does_not_leave_terminal_for_next_guard(self) -> None:
+        """A follow-up keeps the mission terminal, so a later by-design
+        anomaly event (e.g. PhaseEntered) is still flagged."""
+        late_phase = _make_mission_event(
+            PHASE_ENTERED,
+            PhaseEnteredPayload(
+                mission_id="M001",
+                phase_name="implement",
+                actor="user-1",
+            ).model_dump(),
+            lamport_clock=4,
+        )
+        result = reduce_lifecycle_events(
+            [self._started(), self._completed(), self._follow_up(), late_phase]
+        )
+        assert result.mission_status == MissionStatus.COMPLETED
+        assert len(result.anomalies) == 1
+        assert "terminal" in result.anomalies[0].reason.lower()
+
+
 # ── MissionReopenedPayload ───────────────────────────────────────────────────
 
 

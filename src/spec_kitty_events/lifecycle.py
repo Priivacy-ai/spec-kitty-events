@@ -59,11 +59,20 @@ MISSION_EVENT_TYPES: FrozenSet[str] = frozenset({
 
 
 class MissionStatus(str, Enum):
-    """Mission lifecycle states."""
+    """Mission lifecycle states.
+
+    ``REOPENED`` is an *actionable* (non-terminal) state distinct from
+    ``ACTIVE``: it records that a previously-completed/cancelled mission was
+    returned to an actionable state by a ``MissionReopened`` event. It is
+    deliberately NOT in :data:`TERMINAL_MISSION_STATUSES`, so subsequent
+    lifecycle events (e.g. a fresh ``MissionCompleted``) are processed
+    normally rather than flagged as post-terminal anomalies.
+    """
 
     ACTIVE = "active"
     COMPLETED = "completed"
     CANCELLED = "cancelled"
+    REOPENED = "reopened"
 
 
 TERMINAL_MISSION_STATUSES: FrozenSet[MissionStatus] = frozenset({
@@ -437,6 +446,64 @@ def _process_mission_event(
                     reason="Invalid MissionClosed payload",
                 )
             )
+        return mission_id, mission_status, mission_type, current_phase
+
+    # Post-mission events (MissionReopened / FollowUpRecorded) are valid ONLY
+    # after the mission has reached a terminal/completed state. They must be
+    # handled BEFORE the generic terminal-state guard below — otherwise that
+    # guard would misfire and flag these by-design post-completion facts as
+    # "Event after terminal state" anomalies.
+    #
+    # The contract is symmetric: a post-mission event that arrives when the
+    # mission is NOT terminal (no prior completion/cancellation) is itself the
+    # anomaly ("post-mission event before completion").
+    if event.event_type == MISSION_REOPENED:
+        try:
+            MissionReopenedPayload(**event.payload)
+        except Exception:
+            anomalies.append(
+                LifecycleAnomaly(
+                    event_id=event.event_id,
+                    event_type=event.event_type,
+                    reason="Invalid MissionReopened payload",
+                )
+            )
+            return mission_id, mission_status, mission_type, current_phase
+        if mission_status not in TERMINAL_MISSION_STATUSES:
+            anomalies.append(
+                LifecycleAnomaly(
+                    event_id=event.event_id,
+                    event_type=event.event_type,
+                    reason="MissionReopened before completion (mission not terminal)",
+                )
+            )
+            return mission_id, mission_status, mission_type, current_phase
+        # Valid re-open: transition out of terminal back to an actionable state.
+        mission_status = MissionStatus.REOPENED
+        return mission_id, mission_status, mission_type, current_phase
+
+    if event.event_type == FOLLOW_UP_RECORDED:
+        try:
+            FollowUpRecordedPayload(**event.payload)
+        except Exception:
+            anomalies.append(
+                LifecycleAnomaly(
+                    event_id=event.event_id,
+                    event_type=event.event_type,
+                    reason="Invalid FollowUpRecorded payload",
+                )
+            )
+            return mission_id, mission_status, mission_type, current_phase
+        if mission_status not in TERMINAL_MISSION_STATUSES:
+            anomalies.append(
+                LifecycleAnomaly(
+                    event_id=event.event_id,
+                    event_type=event.event_type,
+                    reason="FollowUpRecorded before completion (mission not terminal)",
+                )
+            )
+            return mission_id, mission_status, mission_type, current_phase
+        # Valid follow-up: a recorded fact; mission_status is UNCHANGED.
         return mission_id, mission_status, mission_type, current_phase
 
     # Check: event after terminal state

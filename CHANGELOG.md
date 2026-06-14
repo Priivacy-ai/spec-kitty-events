@@ -27,6 +27,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   model-level validator enforces the commit-vs-pr conditional-required rule.
   Consumer: spec-kitty mission `01KV0S99` (PR Priivacy-ai/spec-kitty#1926).
   No JSON-schema entry yet (the schema layer is optional secondary).
+- **`reduce_lifecycle_events` post-mission semantics** for the two new events.
+  Because `MissionReopened`/`FollowUpRecorded` are members of
+  `MISSION_EVENT_TYPES`, they now flow through the lifecycle reducer with
+  explicit handlers placed *before* the generic post-terminal guard (which would
+  otherwise misfire and flag them as `Event after terminal state` anomalies).
+  A `MissionReopened` is valid only when the mission is terminal and transitions
+  it to the new actionable `MissionStatus.REOPENED` state (non-terminal, so a
+  fresh `MissionCompleted` is processed normally); a `FollowUpRecorded` is valid
+  only when terminal and leaves `mission_status` unchanged (a recorded fact).
+  Inverse contract: either event arriving before completion (mission not in a
+  terminal state) is itself flagged as a `… before completion` anomaly. All
+  other event semantics and existing anomaly detection are preserved.
+- `MissionStatus.REOPENED = "reopened"` enum member (actionable, NOT in
+  `TERMINAL_MISSION_STATUSES`).
 
 ## [6.0.0] - 2026-06-07
 
