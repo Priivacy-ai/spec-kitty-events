@@ -11,7 +11,7 @@ jobs:
 
   build:
     needs: acceptance
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -40,7 +40,7 @@ jobs:
   publish:
     name: Publish package to TestPyPI
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
     environment: testpypi
     permissions:
       id-token: write
