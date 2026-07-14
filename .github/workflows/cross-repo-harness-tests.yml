@@ -62,8 +62,14 @@ jobs:
         # the canary harness which captures cli_version by shelling out
         # to the spec-kitty binary. Pinned to 3.2.0rc22 (matches the
         # canary-gate workflow in spec-kitty-saas).
+        #
+        # spec-kitty-cli 3.2.0rc22 imports `click` directly but does not
+        # pull it in transitively (its typer pin no longer depends on
+        # click), so `uv tool install` produces a binary that dies with
+        # `ModuleNotFoundError: No module named 'click'`. Inject click
+        # into the tool environment with --with so the CLI can start.
         run: |
-          uv tool install --prerelease=allow 'spec-kitty-cli==3.2.0rc22'
+          uv tool install --prerelease=allow --with click 'spec-kitty-cli==3.2.0rc22'
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
       - name: Run identity-boundary unit tests
