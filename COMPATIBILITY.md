@@ -144,9 +144,11 @@ and why the two version numbers are distinct — lives in
 The `6.1.0` release is **additive and wire-compatible**. It adds the
 `MissionReopened` and `FollowUpRecorded` contracts, the
 `MissionStatus.REOPENED` enum member (actionable, not terminal), and their
-handling in `reduce_lifecycle_events`. No consumer action is required; consumers
-on `>=6.0.0,<7.0.0` that do not know these event types are unaffected, and the
-envelope shape is unchanged.
+handling in `reduce_lifecycle_events`. The envelope shape is unchanged, but
+consumers that validate or switch on exact event types must be upgraded before
+they receive either new type. Producers must capability-gate emission until
+each intended consumer recognizes it. Consumers that never receive the new
+types are unaffected.
 
 Producers emitting post-mission lifecycle facts need `>=6.1.0`.
 
