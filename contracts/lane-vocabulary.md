@@ -13,9 +13,11 @@
 
 ## Rule
 
-There is exactly one canonical lane vocabulary. The contract package, the CLI,
-and the SaaS projector each reference the same constant and never define their
-own.
+There is exactly one canonical **wire/event** lane vocabulary. This contract
+package owns that vocabulary. Consumers may keep host-internal state enums or
+sentinels (for example, the CLI's non-persisted `uninitialized` read state), but
+they must translate those states before the event boundary and must never emit
+them as canonical lane values.
 
 ## Authoritative location
 
@@ -87,7 +89,9 @@ signal is the only reliable coordination mechanism here.
 
 ## Forbidden patterns
 
-- Defining a duplicate lane constant anywhere else in the codebase.
+- Defining an independent wire/event lane vocabulary instead of importing this
+  package or validating a consumer translation against it.
+- Emitting a host-internal state or sentinel as a canonical event lane.
 - Comparing lane values to string literals (`if lane == "in_review"`) at API
   boundaries. Compare to `Lane.IN_REVIEW`.
 - Inferring a display surface from `Lane` membership rather than from
@@ -107,8 +111,11 @@ not this document. It must contain:
    `src/spec_kitty_events/` for canonical lane string literals outside
    `status.py`, catching a parallel vocabulary before it ships.
 
-Downstream tranches reference `EXPECTED_CANONICAL_LANES` from that module to
-assert their own constants match this contract.
+`EXPECTED_CANONICAL_LANES` is an in-repository test constant, not a public
+cross-repo API. Downstream consumers enforce boundary parity through their own
+consumer/compatibility tests against the exported `Lane` enum. Their internal
+state sets may be supersets, provided every persisted or wire value is either a
+canonical `Lane` value or is translated before the event boundary.
 
 ## History
 

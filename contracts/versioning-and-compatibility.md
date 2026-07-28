@@ -36,11 +36,15 @@ consumer. Concretely:
   of the previous shape become invalid.
 - **Adding to the forbidden-key set, or widening where it is enforced.**
   Envelopes that previously passed are now rejected.
-- **Any change that makes a previously-accepted envelope rejected, or a
-  previously-rejected envelope accepted.**
+- **Any change to an existing event contract that makes a previously-accepted
+  envelope rejected, or a previously-rejected envelope accepted.**
 
 Adding a new event type with its own payload model is **additive** and takes a
-minor bump — `6.1.0` added `MissionReopened` and `FollowUpRecorded` this way.
+minor bump: the new event family is a new capability, while every existing
+event contract keeps the same accept/reject boundary. `6.1.0` added
+`MissionReopened` and `FollowUpRecorded` this way. A minor version does not make
+an unknown event safe for every consumer: producers MUST capability-gate
+emission until each intended consumer can validate and process the new type.
 
 ## Required artifacts on a major bump
 
