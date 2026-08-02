@@ -358,17 +358,27 @@ class TestParticipantExternalRefs:
         refs = ParticipantExternalRefs(slack_user_id="U123456")
         assert refs.slack_user_id == "U123456"
         assert refs.slack_team_id is None
-        assert refs.teamspace_member_id is None
+        assert refs.workspace_member_id is None
 
     def test_slack_team_id_only(self) -> None:
         refs = ParticipantExternalRefs(slack_team_id="T123456")
         assert refs.slack_team_id == "T123456"
         assert refs.slack_user_id is None
-        assert refs.teamspace_member_id is None
+        assert refs.workspace_member_id is None
 
-    def test_teamspace_member_id_only(self) -> None:
-        refs = ParticipantExternalRefs(teamspace_member_id="M123456")
-        assert refs.teamspace_member_id == "M123456"
+    def test_workspace_member_id_only(self) -> None:
+        refs = ParticipantExternalRefs(workspace_member_id="M123456")
+        assert refs.workspace_member_id == "M123456"
+
+    def test_v6_member_key_is_read_only_compatibility(self) -> None:
+        refs = ParticipantExternalRefs.model_validate(
+            {"teamspace_member_id": "M-legacy"}
+        )
+
+        assert refs.workspace_member_id == "M-legacy"
+        assert refs.model_dump(exclude_none=True) == {
+            "workspace_member_id": "M-legacy"
+        }
         assert refs.slack_user_id is None
         assert refs.slack_team_id is None
 
@@ -376,11 +386,11 @@ class TestParticipantExternalRefs:
         refs = ParticipantExternalRefs(
             slack_user_id="U123",
             slack_team_id="T456",
-            teamspace_member_id="M789",
+            workspace_member_id="M789",
         )
         assert refs.slack_user_id == "U123"
         assert refs.slack_team_id == "T456"
-        assert refs.teamspace_member_id == "M789"
+        assert refs.workspace_member_id == "M789"
 
     def test_rejects_all_none(self) -> None:
         with pytest.raises(PydanticValidationError) as exc_info:
@@ -395,9 +405,9 @@ class TestParticipantExternalRefs:
         with pytest.raises(PydanticValidationError):
             ParticipantExternalRefs(slack_team_id="")
 
-    def test_rejects_empty_teamspace_member_id(self) -> None:
+    def test_rejects_empty_workspace_member_id(self) -> None:
         with pytest.raises(PydanticValidationError):
-            ParticipantExternalRefs(teamspace_member_id="")
+            ParticipantExternalRefs(workspace_member_id="")
 
     def test_forbids_extra_fields(self) -> None:
         with pytest.raises(PydanticValidationError):
@@ -450,7 +460,7 @@ class TestParticipantIdentityExternalRefs:
         refs = ParticipantExternalRefs(
             slack_user_id="U123",
             slack_team_id="T456",
-            teamspace_member_id="M789",
+            workspace_member_id="M789",
         )
         pid = ParticipantIdentity(
             participant_id="p-003",
@@ -460,7 +470,7 @@ class TestParticipantIdentityExternalRefs:
         assert pid.external_refs is not None
         assert pid.external_refs.slack_user_id == "U123"
         assert pid.external_refs.slack_team_id == "T456"
-        assert pid.external_refs.teamspace_member_id == "M789"
+        assert pid.external_refs.workspace_member_id == "M789"
 
     def test_external_refs_rejects_all_none(self) -> None:
         with pytest.raises(PydanticValidationError) as exc_info:

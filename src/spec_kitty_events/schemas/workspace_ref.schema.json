@@ -1,8 +1,8 @@
 {
-  "$id": "spec-kitty-events/teamspace_ref",
+  "$id": "spec-kitty-events/workspace_ref",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
-  "description": "Reference to a Slack-connected teamspace.",
+  "description": "Reference to a Slack-connected Team Kitty workspace.",
   "properties": {
     "name": {
       "anyOf": [
@@ -14,19 +14,19 @@
         }
       ],
       "default": null,
-      "description": "Human-readable teamspace name",
+      "description": "Human-readable workspace name",
       "title": "Name"
     },
-    "teamspace_id": {
-      "description": "Teamspace identifier",
+    "workspace_id": {
+      "description": "Team Kitty workspace identifier",
       "minLength": 1,
-      "title": "Teamspace Id",
+      "title": "Workspace Id",
       "type": "string"
     }
   },
   "required": [
-    "teamspace_id"
+    "workspace_id"
   ],
-  "title": "TeamspaceRef",
+  "title": "WorkspaceRef",
   "type": "object"
 }

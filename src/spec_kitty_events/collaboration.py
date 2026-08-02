@@ -10,7 +10,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Dict, FrozenSet, List, Literal, Optional, Sequence, Set, Tuple
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import AliasChoices, BaseModel, ConfigDict, Field, model_validator
 
 from spec_kitty_events.models import SpecKittyEventsError
 
@@ -58,14 +58,20 @@ class ParticipantExternalRefs(BaseModel):
 
     slack_user_id: Optional[str] = Field(None, min_length=1)
     slack_team_id: Optional[str] = Field(None, min_length=1)
-    teamspace_member_id: Optional[str] = Field(None, min_length=1)
+    workspace_member_id: Optional[str] = Field(
+        None,
+        min_length=1,
+        # Read-only v6 migration alias. Remove after first-party event archives
+        # have been canonicalized and all consumers emit workspace_member_id.
+        validation_alias=AliasChoices("workspace_member_id", "teamspace_member_id"),
+    )
 
     @model_validator(mode="after")
     def _at_least_one(self) -> "ParticipantExternalRefs":
-        if not any((self.slack_user_id, self.slack_team_id, self.teamspace_member_id)):
+        if not any((self.slack_user_id, self.slack_team_id, self.workspace_member_id)):
             raise ValueError(
                 "ParticipantExternalRefs must populate at least one of "
-                "slack_user_id, slack_team_id, teamspace_member_id"
+                "slack_user_id, slack_team_id, workspace_member_id"
             )
         return self
 

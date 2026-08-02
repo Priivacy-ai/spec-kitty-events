@@ -7,7 +7,7 @@ These tests pin three behaviours of
 
 1. A consumer that preserves the producer's canonical timestamp passes,
    including the "old producer, recent receipt" historical-backfill scenario
-   that exposed the original Teamspace Pulse bug.
+   that exposed the original Team Kitty Pulse bug.
 2. The equality edge case (producer time equals receipt time for a live
    event) is also accepted.
 3. A consumer that substitutes receipt time for the canonical timestamp

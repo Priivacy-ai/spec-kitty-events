@@ -332,7 +332,7 @@
           "default": null,
           "title": "Slack User Id"
         },
-        "teamspace_member_id": {
+        "workspace_member_id": {
           "anyOf": [
             {
               "minLength": 1,
@@ -343,7 +343,7 @@
             }
           ],
           "default": null,
-          "title": "Teamspace Member Id"
+          "title": "Workspace Member Id"
         }
       },
       "title": "ParticipantExternalRefs",

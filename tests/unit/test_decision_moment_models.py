@@ -16,7 +16,7 @@ from spec_kitty_events.decision_moment import (
     OriginSurface,
     SummaryBlock,
     SummarySource,
-    TeamspaceRef,
+    WorkspaceRef,
     TerminalOutcome,
     ThreadRef,
     WideningChannel,
@@ -190,34 +190,41 @@ def test_summary_block_extracted_at_roundtrips_via_json() -> None:
     assert restored.extracted_at == now
 
 
-# ── TeamspaceRef ──────────────────────────────────────────────────────────────
+# ── WorkspaceRef ──────────────────────────────────────────────────────────────
 
 
-def test_teamspace_ref_minimal() -> None:
-    ref = TeamspaceRef(teamspace_id="ts-001")
-    assert ref.teamspace_id == "ts-001"
+def test_workspace_ref_minimal() -> None:
+    ref = WorkspaceRef(workspace_id="ts-001")
+    assert ref.workspace_id == "ts-001"
     assert ref.name is None
 
 
-def test_teamspace_ref_with_name() -> None:
-    ref = TeamspaceRef(teamspace_id="ts-001", name="Engineering Team")
+def test_workspace_ref_with_name() -> None:
+    ref = WorkspaceRef(workspace_id="ts-001", name="Engineering Team")
     assert ref.name == "Engineering Team"
 
 
-def test_teamspace_ref_rejects_empty_id() -> None:
+def test_workspace_ref_reads_v6_key_but_emits_only_canonical_key() -> None:
+    ref = WorkspaceRef.model_validate({"teamspace_id": "ts-legacy"})
+
+    assert ref.workspace_id == "ts-legacy"
+    assert ref.model_dump() == {"workspace_id": "ts-legacy", "name": None}
+
+
+def test_workspace_ref_rejects_empty_id() -> None:
     with pytest.raises(ValidationError):
-        TeamspaceRef(teamspace_id="")
+        WorkspaceRef(workspace_id="")
 
 
-def test_teamspace_ref_extra_fields_rejected() -> None:
+def test_workspace_ref_extra_fields_rejected() -> None:
     with pytest.raises(ValidationError):
-        TeamspaceRef(teamspace_id="ts-001", extra_key="x")  # type: ignore[call-arg]
+        WorkspaceRef(workspace_id="ts-001", extra_key="x")  # type: ignore[call-arg]
 
 
-def test_teamspace_ref_frozen() -> None:
-    ref = TeamspaceRef(teamspace_id="ts-001")
+def test_workspace_ref_frozen() -> None:
+    ref = WorkspaceRef(workspace_id="ts-001")
     with pytest.raises(ValidationError):
-        ref.teamspace_id = "changed"  # type: ignore[misc]
+        ref.workspace_id = "changed"  # type: ignore[misc]
 
 
 # ── DefaultChannelRef ─────────────────────────────────────────────────────────
@@ -334,7 +341,7 @@ def _make_widening_projection(**kwargs: object) -> WideningProjection:
     """Helper: build a minimal WideningProjection with overridable fields."""
     defaults: dict[str, object] = dict(
         channel=WideningChannel.SLACK,
-        teamspace_ref=TeamspaceRef(teamspace_id="ts-1"),
+        workspace_ref=WorkspaceRef(workspace_id="ts-1"),
         default_channel_ref=DefaultChannelRef(channel_id="C-1"),
         thread_ref=ThreadRef(channel_id="C-1", thread_ts="111.222"),
         invited_participants=(),

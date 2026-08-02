@@ -960,7 +960,7 @@
       "path": "decisionpoint/valid/v1_widened.json",
       "event_type": "DecisionPointWidened",
       "expected_result": "valid",
-      "notes": "V1 Widened: channel=slack, teamspace_ref, default_channel_ref, thread_ref with url, 2 invited_participants with teamspace_member_id",
+      "notes": "V1 Widened: channel=slack, workspace_ref, default_channel_ref, thread_ref with url, 2 invited_participants with workspace_member_id",
       "min_version": "4.0.0"
     },
     {
@@ -1016,7 +1016,7 @@
       "path": "decisionpoint/valid/v1_participant_identity_with_external_refs.json",
       "event_type": "DecisionPointWidened",
       "expected_result": "valid",
-      "notes": "V1 Widened with ParticipantIdentity carrying all three external_refs (slack_user_id, slack_team_id, teamspace_member_id)",
+      "notes": "V1 Widened with ParticipantIdentity carrying all three external_refs (slack_user_id, slack_team_id, workspace_member_id)",
       "min_version": "4.0.0"
     },
     {
@@ -1048,7 +1048,7 @@
       "path": "decisionpoint/invalid/v1_participant_identity_empty_external_refs.json",
       "event_type": "DecisionPointWidened",
       "expected_result": "invalid",
-      "notes": "V1 Widened with ParticipantIdentity.external_refs={} \u2014 must set at least one of slack_user_id, slack_team_id, teamspace_member_id",
+      "notes": "V1 Widened with ParticipantIdentity.external_refs={} \u2014 must set at least one of slack_user_id, slack_team_id, workspace_member_id",
       "min_version": "4.0.0"
     },
     {

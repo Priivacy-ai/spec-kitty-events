@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [7.0.0] - 2026-08-02
+
+### Breaking
+
+- Team Kitty is the canonical product name. The public Python models and
+  generated schemas rename the workspace boundary to `WorkspaceRef`,
+  `workspace_ref`, `workspace_id`, and `workspace_member_id`. Canonical output
+  never emits the version 6 spellings.
+- The generated `workspace_ref.schema.json` replaces the prior reference schema.
+
+### Migration
+
+- Version 6 input keys remain read-only Pydantic validation aliases for one
+  migration window. Producers must emit the workspace vocabulary immediately;
+  the aliases are removed after all first-party consumers and archived event
+  rows are canonicalized.
+
 ## [6.1.0] - 2026-06-14
 
 ### Added
@@ -184,7 +201,7 @@ or activity feeds) must:
 - Eight-class conformance fixture suite covering canonical envelopes,
   historical synthesized envelopes, every rejection class, raw historical
   rows, and lane-mapping legacy.
-- `COMPATIBILITY.md` section: local-CLI compatibility vs TeamSpace ingress
+- `COMPATIBILITY.md` section: local-CLI compatibility vs Team Kitty ingress
   validity.
 
 ### Fixed

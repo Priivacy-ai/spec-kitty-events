@@ -33,7 +33,7 @@ from typing import (
     cast,
 )
 
-from pydantic import BaseModel, ConfigDict, Field, TypeAdapter, model_validator
+from pydantic import AliasChoices, BaseModel, ConfigDict, Field, TypeAdapter, model_validator
 
 from spec_kitty_events.collaboration import ParticipantIdentity
 from spec_kitty_events.decision_moment import (
@@ -43,7 +43,7 @@ from spec_kitty_events.decision_moment import (
     OriginFlow,
     OriginSurface,
     SummaryBlock,
-    TeamspaceRef,
+    WorkspaceRef,
     TerminalOutcome,
     ThreadRef,
     WideningChannel,
@@ -260,7 +260,10 @@ class DecisionPointWidenedPayload(BaseModel):
     mission_type: str = Field(..., min_length=1)
 
     channel: Literal[WideningChannel.SLACK] = Field(...)
-    teamspace_ref: TeamspaceRef
+    workspace_ref: WorkspaceRef = Field(
+        # Read-only v6 migration alias. Canonical serialization uses workspace_ref.
+        validation_alias=AliasChoices("workspace_ref", "teamspace_ref")
+    )
     default_channel_ref: DefaultChannelRef
     thread_ref: ThreadRef
     invited_participants: Tuple[ParticipantIdentity, ...] = Field(default_factory=tuple)
@@ -844,7 +847,7 @@ def reduce_decision_point_events(
             mission_type = payload.mission_type
             proj_widening = WideningProjection(
                 channel=payload.channel,
-                teamspace_ref=payload.teamspace_ref,
+                workspace_ref=payload.workspace_ref,
                 default_channel_ref=payload.default_channel_ref,
                 thread_ref=payload.thread_ref,
                 invited_participants=payload.invited_participants,

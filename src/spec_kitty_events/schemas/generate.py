@@ -105,7 +105,7 @@ from spec_kitty_events.mission_audit import (
 )
 from spec_kitty_events.decision_moment import (
     SummaryBlock,
-    TeamspaceRef,
+    WorkspaceRef,
     DefaultChannelRef,
     ThreadRef,
     ClosureMessageRef,
@@ -239,7 +239,7 @@ PYDANTIC_MODELS: List[tuple[str, Type[BaseModel]]] = [
     ("cutover_artifact", CutoverArtifact),
     # DecisionPoint shared models (V1 / 4.0.0)
     ("summary_block", SummaryBlock),
-    ("teamspace_ref", TeamspaceRef),
+    ("workspace_ref", WorkspaceRef),
     ("default_channel_ref", DefaultChannelRef),
     ("thread_ref", ThreadRef),
     ("closure_message_ref", ClosureMessageRef),

@@ -20,7 +20,7 @@
       "participant_type": "human",
       "display_name": "Alice Liddell",
       "external_refs": {
-        "teamspace_member_id": "tm-01J10000000000000000000051"
+        "workspace_member_id": "tm-01J10000000000000000000051"
       }
     },
     {
@@ -28,7 +28,7 @@
       "participant_type": "human",
       "display_name": "Bob Marley",
       "external_refs": {
-        "teamspace_member_id": "tm-01J10000000000000000000052"
+        "workspace_member_id": "tm-01J10000000000000000000052"
       }
     }
   ],

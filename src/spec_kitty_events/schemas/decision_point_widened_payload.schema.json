@@ -2,7 +2,7 @@
   "$defs": {
     "DefaultChannelRef": {
       "additionalProperties": false,
-      "description": "Reference to the default Slack channel for a teamspace.",
+      "description": "Reference to the default Slack channel for a Team Kitty workspace.",
       "properties": {
         "channel_id": {
           "description": "Slack channel identifier",
@@ -60,7 +60,7 @@
           "default": null,
           "title": "Slack User Id"
         },
-        "teamspace_member_id": {
+        "workspace_member_id": {
           "anyOf": [
             {
               "minLength": 1,
@@ -71,7 +71,7 @@
             }
           ],
           "default": null,
-          "title": "Teamspace Member Id"
+          "title": "Workspace Member Id"
         }
       },
       "title": "ParticipantExternalRefs",
@@ -141,36 +141,6 @@
       "title": "ParticipantIdentity",
       "type": "object"
     },
-    "TeamspaceRef": {
-      "additionalProperties": false,
-      "description": "Reference to a Slack-connected teamspace.",
-      "properties": {
-        "name": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Human-readable teamspace name",
-          "title": "Name"
-        },
-        "teamspace_id": {
-          "description": "Teamspace identifier",
-          "minLength": 1,
-          "title": "Teamspace Id",
-          "type": "string"
-        }
-      },
-      "required": [
-        "teamspace_id"
-      ],
-      "title": "TeamspaceRef",
-      "type": "object"
-    },
     "ThreadRef": {
       "additionalProperties": false,
       "description": "Reference to a Slack thread.",
@@ -219,6 +189,36 @@
         "thread_ts"
       ],
       "title": "ThreadRef",
+      "type": "object"
+    },
+    "WorkspaceRef": {
+      "additionalProperties": false,
+      "description": "Reference to a Slack-connected Team Kitty workspace.",
+      "properties": {
+        "name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Human-readable workspace name",
+          "title": "Name"
+        },
+        "workspace_id": {
+          "description": "Team Kitty workspace identifier",
+          "minLength": 1,
+          "title": "Workspace Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "workspace_id"
+      ],
+      "title": "WorkspaceRef",
       "type": "object"
     }
   },
@@ -277,9 +277,6 @@
       "title": "Run Id",
       "type": "string"
     },
-    "teamspace_ref": {
-      "$ref": "#/$defs/TeamspaceRef"
-    },
     "thread_ref": {
       "$ref": "#/$defs/ThreadRef"
     },
@@ -292,6 +289,9 @@
       "minLength": 1,
       "title": "Widened By",
       "type": "string"
+    },
+    "workspace_ref": {
+      "$ref": "#/$defs/WorkspaceRef"
     }
   },
   "required": [
@@ -302,7 +302,7 @@
     "mission_slug",
     "mission_type",
     "channel",
-    "teamspace_ref",
+    "workspace_ref",
     "default_channel_ref",
     "thread_ref",
     "widened_by",

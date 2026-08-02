@@ -2,11 +2,19 @@
 
 Canonical event contracts for Spec Kitty mission state, mission runtime, conformance, and replay.
 
-**Package Version**: `5.0.0` | **Cutover Contract**: `3.0.0` | **Python**: `>=3.10`
+**Package Version**: `7.0.0` | **Cutover Contract**: `3.0.0` | **Python**: `>=3.10`
+
+## What Changed In 7.0.0
+
+Team Kitty is the canonical product name. Workspace references now use
+`WorkspaceRef`, `workspace_ref`, `workspace_id`, and `workspace_member_id`.
+Canonical serialization and generated schemas emit only those names. Version
+6 input keys remain temporary read aliases for migration; they are never
+written back out.
 
 ## What Changed In 5.0.0
 
-`5.0.0` is a fail-closed TeamSpace migration contract release. The package
+`5.0.0` was a fail-closed Team Kitty migration contract release. The package
 major version is `5.0.0`; the on-wire envelope schema remains
 `schema_version="3.0.0"`.
 
@@ -15,7 +23,7 @@ major version is `5.0.0`; the on-wire envelope schema remains
 - Live ingestion is fail-closed. There are no runtime compatibility aliases for legacy mission-domain fields.
 - Legacy mission-domain keys and names such as `feature_slug`, `feature_number`, `mission_key`, `legacy_aggregate_id`, `FeatureCreated`, and `FeatureClosed` are rejected on live paths.
 - `in_review` is part of the canonical lane vocabulary.
-- The conformance package includes historical-shape fixtures for TeamSpace migration dry-runs.
+- The conformance package includes historical-shape fixtures for Team Kitty migration dry-runs.
 
 See `COMPATIBILITY.md` for the exact fail-closed rollout policy.
 
@@ -24,13 +32,13 @@ See `COMPATIBILITY.md` for the exact fail-closed rollout policy.
 From PyPI:
 
 ```bash
-pip install "spec-kitty-events==5.0.0"
+pip install "spec-kitty-events==7.0.0"
 ```
 
 With conformance validation support:
 
 ```bash
-pip install "spec-kitty-events[conformance]==5.0.0"
+pip install "spec-kitty-events[conformance]==7.0.0"
 ```
 
 Development install:
@@ -273,7 +281,7 @@ status does not block merge.
 
 ## Versioning
 
-This package now publishes the TeamSpace migration release as package `5.0.0`.
+Package `5.0.0` published the original Team Kitty ingress migration contract.
 
 - `2.x` documentation and mixed-field operation are no longer the public contract.
 - Consumers should treat the cutover artifact, recursive forbidden-key helper, and committed fixtures as the authoritative compatibility surface.

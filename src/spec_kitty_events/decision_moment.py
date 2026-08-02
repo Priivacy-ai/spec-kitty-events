@@ -6,7 +6,7 @@ from datetime import datetime
 from enum import Enum
 from typing import TYPE_CHECKING, Optional, Tuple
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import AliasChoices, BaseModel, ConfigDict, Field
 
 if TYPE_CHECKING:
     from spec_kitty_events.collaboration import ParticipantIdentity
@@ -19,7 +19,7 @@ __all__ = [
     "WideningChannel",
     "DiscussingSnapshotKind",
     "SummaryBlock",
-    "TeamspaceRef",
+    "WorkspaceRef",
     "DefaultChannelRef",
     "ThreadRef",
     "ClosureMessageRef",
@@ -93,17 +93,24 @@ class SummaryBlock(BaseModel):
     )
 
 
-class TeamspaceRef(BaseModel):
-    """Reference to a Slack-connected teamspace."""
+class WorkspaceRef(BaseModel):
+    """Reference to a Slack-connected Team Kitty workspace."""
 
     model_config = ConfigDict(frozen=True, extra="forbid")
 
-    teamspace_id: str = Field(..., min_length=1, description="Teamspace identifier")
-    name: Optional[str] = Field(None, description="Human-readable teamspace name")
+    workspace_id: str = Field(
+        ...,
+        min_length=1,
+        description="Team Kitty workspace identifier",
+        # Read-only v6 migration alias. Remove in the next major after every
+        # first-party consumer emits ``workspace_id``.
+        validation_alias=AliasChoices("workspace_id", "teamspace_id"),
+    )
+    name: Optional[str] = Field(None, description="Human-readable workspace name")
 
 
 class DefaultChannelRef(BaseModel):
-    """Reference to the default Slack channel for a teamspace."""
+    """Reference to the default Slack channel for a Team Kitty workspace."""
 
     model_config = ConfigDict(frozen=True, extra="forbid")
 
@@ -154,11 +161,14 @@ class WideningProjection(BaseModel):
     channel: WideningChannel = Field(
         ..., description="Channel used for widening"
     )
-    teamspace_ref: TeamspaceRef = Field(
-        ..., description="Teamspace the widening was sent to"
+    workspace_ref: WorkspaceRef = Field(
+        ...,
+        description="Team Kitty workspace the widening was sent to",
+        # Read-only v6 migration alias. Canonical serialization uses workspace_ref.
+        validation_alias=AliasChoices("workspace_ref", "teamspace_ref"),
     )
     default_channel_ref: DefaultChannelRef = Field(
-        ..., description="Default channel in the teamspace"
+        ..., description="Default channel in the workspace"
     )
     thread_ref: ThreadRef = Field(
         ..., description="Slack thread created for widening"

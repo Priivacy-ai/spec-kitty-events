@@ -159,7 +159,7 @@ display/summary surfaces and `NON_DISPLAY_LANES` for explicit exclusions;
 | DecisionPoint replay / reducer        | Reduce 3.x ADR payloads                          | Reduce ADR + V1 interview events via the single reducer (discriminated by `origin_surface`) |
 | DecisionInput* consumers              | Consume as-is                                    | No change                                                                    |
 | Slack orchestrator                    | (n/a)                                            | Subscribe to `DecisionPointWidened`; post closure message on `DecisionPointResolved` |
-| Teamspace projection                  | (n/a)                                            | Project V1 fields from `DecisionPointResolved` interview variant             |
+| Team Kitty workspace projection       | (n/a)                                            | Project V1 fields from `DecisionPointResolved` interview variant             |
 
 ### Terminal outcome / write-back rules
 
@@ -170,7 +170,7 @@ display/summary surfaces and `NON_DISPLAY_LANES` for explicit exclusions;
 
 4.x validators fail closed on missing `terminal_outcome` or missing `origin_surface`. There is no temporary permissive path. Downstream consumers must migrate deliberately against this contract boundary.
 
-## Local-CLI compatibility vs TeamSpace ingress validity (added 2026-05-01)
+## Local-CLI compatibility vs Team Kitty ingress validity (added 2026-05-01)
 
 The `5.0.0` major release sharpens a distinction that has always been implicit in
 `spec-kitty-events`: there are two distinct validity domains, and a row that is
@@ -190,25 +190,25 @@ that "valid" is a single global property.
   historical data after this bump. Local compatibility is **not** weakened by
   the `5.0.0` release.
 
-- **TeamSpace ingress validity.** Only canonical envelopes pass TeamSpace
+- **Team Kitty ingress validity.** Only canonical envelopes pass Team Kitty
   ingress. The ingress path runs the full fail-closed contract gate from
   `4.0.0` plus the additions landed in this mission (canonical lane vocabulary
   including `in_review`, reconciled `MissionCreated`/`WPStatusChanged`/
   `MissionClosed` payloads, and the recursive forbidden-key validator that
   rejects legacy keys at any depth, including inside array elements). A row
-  that the local CLI happily reads off disk will be rejected at TeamSpace
+  that the local CLI happily reads off disk will be rejected at Team Kitty
   ingress unless it has been canonicalized first.
 
 ### Concrete examples
 
 A historical row that is **valid for the local CLI** but **invalid for
-TeamSpace ingress** (legacy `feature_slug` key, missing `schema_version`):
+Team Kitty ingress** (legacy `feature_slug` key, missing `schema_version`):
 
 ```json
 {"event_type":"FeatureCreated","aggregate_id":"feature/123","payload":{"feature_slug":"my-feature","feature_number":7}}
 ```
 
-A canonical envelope that is **valid for both** the local CLI and TeamSpace
+A canonical envelope that is **valid for both** the local CLI and Team Kitty
 ingress (canonical mission-domain fields, canonical lane vocabulary including
 `in_review`, `schema_version="3.0.0"`, no forbidden legacy keys at any depth):
 
@@ -234,7 +234,7 @@ The bridge between these two domains is the **CLI canonicalizer** that ships in
 `spec-kitty` Tranche B. The canonicalizer reads historical `status.events.jsonl`
 rows and produces canonical envelopes (`schema_version="3.0.0"`, accepted by
 the package-`5.0.0` cutover gate) suitable for ingress. Producers that need to
-forward historical data into TeamSpace MUST run it through the canonicalizer
+forward historical data into Team Kitty MUST run it through the canonicalizer
 first; ingress will not accept raw historical rows. Consumers that read locally
 MUST NOT assume their local-disk rows have already been canonicalized.
 

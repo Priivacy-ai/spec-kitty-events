@@ -178,7 +178,7 @@ def _valid_widened_dict() -> dict:
         "mission_slug": "mission-x",
         "mission_type": "software-dev",
         "channel": "slack",
-        "teamspace_ref": {"teamspace_id": "ts-001"},
+        "workspace_ref": {"workspace_id": "ts-001"},
         "default_channel_ref": {"channel_id": "ch-001"},
         "thread_ref": {"channel_id": "ch-001", "thread_ts": "12345.67890"},
         "invited_participants": [],
@@ -409,11 +409,25 @@ class TestWidenedPayload:
         with pytest.raises(ValidationError):
             DecisionPointWidenedPayload.model_validate(data)
 
-    def test_missing_teamspace_ref_fails(self) -> None:
+    def test_missing_workspace_ref_fails(self) -> None:
         data = _valid_widened_dict()
-        del data["teamspace_ref"]
+        del data["workspace_ref"]
         with pytest.raises(ValidationError):
             DecisionPointWidenedPayload.model_validate(data)
+
+    def test_v6_widening_keys_are_read_only_compatibility(self) -> None:
+        data = _valid_widened_dict()
+        workspace = data.pop("workspace_ref")
+        data["teamspace_ref"] = {"teamspace_id": workspace["workspace_id"]}
+
+        payload = DecisionPointWidenedPayload.model_validate(data)
+        dumped = payload.model_dump(mode="json")
+
+        assert dumped["workspace_ref"] == {
+            "workspace_id": workspace["workspace_id"],
+            "name": None,
+        }
+        assert "teamspace_ref" not in dumped
 
 
 # ── V1: Discussing discriminated union ───────────────────────────────────────

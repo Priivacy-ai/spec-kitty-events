@@ -6,8 +6,8 @@
   "mission_slug": "decision-moment-v1-contract-freeze-01KPWA0N",
   "mission_type": "software-dev",
   "channel": "slack",
-  "teamspace_ref": {
-    "teamspace_id": "ts-01J10000000000000000000020",
+  "workspace_ref": {
+    "workspace_id": "ts-01J10000000000000000000020",
     "name": "Acme Engineering"
   },
   "default_channel_ref": {
@@ -29,7 +29,7 @@
       "external_refs": {
         "slack_user_id": "U01J10000000000000000000080",
         "slack_team_id": "T01J10000000000000000000040",
-        "teamspace_member_id": "tm-01J10000000000000000000090"
+        "workspace_member_id": "tm-01J10000000000000000000090"
       }
     }
   ],

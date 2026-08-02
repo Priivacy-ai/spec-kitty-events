@@ -1,5 +1,5 @@
 {
-  "__comment": "Invalid: external_refs is an empty object {} — ParticipantExternalRefs requires at least one of slack_user_id, slack_team_id, or teamspace_member_id to be set; Pydantic model_validator must reject",
+  "__comment": "Invalid: external_refs is an empty object {} — ParticipantExternalRefs requires at least one of slack_user_id, slack_team_id, or workspace_member_id to be set; Pydantic model_validator must reject",
   "origin_surface": "planning_interview",
   "decision_point_id": "01J10000000000000000000103",
   "mission_id": "01KPWA0N4DX047S3NX734YRFVW",
@@ -7,8 +7,8 @@
   "mission_slug": "decision-moment-v1-contract-freeze-01KPWA0N",
   "mission_type": "software-dev",
   "channel": "slack",
-  "teamspace_ref": {
-    "teamspace_id": "ts-01J10000000000000000000020",
+  "workspace_ref": {
+    "workspace_id": "ts-01J10000000000000000000020",
     "name": "Acme Engineering"
   },
   "default_channel_ref": {

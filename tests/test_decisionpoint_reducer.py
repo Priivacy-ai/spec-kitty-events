@@ -782,7 +782,7 @@ def _widened_payload(*, lamport: int = 2) -> dict[str, Any]:
         "mission_slug": _MISSION_SLUG,
         "mission_type": "software-dev",
         "channel": "slack",
-        "teamspace_ref": {"teamspace_id": "ts-001", "name": "Engineering"},
+        "workspace_ref": {"workspace_id": "ts-001", "name": "Engineering"},
         "default_channel_ref": {"channel_id": "ch-001", "name": "#decisions"},
         "thread_ref": {
             "slack_team_id": "T-001",
@@ -1014,7 +1014,7 @@ def test_reducer_opened_interview_then_widened_resolved_resolved() -> None:
     assert result.anomalies == ()
     assert result.widening is not None
     assert result.widening.channel == "slack"
-    assert result.widening.teamspace_ref.teamspace_id == "ts-001"
+    assert result.widening.workspace_ref.workspace_id == "ts-001"
     assert result.widening.thread_ref.channel_id == "ch-001"
     assert len(result.widening.invited_participants) == 1
     assert len(result.actual_participants) == 1
@@ -1074,7 +1074,7 @@ def test_reducer_duplicate_widened_is_idempotent() -> None:
     assert result.anomalies == ()
     # widening is projected exactly once (from the first Widened)
     assert result.widening is not None
-    assert result.widening.teamspace_ref.teamspace_id == "ts-001"
+    assert result.widening.workspace_ref.workspace_id == "ts-001"
 
 
 def test_reducer_closed_locally_while_widened_true_sets_field() -> None:
@@ -1210,7 +1210,7 @@ def test_reducer_widened_skipped_for_adr_origin() -> None:
         "mission_slug": _MISSION_SLUG,
         "mission_type": "software-dev",
         "channel": "slack",
-        "teamspace_ref": {"teamspace_id": "ts-001"},
+        "workspace_ref": {"workspace_id": "ts-001"},
         "default_channel_ref": {"channel_id": "ch-001"},
         "thread_ref": {"channel_id": "ch-001", "thread_ts": "1700000000.1"},
         "invited_participants": [],

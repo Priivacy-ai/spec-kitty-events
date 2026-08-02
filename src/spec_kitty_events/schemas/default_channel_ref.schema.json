@@ -2,7 +2,7 @@
   "$id": "spec-kitty-events/default_channel_ref",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
-  "description": "Reference to the default Slack channel for a teamspace.",
+  "description": "Reference to the default Slack channel for a Team Kitty workspace.",
   "properties": {
     "channel_id": {
       "description": "Slack channel identifier",

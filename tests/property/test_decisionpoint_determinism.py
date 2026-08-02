@@ -321,7 +321,7 @@ def st_widened_payload(decision_point_id: str) -> st.SearchStrategy[dict[str, An
             "mission_slug": _PROP_MISSION_SLUG,
             "mission_type": "software-dev",
             "channel": "slack",
-            "teamspace_ref": {"teamspace_id": "ts-prop-001", "name": "Prop Eng"},
+            "workspace_ref": {"workspace_id": "ts-prop-001", "name": "Prop Eng"},
             "default_channel_ref": {"channel_id": "ch-prop-001", "name": "#prop-decisions"},
             "thread_ref": {
                 "slack_team_id": "T-prop-001",

@@ -1,4 +1,4 @@
-"""Public package exports for the canonical 5.x TeamSpace migration release.
+"""Public package exports for canonical Spec Kitty event contracts.
 
 This release publishes the fail-closed cutover surface for:
 
@@ -8,12 +8,12 @@ This release publishes the fail-closed cutover surface for:
 - authoritative artifact-driven compatibility gating via ``spec_kitty_events.cutover``
 - Decision Moment V1: discriminated-union DecisionPoint payloads, Widened event,
   interview-origin fields, terminal outcome rules, and shared V1 models
-- TeamSpace migration readiness: canonical ``in_review`` lane handling,
+- Team Kitty migration readiness: canonical ``in_review`` lane handling,
   reconciled mission payloads, recursive forbidden-key validation, and
   historical-shape conformance fixtures.
 """
 
-__version__ = "6.1.0"
+__version__ = "7.0.0"
 
 from spec_kitty_events.cutover import (
     CUTOVER_ARTIFACT,
@@ -400,7 +400,7 @@ from spec_kitty_events.decision_moment import (
     OriginSurface,
     SummaryBlock,
     SummarySource,
-    TeamspaceRef,
+    WorkspaceRef,
     TerminalOutcome,
     ThreadRef,
     WideningChannel,
@@ -802,7 +802,7 @@ __all__ = [
     "OriginSurface",
     "SummaryBlock",
     "SummarySource",
-    "TeamspaceRef",
+    "WorkspaceRef",
     "TerminalOutcome",
     "ThreadRef",
     "WideningChannel",

@@ -151,8 +151,8 @@ S2_EVENTS = [
             "mission_slug": "data-pipeline",
             "mission_type": "software-dev",
             "channel": "slack",
-            "teamspace_ref": {
-                "teamspace_id": "ts-acme-001",
+            "workspace_ref": {
+                "workspace_id": "ts-acme-001",
                 "name": "Acme Engineering",
             },
             "default_channel_ref": {
@@ -174,7 +174,7 @@ S2_EVENTS = [
                     "external_refs": {
                         "slack_user_id": "U0000000001",
                         "slack_team_id": "T0123456789",
-                        "teamspace_member_id": None,
+                        "workspace_member_id": None,
                     },
                 }
             ],
@@ -255,7 +255,7 @@ S2_EVENTS = [
                     "external_refs": {
                         "slack_user_id": "U0000000001",
                         "slack_team_id": "T0123456789",
-                        "teamspace_member_id": None,
+                        "workspace_member_id": None,
                     },
                 },
                 {
@@ -266,7 +266,7 @@ S2_EVENTS = [
                     "external_refs": {
                         "slack_user_id": "U0000000002",
                         "slack_team_id": "T0123456789",
-                        "teamspace_member_id": None,
+                        "workspace_member_id": None,
                     },
                 },
             ],
@@ -343,8 +343,8 @@ S3_EVENTS = [
             "mission_slug": "infra-redesign",
             "mission_type": "software-dev",
             "channel": "slack",
-            "teamspace_ref": {
-                "teamspace_id": "ts-acme-002",
+            "workspace_ref": {
+                "workspace_id": "ts-acme-002",
                 "name": "Acme Infrastructure",
             },
             "default_channel_ref": {

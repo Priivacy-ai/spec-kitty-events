@@ -1,7 +1,7 @@
 """Canonical project / mission / artifact / WP lifecycle event contracts.
 
 This module defines the additional typed payload models needed by Spec Kitty
-and TeamSpace to record the full canonical lifecycle:
+and Team Kitty to record the full canonical lifecycle:
 
 * Project initialization (``ProjectInitialized``)
 * Specify / plan / tasks artifact lifecycle (``SpecifyStarted`` /
@@ -47,7 +47,7 @@ Ordering, idempotency, and replay
   (see :func:`spec_kitty_events.status.is_bootstrap_planned_event`). They never
   regress WP state on replay.
 
-This is the consumer contract that TeamSpace import and the Spec Kitty local
+This is the consumer contract that Team Kitty import and the Spec Kitty local
 dashboard both materialize from.
 """
 

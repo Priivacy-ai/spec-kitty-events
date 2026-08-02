@@ -5,7 +5,7 @@
       "external_refs": {
         "slack_team_id": "T0123456789",
         "slack_user_id": "U0000000001",
-        "teamspace_member_id": null
+        "workspace_member_id": null
       },
       "participant_id": "p-ext-001",
       "participant_type": "human",
@@ -16,7 +16,7 @@
       "external_refs": {
         "slack_team_id": "T0123456789",
         "slack_user_id": "U0000000002",
-        "teamspace_member_id": null
+        "workspace_member_id": null
       },
       "participant_id": "p-ext-002",
       "participant_type": "human",
@@ -79,17 +79,13 @@
         "external_refs": {
           "slack_team_id": "T0123456789",
           "slack_user_id": "U0000000001",
-          "teamspace_member_id": null
+          "workspace_member_id": null
         },
         "participant_id": "p-ext-001",
         "participant_type": "human",
         "session_id": null
       }
     ],
-    "teamspace_ref": {
-      "name": "Acme Engineering",
-      "teamspace_id": "ts-acme-001"
-    },
     "thread_ref": {
       "channel_id": "C0123456789",
       "slack_team_id": "T0123456789",
@@ -97,6 +93,10 @@
       "url": "https://acme.slack.com/archives/C0123456789/p1714464000000100"
     },
     "widened_at": "2026-04-23T10:00:01Z",
-    "widened_by": "human-owner-2"
+    "widened_by": "human-owner-2",
+    "workspace_ref": {
+      "name": "Acme Engineering",
+      "workspace_id": "ts-acme-001"
+    }
   }
 }
