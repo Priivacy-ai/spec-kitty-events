@@ -1,6 +1,18 @@
 # Compatibility Guide
 
-`spec-kitty-events` package version `5.0.0` is a fail-closed contract release. The on-wire envelope schema version is `3.0.0` (the cutover-contract version pinned by `cutover.py`); the major package bump from `4.x` to `5.0.0` reflects contract behaviour changes (`in_review` canonical, payload reconciliation, recursive forbidden-key validator) and is independent of the envelope schema version.
+**Current package version**: `6.1.0`
+
+The on-wire envelope schema version is `3.0.0` (the cutover-contract version
+pinned by `cutover.py`) and has been unchanged since the cutover. The package
+version and the envelope schema version move independently — see
+[`contracts/versioning-and-compatibility.md`](contracts/versioning-and-compatibility.md).
+
+`spec-kitty-events` is a fail-closed contract package. Sections below are
+ordered newest-first by the release that introduced them.
+
+> The single declaration above is the only place this document states the
+> package version; `tests/test_compatibility_doc.py` pins it to
+> `spec_kitty_events.__version__`. Do not restate it in prose.
 
 This document is the public compatibility policy for consumers of:
 
@@ -12,9 +24,9 @@ This document is the public compatibility policy for consumers of:
 
 The authoritative cutover artifact ships in the package
 (`spec_kitty_events.cutover.CUTOVER_ARTIFACT`) and defines the live
-compatibility gate. Note: the **package** is at version `5.0.0`; the
-**envelope schema on the wire** is at version `3.0.0`. The two are
-intentionally distinct (see the bump-rationale section below).
+compatibility gate. Note: the **envelope schema on the wire** is at version
+`3.0.0`, which is not the package version declared at the top of this document.
+The two are intentionally distinct (see the bump-rationale section below).
 
 - Signal field: `schema_version`
 - Signal location: event envelope
@@ -64,7 +76,7 @@ There are no runtime compatibility bridges in live ingestion.
 
 `spec-kitty-events` should only be treated as released when all of the following are true:
 
-1. `spec-kitty-events` package metadata is at the latest release (`5.0.0` at this writing).
+1. `spec-kitty-events` package metadata matches the version declared at the top of this document.
 2. Committed JSON Schemas are regenerated and drift-free.
 3. Conformance fixtures and replay goldens pass with artifact-driven validation.
 4. `spec-kitty-saas` is updated to emit canonical envelopes (`schema_version="3.0.0"`) only.
@@ -116,10 +128,29 @@ Rejected live envelope examples:
 
 ## Versioning
 
-The current package release is `5.0.0`. The on-wire envelope schema is `3.0.0`. Together they publish the canonical mission/build contract and the recursive forbidden-key gate.
+The on-wire envelope schema is `3.0.0`; the package version is declared at the
+top of this document. Together they publish the canonical mission/build contract
+and the recursive forbidden-key gate.
+
+The full policy — what requires a major bump, what artifacts a bump must update,
+and why the two version numbers are distinct — lives in
+[`contracts/versioning-and-compatibility.md`](contracts/versioning-and-compatibility.md).
 
 - `2.x` additive compatibility language no longer applies.
-- Future breaking contract changes require a new major **package** release; whether they also bump the envelope schema version depends on whether they change the wire format (the `5.0.0` package release intentionally did NOT bump the wire-format envelope version — it changed contract behaviour with the existing `3.0.0` envelope shape).
+- Future breaking contract changes require a new major **package** release; whether they also bump the envelope schema version depends on whether they change the wire format. Neither the `5.0.0` nor the `6.0.0` package release bumped the wire-format envelope version — both changed contract behaviour with the existing `3.0.0` envelope shape.
+
+### Post-mission lifecycle events (6.1.0)
+
+The `6.1.0` release is **additive and wire-compatible**. It adds the
+`MissionReopened` and `FollowUpRecorded` contracts, the
+`MissionStatus.REOPENED` enum member (actionable, not terminal), and their
+handling in `reduce_lifecycle_events`. The envelope shape is unchanged, but
+consumers that validate or switch on exact event types must be upgraded before
+they receive either new type. Producers must capability-gate emission until
+each intended consumer recognizes it. Consumers that never receive the new
+types are unaffected.
+
+Producers emitting post-mission lifecycle facts need `>=6.1.0`.
 
 ### Genesis lane (6.0.0)
 
@@ -217,30 +248,33 @@ ingress (canonical mission-domain fields, canonical lane vocabulary including
 ```
 
 > **Package version vs envelope schema version (read this carefully).**
-> `spec-kitty-events` ships at **package version `5.0.0`** (the value you
-> see in `pyproject.toml` and `__version__`). The **envelope schema
-> version on the wire** is **`3.0.0`** — it is the cutover-contract
-> version pinned by `cutover.py::CUTOVER_ARTIFACT.cutover_contract_version`
-> and is the default for `Event.schema_version`. The major package bump
-> from `4.x` to `5.0.0` reflects contract behaviour changes (`in_review`
-> canonical, payload reconciliation, recursive forbidden-key validator),
-> NOT a wire-format envelope-version bump. Producers must continue to
-> emit `schema_version="3.0.0"` on the envelope; the cutover gate will
-> reject anything else.
+> The **package version** is the value in `pyproject.toml` and
+> `__version__`, declared once at the top of this document. The
+> **envelope schema version on the wire** is **`3.0.0`** — the
+> cutover-contract version pinned by
+> `cutover.py::CUTOVER_ARTIFACT.cutover_contract_version`, and the default
+> for `Event.schema_version`. They are not the same number and they do not
+> move together. The major package bump from `4.x` to `5.0.0` reflected
+> contract behaviour changes (`in_review` canonical, payload
+> reconciliation, recursive forbidden-key validator), NOT a wire-format
+> envelope-version bump; `6.0.0` likewise. Producers must continue to
+> emit `schema_version="3.0.0"` on the envelope regardless of the package
+> major; the cutover gate will reject anything else.
 
 ### The documented bridge
 
 The bridge between these two domains is the **CLI canonicalizer** that ships in
 `spec-kitty` Tranche B. The canonicalizer reads historical `status.events.jsonl`
 rows and produces canonical envelopes (`schema_version="3.0.0"`, accepted by
-the package-`5.0.0` cutover gate) suitable for ingress. Producers that need to
+the cutover gate) suitable for ingress. Producers that need to
 forward historical data into TeamSpace MUST run it through the canonicalizer
 first; ingress will not accept raw historical rows. Consumers that read locally
 MUST NOT assume their local-disk rows have already been canonicalized.
 
 ### Cross-references
 
-- [`kitty-specs/teamspace-event-contract-foundation-01KQHDE4/contracts/lane-vocabulary.md`](kitty-specs/teamspace-event-contract-foundation-01KQHDE4/contracts/lane-vocabulary.md) — the canonical lane vocabulary including `in_review`.
+- [`contracts/lane-vocabulary.md`](contracts/lane-vocabulary.md) — the canonical lane vocabulary and the major-bump rule that governs changing it.
+- [`contracts/versioning-and-compatibility.md`](contracts/versioning-and-compatibility.md) — what requires a major bump and which artifacts a bump must update.
 - [`kitty-specs/teamspace-event-contract-foundation-01KQHDE4/contracts/payload-reconciliation.md`](kitty-specs/teamspace-event-contract-foundation-01KQHDE4/contracts/payload-reconciliation.md) — the reconciliation log for `MissionCreated`, `WPStatusChanged`, and `MissionClosed` payloads.
 
 ### Bump rationale (per R-03)

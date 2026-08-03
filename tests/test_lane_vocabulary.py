@@ -3,9 +3,10 @@
 These tests guard against silent drift of the canonical ``Lane`` enum and
 prevent parallel lane-vocabulary definitions from sneaking into the package.
 
-Cross-repo handshake: downstream tranches (CLI Tranche A, SaaS Tranche A)
-reference ``EXPECTED_CANONICAL_LANES`` from this module to assert their own
-canonical-lane constants match this contract.
+Cross-repo handshake: downstream consumers validate their event-boundary
+translations against the package's public ``Lane`` enum. They do not import
+``EXPECTED_CANONICAL_LANES`` from this test module, and they may carry
+host-internal states that are translated before persistence or wire emission.
 
 Refs: FR-001, FR-002, C-002, SC-003 of mission
 ``teamspace-event-contract-foundation-01KQHDE4``.

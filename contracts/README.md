@@ -1,8 +1,33 @@
 # spec-kitty-events Contracts
 
-This directory is the canonical entry point for event contracts published by the
-`spec-kitty-events` library.  The contracts are defined in Python using Pydantic v2
-models and are available from the top-level package starting with **v2.5.0**.
+This directory is the canonical entry point for the contracts published by the
+`spec-kitty-events` library.
+
+---
+
+## Durable Contracts
+
+Policy documents that apply to **every** release. These govern; per-mission
+contract folders under `kitty-specs/*/contracts/` are historical artifacts
+recording one application of a policy.
+
+| Contract | Governs |
+|---|---|
+| [`lane-vocabulary.md`](./lane-vocabulary.md) | The canonical `Lane` vocabulary, its authoritative location, and the major-bump rule for changing it |
+| [`versioning-and-compatibility.md`](./versioning-and-compatibility.md) | Package version vs on-wire envelope schema version; what requires a major bump; required artifacts on bump |
+
+See also [`../COMPATIBILITY.md`](../COMPATIBILITY.md) — the public compatibility
+policy and the single declaration of the current package version.
+
+---
+
+## Event Contracts
+
+Event contracts are defined in Python using Pydantic v2 models and are available
+from the top-level package. The mission-audit family documented below has been
+available since **v2.5.0**; this section has not been extended to cover families
+added in later releases — consult `CHANGELOG.md` and the package's
+`__all__` for the current surface.
 
 ---
 
