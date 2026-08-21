@@ -20,9 +20,14 @@ from spec_kitty_events import __version__
 
 _REPO_ROOT = Path(__file__).resolve().parent.parent
 _COMPATIBILITY_PATH = _REPO_ROOT / "COMPATIBILITY.md"
+_README_PATH = _REPO_ROOT / "README.md"
 
 # The single declaration, e.g. ``**Current package version**: `6.1.0` ``
 _DECLARATION = re.compile(r"^\*\*Current package version\*\*:\s*`([^`]+)`\s*$", re.M)
+
+# README.md's own declaration line, e.g.
+# ``**Package Version**: `7.0.0` | **Cutover Contract**: `3.0.0` | ...``
+_README_DECLARATION = re.compile(r"^\*\*Package Version\*\*:\s*`([^`]+)`", re.M)
 
 
 def test_compatibility_doc_exists() -> None:
@@ -73,4 +78,40 @@ def test_promoted_contracts_are_present() -> None:
         f"Missing durable contract(s) under contracts/: {missing}. These are "
         f"referenced by CHANGELOG.md, COMPATIBILITY.md, and "
         f"tests/test_lane_vocabulary.py by repo-root path."
+    )
+
+
+# ---------------------------------------------------------------------------
+# README.md's own version declaration (Renata HANDBACK_PACKET_REPAIR finding
+# #5, LOW): README.md carries the identical stale-version failure mode
+# COMPATIBILITY.md had before test_compatibility_doc_version_matches_package
+# was written -- it "spent the whole of 6.0.0 and 6.1.0" asserting 5.0.0.
+# README.md was hand-fixed to 7.0.0 in this release; this pin is what keeps
+# it from going stale again, mirroring test_compatibility_doc_version_
+# matches_package's shape exactly.
+# ---------------------------------------------------------------------------
+
+
+def test_readme_exists() -> None:
+    assert _README_PATH.is_file(), f"README.md not found at {_README_PATH}"
+
+
+def test_readme_declares_version_exactly_once() -> None:
+    matches = _README_DECLARATION.findall(_README_PATH.read_text(encoding="utf-8"))
+    assert len(matches) == 1, (
+        f"Expected exactly one '**Package Version**: `X.Y.Z`' line in "
+        f"README.md, found {len(matches)}: {matches}."
+    )
+
+
+def test_readme_version_matches_package() -> None:
+    """The declared version equals ``spec_kitty_events.__version__``."""
+    match = _README_DECLARATION.search(_README_PATH.read_text(encoding="utf-8"))
+    assert match is not None, "No '**Package Version**' declaration in README.md"
+    declared = match.group(1)
+    assert declared == __version__, (
+        f"README.md declares package version {declared!r} but the package "
+        f"is {__version__!r}. Per contracts/versioning-and-compatibility.md, "
+        f"user-facing docs are a required artifact on every bump -- update "
+        f"the declaration."
     )
