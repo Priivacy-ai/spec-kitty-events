@@ -1,0 +1,78 @@
+{
+  "$id": "spec-kitty-events/follow_up_recorded_payload",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Typed payload for ``FollowUpRecorded`` events.\n\nRecords a follow-up commit or PR against an already-merged (or any-state)\nmission. ``follow_up_type`` is the discriminator: ``\"commit\"`` requires\n``commit_sha``; ``\"pr\"`` requires ``pr_number``. Attribution is via\n``mission_id``. A commit and the PR that contains it are recorded as\ndistinct facts (no resolved-commit-of-PR lookup).\n\nProducer: ``spec-kitty/src/specify_cli/status/lifecycle_events.py``\n``emit_follow_up_recorded``. Data-model:\n``mission-lifecycle-dispatch-drg-closeout-01KV0S99/data-model.md``.",
+  "properties": {
+    "commit_sha": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Commit SHA; required iff follow_up_type == 'commit'.",
+      "title": "Commit Sha"
+    },
+    "follow_up_type": {
+      "description": "Discriminator: 'commit' (requires commit_sha) or 'pr' (requires pr_number).",
+      "enum": [
+        "commit",
+        "pr"
+      ],
+      "title": "Follow Up Type",
+      "type": "string"
+    },
+    "mission_id": {
+      "description": "Canonical machine identity (ULID); attribution key.",
+      "minLength": 1,
+      "title": "Mission Id",
+      "type": "string"
+    },
+    "mission_slug": {
+      "description": "Human handle (display).",
+      "minLength": 1,
+      "title": "Mission Slug",
+      "type": "string"
+    },
+    "pr_number": {
+      "anyOf": [
+        {
+          "minimum": 1,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "PR number; required iff follow_up_type == 'pr'.",
+      "title": "Pr Number"
+    },
+    "recorded_at": {
+      "description": "Event time (ISO-8601 UTC).",
+      "minLength": 1,
+      "title": "Recorded At",
+      "type": "string"
+    },
+    "recorded_by": {
+      "description": "Detected actor who recorded the follow-up.",
+      "minLength": 1,
+      "title": "Recorded By",
+      "type": "string"
+    }
+  },
+  "required": [
+    "mission_id",
+    "mission_slug",
+    "follow_up_type",
+    "recorded_by",
+    "recorded_at"
+  ],
+  "title": "FollowUpRecordedPayload",
+  "type": "object"
+}

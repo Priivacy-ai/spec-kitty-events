@@ -42,6 +42,7 @@ license-files = ["LICENSE"]
 [tool.setuptools.package-data]
 spec_kitty_events = [
     "py.typed",
+    "support_matrix.json",
     "schemas/*.json",
     "conformance/fixtures/*.json",
     "conformance/README.md",

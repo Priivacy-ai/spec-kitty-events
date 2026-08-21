@@ -195,6 +195,9 @@ from spec_kitty_events.strict import (
     STRICT_EVENT_TYPES,
     STRICT_TIMESTAMP_RULES,
     validate_strict_envelope,
+    SupportRow,
+    SUPPORT_MATRIX,
+    support_matrix_digest,
 )
 
 # Machine-readable classification surface for event types that are NOT
@@ -967,4 +970,7 @@ __all__ = [
     "STRICT_EVENT_TYPES",
     "STRICT_TIMESTAMP_RULES",
     "validate_strict_envelope",
+    "SupportRow",
+    "SUPPORT_MATRIX",
+    "support_matrix_digest",
 ]

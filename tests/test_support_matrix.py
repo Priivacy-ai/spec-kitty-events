@@ -141,8 +141,8 @@ def test_every_row_model_is_importable_and_strict() -> None:
 
 def test_every_row_schema_file_is_committed() -> None:
     for row in SUPPORT_MATRIX:
-        schema_path = _SCHEMA_DIR / row.schema
-        assert schema_path.is_file(), f"{row.event_type}: missing schema {row.schema}"
+        schema_path = _SCHEMA_DIR / row.schema_
+        assert schema_path.is_file(), f"{row.event_type}: missing schema {row.schema_}"
 
 
 def test_support_row_rejects_unknown_extra_field() -> None:
@@ -200,6 +200,16 @@ def test_support_matrix_json_has_24_entries() -> None:
     data = json.loads(_SUPPORT_MATRIX_PATH.read_text(encoding="utf-8"))
     assert isinstance(data, list)
     assert len(data) == 24
+
+
+def test_support_matrix_json_uses_schema_key_not_schema_underscore() -> None:
+    """The wire/JSON key is exactly `schema` (draft §3.4), even though the
+    Python attribute is `schema_` (renamed to avoid shadowing
+    `BaseModel.schema`, see strict.SupportRow docstring)."""
+    data = json.loads(_SUPPORT_MATRIX_PATH.read_text(encoding="utf-8"))
+    for row in data:
+        assert "schema" in row
+        assert "schema_" not in row
 
 
 # ---------------------------------------------------------------------------
