@@ -2,9 +2,19 @@
 
 Covers the negative/fault/compatibility matrix in the F1 contract-freeze
 draft §4 as direct pytest cases (rows are referenced by their draft ID in
-each test's docstring/name). Not every §4 row is represented here — replay
-golden files, hypothesis property tests, and the wheel-content test are
-tracked as remaining work in the WP01 handoff.
+each test's docstring/name). Not every §4 row is represented here:
+
+- The support matrix (SUPPORT_MATRIX/SupportRow/support_matrix_digest) is
+  covered by tests/test_support_matrix.py, not this module.
+- R1 (replay) is covered by tests/integration/test_lifecycle_replay.py;
+  R3/R4 (timestamp-order invariance, hypothesis permutation) are not yet
+  added (tracked in CHANGELOG.md's Known gaps).
+- The 9-row `envelope_strict_journal` class_taxonomy fixtures (V1, V2, U1,
+  X1, T2, X10) are covered by tests/test_envelope_strict_journal_class.py.
+- The wheel-content test (P1) is tests/test_wheel_contents.py.
+- V6 (old-consumer skew) is tests/test_support_matrix.py::
+  test_old_consumer_fails_closed.
+- T7 and C5 are not yet added (tracked in CHANGELOG.md's Known gaps).
 """
 
 from __future__ import annotations

@@ -55,18 +55,59 @@ F1-T1 (spec-kitty-rearchitecture, M1): strict journal profile + HarnessObservati
   `mission_cancelled_payload`, `phase_entered_payload`, and
   `review_rollback_payload` schemas (`additionalProperties: false`; three
   gain an optional `mission_slug` property).
+- `spec_kitty_events.strict.SupportRow` / `SUPPORT_MATRIX` (24 rows: 18
+  journal + 6 observation, exactly six payload IDs) and
+  `support_matrix_digest()` — the machine-readable support matrix
+  described in the F1 contract-freeze draft §3.4, generated to
+  `support_matrix.json` (package data) by `schemas/generate.py` and
+  covered by its `--check` drift gate. `MissionReopenedPayload` and
+  `FollowUpRecordedPayload` (6.1.0) previously had no committed JSON
+  schema (see the `[6.1.0]` entry below); both now do
+  (`mission_reopened_payload.schema.json`,
+  `follow_up_recorded_payload.schema.json`), since every support-matrix
+  row must have one.
+- Real fixture files for the `harness_observation` category
+  (`conformance/fixtures/harness_observation/{valid,invalid}/`, 11
+  fixtures) and a ninth conformance class, `envelope_strict_journal`
+  (`conformance/fixtures/class_taxonomy/envelope_strict_journal/`, 7
+  fixtures pinning the strict-profile-only negatives with an ordered
+  `expected_error_codes` list), plus a replay golden proving
+  `HarnessObservation` is never reduced into mission/WP state
+  (`conformance/fixtures/harness_observation/replay/`) and a built-wheel
+  content test (`tests/test_wheel_contents.py`).
+- README.md's `**Package Version**` line is now pinned to
+  `spec_kitty_events.__version__` by a regression test (same shape as
+  the pre-existing `COMPATIBILITY.md` pin).
+
+### Fixed
+
+- `pyproject.toml`'s `harness_observation/{valid,invalid,replay}`
+  package-data globs, added ahead of any matching file, now resolve —
+  the fixtures named above exist and are verified present in a real
+  built wheel by `tests/test_wheel_contents.py`.
 
 ### Known gaps carried into this release (see `COMPATIBILITY.md`)
 
-- The machine-readable support matrix (`spec_kitty_events.strict.SUPPORT_MATRIX`
-  / `support_matrix.json` / `support_matrix_digest()`) described in the F1
-  contract-freeze draft §3.4 is not yet implemented; tracked as WP01
-  remaining work.
+- Replay/property-based reducer-determinism goldens R3 (timestamp
+  ordering invariance) and R4 (hypothesis permutation property test) are
+  not added; R1, R2, R5, R6 are covered.
+  (`tests/integration/test_lifecycle_replay.py`,
+  `tests/property/test_lifecycle_determinism.py`.)
+- T7 (re-running the timestamp-semantics consumer-substitution fixture
+  against a `HarnessObservation` envelope) is not added.
+- C5's dedicated mirror test (asserting the exact symbol list
+  spec-kitty's `tests/contract/spec_kitty_events_consumer/
+  test_consumer_contract.py` imports) is not added; the full suite
+  passing and `__init__.py`'s exports being purely additive is indirect,
+  not dedicated, evidence.
+- `contracts/README.md` table rows for the new module/contract are not
+  updated.
 - Local-appender canonicalization (the `.kittify/canonical-events.jsonl` /
   `status.events.jsonl` rows written by
   `spec-kitty/src/specify_cli/status/lifecycle_events.py`) is out of scope
   for this package; those rows fail the strict profile today and are left
-  untouched.
+  untouched (fixture-backed: `class_taxonomy/envelope_strict_journal/
+  local_appender_envelope_5_0_0.json`, X10).
 
 ## [6.1.0] - 2026-06-14
 
