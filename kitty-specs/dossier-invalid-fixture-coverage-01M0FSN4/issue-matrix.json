@@ -13,7 +13,7 @@
       "wp": null
     },
     "#23": {
-      "evidence_ref": "spec.md US3: this mission closes the fixture-coverage acceptance criterion of #23 via WP01+WP02; WP02 not yet approved. Re-resolve to a terminal verdict before mission merge (the mirror-deletion AC stays open under #1058 regardless).",
+      "evidence_ref": "Fixture-coverage AC of #23 fixed by WP01+WP02 (merged, commit 0012fff). #23 as a whole stays open: the mirror-deletion AC is tracked separately under spec-kitty#1058 (deferred-with-followup). This mission cannot close #23 unilaterally.",
       "fr": null,
       "nfr": null,
       "repo": null,
@@ -21,7 +21,7 @@
       "scope": null,
       "source_file": "spec.md",
       "title": "<fill at WP-implementation time>",
-      "verdict": "in-mission",
+      "verdict": "deferred-with-followup",
       "wp": "WP02"
     }
   },
