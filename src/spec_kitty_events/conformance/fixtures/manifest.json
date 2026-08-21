@@ -1971,6 +1971,24 @@
       "fixture_type": "legacy_normalization",
       "notes": "Envelope with no recognized legacy markers; normalizer surfaces UnnormalizableLegacyDiagnostic.",
       "min_version": "5.2.0"
+    },
+    {
+      "id": "harness-observation-replay-lifecycle-with-observations",
+      "path": "harness_observation/replay/lifecycle_with_observations.jsonl",
+      "expected_result": "valid",
+      "event_type": "HarnessObservationReplay",
+      "fixture_type": "replay_stream",
+      "notes": "R1 (F1 contract-freeze draft F1.md §4): a mission lifecycle stream (MissionStarted, 2x PhaseEntered, MissionCompleted) with five interleaved HarnessObservation events at surrounding lamport clocks. reduce_lifecycle_events() output (minus event_count and last_processed_event_id) is byte-identical to the golden in lifecycle_with_observations_output.json, which was computed from the mission-only stream -- proving observations are never reduced into mission/WP state.",
+      "min_version": "7.0.0"
+    },
+    {
+      "id": "harness-observation-replay-lifecycle-with-observations-output",
+      "path": "harness_observation/replay/lifecycle_with_observations_output.json",
+      "fixture_type": "reducer_output",
+      "event_type": "ReducedMissionState",
+      "expected_result": "valid",
+      "notes": "Golden reducer output (event_count/last_processed_event_id stripped) for lifecycle_with_observations.jsonl -- computed from the mission-only sub-stream (HarnessObservation rows excluded); tests/integration/test_lifecycle_replay.py's R1 test asserts both the interleaved and clean streams reduce to exactly this.",
+      "min_version": "7.0.0"
     }
   ],
   "classes": {

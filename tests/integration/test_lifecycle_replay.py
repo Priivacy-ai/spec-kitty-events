@@ -15,6 +15,7 @@ from typing import List
 import pytest
 from ulid import ULID
 
+from spec_kitty_events.conformance.loader import load_replay_stream
 from spec_kitty_events.decisionpoint import reduce_decision_point_events
 from spec_kitty_events.lifecycle import (
     FOLLOW_UP_RECORDED,
@@ -615,3 +616,74 @@ def test_v1_golden_replay_deterministic_under_permutation(name: str) -> None:
     assert permutation_count <= 24, (
         f"{name} has more events than expected (>4): {permutation_count} permutations"
     )
+
+
+# ---------------------------------------------------------------------------
+# R1 (F1 contract-freeze draft F1.md §4): HarnessObservation is volatile --
+# never reduced into mission/WP state.
+# ---------------------------------------------------------------------------
+
+
+def _strip_bookkeeping_fields(state: object) -> dict:  # type: ignore[type-arg]
+    """Drop event_count / last_processed_event_id before comparison.
+
+    Both fields legitimately differ between the interleaved and clean
+    streams: event_count = len(unique_events) over the *raw input set*
+    (reduce_lifecycle_events counts every deduplicated event handed to it,
+    including HarnessObservation rows it goes on to ignore), and
+    last_processed_event_id is the sort-order-last input event's id, which
+    can be an observation's id when one happens to sort last. Neither is
+    semantic mission/WP *state* -- the R1 invariant this test proves is
+    that observations never influence mission_status, current_phase,
+    phases_entered, wp_states, or anomalies, which is everything else in
+    ReducedMissionState.
+    """
+    dumped = state.model_dump(mode="json")  # type: ignore[attr-defined]
+    dumped.pop("event_count")
+    dumped.pop("last_processed_event_id")
+    return dumped
+
+
+def test_r1_harness_observations_do_not_affect_reduced_lifecycle_state() -> None:
+    """Interleaving HarnessObservation events into a mission lifecycle
+    stream must not change the reduced mission/WP state.
+
+    Fixture: conformance/fixtures/harness_observation/replay/
+    lifecycle_with_observations.jsonl -- a MissionStarted/2x PhaseEntered/
+    MissionCompleted stream with five HarnessObservation events (presence,
+    focus_started, focus_heartbeat, focus_ended) interleaved at
+    surrounding lamport clocks, including one before the first mission
+    event and one after the last.
+    """
+    raw_events = load_replay_stream(
+        "harness-observation-replay-lifecycle-with-observations"
+    )
+    interleaved = [Event.model_validate(e) for e in raw_events]
+    assert any(e.event_type == "HarnessObservation" for e in interleaved)
+
+    clean = [e for e in interleaved if e.event_type != "HarnessObservation"]
+    assert 0 < len(clean) < len(interleaved)
+
+    reduced_interleaved = _strip_bookkeeping_fields(
+        reduce_lifecycle_events(interleaved)
+    )
+    reduced_clean = _strip_bookkeeping_fields(reduce_lifecycle_events(clean))
+
+    assert reduced_interleaved == reduced_clean, (
+        "HarnessObservation events changed the reduced mission/WP state; "
+        "they must be volatile and never reduced (F1 draft §3.3 semantics)."
+    )
+
+    golden_path = (
+        pathlib.Path(__file__).resolve().parent.parent.parent
+        / "src"
+        / "spec_kitty_events"
+        / "conformance"
+        / "fixtures"
+        / "harness_observation"
+        / "replay"
+        / "lifecycle_with_observations_output.json"
+    )
+    golden = json.loads(golden_path.read_text(encoding="utf-8"))
+    assert reduced_clean == golden
+    assert reduced_interleaved == golden
