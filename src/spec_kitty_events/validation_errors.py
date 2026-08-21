@@ -65,6 +65,12 @@ class ValidationErrorCode(str, Enum):
     PAYLOAD_SCHEMA_FAIL = "PAYLOAD_SCHEMA_FAIL"
     ENVELOPE_SHAPE_INVALID = "ENVELOPE_SHAPE_INVALID"
     RAW_HISTORICAL_ROW = "RAW_HISTORICAL_ROW"
+    # Added by F1-T1 (spec_kitty_events.strict, 7.0.0): compatibility classes
+    # a consumer must be able to route on without string-matching exception
+    # text (today spec-kitty-saas matches "Unknown event type:" — see
+    # apps/sync/cutover_contract.py:368,437 in spec-kitty-saas).
+    UNKNOWN_EVENT_TYPE = "UNKNOWN_EVENT_TYPE"
+    UNSUPPORTED_SCHEMA_VERSION = "UNSUPPORTED_SCHEMA_VERSION"
 
 
 class ValidationError(BaseModel):

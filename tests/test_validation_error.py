@@ -66,12 +66,17 @@ def test_validation_error_is_frozen() -> None:
 
 
 def test_validation_error_codes_are_closed_set() -> None:
+    # F1-T1 (7.0.0) widens this closed set by exactly two members:
+    # UNKNOWN_EVENT_TYPE and UNSUPPORTED_SCHEMA_VERSION (see
+    # spec_kitty_events.strict / CHANGELOG.md [7.0.0] Added).
     expected = {
         "FORBIDDEN_KEY",
         "UNKNOWN_LANE",
         "PAYLOAD_SCHEMA_FAIL",
         "ENVELOPE_SHAPE_INVALID",
         "RAW_HISTORICAL_ROW",
+        "UNKNOWN_EVENT_TYPE",
+        "UNSUPPORTED_SCHEMA_VERSION",
     }
     actual = {member.value for member in ValidationErrorCode}
     assert actual == expected
