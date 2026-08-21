@@ -1,0 +1,30 @@
+{
+  "entries": [
+    {
+      "created_at": "2026-08-20T14:58:09.852116Z",
+      "decision_id": "01M0FTVXSW7FW2SZC9F2QWS9BP",
+      "final_answer": "ArtifactMissing: manifest_step empty string (min_length=1 violation). SnapshotComputed: negative artifact_count (ge=0 violation) \u2014 chosen over invalid algorithm literal to keep the violation category distinct from the existing enum/Literal fixture.",
+      "input_key": "violation_choice",
+      "mission_id": "01M0FSN4794K51VM46E9KA2MSS",
+      "mission_slug": "dossier-invalid-fixture-coverage-01M0FSN4",
+      "opened_by": "cli",
+      "options": [
+        "SnapshotComputed: negative artifact_count",
+        "SnapshotComputed: invalid algorithm literal",
+        "Other"
+      ],
+      "origin_flow": "plan",
+      "other_answer": false,
+      "question": "Which specific violation should each new invalid fixture exercise? (ArtifactMissing: manifest_step empty string, violating min_length=1. SnapshotComputed: pick one of negative artifact_count/anomaly_count violating ge=0, or an invalid algorithm literal.)",
+      "rationale": null,
+      "resolved_at": "2026-08-20T15:01:03.705029Z",
+      "resolved_by": null,
+      "slot_key": "plan.fixtures.violation-choice",
+      "status": "resolved",
+      "step_id": null,
+      "summary_json": null
+    }
+  ],
+  "mission_id": "01M0FSN4794K51VM46E9KA2MSS",
+  "version": 1
+}

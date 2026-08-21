@@ -1,0 +1,20 @@
+{
+  "wp_id": "WP01",
+  "mission_slug": "dossier-invalid-fixture-coverage-01M0FSN4",
+  "worktree_path": ".worktrees/dossier-invalid-fixture-coverage-01M0FSN4-lane-a",
+  "branch_name": "kitty/mission-dossier-invalid-fixture-coverage-01M0FSN4-lane-a",
+  "base_branch": "kitty/mission-dossier-invalid-fixture-coverage-01M0FSN4",
+  "base_commit": "5a7c8e7894ed0aa5219428499d0d375882a12e4b",
+  "dependencies": [],
+  "created_at": "2026-08-21T10:37:11.959749+00:00",
+  "created_by": "implement-command-lane",
+  "vcs_backend": "git",
+  "lane_id": "lane-a",
+  "lane_wp_ids": [
+    "WP01"
+  ],
+  "current_wp": "WP01",
+  "lane_test_env": {
+    "SPEC_KITTY_TEST_DB_NAME": "test_dossier_invalid_fixture_coverage_01M0FSN4_lane_a"
+  }
+}

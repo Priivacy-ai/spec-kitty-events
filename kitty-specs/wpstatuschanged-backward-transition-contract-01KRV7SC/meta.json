@@ -1,5 +1,6 @@
 {
   "created_at": "2026-05-17T15:10:01.867247+00:00",
+  "flattened": false,
   "friendly_name": "WPStatusChanged Backward Transition Contract",
   "mission_id": "01KRV7SC4AS4SGM7HGN93HGP0W",
   "mission_number": null,
@@ -9,6 +10,7 @@
   "purpose_tldr": "Lock the canonical WPStatusChanged event contract for backward transitions, force, actor, and reconciliation so CLI and SaaS share one interpretation.",
   "slug": "wpstatuschanged-backward-transition-contract-01KRV7SC",
   "target_branch": "main",
+  "topology": "lanes",
   "vcs": "git",
   "vcs_locked_at": "2026-05-17T15:25:30.509734+00:00"
 }

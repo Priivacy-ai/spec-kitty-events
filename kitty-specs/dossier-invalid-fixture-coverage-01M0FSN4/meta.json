@@ -1,0 +1,32 @@
+{
+  "accept_commit": "83c6937d1d6407db9404eb4770e84844144232d8",
+  "acceptance_history": [
+    {
+      "accept_commit": "83c6937d1d6407db9404eb4770e84844144232d8",
+      "acceptance_mode": "pr",
+      "accepted_at": "2026-08-21T11:11:17.195982+00:00",
+      "accepted_by": "maarten",
+      "accepted_from_commit": "edb09f625a4ed638964f86eadae6b3d4e99d6166"
+    }
+  ],
+  "acceptance_mode": "pr",
+  "accepted_at": "2026-08-21T11:11:17.195982+00:00",
+  "accepted_by": "maarten",
+  "accepted_from_commit": "edb09f625a4ed638964f86eadae6b3d4e99d6166",
+  "created_at": "2026-08-20T14:36:58.475410+00:00",
+  "flattened": true,
+  "friendly_name": "Dossier Invalid Fixture Coverage",
+  "mission_id": "01M0FSN4794K51VM46E9KA2MSS",
+  "mission_number": null,
+  "mission_slug": "dossier-invalid-fixture-coverage-01M0FSN4",
+  "mission_type": "software-dev",
+  "pr_bound": true,
+  "purpose_context": "Issue #23 asked spec-kitty-events to publish canonical MissionDossier payload builders, a validator API, and golden valid/invalid fixtures for all four dossier events. Missions 008 and 009 already shipped the typed payload models, the validate_event() API, and historical-envelope documentation (released as v2.4.0). The one remaining gap owned by this repo is fixture coverage: MissionDossierArtifactMissing and MissionDossierSnapshotComputed have valid fixtures but no invalid fixtures, unlike ArtifactIndexed and ParityDriftDetected. This mission closes that gap so the repo can assert full acceptance-criteria coverage for its portion of #23. The companion spec-kitty-repo mirror deletion is tracked in spec-kitty issue #1058 (open, blocked on this issue, not yet started as of 2026-08-20).",
+  "purpose_tldr": "Close the spec-kitty-events side of GitHub issue #23 by adding the missing invalid conformance fixtures for two dossier event payloads.",
+  "slug": "dossier-invalid-fixture-coverage-01M0FSN4",
+  "status_phase": "1",
+  "target_branch": "feat/dossier-invalid-fixture-coverage",
+  "topology": "lanes",
+  "vcs": "git",
+  "vcs_locked_at": "2026-08-21T10:30:49.021242+00:00"
+}
