@@ -1,0 +1,29 @@
+{
+  "class": "envelope_strict_journal",
+  "expected": "valid",
+  "expected_error_codes": [],
+  "event_type": "MissionStarted",
+  "input": {
+    "event_id": "01M0HTQMTHV0Z55VAVK5FNT57B",
+    "event_type": "MissionStarted",
+    "aggregate_id": "mission/M-SJ",
+    "payload": {
+      "mission_id": "M-SJ",
+      "mission_type": "software-dev",
+      "initial_phase": "specify",
+      "actor": "user-1",
+      "mission_slug": "strict-journal-fixture"
+    },
+    "timestamp": "2026-01-01T00:00:00+00:00",
+    "build_id": "build-fixture",
+    "node_id": "fixture-node",
+    "lamport_clock": 1,
+    "causation_id": null,
+    "project_uuid": "12345678-1234-5678-1234-567812345678",
+    "project_slug": null,
+    "correlation_id": "01M0HTQMTHV0Z55VAVK5FNT57C",
+    "schema_version": "3.0.0",
+    "data_tier": 0
+  },
+  "notes": "C8: MissionStarted exactly as emitter.py:1467-1491 builds it (with mission_slug), wrapped in a strict envelope. Accepted (empty tuple)."
+}

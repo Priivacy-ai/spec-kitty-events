@@ -1989,6 +1989,157 @@
       "expected_result": "valid",
       "notes": "Golden reducer output (event_count/last_processed_event_id stripped) for lifecycle_with_observations.jsonl -- computed from the mission-only sub-stream (HarnessObservation rows excluded); tests/integration/test_lifecycle_replay.py's R1 test asserts both the interleaved and clean streams reduce to exactly this.",
       "min_version": "7.0.0"
+    },
+    {
+      "id": "harness-observation-presence-valid-minimal",
+      "path": "harness_observation/valid/presence_minimal.json",
+      "expected_result": "valid",
+      "event_type": "HarnessObservation",
+      "notes": "Minimal valid presence observation: harness, session_id, activity only.",
+      "min_version": "7.0.0"
+    },
+    {
+      "id": "harness-observation-presence-valid-full",
+      "path": "harness_observation/valid/presence_full.json",
+      "expected_result": "valid",
+      "event_type": "HarnessObservation",
+      "notes": "Presence observation with every optional field a presence kind allows (agent_id, repo, mission_slug, wp_id, path).",
+      "min_version": "7.0.0"
+    },
+    {
+      "id": "harness-observation-lane-signal-valid-minimal",
+      "path": "harness_observation/valid/lane_signal_minimal.json",
+      "expected_result": "valid",
+      "event_type": "HarnessObservation",
+      "notes": "Minimal valid lane_signal observation: mission_slug, wp_id, and lane are required for this kind.",
+      "min_version": "7.0.0"
+    },
+    {
+      "id": "harness-observation-focus-paused-valid-minimal",
+      "path": "harness_observation/valid/focus_paused_minimal.json",
+      "expected_result": "valid",
+      "event_type": "HarnessObservation",
+      "notes": "Minimal valid focus_paused observation: pause_reason is required for this kind.",
+      "min_version": "7.0.0"
+    },
+    {
+      "id": "harness-observation-focus-ended-valid-minimal",
+      "path": "harness_observation/valid/focus_ended_minimal.json",
+      "expected_result": "valid",
+      "event_type": "HarnessObservation",
+      "notes": "Minimal valid focus_ended observation: ended_reason is required for this kind.",
+      "min_version": "7.0.0"
+    },
+    {
+      "id": "harness-observation-path-valid-hyphenated-prose",
+      "path": "harness_observation/valid/observation_path_hyphenated_prose.json",
+      "expected_result": "valid",
+      "event_type": "HarnessObservation",
+      "notes": "X8 boundary (F1 draft F1.md Sec4): path is character-class valid (letters/digits/hyphens/dot only) even though it reads as prose-shaped injection text. F1's _REF grammar is a character-class + length bound, not a prose-shape rule; the segment-shape rejection of strings like this stays zeitgeist's single render-side authority (editor.py _MAX_SEGMENTS/_ident), applied at F3/Z3/Z8 ingest, not here. Committed deliberately under valid/ so the boundary is evidence-backed.",
+      "min_version": "7.0.0"
+    },
+    {
+      "id": "harness-observation-invalid-missing-kind",
+      "path": "harness_observation/invalid/missing_kind.json",
+      "expected_result": "invalid",
+      "event_type": "HarnessObservation",
+      "notes": "kind is required and absent.",
+      "min_version": "7.0.0"
+    },
+    {
+      "id": "harness-observation-invalid-presence-with-pause-reason",
+      "path": "harness_observation/invalid/presence_with_pause_reason.json",
+      "expected_result": "invalid",
+      "event_type": "HarnessObservation",
+      "notes": "X5: pause_reason is forbidden for kind=presence (only legal for focus_paused) per the per-kind field matrix.",
+      "min_version": "7.0.0"
+    },
+    {
+      "id": "harness-observation-invalid-forbidden-detail",
+      "path": "harness_observation/invalid/observation_forbidden_detail.json",
+      "expected_result": "invalid",
+      "event_type": "HarnessObservation",
+      "notes": "X6: detail is not a field on HarnessObservationPayload at all (extra=\"forbid\" rejects it); at the full-envelope level it is also a member of FORBIDDEN_OBSERVATION_KEYS (defense in depth, tested separately in tests/unit/test_strict.py).",
+      "min_version": "7.0.0"
+    },
+    {
+      "id": "harness-observation-invalid-lane-signal-missing-required",
+      "path": "harness_observation/invalid/lane_signal_missing_required.json",
+      "expected_result": "invalid",
+      "event_type": "HarnessObservation",
+      "notes": "lane_signal requires mission_slug, wp_id, and lane; all three are absent.",
+      "min_version": "7.0.0"
+    },
+    {
+      "id": "harness-observation-invalid-session-id-too-long",
+      "path": "harness_observation/invalid/session_id_too_long.json",
+      "expected_result": "invalid",
+      "event_type": "HarnessObservation",
+      "notes": "X9: session_id is 129 characters, one over the 128 max_length bound (mirrors zeitgeist editor.py FIELD_MAX).",
+      "min_version": "7.0.0"
+    },
+    {
+      "id": "class-taxonomy-envelope-strict-journal-valid-mission-started-with-slug",
+      "path": "class_taxonomy/envelope_strict_journal/valid_mission_started_with_slug.json",
+      "fixture_type": "strict_profile_only",
+      "expected_result": "valid",
+      "event_type": "MissionStarted",
+      "notes": "envelope_strict_journal class (F1-T1, not part of the frozen eight-class taxonomy in tests/test_conformance_classes.py -- see tests/test_envelope_strict_journal_class.py). C8: real producer shape, accepted.",
+      "min_version": "7.0.0"
+    },
+    {
+      "id": "class-taxonomy-envelope-strict-journal-skew-missing-version",
+      "path": "class_taxonomy/envelope_strict_journal/skew_missing_version.json",
+      "fixture_type": "strict_profile_only",
+      "expected_result": "invalid",
+      "event_type": "MissionStarted",
+      "notes": "envelope_strict_journal class. V1: schema_version key absent; collect-all yields two error codes.",
+      "min_version": "7.0.0"
+    },
+    {
+      "id": "class-taxonomy-envelope-strict-journal-skew-major-2",
+      "path": "class_taxonomy/envelope_strict_journal/skew_major_2.json",
+      "fixture_type": "strict_profile_only",
+      "expected_result": "invalid",
+      "event_type": "MissionStarted",
+      "notes": "envelope_strict_journal class. V2: schema_version wrong major.",
+      "min_version": "7.0.0"
+    },
+    {
+      "id": "class-taxonomy-envelope-strict-journal-unknown-event-type",
+      "path": "class_taxonomy/envelope_strict_journal/unknown_event_type.json",
+      "fixture_type": "strict_profile_only",
+      "expected_result": "invalid",
+      "event_type": "Sparkle",
+      "notes": "envelope_strict_journal class. U1: event_type not admitted by the strict profile.",
+      "min_version": "7.0.0"
+    },
+    {
+      "id": "class-taxonomy-envelope-strict-journal-envelope-extra-team-slug",
+      "path": "class_taxonomy/envelope_strict_journal/envelope_extra_team_slug.json",
+      "fixture_type": "strict_profile_only",
+      "expected_result": "invalid",
+      "event_type": "MissionStarted",
+      "notes": "envelope_strict_journal class. X1: envelope-level extra key team_slug.",
+      "min_version": "7.0.0"
+    },
+    {
+      "id": "class-taxonomy-envelope-strict-journal-timestamp-naive",
+      "path": "class_taxonomy/envelope_strict_journal/timestamp_naive.json",
+      "fixture_type": "strict_profile_only",
+      "expected_result": "invalid",
+      "event_type": "MissionStarted",
+      "notes": "envelope_strict_journal class. T2: naive (non-tz-aware) timestamp.",
+      "min_version": "7.0.0"
+    },
+    {
+      "id": "class-taxonomy-envelope-strict-journal-local-appender-envelope-5-0-0",
+      "path": "class_taxonomy/envelope_strict_journal/local_appender_envelope_5_0_0.json",
+      "fixture_type": "strict_profile_only",
+      "expected_result": "invalid",
+      "event_type": "MissionCreated",
+      "notes": "envelope_strict_journal class. X10: the actual spec-kitty local-appender envelope shape; three collect-all errors.",
+      "min_version": "7.0.0"
     }
   ],
   "classes": {

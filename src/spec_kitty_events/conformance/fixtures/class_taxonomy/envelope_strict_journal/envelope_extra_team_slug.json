@@ -1,0 +1,32 @@
+{
+  "class": "envelope_strict_journal",
+  "expected": "invalid",
+  "expected_error_codes": [
+    "ENVELOPE_SHAPE_INVALID"
+  ],
+  "event_type": "MissionStarted",
+  "input": {
+    "event_id": "01M0HTQMTJGMFJ5ERG6T0G9KJN",
+    "event_type": "MissionStarted",
+    "aggregate_id": "mission/M-SJ",
+    "payload": {
+      "mission_id": "M-SJ",
+      "mission_type": "software-dev",
+      "initial_phase": "specify",
+      "actor": "user-1",
+      "mission_slug": "strict-journal-fixture"
+    },
+    "timestamp": "2026-01-01T00:00:00+00:00",
+    "build_id": "build-fixture",
+    "node_id": "fixture-node",
+    "lamport_clock": 1,
+    "causation_id": null,
+    "project_uuid": "12345678-1234-5678-1234-567812345678",
+    "project_slug": null,
+    "correlation_id": "01M0HTQMTJGMFJ5ERG6T0G9KJP",
+    "schema_version": "3.0.0",
+    "data_tier": 0,
+    "team_slug": "acme"
+  },
+  "notes": "X1: envelope carries team_slug, a key outside STRICT_ENVELOPE_KEYS (present in the pre-existing edge_cases/replay/wp_review_rejection_cycle.jsonl fixture, which Event silently ignores but the strict profile rejects)."
+}

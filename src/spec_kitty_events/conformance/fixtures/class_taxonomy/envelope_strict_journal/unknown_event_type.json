@@ -1,0 +1,25 @@
+{
+  "class": "envelope_strict_journal",
+  "expected": "invalid",
+  "expected_error_codes": [
+    "UNKNOWN_EVENT_TYPE"
+  ],
+  "event_type": "Sparkle",
+  "input": {
+    "event_id": "01M0HTQMTJGMFJ5ERG6T0G9KJK",
+    "event_type": "Sparkle",
+    "aggregate_id": "mission/M-SJ",
+    "payload": {},
+    "timestamp": "2026-01-01T00:00:00+00:00",
+    "build_id": "build-fixture",
+    "node_id": "fixture-node",
+    "lamport_clock": 1,
+    "causation_id": null,
+    "project_uuid": "12345678-1234-5678-1234-567812345678",
+    "project_slug": null,
+    "correlation_id": "01M0HTQMTJGMFJ5ERG6T0G9KJM",
+    "schema_version": "3.0.0",
+    "data_tier": 0
+  },
+  "notes": "U1: event_type 'Sparkle' is not a member of STRICT_EVENT_TYPES."
+}

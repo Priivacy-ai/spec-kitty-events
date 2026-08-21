@@ -1,0 +1,31 @@
+{
+  "class": "envelope_strict_journal",
+  "expected": "invalid",
+  "expected_error_codes": [
+    "ENVELOPE_SHAPE_INVALID",
+    "ENVELOPE_SHAPE_INVALID",
+    "UNSUPPORTED_SCHEMA_VERSION"
+  ],
+  "event_type": "MissionCreated",
+  "input": {
+    "event_id": "01M0HTQMTJGMFJ5ERG6T0G9KJS",
+    "event_type": "MissionCreated",
+    "aggregate_id": "mission/M-SJ",
+    "aggregate_type": "Mission",
+    "schema_version": "5.0.0",
+    "timestamp": "2026-01-01T00:00:00+00:00",
+    "payload": {
+      "mission_slug": "strict-journal-fixture",
+      "mission_number": 1,
+      "mission_type": "software-dev",
+      "target_branch": "main",
+      "wp_count": 1,
+      "friendly_name": "Fixture Mission",
+      "purpose_tldr": "Local appender shape.",
+      "purpose_context": "Exercises X10."
+    },
+    "project_uuid": "12345678-1234-5678-1234-567812345678",
+    "project_slug": null
+  },
+  "notes": "X10: the actual envelope shape spec-kitty/src/specify_cli/status/lifecycle_events.py:_build_envelope writes to .kittify/canonical-events.jsonl / status.events.jsonl. Exactly three errors in check order: missing=[build_id,correlation_id,data_tier,lamport_clock,node_id] (step 2), extra=[aggregate_type] (step 3), UNSUPPORTED_SCHEMA_VERSION found='5.0.0' (step 5). F1 does not rewrite these rows; F2-T1 owns canonicalization."
+}

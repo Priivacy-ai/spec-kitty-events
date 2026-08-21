@@ -1,0 +1,31 @@
+{
+  "class": "envelope_strict_journal",
+  "expected": "invalid",
+  "expected_error_codes": [
+    "UNSUPPORTED_SCHEMA_VERSION"
+  ],
+  "event_type": "MissionStarted",
+  "input": {
+    "event_id": "01M0HTQMTJGMFJ5ERG6T0G9KJH",
+    "event_type": "MissionStarted",
+    "aggregate_id": "mission/M-SJ",
+    "payload": {
+      "mission_id": "M-SJ",
+      "mission_type": "software-dev",
+      "initial_phase": "specify",
+      "actor": "user-1",
+      "mission_slug": "strict-journal-fixture"
+    },
+    "timestamp": "2026-01-01T00:00:00+00:00",
+    "build_id": "build-fixture",
+    "node_id": "fixture-node",
+    "lamport_clock": 1,
+    "causation_id": null,
+    "project_uuid": "12345678-1234-5678-1234-567812345678",
+    "project_slug": null,
+    "correlation_id": "01M0HTQMTJGMFJ5ERG6T0G9KJJ",
+    "schema_version": "2.9.0",
+    "data_tier": 0
+  },
+  "notes": "V2: schema_version is a valid string but the wrong major version."
+}

@@ -1,0 +1,7 @@
+{
+  "kind": "focus_ended",
+  "harness": "claude",
+  "session_id": "sess-jkl000",
+  "mission_slug": "f1-t1-strict-journal",
+  "ended_reason": "timeout"
+}

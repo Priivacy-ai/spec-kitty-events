@@ -81,6 +81,16 @@ def _event_fixture_entries() -> List[Dict[str, Any]]:
             "reducer_output",
             "timestamp_semantics",
             "legacy_normalization",
+            # envelope_strict_journal (F1-T1) class_taxonomy fixtures: these
+            # assert strict-profile-only rejections (e.g. an envelope-level
+            # extra key, a naive timestamp) that the lenient Event model /
+            # validate_event() deliberately do NOT reject (decision 3,
+            # COMPATIBILITY.md) -- routing them through this generic,
+            # weaker-validator entrypoint would produce false failures (or
+            # false passes that test nothing). They are validated by
+            # spec_kitty_events.strict.validate_strict_envelope in
+            # tests/test_envelope_strict_journal_class.py instead.
+            "strict_profile_only",
         )
         # Skip diagnostic-taxonomy fixtures whose event_type is a sentinel
         # (e.g. "<missing>", "<wrong>") used only to label the class. These
