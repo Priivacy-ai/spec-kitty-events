@@ -21,6 +21,7 @@ _VALID_CATEGORIES = frozenset({
     "dossier", "mission_audit", "decisionpoint",
     "connector", "sync",
     "profile_invocation", "retrospective",  # 3.1.0
+    "harness_observation",  # F1-T1 (7.0.0)
 })
 
 # Replay stream fixture type sentinel

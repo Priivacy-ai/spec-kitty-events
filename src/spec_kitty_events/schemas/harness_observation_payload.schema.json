@@ -1,0 +1,195 @@
+{
+  "$defs": {
+    "Lane": {
+      "description": "Work-package lifecycle lanes.\n\n``GENESIS`` is the non-display, pre-finalize origin lane: a work-package\nwith no recorded lane events derives as ``genesis`` until ``finalize-tasks``\nseeds it to ``planned``. It is a producer-side state only \u2014 it is never a\ndisplay/summary lane and the only legal edges out of it are\n``genesis -> planned`` (the seed) and ``genesis -> canceled``.",
+      "enum": [
+        "genesis",
+        "planned",
+        "claimed",
+        "in_progress",
+        "for_review",
+        "in_review",
+        "approved",
+        "done",
+        "blocked",
+        "canceled"
+      ],
+      "title": "Lane",
+      "type": "string"
+    },
+    "ObservationKind": {
+      "description": "Closed set of harness-observation kinds. Exactly six members.\n\nStructure over names: if PR #51's exact bytes name these differently,\nonly the string values move \u2014 the six-kind structure and the per-kind\nfield matrix below stay (F1 draft \u00a76.1).",
+      "enum": [
+        "presence",
+        "lane_signal",
+        "focus_started",
+        "focus_heartbeat",
+        "focus_paused",
+        "focus_ended"
+      ],
+      "title": "ObservationKind",
+      "type": "string"
+    }
+  },
+  "$id": "spec-kitty-events/harness_observation_payload",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Typed payload for the six HarnessObservation kinds.\n\nEnvelope conventions (validated by ``spec_kitty_events.strict``,\ndocumented here per draft \u00a73.3): ``event_type=\"HarnessObservation\"``,\n``aggregate_id=\"session/<session_id>\"``, ``schema_version=\"3.0.0\"``,\n``timestamp`` = producer occurrence time (R-T-01); ``lamport_clock`` =\nthe journal clock value at offer time for ``lane_signal`` and the\nclient's local clock otherwise; ``correlation_id`` = the journal\nevent's ``event_id`` for ``lane_signal``. No time field in the payload\n(R-T-02); no TTL/expiry field (server receipt clock/TTL is Z3/F3\npolicy); no user/team identity (server-derived, Z2a/Z7).",
+  "properties": {
+    "activity": {
+      "anyOf": [
+        {
+          "enum": [
+            "file_edit",
+            "command"
+          ],
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Activity"
+    },
+    "agent_id": {
+      "anyOf": [
+        {
+          "maxLength": 64,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._@+-]{0,63}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Agent Id"
+    },
+    "ended_reason": {
+      "anyOf": [
+        {
+          "enum": [
+            "user",
+            "timeout"
+          ],
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Ended Reason"
+    },
+    "harness": {
+      "description": "Harness identity, e.g. 'claude', 'codex'.",
+      "maxLength": 32,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._@+-]{0,63}$",
+      "title": "Harness",
+      "type": "string"
+    },
+    "kind": {
+      "$ref": "#/$defs/ObservationKind"
+    },
+    "lane": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Lane"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "mission_slug": {
+      "anyOf": [
+        {
+          "maxLength": 120,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._@+/-]{0,239}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Mission Slug"
+    },
+    "path": {
+      "anyOf": [
+        {
+          "maxLength": 240,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._@+/-]{0,239}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Path"
+    },
+    "pause_reason": {
+      "anyOf": [
+        {
+          "enum": [
+            "user",
+            "dnd"
+          ],
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Pause Reason"
+    },
+    "repo": {
+      "anyOf": [
+        {
+          "maxLength": 120,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._@+/-]{0,239}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Typed repo-identity slot; derivation is owned by Z6.",
+      "title": "Repo"
+    },
+    "session_id": {
+      "maxLength": 128,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._@+-]{0,63}$",
+      "title": "Session Id",
+      "type": "string"
+    },
+    "wp_id": {
+      "anyOf": [
+        {
+          "maxLength": 32,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._@+-]{0,63}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Wp Id"
+    }
+  },
+  "required": [
+    "kind",
+    "harness",
+    "session_id"
+  ],
+  "title": "HarnessObservationPayload",
+  "type": "object"
+}

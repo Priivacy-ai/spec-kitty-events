@@ -13,7 +13,7 @@ This release publishes the fail-closed cutover surface for:
   historical-shape conformance fixtures.
 """
 
-__version__ = "6.1.0"
+__version__ = "7.0.0"
 
 from spec_kitty_events.cutover import (
     CUTOVER_ARTIFACT,
@@ -170,6 +170,31 @@ from spec_kitty_events.legacy import (
     UnnormalizableLegacyDiagnostic,
     NormalizationResult,
     LegacyEnvelopeNormalizer,
+)
+
+# HarnessObservation vocabulary (F1-T1, 7.0.0). F1 is the single owner of
+# this vocabulary (draft §3.1 normative ownership clause).
+from spec_kitty_events.harness_observation import (
+    HARNESS_OBSERVATION,
+    HARNESS_OBSERVATION_CONTRACT_VERSION,
+    ObservationKind,
+    PAYLOAD_ID_BY_KIND,
+    HARNESS_OBSERVATION_PAYLOAD_IDS,
+    FORBIDDEN_OBSERVATION_KEYS,
+    FORBIDDEN_OBSERVATION_KEYS_VERSION,
+    HarnessObservationPayload,
+)
+
+# Strict journal profile (F1-T1, 7.0.0): a deterministic, structured
+# envelope validator layered over the existing lenient Event/lifecycle
+# contracts. Opt-in for new producers/readers (F2 journal, D1 projector,
+# Z1 client); Event itself stays lenient (decision 3).
+from spec_kitty_events.strict import (
+    STRICT_PROFILE_ID,
+    STRICT_ENVELOPE_KEYS,
+    STRICT_EVENT_TYPES,
+    STRICT_TIMESTAMP_RULES,
+    validate_strict_envelope,
 )
 
 # Machine-readable classification surface for event types that are NOT
@@ -927,4 +952,19 @@ __all__ = [
     "LegacyEnvelopeNormalizer",
     # Machine-readable classification surface.
     "LOCAL_ONLY_EVENT_TYPES",
+    # HarnessObservation vocabulary (F1-T1, 7.0.0).
+    "HARNESS_OBSERVATION",
+    "HARNESS_OBSERVATION_CONTRACT_VERSION",
+    "ObservationKind",
+    "PAYLOAD_ID_BY_KIND",
+    "HARNESS_OBSERVATION_PAYLOAD_IDS",
+    "FORBIDDEN_OBSERVATION_KEYS",
+    "FORBIDDEN_OBSERVATION_KEYS_VERSION",
+    "HarnessObservationPayload",
+    # Strict journal profile (F1-T1, 7.0.0).
+    "STRICT_PROFILE_ID",
+    "STRICT_ENVELOPE_KEYS",
+    "STRICT_EVENT_TYPES",
+    "STRICT_TIMESTAMP_RULES",
+    "validate_strict_envelope",
 ]

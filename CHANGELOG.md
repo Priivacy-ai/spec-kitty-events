@@ -7,6 +7,67 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [7.0.0] - 2026-08-21
+
+F1-T1 (spec-kitty-rearchitecture, M1): strict journal profile + HarnessObservation.
+
+### Breaking
+
+- `MissionStartedPayload`, `MissionCompletedPayload`, `MissionCancelledPayload`,
+  `PhaseEnteredPayload`, and `ReviewRollbackPayload` now reject unknown extra
+  fields (`ConfigDict(extra="forbid")`; previously `frozen=True` only, so
+  extras were silently ignored). No field was renamed or removed. The
+  real spec-kitty producer output for `MissionStarted`/`PhaseEntered`/
+  `MissionCompleted` (which already sends `mission_slug`) stays valid,
+  because `mission_slug` is added to those three models (see `### Added`)
+  *before* this hardening lands.
+- `ValidationErrorCode` (closed enum) gains two members:
+  `UNKNOWN_EVENT_TYPE`, `UNSUPPORTED_SCHEMA_VERSION`. Any code that
+  exhaustively matches on `ValidationErrorCode` values must handle them.
+
+### Added
+
+- `spec_kitty_events.strict`: `STRICT_PROFILE_ID` (`"journal/v1"`),
+  `STRICT_ENVELOPE_KEYS` (the 14 `Event` fields, all required present
+  under the strict profile — nullable ones as explicit `null`),
+  `STRICT_EVENT_TYPES` (19 admitted event types), `STRICT_TIMESTAMP_RULES`,
+  and `validate_strict_envelope(record)` — a pure, deterministic,
+  collect-all structured validator over a raw envelope dict. `Event`
+  itself is unchanged and stays lenient; this is an opt-in profile for
+  new producers/readers (the forthcoming F2 journal writer/reader, D1
+  projector, Z1 client).
+- `spec_kitty_events.harness_observation`: a new, volatile
+  `HarnessObservation` event family. `ObservationKind` (closed, six
+  members: `presence`, `lane_signal`, `focus_started`, `focus_heartbeat`,
+  `focus_paused`, `focus_ended`), `PAYLOAD_ID_BY_KIND` (total map to
+  `harness.<kind>.v1`), `HARNESS_OBSERVATION_PAYLOAD_IDS` (exactly six),
+  `FORBIDDEN_OBSERVATION_KEYS` (v1), and `HarnessObservationPayload`
+  (`extra="forbid"`, per-kind required/optional/forbidden field matrix).
+  No time/TTL/user/team identity field exists on the payload by design —
+  observations are never reduced into mission/WP state.
+- `mission_slug: Optional[str] = None` added to `MissionStartedPayload`,
+  `MissionCompletedPayload`, and `PhaseEnteredPayload` (display/back-compat
+  field; `mission_id` remains the identity) — matches the shape the live
+  spec-kitty producer (`sync/emitter.py` `emit_mission_started` /
+  `emit_phase_entered` / `emit_mission_completed`) already emits.
+- New JSON schema: `harness_observation_payload.schema.json`. Regenerated
+  `mission_started_payload`, `mission_completed_payload`,
+  `mission_cancelled_payload`, `phase_entered_payload`, and
+  `review_rollback_payload` schemas (`additionalProperties: false`; three
+  gain an optional `mission_slug` property).
+
+### Known gaps carried into this release (see `COMPATIBILITY.md`)
+
+- The machine-readable support matrix (`spec_kitty_events.strict.SUPPORT_MATRIX`
+  / `support_matrix.json` / `support_matrix_digest()`) described in the F1
+  contract-freeze draft §3.4 is not yet implemented; tracked as WP01
+  remaining work.
+- Local-appender canonicalization (the `.kittify/canonical-events.jsonl` /
+  `status.events.jsonl` rows written by
+  `spec-kitty/src/specify_cli/status/lifecycle_events.py`) is out of scope
+  for this package; those rows fail the strict profile today and are left
+  untouched.
+
 ## [6.1.0] - 2026-06-14
 
 ### Added

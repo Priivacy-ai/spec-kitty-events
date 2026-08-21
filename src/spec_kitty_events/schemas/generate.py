@@ -38,6 +38,7 @@ from spec_kitty_events.project_lifecycle import (
     WPCreatedPayload,
 )
 from spec_kitty_events.cutover import CutoverArtifact
+from spec_kitty_events.harness_observation import HarnessObservationPayload
 from spec_kitty_events.gates import (
     GatePassedPayload,
     GateFailedPayload,
@@ -171,6 +172,8 @@ PYDANTIC_MODELS: List[tuple[str, Type[BaseModel]]] = [
     ("mission_cancelled_payload", MissionCancelledPayload),
     ("phase_entered_payload", PhaseEnteredPayload),
     ("review_rollback_payload", ReviewRollbackPayload),
+    # HarnessObservation vocabulary (F1-T1, 7.0.0)
+    ("harness_observation_payload", HarnessObservationPayload),
     # Canonical project / artifact / WP lifecycle event contracts
     ("project_initialized_payload", ProjectInitializedPayload),
     ("specify_started_payload", SpecifyStartedPayload),

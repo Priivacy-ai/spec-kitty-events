@@ -1,6 +1,6 @@
 # Compatibility Guide
 
-**Current package version**: `6.1.0`
+**Current package version**: `7.0.0`
 
 The on-wire envelope schema version is `3.0.0` (the cutover-contract version
 pinned by `cutover.py`) and has been unchanged since the cutover. The package
@@ -19,6 +19,42 @@ This document is the public compatibility policy for consumers of:
 - `spec-kitty-events`
 - `spec-kitty-saas`
 - `spec-kitty`
+
+## `7.0.0` — Strict journal profile + HarnessObservation
+
+`7.0.0` publishes `spec_kitty_events.strict.validate_strict_envelope`: an
+opt-in, deterministic, structured validator over the existing envelope and
+lifecycle/WP contracts (`Event` itself is unchanged and stays lenient — see
+`### Breaking` below for what *is* newly rejected by the strict profile).
+It also publishes `spec_kitty_events.harness_observation`: a new, volatile
+`HarnessObservation` event family with exactly six payload IDs
+(`harness.presence.v1`, `harness.lane_signal.v1`, `harness.focus_started.v1`,
+`harness.focus_heartbeat.v1`, `harness.focus_paused.v1`,
+`harness.focus_ended.v1`). Observations are never reduced into mission/WP
+state and carry no time/TTL/user/team field.
+
+Skew story (6.x ↔ 7.0):
+
+- a 6.x consumer calling `validate_event(payload, "HarnessObservation")`
+  raises `ValueError("Unknown event type: ...")` — fail closed, unchanged
+  API shape;
+- a 6.x consumer given a 7.0 `MissionStarted` payload that carries the new
+  optional `mission_slug` field still accepts it (the 6.x model is lenient)
+  — benign forward-compat;
+- a 7.0 consumer rejects a `MissionStarted` payload carrying an unknown
+  extra field with `PAYLOAD_SCHEMA_FAIL` (new in `7.0.0`; the four-field
+  shape with no `mission_slug` remains valid, since the field is optional).
+
+Local-appender canonicalization debt (out of scope for this release):
+every envelope written today by
+`spec-kitty/src/specify_cli/status/lifecycle_events.py`'s `_build_envelope`
+(`.kittify/canonical-events.jsonl`, `status.events.jsonl`) fails the strict
+profile on multiple counts (`schema_version="5.0.0"`, an extra
+`aggregate_type` key, several missing envelope keys) and its
+`ReviewerSelfApproval` rows additionally have no events model. This
+package does not rewrite those rows; local-CLI permissive reading of them
+is unweakened. Canonicalizing the appender is out of scope for this
+release (tracked for the journal-writer work that consumes this contract).
 
 ## Canonical On-Wire Policy
 

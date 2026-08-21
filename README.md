@@ -2,7 +2,22 @@
 
 Canonical event contracts for Spec Kitty mission state, mission runtime, conformance, and replay.
 
-**Package Version**: `5.0.0` | **Cutover Contract**: `3.0.0` | **Python**: `>=3.10`
+**Package Version**: `7.0.0` | **Cutover Contract**: `3.0.0` | **Python**: `>=3.10`
+
+## What Changed In 7.0.0
+
+`7.0.0` publishes `spec_kitty_events.strict.validate_strict_envelope`, an
+opt-in, deterministic, structured validator (`STRICT_PROFILE_ID =
+"journal/v1"`) layered over the existing envelope and lifecycle/WP
+contracts, plus the new `spec_kitty_events.harness_observation` module: a
+volatile `HarnessObservation` event family with exactly six payload IDs
+(`ObservationKind`: `presence`, `lane_signal`, `focus_started`,
+`focus_heartbeat`, `focus_paused`, `focus_ended`). Five lifecycle payloads
+(`MissionStarted`, `MissionCompleted`, `MissionCancelled`, `PhaseEntered`,
+`ReviewRollback`) are hardened to `extra="forbid"`; `MissionStarted`,
+`MissionCompleted`, and `PhaseEntered` gain an optional `mission_slug`
+field first, so the real spec-kitty producer's current output stays valid.
+See `COMPATIBILITY.md` for the full skew story and migration posture.
 
 ## What Changed In 5.0.0
 

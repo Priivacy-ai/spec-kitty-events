@@ -21,6 +21,7 @@ from spec_kitty_events.build_lifecycle import (
     BuildRegisteredPayload,
 )
 from spec_kitty_events.gates import GateFailedPayload, GatePassedPayload
+from spec_kitty_events.harness_observation import HARNESS_OBSERVATION, HarnessObservationPayload
 from spec_kitty_events.lifecycle import (
     FollowUpRecordedPayload,
     MissionClosedPayload,
@@ -290,6 +291,9 @@ _EVENT_TYPE_TO_MODEL: Dict[str, Any] = {
     # no JSON schema entry yet (the schema layer is optional secondary).
     "MissionReopened": MissionReopenedPayload,
     "FollowUpRecorded": FollowUpRecordedPayload,
+    # HarnessObservation vocabulary (F1-T1, 7.0.0). F1 is the single owner
+    # of this vocabulary; see spec_kitty_events.harness_observation.
+    HARNESS_OBSERVATION: HarnessObservationPayload,
 }
 
 # Event type to JSON Schema name mapping (used with load_schema())
@@ -392,6 +396,8 @@ _EVENT_TYPE_TO_SCHEMA: Dict[str, str] = {
     # Legacy retrospective terminal contracts (3.1.0)
     "RetrospectiveCompleted": "retrospective_completed_payload",
     "RetrospectiveSkipped": "retrospective_skipped_payload",
+    # HarnessObservation vocabulary (F1-T1, 7.0.0).
+    HARNESS_OBSERVATION: "harness_observation_payload",
 }
 
 
