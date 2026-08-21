@@ -84,9 +84,17 @@ TERMINAL_MISSION_STATUSES: FrozenSet[MissionStatus] = frozenset({
 
 
 class MissionStartedPayload(BaseModel):
-    """Typed payload for MissionStarted events."""
+    """Typed payload for MissionStarted events.
 
-    model_config = ConfigDict(frozen=True)
+    Hardened by F1-T1 (7.0.0, strict journal profile): ``extra="forbid"``.
+    ``mission_slug`` is added *before* strictness (draft §3.3 step 1) because
+    the live spec-kitty producer (``emitter.py`` ``emit_mission_started``)
+    always builds this payload and sets ``payload["mission_slug"] = ...``
+    when a slug is known — display/back-compat only, ``mission_id`` is the
+    identity (``emitter.py:11-22``).
+    """
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
 
     mission_id: str = Field(
         ..., min_length=1, description="Mission identifier"
@@ -101,6 +109,11 @@ class MissionStartedPayload(BaseModel):
     )
     actor: str = Field(
         ..., min_length=1, description="Actor who started the mission"
+    )
+    mission_slug: Optional[str] = Field(
+        None,
+        min_length=1,
+        description="Canonical mission slug (display/back-compat; mission_id is the identity)",
     )
 
 
@@ -158,9 +171,14 @@ class MissionClosedPayload(BaseModel):
 
 
 class MissionCompletedPayload(BaseModel):
-    """Typed payload for MissionCompleted events."""
+    """Typed payload for MissionCompleted events.
 
-    model_config = ConfigDict(frozen=True)
+    Hardened by F1-T1 (7.0.0, strict journal profile): ``extra="forbid"``;
+    ``mission_slug`` added for the same reason as ``MissionStartedPayload``
+    (live producer: ``emitter.py`` ``emit_mission_completed``).
+    """
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
 
     mission_id: str = Field(
         ..., min_length=1, description="Mission identifier"
@@ -174,12 +192,22 @@ class MissionCompletedPayload(BaseModel):
     actor: str = Field(
         ..., min_length=1, description="Actor who completed the mission"
     )
+    mission_slug: Optional[str] = Field(
+        None,
+        min_length=1,
+        description="Canonical mission slug (display/back-compat; mission_id is the identity)",
+    )
 
 
 class MissionCancelledPayload(BaseModel):
-    """Typed payload for MissionCancelled events."""
+    """Typed payload for MissionCancelled events.
 
-    model_config = ConfigDict(frozen=True)
+    Hardened by F1-T1 (7.0.0, strict journal profile): ``extra="forbid"``.
+    No ``mission_slug`` field is added — no live producer exists in
+    spec-kitty/src (grep, F1 draft §2.2); spec-kitty-saas only consumes it.
+    """
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
 
     mission_id: str = Field(
         ..., min_length=1, description="Mission identifier"
@@ -304,9 +332,14 @@ class FollowUpRecordedPayload(BaseModel):
 
 
 class PhaseEnteredPayload(BaseModel):
-    """Typed payload for PhaseEntered events."""
+    """Typed payload for PhaseEntered events.
 
-    model_config = ConfigDict(frozen=True)
+    Hardened by F1-T1 (7.0.0, strict journal profile): ``extra="forbid"``;
+    ``mission_slug`` added for the same reason as ``MissionStartedPayload``
+    (live producer: ``emitter.py`` ``emit_phase_entered``).
+    """
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
 
     mission_id: str = Field(
         ..., min_length=1, description="Mission identifier"
@@ -320,12 +353,22 @@ class PhaseEnteredPayload(BaseModel):
     actor: str = Field(
         ..., min_length=1, description="Actor triggering phase transition"
     )
+    mission_slug: Optional[str] = Field(
+        None,
+        min_length=1,
+        description="Canonical mission slug (display/back-compat; mission_id is the identity)",
+    )
 
 
 class ReviewRollbackPayload(BaseModel):
-    """Typed payload for ReviewRollback events."""
+    """Typed payload for ReviewRollback events.
 
-    model_config = ConfigDict(frozen=True)
+    Hardened by F1-T1 (7.0.0, strict journal profile): ``extra="forbid"``.
+    No ``mission_slug`` field is added — no live producer exists in
+    spec-kitty/src (grep, F1 draft §2.2); spec-kitty-saas only consumes it.
+    """
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
 
     mission_id: str = Field(
         ..., min_length=1, description="Mission identifier"

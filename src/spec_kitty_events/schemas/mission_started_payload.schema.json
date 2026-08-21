@@ -1,7 +1,8 @@
 {
   "$id": "spec-kitty-events/mission_started_payload",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "description": "Typed payload for MissionStarted events.",
+  "additionalProperties": false,
+  "description": "Typed payload for MissionStarted events.\n\nHardened by F1-T1 (7.0.0, strict journal profile): ``extra=\"forbid\"``.\n``mission_slug`` is added *before* strictness (draft \u00a73.3 step 1) because\nthe live spec-kitty producer (``emitter.py`` ``emit_mission_started``)\nalways builds this payload and sets ``payload[\"mission_slug\"] = ...``\nwhen a slug is known \u2014 display/back-compat only, ``mission_id`` is the\nidentity (``emitter.py:11-22``).",
   "properties": {
     "actor": {
       "description": "Actor who started the mission",
@@ -20,6 +21,20 @@
       "minLength": 1,
       "title": "Mission Id",
       "type": "string"
+    },
+    "mission_slug": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Canonical mission slug (display/back-compat; mission_id is the identity)",
+      "title": "Mission Slug"
     },
     "mission_type": {
       "description": "Mission type (e.g., 'software-dev', 'research', 'plan')",

@@ -250,6 +250,53 @@ class TestMissionStartedPayload:
         restored = MissionStartedPayload(**dumped)
         assert restored == p
 
+    # ── F1-T1: mission_slug field reconciliation (draft §3.3 step 1) ────────
+    # The live spec-kitty producer (emitter.py:1467-1491) always builds this
+    # payload and then, when it has a slug, does
+    # `payload["mission_slug"] = mission_slug`. The field must be optional
+    # (default None) so the four-field shape stays valid too.
+
+    def test_mission_slug_defaults_to_none(self) -> None:
+        p = MissionStartedPayload(
+            mission_id="M001",
+            mission_type="software-dev",
+            initial_phase="specify",
+            actor="user-1",
+        )
+        assert p.mission_slug is None
+
+    def test_mission_slug_accepted_when_present(self) -> None:
+        p = MissionStartedPayload(
+            mission_id="M001",
+            mission_type="software-dev",
+            initial_phase="specify",
+            actor="user-1",
+            mission_slug="mission-contract-cutover",
+        )
+        assert p.mission_slug == "mission-contract-cutover"
+
+    def test_mission_slug_empty_string_rejected(self) -> None:
+        with pytest.raises(PydanticValidationError):
+            MissionStartedPayload(
+                mission_id="M001",
+                mission_type="software-dev",
+                initial_phase="specify",
+                actor="user-1",
+                mission_slug="",
+            )
+
+    # ── F1-T1: strictness (draft §3.3 step 2) ────────────────────────────────
+
+    def test_extra_field_rejected(self) -> None:
+        with pytest.raises(PydanticValidationError):
+            MissionStartedPayload(
+                mission_id="M001",
+                mission_type="software-dev",
+                initial_phase="specify",
+                actor="user-1",
+                unknown_extra_field="nope",
+            )  # type: ignore[call-arg]
+
 
 # ── MissionCompletedPayload ──────────────────────────────────────────────────
 
@@ -303,6 +350,35 @@ class TestMissionCompletedPayload:
         )
         restored = MissionCompletedPayload(**p.model_dump())
         assert restored == p
+
+    def test_mission_slug_defaults_to_none(self) -> None:
+        p = MissionCompletedPayload(
+            mission_id="M001",
+            mission_type="software-dev",
+            final_phase="accept",
+            actor="user-1",
+        )
+        assert p.mission_slug is None
+
+    def test_mission_slug_accepted_when_present(self) -> None:
+        p = MissionCompletedPayload(
+            mission_id="M001",
+            mission_type="software-dev",
+            final_phase="accept",
+            actor="user-1",
+            mission_slug="mission-contract-cutover",
+        )
+        assert p.mission_slug == "mission-contract-cutover"
+
+    def test_extra_field_rejected(self) -> None:
+        with pytest.raises(PydanticValidationError):
+            MissionCompletedPayload(
+                mission_id="M001",
+                mission_type="software-dev",
+                final_phase="accept",
+                actor="user-1",
+                unknown_extra_field="nope",
+            )  # type: ignore[call-arg]
 
 
 # ── MissionCreatedPayload ────────────────────────────────────────────────────
@@ -416,6 +492,18 @@ class TestMissionCancelledPayload:
         restored = MissionCancelledPayload(**p.model_dump())
         assert restored == p
 
+    def test_extra_field_rejected(self) -> None:
+        # No live producer exists for MissionCancelled (grep over
+        # spec-kitty/src finds zero hits; SaaS only consumes it) so no field
+        # is added here — only strictness (draft §3.3 step 2, §6.11).
+        with pytest.raises(PydanticValidationError):
+            MissionCancelledPayload(
+                mission_id="M001",
+                reason="abort",
+                actor="user-1",
+                unknown_extra_field="nope",
+            )  # type: ignore[call-arg]
+
 
 # ── PhaseEnteredPayload ──────────────────────────────────────────────────────
 
@@ -495,6 +583,32 @@ class TestPhaseEnteredPayload:
         restored = PhaseEnteredPayload(**p.model_dump())
         assert restored == p
         assert restored.previous_phase is None
+
+    def test_mission_slug_defaults_to_none(self) -> None:
+        p = PhaseEnteredPayload(
+            mission_id="M001",
+            phase_name="implement",
+            actor="user-1",
+        )
+        assert p.mission_slug is None
+
+    def test_mission_slug_accepted_when_present(self) -> None:
+        p = PhaseEnteredPayload(
+            mission_id="M001",
+            phase_name="implement",
+            actor="user-1",
+            mission_slug="mission-contract-cutover",
+        )
+        assert p.mission_slug == "mission-contract-cutover"
+
+    def test_extra_field_rejected(self) -> None:
+        with pytest.raises(PydanticValidationError):
+            PhaseEnteredPayload(
+                mission_id="M001",
+                phase_name="implement",
+                actor="user-1",
+                unknown_extra_field="nope",
+            )  # type: ignore[call-arg]
 
 
 # ── ReviewRollbackPayload ────────────────────────────────────────────────────
@@ -581,6 +695,19 @@ class TestReviewRollbackPayload:
         assert isinstance(dumped, dict)
         assert dumped["mission_id"] == "M001"
         assert dumped["review_ref"] == "PR-42"
+
+    def test_extra_field_rejected(self) -> None:
+        # No live producer exists for ReviewRollback (grep over
+        # spec-kitty/src finds zero hits; SaaS only consumes it) so no field
+        # is added here — only strictness (draft §3.3 step 2, §6.11).
+        with pytest.raises(PydanticValidationError):
+            ReviewRollbackPayload(
+                mission_id="M001",
+                review_ref="PR-42",
+                target_phase="implement",
+                actor="reviewer-1",
+                unknown_extra_field="nope",
+            )  # type: ignore[call-arg]
 
 
 # ── Reducer Output Models ────────────────────────────────────────────────────

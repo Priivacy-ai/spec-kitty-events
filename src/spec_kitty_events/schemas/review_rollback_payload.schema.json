@@ -1,7 +1,8 @@
 {
   "$id": "spec-kitty-events/review_rollback_payload",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "description": "Typed payload for ReviewRollback events.",
+  "additionalProperties": false,
+  "description": "Typed payload for ReviewRollback events.\n\nHardened by F1-T1 (7.0.0, strict journal profile): ``extra=\"forbid\"``.\nNo ``mission_slug`` field is added \u2014 no live producer exists in\nspec-kitty/src (grep, F1 draft \u00a72.2); spec-kitty-saas only consumes it.",
   "properties": {
     "actor": {
       "description": "Actor triggering rollback",
