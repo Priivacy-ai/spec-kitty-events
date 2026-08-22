@@ -3,8 +3,8 @@ governance:
   testing:
     min_coverage: 0
     tdd_required: false
-    framework: ''
-    type_checking: ''
+    framework: pytest
+    type_checking: mypy --strict
   quality:
     linting: ''
     pr_approvals: 1
@@ -27,7 +27,9 @@ governance:
     selected_mission_step_contracts: []
     selected_glossary_packs: []
     selected_assets: []
-    available_tools: []
+    available_tools:
+    - git
+    - spec-kitty
     authority_paths: []
     governance_references: []
   activations: []
