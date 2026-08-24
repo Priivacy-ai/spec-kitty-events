@@ -1,5 +1,7 @@
 vcs:
   type: git
+mission_type_activations:
+- software-dev
 agents:
   available:
   - claude
@@ -14,3 +16,4 @@ project:
   slug: spec-kitty-events
   node_id: d036a097a835
   build_id: 9324aef4-7e11-420a-8c53-46e88baa534f
+charter: .kittify/charter/charter.yaml

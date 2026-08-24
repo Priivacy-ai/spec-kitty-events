@@ -1,0 +1,39 @@
+{
+  "mission_slug": "dossier-invalid-fixture-coverage-01M0FSN4",
+  "mission_number": "",
+  "mission_type": "software-dev",
+  "overall_verdict": "pass",
+  "criteria": [
+    {
+      "criterion_id": "FR-001",
+      "description": "Invalid fixture for MissionDossierArtifactMissing: targets a real Pydantic constraint, minimally different from a valid sibling, registered in manifest.json.",
+      "proof_type": "automated_test",
+      "evidence": "WP01 commit 9382bcd: dossier_artifact_missing_empty_step.json, independently re-validated by reviewer via validate_event() -> fails on manifest_step min_length=1",
+      "pass_fail": "pass",
+      "verified_by": "claude",
+      "verified_at": "2026-08-21T11:10:17.438133+00:00",
+      "notes": "Criterion text sourced from spec.md Functional Requirements, FR-001."
+    },
+    {
+      "criterion_id": "FR-002",
+      "description": "Invalid fixture for MissionDossierSnapshotComputed: exercises a violation kind distinct from FR-001's and the three pre-existing invalid fixtures, registered in manifest.json.",
+      "proof_type": "automated_test",
+      "evidence": "WP01 commit 9382bcd: dossier_snapshot_computed_negative_count.json, independently re-validated by reviewer via validate_event() -> fails on artifact_count ge=0",
+      "pass_fail": "pass",
+      "verified_by": "claude",
+      "verified_at": "2026-08-21T11:10:27.573173+00:00",
+      "notes": "Criterion text sourced from spec.md Functional Requirements, FR-002."
+    },
+    {
+      "criterion_id": "FR-003",
+      "description": "Both fixtures registered in src/spec_kitty_events/conformance/fixtures/manifest.json with expected_result: invalid (the mechanism load_fixtures() uses, not directory-scanning), and the hardcoded counts in tests/test_dossier_conformance.py updated (13->15, 3->5) so the existing parametrized tests pick both up.",
+      "proof_type": "automated_test",
+      "evidence": "WP02 commit a114876: manifest.json entries added, test_dossier_conformance.py count gates bumped 13->15/3->5, pytest 26/26 passed independently re-run by reviewer",
+      "pass_fail": "pass",
+      "verified_by": "claude",
+      "verified_at": "2026-08-21T11:10:38.654391+00:00",
+      "notes": "Criterion text sourced from spec.md Functional Requirements, FR-003."
+    }
+  ],
+  "negative_invariants": []
+}

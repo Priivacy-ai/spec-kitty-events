@@ -1,5 +1,6 @@
 {
   "created_at": "2026-05-22T10:10:16.762124+00:00",
+  "flattened": false,
   "friendly_name": "Canonical Producer Contracts and Legacy Envelope Compatibility",
   "mission_id": "01KS7JM3HSNXGCWV2E9X3JGAEP",
   "mission_number": null,
@@ -9,6 +10,7 @@
   "purpose_tldr": "Close the conformance and legacy-envelope gaps that block the CLI producer refactor and SaaS legacy adapter.",
   "slug": "canonical-producer-contracts-legacy-envelope-01KS7JM3",
   "target_branch": "kitty/pr/1198-canonical-producer-contracts",
+  "topology": "lanes",
   "vcs": "git",
   "vcs_locked_at": "2026-05-22T10:43:00.449313+00:00"
 }

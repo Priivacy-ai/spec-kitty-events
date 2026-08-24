@@ -1,0 +1,81 @@
+{
+  "event_count": 14,
+  "last_event_id": "01M0J0CA8ADZ8WA5JQRGDV14QA",
+  "materialized_at": "2026-08-21T11:12:58.634119+00:00",
+  "mission_number": "",
+  "mission_slug": "dossier-invalid-fixture-coverage-01M0FSN4",
+  "mission_type": "software-dev",
+  "summary": {
+    "approved": 0,
+    "blocked": 0,
+    "canceled": 0,
+    "claimed": 0,
+    "done": 2,
+    "for_review": 0,
+    "in_progress": 0,
+    "in_review": 0,
+    "planned": 0
+  },
+  "work_packages": {
+    "WP01": {
+      "actor": "merge",
+      "agent": "claude",
+      "agent_profile": "reviewer-renata",
+      "agent_profile_version": "1.0",
+      "force_count": 0,
+      "lane": "done",
+      "last_event_id": "01M0J0C50V6ME01CXSMF9SY5FZ",
+      "last_transition_at": "2026-08-21T11:12:53.275635+00:00",
+      "model": "__resolved_model_absent__",
+      "notes": [
+        "Both invalid fixtures authored and locally validated against validate_event().",
+        "Review passed: both fixtures independently re-verified against valid siblings (exactly one field differs each) and against validate_event() (fail for exactly the documented reason at both the Pydantic-model and JSON-Schema layers). Zero out-of-scope files touched. Anti-pattern checklist: all N/A or PASS."
+      ],
+      "provider": "__resolved_provider_absent__",
+      "review_result": {
+        "reference": "Review passed: both fixtures independently re-verified against valid siblings (exactly one field differs each) and against validate_event() (fail for exactly the documented reason at both the Pydantic-model and JSON-Schema layers). Zero out-of-scope files touched. Anti-pattern checklist: all N/A or PASS.",
+        "reviewer": "Maarten Van Bosstraeten",
+        "verdict": "approved"
+      },
+      "role": "reviewer",
+      "shell_pid": 187160,
+      "shell_pid_created_at": "1787309127.77",
+      "subtasks": {
+        "T001": "done",
+        "T002": "done",
+        "T003": "done",
+        "T004": "done"
+      }
+    },
+    "WP02": {
+      "actor": "merge",
+      "agent": "claude",
+      "agent_profile": "reviewer-renata",
+      "agent_profile_version": "1.0",
+      "force_count": 0,
+      "lane": "done",
+      "last_event_id": "01M0J0CA8ADZ8WA5JQRGDV14QA",
+      "last_transition_at": "2026-08-21T11:12:58.634119+00:00",
+      "model": "__resolved_model_absent__",
+      "notes": [
+        "Manifest entries added, count gates updated, full pytest suite green, manifest/directory consistency verified.",
+        "Review passed. WP02 commit a114876 is scoped exactly to manifest.json (+2 entries for dossier-artifact-missing-empty-step, dossier-snapshot-computed-negative-count, both expected_result=invalid with specific rule-violation notes, matching contracts/manifest-entry-contract.md) and tests/test_dossier_conformance.py (13->15, 3->5 literals only; test_dossier_valid_case_count=10 untouched; no new def test_ added). Independently ran uv pip install -e '.[dev]' + pytest tests/test_dossier_conformance.py -v: 26/26 passed, including both new parametrized cases under test_invalid_fixture_fails_conformance and all three count-gate tests. T008 manifest/directory 1:1 consistency script confirms 5 invalid dossier fixtures, no mismatch. git show --stat on the WP02 commit itself confirms zero out-of-scope files touched; dossier.py/schemas/validators.py untouched (C-001/C-003 respected). lanes.json shows clean write-scope separation from WP01, no shared-file coordination needed. Anti-pattern checklist: 8/8 PASS."
+      ],
+      "provider": "__resolved_provider_absent__",
+      "review_result": {
+        "reference": "Review passed. WP02 commit a114876 is scoped exactly to manifest.json (+2 entries for dossier-artifact-missing-empty-step, dossier-snapshot-computed-negative-count, both expected_result=invalid with specific rule-violation notes, matching contracts/manifest-entry-contract.md) and tests/test_dossier_conformance.py (13->15, 3->5 literals only; test_dossier_valid_case_count=10 untouched; no new def test_ added). Independently ran uv pip install -e '.[dev]' + pytest tests/test_dossier_conformance.py -v: 26/26 passed, including both new parametrized cases under test_invalid_fixture_fails_conformance and all three count-gate tests. T008 manifest/directory 1:1 consistency script confirms 5 invalid dossier fixtures, no mismatch. git show --stat on the WP02 commit itself confirms zero out-of-scope files touched; dossier.py/schemas/validators.py untouched (C-001/C-003 respected). lanes.json shows clean write-scope separation from WP01, no shared-file coordination needed. Anti-pattern checklist: 8/8 PASS.",
+        "reviewer": "Maarten Van Bosstraeten",
+        "verdict": "approved"
+      },
+      "role": "reviewer",
+      "shell_pid": 196554,
+      "shell_pid_created_at": "1787310216.81",
+      "subtasks": {
+        "T005": "done",
+        "T006": "done",
+        "T007": "done",
+        "T008": "done"
+      }
+    }
+  }
+}

@@ -62,9 +62,9 @@ def test_invalid_fixture_fails_conformance(case: object) -> None:
 
 
 def test_dossier_fixture_count() -> None:
-    """Loader must return exactly 13 dossier fixture cases (not replay streams)."""
+    """Loader must return exactly 15 dossier fixture cases (not replay streams)."""
     cases = load_fixtures("dossier")
-    assert len(cases) == 13, f"Expected 13 cases, got {len(cases)}"
+    assert len(cases) == 15, f"Expected 15 cases, got {len(cases)}"
 
 
 def test_dossier_valid_case_count() -> None:
@@ -76,9 +76,9 @@ def test_dossier_valid_case_count() -> None:
 
 
 def test_dossier_invalid_case_count() -> None:
-    """Loader must return exactly 3 invalid dossier fixture cases."""
-    assert len(_INVALID_CASES) == 3, (
-        f"Expected 3 invalid cases, got {len(_INVALID_CASES)}: "
+    """Loader must return exactly 5 invalid dossier fixture cases."""
+    assert len(_INVALID_CASES) == 5, (
+        f"Expected 5 invalid cases, got {len(_INVALID_CASES)}: "
         f"{[c.id for c in _INVALID_CASES]}"
     )
 
