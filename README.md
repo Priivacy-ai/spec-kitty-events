@@ -73,6 +73,12 @@ cd spec-kitty-events
 pip install -e ".[dev,conformance]"
 ```
 
+Or, with [uv](https://docs.astral.sh/uv/), install the exact versions pinned by the committed `uv.lock` — what CI and `make test-fast`/`make test-full` resolve against. If `pyproject.toml` changes, re-run `uv lock` and commit the updated file (`uv sync --locked` fails on a stale lock):
+
+```bash
+uv sync --locked --extra dev --extra conformance
+```
+
 ## Contract Highlights
 
 - `Event` is the canonical top-level envelope.
