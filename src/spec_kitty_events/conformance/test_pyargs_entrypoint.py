@@ -84,7 +84,7 @@ def _event_fixture_entries() -> List[Dict[str, Any]]:
       "<missing>", "<wrong>") used only to label the class; the
       class-taxonomy suite asserts on them via a different code path.
     """
-    def _included(f: Dict[str, Any]) -> bool:
+    def _included(f: dict[str, Any]) -> bool:
         if f["event_type"] == "LaneMapping":
             return False
         if f.get("fixture_type") in (
