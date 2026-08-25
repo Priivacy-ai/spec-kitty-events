@@ -19,10 +19,11 @@ def test_unsupported_schema_version_code_exists() -> None:
     assert ValidationErrorCode.UNSUPPORTED_SCHEMA_VERSION == "UNSUPPORTED_SCHEMA_VERSION"
 
 
-def test_closed_enum_has_exactly_seven_members() -> None:
+def test_closed_enum_has_exactly_eight_members() -> None:
     # 5 pre-existing (FORBIDDEN_KEY, UNKNOWN_LANE, PAYLOAD_SCHEMA_FAIL,
-    # ENVELOPE_SHAPE_INVALID, RAW_HISTORICAL_ROW) + 2 new members.
-    assert len(ValidationErrorCode) == 7
+    # ENVELOPE_SHAPE_INVALID, RAW_HISTORICAL_ROW) + 2 from F1-T1 (7.0.0)
+    # + FORBIDDEN_AGGREGATE_NAME (8.0.0, issue #10).
+    assert len(ValidationErrorCode) == 8
 
 
 def test_unknown_event_type_error_constructs() -> None:

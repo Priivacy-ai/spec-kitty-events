@@ -45,7 +45,7 @@ major version is `5.0.0`; the on-wire envelope schema remains
 - Mission identity fields are canonicalized to `mission_slug`, `mission_number`, and `mission_type`.
 - Event envelopes require `build_id` and use the cutover signal `schema_version="3.0.0"`.
 - Live ingestion is fail-closed. There are no runtime compatibility aliases for legacy mission-domain fields.
-- Legacy mission-domain keys and names such as `feature_slug`, `feature_number`, `mission_key`, `legacy_aggregate_id`, `FeatureCreated`, and `FeatureClosed` are rejected on live paths.
+- Legacy mission-domain keys, names, and aggregate prefixes such as `feature_slug`, `feature_number`, `mission_key`, `legacy_aggregate_id`, `FeatureCreated`, `FeatureClosed`, and `aggregate_id="feature/…"` are rejected on live paths (the strict profile; see `COMPATIBILITY.md`).
 - `in_review` is part of the canonical lane vocabulary.
 - The conformance package includes historical-shape fixtures for TeamSpace migration dry-runs.
 

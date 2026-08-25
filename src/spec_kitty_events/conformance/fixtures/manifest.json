@@ -2099,7 +2099,7 @@
       "path": "cutover_boundary/accepted_by_validate_event/aggregate_prefix_feature.json",
       "expected_result": "valid",
       "event_type": "MissionCreated",
-      "notes": "8.0.0 boundary: the legacy aggregate prefix feature/ is no longer rejected by any shipped validator; the dedicated prefix check was removed with the cutover artifact (aggregate-prefix decision tracked separately).",
+      "notes": "8.0.0 boundary: validate_event no longer applies the aggregate-prefix check (cutover gate removed); strict-profile rejection is covered by cutover-boundary-strict-aggregate-prefix-feature.",
       "min_version": "8.0.0"
     },
     {
@@ -2140,6 +2140,14 @@
       "expected_result": "invalid",
       "event_type": "MissionCreated",
       "notes": "Strict profile rejects what 8.0.0's validate_event accepts: payload-nested feature_slug yields FORBIDDEN_KEY (recursive walk) + PAYLOAD_SCHEMA_FAIL (extra=forbid).",
+      "min_version": "8.0.0"
+    },
+    {
+      "id": "cutover-boundary-strict-aggregate-prefix-feature",
+      "path": "cutover_boundary/rejected_by_strict_profile/aggregate_prefix_feature.json",
+      "expected_result": "invalid",
+      "event_type": "MissionCreated",
+      "notes": "Strict profile rejects what 8.0.0's validate_event accepts: the legacy aggregate prefix feature/ yields exactly FORBIDDEN_AGGREGATE_NAME -- the cutover-artifact prefix rule re-homed onto the strict profile (issue #10).",
       "min_version": "8.0.0"
     },
     {

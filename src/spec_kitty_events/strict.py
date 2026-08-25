@@ -59,6 +59,7 @@ __all__ = [
     "STRICT_ENVELOPE_KEYS",
     "STRICT_EVENT_TYPES",
     "STRICT_TIMESTAMP_RULES",
+    "FORBIDDEN_LEGACY_AGGREGATE_NAMES",
     "validate_strict_envelope",
     "SupportRow",
     "SUPPORT_MATRIX",
@@ -110,6 +111,18 @@ STRICT_EVENT_TYPES: frozenset[str] = frozenset(
 )
 
 STRICT_TIMESTAMP_RULES: str = "iso8601-tz-aware"
+
+# Legacy mission-domain aggregate names (issue #10): pre-cutover envelopes
+# named their aggregate ``feature/<slug>`` or ``feature_catalog/<n>``;
+# canonical ids are ``mission/...`` (and ``session/<id>`` for
+# HarnessObservation). The prefix rule shipped with the deleted cutover
+# artifact; 8.0.0 re-homes it onto this profile so every legacy surface it
+# policed — keys, event names, aggregate names — fails closed on live paths
+# again. Like FORBIDDEN_LEGACY_KEYS, membership changes are a contract
+# change under contracts/versioning-and-compatibility.md.
+FORBIDDEN_LEGACY_AGGREGATE_NAMES: frozenset[str] = frozenset(
+    {"feature", "feature_catalog"}
+)
 
 _REQUIRED_SCHEMA_VERSION = "3.0.0"
 
@@ -447,15 +460,18 @@ def validate_strict_envelope(record: Any) -> Tuple[ValidationError, ...]:
     3. no key outside STRICT_ENVELOPE_KEYS
     4. forbidden keys anywhere (recursive walk; FORBIDDEN_LEGACY_KEYS,
        plus FORBIDDEN_OBSERVATION_KEYS when event_type == HarnessObservation)
-    5. schema_version present, str, == "3.0.0"
-    6. event_type in STRICT_EVENT_TYPES
-    7. timestamp is str, ISO-8601, tz-aware
-    8. Event.model_validate(record)
-    9. validate_event(record, event_type, strict=False) model violations
+    5. aggregate_id does not use a forbidden legacy name prefix
+       (FORBIDDEN_LEGACY_AGGREGATE_NAMES)
+    6. schema_version present, str, == "3.0.0"
+    7. event_type in STRICT_EVENT_TYPES
+    8. timestamp is str, ISO-8601, tz-aware
 
-    Steps 1-7 all run (collect-all); steps 8-9 are skipped when any of 1-3
-    or 5-6 failed (no cascading noise from a record already known to be
+    Steps 1-8 all run (collect-all); steps 9-10 are skipped when any of 1-3
+    or 6-7 failed (no cascading noise from a record already known to be
     unusable at the envelope/type level).
+
+    9. Event.model_validate(record)
+    10. validate_event(record, event_type, strict=False) model violations
     """
     errors: list[ValidationError] = []
 
@@ -483,7 +499,26 @@ def validate_strict_envelope(record: Any) -> Tuple[ValidationError, ...]:
         forbidden_set = FORBIDDEN_LEGACY_KEYS | FORBIDDEN_OBSERVATION_KEYS
     errors.extend(find_forbidden_keys(record, forbidden=forbidden_set))
 
-    # Step 5: schema_version present, str, exact match.
+    # Step 5: no forbidden legacy aggregate-name prefix (issue #10). Like
+    # step 4, a hit here does not set envelope_shape_failed/type_failed —
+    # the model layers below still run and may report further defects.
+    aggregate_id = record.get("aggregate_id")
+    if isinstance(aggregate_id, str):
+        aggregate_name = aggregate_id.split("/", 1)[0]
+        if aggregate_name in FORBIDDEN_LEGACY_AGGREGATE_NAMES:
+            errors.append(
+                ValidationError(
+                    code=ValidationErrorCode.FORBIDDEN_AGGREGATE_NAME,
+                    message=(
+                        "aggregate_id uses forbidden legacy aggregate name "
+                        f"'{aggregate_name}'"
+                    ),
+                    path=["aggregate_id"],
+                    details={"aggregate_name": aggregate_name},
+                )
+            )
+
+    # Step 6: schema_version present, str, exact match.
     type_failed = False
     schema_version = record.get("schema_version")
     if not isinstance(schema_version, str) or schema_version != _REQUIRED_SCHEMA_VERSION:
@@ -497,7 +532,7 @@ def validate_strict_envelope(record: Any) -> Tuple[ValidationError, ...]:
         )
         type_failed = True
 
-    # Step 6: event_type admitted by the profile.
+    # Step 7: event_type admitted by the profile.
     event_type = record.get("event_type")
     if event_type not in STRICT_EVENT_TYPES:
         errors.append(
@@ -510,7 +545,7 @@ def validate_strict_envelope(record: Any) -> Tuple[ValidationError, ...]:
         )
         type_failed = True
 
-    # Step 7: timestamp shape (only when the key is present at all — its
+    # Step 8: timestamp shape (only when the key is present at all — its
     # absence is already reported by step 2 and we do not want a second,
     # confusing error about the same missing field).
     if "timestamp" in record:
@@ -551,7 +586,7 @@ def validate_strict_envelope(record: Any) -> Tuple[ValidationError, ...]:
         # detailed, and potentially misleading) model layers.
         return tuple(errors)
 
-    # Step 8: Event.model_validate(record).
+    # Step 9: Event.model_validate(record).
     try:
         Event.model_validate(dict(record))
     except PydanticValidationError as exc:
@@ -576,9 +611,9 @@ def validate_strict_envelope(record: Any) -> Tuple[ValidationError, ...]:
                     )
                 )
 
-    # Step 9: typed payload / semantic validation via the existing registry.
+    # Step 10: typed payload / semantic validation via the existing registry.
     # event_type is known to be a str member of STRICT_EVENT_TYPES here:
-    # type_failed is False, so step 6 above confirmed membership.
+    # type_failed is False, so step 7 above confirmed membership.
     assert isinstance(event_type, str)
     result = validate_event(dict(record), event_type, strict=False)
     for violation in result.model_violations:
