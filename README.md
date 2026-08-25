@@ -130,16 +130,7 @@ assert result.valid
 
 ### Validate a Full Envelope
 
-`validate_event` checks payload shape against the canonical contract. For
-fail-closed envelope gating (`schema_version == "3.0.0"`, full key set,
-recursive forbidden-key walk), use the strict profile:
-
-```python
-from spec_kitty_events.strict import validate_strict_envelope
-
-errors = validate_strict_envelope(envelope)
-assert not errors
-```
+Build the envelope, then validate it:
 
 ```python
 from spec_kitty_events.conformance import validate_event
@@ -167,6 +158,17 @@ envelope = {
 
 result = validate_event(envelope, "WPStatusChanged", strict=True)
 assert result.valid
+```
+
+For fail-closed envelope gating (`schema_version == "3.0.0"`, full key
+set, recursive forbidden-key walk), use the strict profile —
+`validate_event` does not enforce it itself:
+
+```python
+from spec_kitty_events.strict import validate_strict_envelope
+
+errors = validate_strict_envelope(envelope)
+assert not errors
 ```
 
 ## Schemas And Conformance

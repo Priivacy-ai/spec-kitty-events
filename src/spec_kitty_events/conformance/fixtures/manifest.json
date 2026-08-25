@@ -1941,6 +1941,78 @@
       "event_type": "MissionCreated",
       "notes": "envelope_strict_journal class. X10: the actual spec-kitty local-appender envelope shape; three collect-all errors.",
       "min_version": "7.0.0"
+    },
+    {
+      "id": "cutover-boundary-accept-schema-version-missing",
+      "path": "cutover_boundary/accepted_by_validate_event/schema_version_missing.json",
+      "expected_result": "valid",
+      "event_type": "MissionCreated",
+      "notes": "8.0.0 boundary: envelope without schema_version is no longer rejected by validate_event (cutover gate removed); strict-profile rejection covered by cutover-boundary-strict-schema-version-missing.",
+      "min_version": "8.0.0"
+    },
+    {
+      "id": "cutover-boundary-accept-schema-version-wrong-major",
+      "path": "cutover_boundary/accepted_by_validate_event/schema_version_wrong_major.json",
+      "expected_result": "valid",
+      "event_type": "MissionCreated",
+      "notes": "8.0.0 boundary: schema_version \"2.9.0\" is no longer rejected by validate_event (cutover gate removed); strict-profile rejection covered by cutover-boundary-strict-schema-version-wrong-major.",
+      "min_version": "8.0.0"
+    },
+    {
+      "id": "cutover-boundary-accept-aggregate-prefix-feature",
+      "path": "cutover_boundary/accepted_by_validate_event/aggregate_prefix_feature.json",
+      "expected_result": "valid",
+      "event_type": "MissionCreated",
+      "notes": "8.0.0 boundary: the legacy aggregate prefix feature/ is no longer rejected by any shipped validator; the dedicated prefix check was removed with the cutover artifact (aggregate-prefix decision tracked separately).",
+      "min_version": "8.0.0"
+    },
+    {
+      "id": "cutover-boundary-accept-envelope-level-legacy-key",
+      "path": "cutover_boundary/accepted_by_validate_event/envelope_level_legacy_key.json",
+      "expected_result": "valid",
+      "event_type": "MissionCreated",
+      "notes": "8.0.0 boundary: an envelope-level forbidden legacy key (mission_key) is not seen by validate_event, which does not run the recursive walker; strict-profile rejection covered by cutover-boundary-strict-forbidden-key-top-level.",
+      "min_version": "8.0.0"
+    },
+    {
+      "id": "cutover-boundary-strict-schema-version-missing",
+      "path": "cutover_boundary/rejected_by_strict_profile/schema_version_missing.json",
+      "expected_result": "invalid",
+      "event_type": "MissionCreated",
+      "notes": "Strict profile rejects what 8.0.0's validate_event accepts: missing schema_version yields ENVELOPE_SHAPE_INVALID + UNSUPPORTED_SCHEMA_VERSION from validate_strict_envelope.",
+      "min_version": "8.0.0"
+    },
+    {
+      "id": "cutover-boundary-strict-schema-version-wrong-major",
+      "path": "cutover_boundary/rejected_by_strict_profile/schema_version_wrong_major.json",
+      "expected_result": "invalid",
+      "event_type": "MissionCreated",
+      "notes": "Strict profile rejects what 8.0.0's validate_event accepts: schema_version \"2.9.0\" yields exactly UNSUPPORTED_SCHEMA_VERSION.",
+      "min_version": "8.0.0"
+    },
+    {
+      "id": "cutover-boundary-strict-forbidden-key-top-level",
+      "path": "cutover_boundary/rejected_by_strict_profile/forbidden_key_top_level.json",
+      "expected_result": "invalid",
+      "event_type": "MissionCreated",
+      "notes": "Strict profile rejects what 8.0.0's validate_event accepts: envelope-level mission_key yields ENVELOPE_SHAPE_INVALID (extra key) + FORBIDDEN_KEY.",
+      "min_version": "8.0.0"
+    },
+    {
+      "id": "cutover-boundary-strict-forbidden-key-nested-payload",
+      "path": "cutover_boundary/rejected_by_strict_profile/forbidden_key_nested_payload.json",
+      "expected_result": "invalid",
+      "event_type": "MissionCreated",
+      "notes": "Strict profile rejects what 8.0.0's validate_event accepts: payload-nested feature_slug yields FORBIDDEN_KEY (recursive walk) + PAYLOAD_SCHEMA_FAIL (extra=forbid).",
+      "min_version": "8.0.0"
+    },
+    {
+      "id": "cutover-boundary-strict-legacy-event-name",
+      "path": "cutover_boundary/rejected_by_strict_profile/legacy_event_name.json",
+      "expected_result": "invalid",
+      "event_type": "FeatureCreated",
+      "notes": "Forbidden legacy event name FeatureCreated moved from the removed cutover gate to strict-profile membership: validate_strict_envelope reports exactly UNKNOWN_EVENT_TYPE.",
+      "min_version": "8.0.0"
     }
   ],
   "classes": {

@@ -1,0 +1,23 @@
+{
+  "event_id": "01J00000000000000000000001",
+  "event_type": "MissionCreated",
+  "aggregate_id": "mission/01J0000000000000000000MS1",
+  "payload": {
+    "mission_id": "01J0000000000000000000MS1",
+    "mission_slug": "fixture-mission",
+    "mission_number": 1,
+    "mission_type": "software-dev",
+    "target_branch": "main",
+    "wp_count": 3,
+    "friendly_name": "Fixture Mission",
+    "purpose_tldr": "Boundary fixture: envelope with a pre-cutover schema_version major.",
+    "purpose_context": "Identical to the envelope_valid_canonical MissionCreated baseline except that schema_version is \"2.9.0\". The 8.0.0 cutover-gate removal means validate_event accepts this envelope; fail-closed gating lives in the strict profile (see rejected_by_strict_profile/schema_version_wrong_major.json)."
+  },
+  "timestamp": "2026-01-01T00:00:00+00:00",
+  "build_id": "build-2026-01-01-fixture",
+  "node_id": "fixture-node",
+  "lamport_clock": 1,
+  "correlation_id": "01J0000000000000000000CR01",
+  "project_uuid": "00000000-0000-0000-0000-000000000001",
+  "schema_version": "2.9.0"
+}
