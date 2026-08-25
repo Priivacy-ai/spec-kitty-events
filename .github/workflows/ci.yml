@@ -21,18 +21,23 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
 
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -e ".[dev,conformance]"
+    - name: Install uv
+      uses: astral-sh/setup-uv@v3
+      with:
+        enable-cache: true
+
+    # `--locked`, not `--frozen`: frozen silently installs a stale lock, while
+    # locked fails when pyproject.toml and uv.lock disagree (issue #8).
+    - name: Install dependencies (pinned by committed uv.lock)
+      run: uv sync --locked --extra dev --extra conformance --python ${{ matrix.python-version }}
 
     - name: Run pytest with coverage
       run: |
-        pytest --cov --cov-report=xml
+        uv run --no-sync pytest --cov --cov-report=xml
 
     - name: Run mypy type checker
       run: |
-        mypy src/spec_kitty_events --strict
+        uv run --no-sync mypy src/spec_kitty_events --strict
 
     - name: Upload coverage to Codecov (optional)
       if: matrix.python-version == '3.10'
