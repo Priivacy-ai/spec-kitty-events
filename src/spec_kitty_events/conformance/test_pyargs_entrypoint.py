@@ -21,6 +21,7 @@ from spec_kitty_events.conformance.validators import (
 )
 from spec_kitty_events.schemas import list_schemas, load_schema
 from spec_kitty_events.status import Lane, SyncLaneV1, CANONICAL_TO_SYNC_V1
+from spec_kitty_events.validation_errors import ValidationErrorCode
 
 
 # --- Manifest-driven fixture tests ---
@@ -66,21 +67,30 @@ def _event_fixture_entries() -> List[Dict[str, Any]]:
 
     Excludes:
     - LaneMapping fixtures (handled by lane-mapping parametrized tests).
-    - LegacyEnvelope fixtures (exercised by tests/unit/test_legacy_normalizer.py,
-      not by validate_event). Mission:
-      canonical-producer-contracts-legacy-envelope-01KS7JM3.
     - Special fixture_type kinds (replay_stream, reducer_output,
-      timestamp_semantics, legacy_normalization) that are not raw envelope
-      payloads to validate.
+      timestamp_semantics) that are not raw envelope payloads to validate.
+    - Forbidden-key class fixtures: they assert rejection with code
+      FORBIDDEN_KEY from the recursive walker
+      (forbidden_keys.find_forbidden_keys), enforced by the strict profile;
+      the shipped assertion lives in
+      test_strict_profile_rejects_forbidden_key_class_fixtures below --
+      this generic, lenient entrypoint does not run the walker.
+    - Cutover-boundary strict-profile fixtures
+      (cutover_boundary/rejected_by_strict_profile/): they assert
+      validate_strict_envelope rejections on envelopes that validate_event
+      deliberately accepts since 8.0.0 removed the cutover gate; routing
+      them through this generic test would produce false failures.
+    - Diagnostic-taxonomy fixtures whose event_type is a sentinel (e.g.
+      "<missing>", "<wrong>") used only to label the class; the
+      class-taxonomy suite asserts on them via a different code path.
     """
-    return [
-        f for f in _MANIFEST["fixtures"]
-        if f["event_type"] not in ("LaneMapping", "LegacyEnvelope")
-        and f.get("fixture_type") not in (
+    def _included(f: dict[str, Any]) -> bool:
+        if f["event_type"] == "LaneMapping":
+            return False
+        if f.get("fixture_type") in (
             "replay_stream",
             "reducer_output",
             "timestamp_semantics",
-            "legacy_normalization",
             # envelope_strict_journal (F1-T1) class_taxonomy fixtures: these
             # assert strict-profile-only rejections (e.g. an envelope-level
             # extra key, a naive timestamp) that the lenient Event model /
@@ -91,14 +101,15 @@ def _event_fixture_entries() -> List[Dict[str, Any]]:
             # spec_kitty_events.strict.validate_strict_envelope in
             # tests/test_envelope_strict_journal_class.py instead.
             "strict_profile_only",
-        )
-        # Skip diagnostic-taxonomy fixtures whose event_type is a sentinel
-        # (e.g. "<missing>", "<wrong>") used only to label the class. These
-        # are not real events; the class-taxonomy test suite asserts on them
-        # via a different code path. Mission:
-        # canonical-producer-contracts-legacy-envelope-01KS7JM3.
-        and f["event_type"] in _EVENT_TYPE_TO_MODEL
-    ]
+        ):
+            return False
+        if f["path"].startswith("class_taxonomy/envelope_invalid_forbidden_key/"):
+            return False
+        if f["path"].startswith("cutover_boundary/rejected_by_strict_profile/"):
+            return False
+        return f["event_type"] in _EVENT_TYPE_TO_MODEL
+
+    return [f for f in _MANIFEST["fixtures"] if _included(f)]
 
 
 def _event_fixture_ids() -> List[str]:
@@ -232,6 +243,130 @@ def test_schema_is_valid_json_schema(name: str) -> None:
     schema = load_schema(name)
     assert "$schema" in schema
     assert "$id" in schema
+
+
+# --- Cutover-boundary conformance tests (8.0.0) ---
+#
+# 8.0.0 deleted spec_kitty_events.cutover and with it the envelope-level
+# gate validate_event() used to apply (missing/wrong schema_version,
+# forbidden legacy keys/names, aggregate prefixes). contracts/
+# versioning-and-compatibility.md item 5 ("Required artifacts on a major
+# bump") requires fixtures covering that moved accept/reject boundary,
+# shipped in this packaged entrypoint -- not only in the repo-only test
+# tree, which downstream consumers running
+# `pytest --pyargs spec_kitty_events.conformance` never see.
+#
+# The fixtures live under cutover_boundary/:
+#
+# - accepted_by_validate_event/: envelopes the removed gate used to reject
+#   and validate_event now accepts. Each one differs from the canonical
+#   MissionCreated baseline by exactly the moved property.
+# - rejected_by_strict_profile/: full strict-profile envelopes (all 14
+#   STRICT_ENVELOPE_KEYS) carrying exactly one boundary defect, which
+#   validate_strict_envelope must reject with a pinned error-code list.
+
+_ACCEPT_DIR = "cutover_boundary/accepted_by_validate_event/"
+_STRICT_REJECT_DIR = "cutover_boundary/rejected_by_strict_profile/"
+_FORBIDDEN_KEY_CLASS_DIR = "class_taxonomy/envelope_invalid_forbidden_key/"
+
+
+def _manifest_entries(path_prefix: str) -> list[dict[str, Any]]:
+    return [f for f in _MANIFEST["fixtures"] if f["path"].startswith(path_prefix)]
+
+
+def _read_fixture(entry: dict[str, Any]) -> dict[str, Any]:
+    fixture_path = _FIXTURES_DIR / entry["path"]
+    payload: Any = json.loads(fixture_path.read_text(encoding="utf-8"))
+    if _is_wrapper_shape(payload):
+        payload = payload["input"]
+    assert isinstance(payload, dict)
+    return payload
+
+
+@pytest.mark.parametrize(
+    "entry",
+    _manifest_entries(_ACCEPT_DIR),
+    ids=[e["id"] for e in _manifest_entries(_ACCEPT_DIR)],
+)
+def test_cutover_boundary_accepted_by_validate_event(entry: dict[str, Any]) -> None:
+    """Envelopes the removed cutover gate rejected are accepted since 8.0.0.
+
+    Pins the new accept side of the boundary in both validation layers:
+    zero model violations AND zero schema violations (the generic
+    manifest-driven test above tolerates schema-layer noise for valid
+    fixtures; these boundary pins do not).
+    """
+    payload = _read_fixture(entry)
+    result = validate_event(payload, entry["event_type"])
+    assert result.valid, (
+        f"Fixture {entry['path']} must be accepted by validate_event since "
+        f"8.0.0 removed the cutover gate; violations: "
+        f"{[v.message for v in result.model_violations]} / "
+        f"{[v.message for v in result.schema_violations]}"
+    )
+    assert not result.model_violations
+    assert not result.schema_violations
+
+
+@pytest.mark.parametrize(
+    "entry",
+    _manifest_entries(_STRICT_REJECT_DIR),
+    ids=[e["id"] for e in _manifest_entries(_STRICT_REJECT_DIR)],
+)
+def test_cutover_boundary_rejected_by_strict_profile(entry: dict[str, Any]) -> None:
+    """validate_strict_envelope still fails closed on the moved boundary.
+
+    The fixture file carries ``expected_error_codes`` -- the exact,
+    deterministic code list validate_strict_envelope returns for that
+    single-defect envelope -- and the assertion is equality, so an
+    envelope that starts failing for some additional reason fails here.
+    """
+    from spec_kitty_events.strict import validate_strict_envelope
+
+    fixture_path = _FIXTURES_DIR / entry["path"]
+    wrapper: dict[str, Any] = json.loads(fixture_path.read_text(encoding="utf-8"))
+    expected_codes = wrapper["expected_error_codes"]
+    errors = validate_strict_envelope(wrapper["input"])
+    actual_codes = [error.code.value for error in errors]
+    assert actual_codes == expected_codes, (
+        f"Fixture {entry['path']}: expected strict-profile codes "
+        f"{expected_codes}, got {actual_codes}"
+    )
+
+
+@pytest.mark.parametrize(
+    "entry",
+    [
+        e
+        for e in _MANIFEST["classes"]["entries"]
+        if e["path"].startswith(_FORBIDDEN_KEY_CLASS_DIR)
+    ],
+    ids=[
+        e["id"]
+        for e in _MANIFEST["classes"]["entries"]
+        if e["path"].startswith(_FORBIDDEN_KEY_CLASS_DIR)
+    ],
+)
+def test_strict_profile_rejects_forbidden_key_class_fixtures(entry: dict[str, Any]) -> None:
+    """The forbidden-key class taxonomy stays enforced under the strict profile.
+
+    The four class fixtures carry forbidden legacy keys at top level,
+    nested, at depth >= 10, and inside an array element. validate_event()
+    does not run the walker since 8.0.0, so their rejection assertion must
+    come from validate_strict_envelope -- here in the shipped gate, where
+    consumers running `pytest --pyargs` can see it (their envelope shapes
+    predate the strict profile's closed key set, so FORBIDDEN_KEY is
+    asserted as present rather than as the sole error).
+    """
+    from spec_kitty_events.strict import validate_strict_envelope
+
+    fixture = _read_fixture(entry)
+    errors = validate_strict_envelope(fixture)
+    actual_codes = {error.code.value for error in errors}
+    assert ValidationErrorCode.FORBIDDEN_KEY.value in actual_codes, (
+        f"Fixture {entry['path']} must be rejected with FORBIDDEN_KEY by "
+        f"validate_strict_envelope; got {sorted(actual_codes)}"
+    )
 
 
 # --- Round-trip serialization tests ---

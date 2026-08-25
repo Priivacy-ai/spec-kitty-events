@@ -1,6 +1,6 @@
 [project]
 name = "spec-kitty-events"
-version = "7.0.0"
+version = "8.0.0"
 description = "Event log library with Lamport clocks and systematic error tracking"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -50,12 +50,12 @@ spec_kitty_events = [
     "conformance/fixtures/events/invalid/*.json",
     "conformance/fixtures/class_taxonomy/*/*.json",
     "conformance/fixtures/class_taxonomy/*/*/*.json",
+    "conformance/fixtures/cutover_boundary/*/*.json",
     "conformance/fixtures/lane_mapping/valid/*.json",
     "conformance/fixtures/lane_mapping/invalid/*.json",
     "conformance/fixtures/edge_cases/valid/*.json",
     "conformance/fixtures/edge_cases/invalid/*.json",
     "conformance/fixtures/edge_cases/replay/*.jsonl",
-    "conformance/fixtures/legacy/*.json",
     "conformance/fixtures/collaboration/valid/*.json",
     "conformance/fixtures/collaboration/invalid/*.json",
     "conformance/fixtures/glossary/valid/*.json",
@@ -78,18 +78,12 @@ spec_kitty_events = [
     "conformance/fixtures/connector/invalid/*.json",
     "conformance/fixtures/connector/replay/*.jsonl",
     "conformance/fixtures/connector/replay/*_output.json",
-    "conformance/fixtures/sync/valid/*.json",
-    "conformance/fixtures/sync/invalid/*.json",
-    "conformance/fixtures/sync/replay/*.jsonl",
-    "conformance/fixtures/sync/replay/*_output.json",
     "conformance/fixtures/profile_invocation/valid/*.json",
     "conformance/fixtures/profile_invocation/invalid/*.json",
     "conformance/fixtures/retrospective/valid/*.json",
     "conformance/fixtures/retrospective/invalid/*.json",
     "conformance/fixtures/analytics/valid/*.json",
     "conformance/fixtures/analytics/invalid/*.json",
-    "conformance/fixtures/replay/*.jsonl",
-    "conformance/fixtures/replay/*.json",
     "conformance/fixtures/harness_observation/valid/*.json",
     "conformance/fixtures/harness_observation/invalid/*.json",
     "conformance/fixtures/harness_observation/replay/*.jsonl",

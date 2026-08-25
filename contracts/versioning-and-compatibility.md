@@ -13,13 +13,13 @@
 | Axis | Where it lives | Current |
 |---|---|---|
 | **Package version** | `pyproject.toml` `[project].version`, `spec_kitty_events.__version__` | see [COMPATIBILITY.md](../COMPATIBILITY.md) |
-| **On-wire envelope schema version** | `Event.schema_version`; pinned by `cutover.py::CUTOVER_ARTIFACT.cutover_contract_version` | `3.0.0` |
+| **On-wire envelope schema version** | `Event.schema_version` (its default); required value enforced by `strict.validate_strict_envelope` | `3.0.0` |
 
 These move independently and conflating them is the most common misreading of
 this package. A major **package** bump signals a contract-behaviour change for
 at least one role. It does **not** imply a wire-format change, and producers
 must keep emitting `schema_version="3.0.0"` regardless of the package major —
-the cutover gate rejects anything else.
+the strict profile rejects anything else.
 
 Both `5.0.0` and `6.0.0` were major package bumps that intentionally left the
 envelope at `3.0.0`.

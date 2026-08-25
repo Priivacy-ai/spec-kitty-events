@@ -14,7 +14,6 @@ from dataclasses import dataclass
 from typing import Any, Callable, Dict, Tuple, Type, Union
 
 from pydantic import BaseModel, ValidationError as PydanticValidationError
-from spec_kitty_events.cutover import assert_canonical_cutover_signal
 
 from spec_kitty_events.build_lifecycle import (
     BuildHeartbeatPayload,
@@ -114,14 +113,6 @@ from spec_kitty_events.connector import (
     ConnectorDegradedPayload,
     ConnectorRevokedPayload,
     ConnectorReconnectedPayload,
-)
-from spec_kitty_events.sync import (
-    SyncIngestAcceptedPayload,
-    SyncIngestRejectedPayload,
-    SyncRetryScheduledPayload,
-    SyncDeadLetteredPayload,
-    SyncReplayCompletedPayload,
-    ExternalReferenceLinkedPayload,
 )
 from spec_kitty_events.profile_invocation import (
     ProfileInvocationStartedPayload,
@@ -251,13 +242,6 @@ _EVENT_TYPE_TO_MODEL: Dict[str, Any] = {
     "ConnectorDegraded": ConnectorDegradedPayload,
     "ConnectorRevoked": ConnectorRevokedPayload,
     "ConnectorReconnected": ConnectorReconnectedPayload,
-    # Sync lifecycle contracts (2.7.0)
-    "SyncIngestAccepted": SyncIngestAcceptedPayload,
-    "SyncIngestRejected": SyncIngestRejectedPayload,
-    "SyncRetryScheduled": SyncRetryScheduledPayload,
-    "SyncDeadLettered": SyncDeadLetteredPayload,
-    "SyncReplayCompleted": SyncReplayCompletedPayload,
-    "ExternalReferenceLinked": ExternalReferenceLinkedPayload,
     # Profile invocation contracts (3.1.0)
     "ProfileInvocationStarted": ProfileInvocationStartedPayload,
     # Retrospective contracts (4.1.0)
@@ -375,13 +359,6 @@ _EVENT_TYPE_TO_SCHEMA: Dict[str, str] = {
     "ConnectorDegraded": "connector_degraded_payload",
     "ConnectorRevoked": "connector_revoked_payload",
     "ConnectorReconnected": "connector_reconnected_payload",
-    # Sync lifecycle contracts (2.7.0)
-    "SyncIngestAccepted": "sync_ingest_accepted_payload",
-    "SyncIngestRejected": "sync_ingest_rejected_payload",
-    "SyncRetryScheduled": "sync_retry_scheduled_payload",
-    "SyncDeadLettered": "sync_dead_lettered_payload",
-    "SyncReplayCompleted": "sync_replay_completed_payload",
-    "ExternalReferenceLinked": "external_reference_linked_payload",
     # Profile invocation contracts (3.1.0)
     "ProfileInvocationStarted": "profile_invocation_started_payload",
     # Retrospective contracts (4.1.0)
@@ -577,33 +554,16 @@ def validate_event(
     model_class = _EVENT_TYPE_TO_MODEL[event_type]
     schema_name = _EVENT_TYPE_TO_SCHEMA.get(event_type)
 
-    envelope = None
     model_payload = payload
     if (
         event_type != "Event"
         and isinstance(payload.get("payload"), dict)
         and payload.get("event_type") == event_type
     ):
-        envelope = payload
         model_payload = payload["payload"]
 
-    cutover_violations: Tuple[ModelViolation, ...] = ()
-    if envelope is not None or event_type == "Event":
-        candidate_envelope = envelope or payload
-        try:
-            assert_canonical_cutover_signal(candidate_envelope)
-        except (TypeError, ValueError) as exc:
-            cutover_violations = (
-                ModelViolation(
-                    field="schema_version",
-                    message=str(exc),
-                    violation_type="cutover_policy",
-                    input_value=candidate_envelope,
-                ),
-            )
-
     # Layer 1: Pydantic validation
-    model_violations = cutover_violations + _validate_with_model(model_payload, model_class)
+    model_violations = _validate_with_model(model_payload, model_class)
 
     # Layer 1.5: Semantic (business-rule) validation. Run only when:
     #   (a) pydantic shape validation produced no violations (so the model

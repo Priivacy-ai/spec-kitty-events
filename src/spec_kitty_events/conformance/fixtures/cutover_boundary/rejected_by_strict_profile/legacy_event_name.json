@@ -1,0 +1,26 @@
+{
+  "expected": "invalid",
+  "profile": "journal/v1",
+  "event_type": "FeatureCreated",
+  "expected_error_codes": ["UNKNOWN_EVENT_TYPE"],
+  "input": {
+    "event_id": "01J00000000000000000000001",
+    "event_type": "FeatureCreated",
+    "aggregate_id": "mission/01J0000000000000000000MS1",
+    "payload": {
+      "mission_slug": "fixture-mission",
+      "friendly_name": "Fixture Mission"
+    },
+    "timestamp": "2026-01-01T00:00:00+00:00",
+    "build_id": "build-2026-01-01-fixture",
+    "node_id": "fixture-node",
+    "lamport_clock": 1,
+    "causation_id": null,
+    "project_uuid": "00000000-0000-0000-0000-000000000001",
+    "project_slug": null,
+    "correlation_id": "01J0000000000000000000CR01",
+    "schema_version": "3.0.0",
+    "data_tier": 0
+  },
+  "notes": "The forbidden legacy event name FeatureCreated was rejected by the removed cutover gate; since 8.0.0 the strict profile rejects it via profile membership (it is not in STRICT_EVENT_TYPES), which is exactly one defect here, so validate_strict_envelope reports exactly UNKNOWN_EVENT_TYPE."
+}

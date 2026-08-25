@@ -35,6 +35,28 @@ accepts any rejection for these fixtures while pinning the *ideal* code in
 `expected_error_code`. A downstream WP can refine the validator to detect
 the raw-historical-row class as a distinct rejection.
 
+## Cutover-boundary fixtures (8.0.0)
+
+`cutover_boundary/` pins the accept/reject boundary that moved when 8.0.0
+removed the cutover gate from `validate_event`
+(contracts/versioning-and-compatibility.md item 5):
+
+- `accepted_by_validate_event/` — raw envelopes the removed gate used to
+  reject and `validate_event` now accepts (missing/wrong-major
+  `schema_version`, legacy `feature/` aggregate prefix, envelope-level
+  legacy key). Each differs from the canonical MissionCreated baseline by
+  exactly the moved property.
+- `rejected_by_strict_profile/` — full strict-profile envelopes carrying
+  exactly one boundary defect, which `validate_strict_envelope` must
+  reject; each file pins its exact `expected_error_codes`.
+
+Both sides are asserted inside the packaged entrypoint
+(`test_pyargs_entrypoint.py`), so consumers running
+`pytest --pyargs spec_kitty_events.conformance` see them without this
+repository's test tree. These files are not part of the eight-class
+taxonomy and are not audited by the determinism walker below, but they
+follow the same R-06 pinned-value convention.
+
 ## Fixture file format
 
 Each fixture is a JSON file with the following minimum schema:

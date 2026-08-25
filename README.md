@@ -2,7 +2,24 @@
 
 Canonical event contracts for Spec Kitty mission state, mission runtime, conformance, and replay.
 
-**Package Version**: `7.0.0` | **Cutover Contract**: `3.0.0` | **Python**: `>=3.10`
+**Package Version**: `8.0.0` | **Envelope Schema Version**: `3.0.0` | **Python**: `>=3.10`
+
+## What Changed In 8.0.0
+
+`8.0.0` deletes the offline sync/replay surfaces:
+`spec_kitty_events.sync`, `spec_kitty_events.legacy`
+(`legacy_envelope_v1`), and `spec_kitty_events.cutover`
+(`CUTOVER_ARTIFACT`). Only `.sync` had no consumers left: `.cutover`
+and `.legacy` are still imported by `spec-kitty-saas`'s `apps/sync`
+adapters (inert today only because that repo pins `==6.1.0`;
+`apps/sync` itself is deleted by epic E6) and by `spec-kitty`'s
+consumer-contract test suite — both repos must drop or port those
+imports before pinning `==8.0.0`. One
+behaviour change rides along: `validate_event()` no longer applies the
+envelope-level cutover gate (missing/wrong `schema_version`, forbidden
+legacy names) — fail-closed envelope gating lives in
+`spec_kitty_events.strict.validate_strict_envelope`. Pin `>=8.0.0`; see
+`COMPATIBILITY.md` and `CHANGELOG.md` for the full list.
 
 ## What Changed In 7.0.0
 
@@ -116,7 +133,9 @@ result = validate_event(payload, "WPStatusChanged")
 assert result.valid
 ```
 
-### Validate a Full Envelope With Fail-Closed Cutover Checks
+### Validate a Full Envelope
+
+Build the envelope, then validate it:
 
 ```python
 from spec_kitty_events.conformance import validate_event
@@ -130,8 +149,11 @@ envelope = {
     "node_id": "runner-01",
     "lamport_clock": 1,
     "project_uuid": "12345678-1234-5678-1234-567812345678",
+    "project_slug": None,
     "correlation_id": "01ARZ3NDEKTSV4RRFFQ69G5FAV",
+    "causation_id": None,
     "schema_version": "3.0.0",
+    "data_tier": 0,
     "payload": {
         "mission_slug": "mission-001",
         "wp_id": "WP01",
@@ -146,11 +168,24 @@ result = validate_event(envelope, "WPStatusChanged", strict=True)
 assert result.valid
 ```
 
+For fail-closed envelope gating (`schema_version == "3.0.0"`, full key
+set, recursive forbidden-key walk), use the strict profile —
+`validate_event` does not enforce it itself (the example above carries
+all 14 `STRICT_ENVELOPE_KEYS`, so the strict-profile check below also
+passes):
+
+```python
+from spec_kitty_events.strict import validate_strict_envelope
+
+errors = validate_strict_envelope(envelope)
+assert not errors
+```
+
 ## Schemas And Conformance
 
 - Committed JSON Schemas are generated from the canonical Pydantic models.
 - Replay streams and golden reducer outputs ship in the package.
-- Conformance validation combines Pydantic validation, committed JSON Schemas, and cutover artifact checks.
+- Conformance validation combines Pydantic validation and committed JSON Schemas; the opt-in strict profile adds fail-closed envelope gating.
 
 Run the drift and conformance gates:
 
@@ -165,47 +200,6 @@ pytest --pyargs spec_kitty_events.conformance -v
 - Use `build_id` to identify the emitting build and `node_id` to identify the emitting node.
 - Do not rely on runtime translation of legacy mission-domain fields.
 - Use offline rewrite or migration jobs if you need to transform historical pre-cutover data.
-
-## Legacy Envelope Normalization (`legacy_envelope_v1`)
-
-`spec_kitty_events.legacy` publishes a named, frozen contract for promoting
-known legacy event shapes to canonical 3.x envelopes. Three legacy shapes are
-recognized in v1: `pre_3_0_envelope`, `feature_keys_envelope`, and
-`awaiting_review_synonym`.
-
-```python
-from spec_kitty_events.legacy import (
-    LegacyEnvelopeNormalizer,
-    NormalizedEnvelope,
-    UnnormalizableLegacyDiagnostic,
-)
-from spec_kitty_events.conformance.validators import validate_event
-
-result = LegacyEnvelopeNormalizer().normalize(stored_legacy_row)
-
-match result:
-    case NormalizedEnvelope(canonical=canonical, raw=raw, legacy_shape=shape):
-        conformance = validate_event(canonical, canonical["event_type"], strict=True)
-        # ship to materializer, retain raw for audit
-    case UnnormalizableLegacyDiagnostic(reason=reason, shape_hints=hints, raw=raw):
-        # classify as legacy / business-rule diagnostic; never silent
-```
-
-Guarantees:
-
-- **Audit preservation**: both result variants carry the original `raw` dict.
-- **Determinism**: same input always yields the same output (including the
-  minted `project_uuid` via UUID5 over `(node_id, build_id)`).
-- **No silent aliases**: every field-name change is captured by the
-  `legacy_shape` identifier; un-normalizable rows surface as structured
-  diagnostics, never silent passes.
-- **Idempotency**: calling `normalize()` on an already-canonical envelope
-  returns `UnnormalizableLegacyDiagnostic(reason="unrecognized_legacy_shape")`.
-
-The contract is named `legacy_envelope_v1` and frozen. Future legacy shapes
-ship as `legacy_envelope_v2` alongside v1 for a deprecation window.
-
-Mission: `canonical-producer-contracts-legacy-envelope-01KS7JM3`.
 
 ## Local-Only Event Classification (`LOCAL_ONLY_EVENT_TYPES`)
 
@@ -291,7 +285,7 @@ status does not block merge.
 This package now publishes the TeamSpace migration release as package `5.0.0`.
 
 - `2.x` documentation and mixed-field operation are no longer the public contract.
-- Consumers should treat the cutover artifact, recursive forbidden-key helper, and committed fixtures as the authoritative compatibility surface.
+- Consumers should treat the strict profile, recursive forbidden-key helper, and committed fixtures as the authoritative compatibility surface.
 - The envelope schema version intentionally remains `3.0.0`.
 
 ## License
