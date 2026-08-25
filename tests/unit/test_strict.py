@@ -27,6 +27,7 @@ import pytest
 from ulid import ULID
 
 from spec_kitty_events.strict import (
+    FORBIDDEN_LEGACY_AGGREGATE_NAMES,
     STRICT_ENVELOPE_KEYS,
     STRICT_EVENT_TYPES,
     STRICT_PROFILE_ID,
@@ -518,3 +519,66 @@ def test_wrapper_not_an_object_rejected() -> None:
     assert len(errors) == 1
     assert errors[0].code == ValidationErrorCode.ENVELOPE_SHAPE_INVALID
     assert errors[0].details["wrapper"] == "str"
+
+
+# ---------------------------------------------------------------------------
+# Forbidden legacy aggregate-name prefixes (issue #10, re-homed from the
+# deleted cutover artifact)
+# ---------------------------------------------------------------------------
+
+
+def test_forbidden_legacy_aggregate_names_constant() -> None:
+    assert FORBIDDEN_LEGACY_AGGREGATE_NAMES == frozenset(
+        {"feature", "feature_catalog"}
+    )
+
+
+@pytest.mark.parametrize("aggregate_id", ["feature/123", "feature/WP01", "feature_catalog/7"])
+def test_legacy_aggregate_name_prefix_rejected(aggregate_id: str) -> None:
+    envelope = _mission_started_envelope(aggregate_id=aggregate_id)
+    errors = validate_strict_envelope(envelope)
+    assert len(errors) == 1
+    assert errors[0].code == ValidationErrorCode.FORBIDDEN_AGGREGATE_NAME
+    assert errors[0].path == ["aggregate_id"]
+    assert errors[0].details["aggregate_name"] == aggregate_id.split("/", 1)[0]
+    assert errors[0].message.startswith("aggregate_id uses forbidden legacy aggregate name")
+
+
+def test_canonical_aggregate_name_prefixes_accepted() -> None:
+    for aggregate_id in ("mission/M001", "session/sess-1", "WP001", "mission/a/b"):
+        envelope = _valid_envelope(
+            "MissionStarted",
+            {
+                "mission_id": "M001",
+                "mission_type": "software-dev",
+                "initial_phase": "specify",
+                "actor": "user-1",
+            },
+            aggregate_id=aggregate_id,
+        )
+        assert validate_strict_envelope(envelope) == (), aggregate_id
+
+
+def test_legacy_prefix_error_does_not_suppress_model_layers() -> None:
+    """A prefix hit collects alongside deeper defects instead of masking them.
+
+    Mirrors step 4's forbidden-key behaviour: neither sets the
+    envelope/type failure flags that skip steps 9-10.
+    """
+    envelope = _mission_started_envelope(
+        aggregate_id="feature/123", timestamp="not-a-timestamp"
+    )
+    codes = [e.code for e in validate_strict_envelope(envelope)]
+    assert ValidationErrorCode.FORBIDDEN_AGGREGATE_NAME in codes
+    assert ValidationErrorCode.ENVELOPE_SHAPE_INVALID in codes
+
+
+def test_r5_purity_holds_with_legacy_aggregate_prefix() -> None:
+    envelope = _mission_started_envelope(aggregate_id="feature_catalog/7")
+    snapshot = copy.deepcopy(envelope)
+    first = validate_strict_envelope(envelope)
+    second = validate_strict_envelope(envelope)
+    assert first == second
+    assert len(first) == 1
+    assert first[0].code == ValidationErrorCode.FORBIDDEN_AGGREGATE_NAME
+    assert envelope == snapshot

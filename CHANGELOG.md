@@ -36,8 +36,14 @@ relay, not through this package's sync contracts.
   envelope gating still exists as the opt-in strict profile:
   `spec_kitty_events.strict.validate_strict_envelope` enforces
   `schema_version == "3.0.0"`, the recursive forbidden-key walk, and the
-  full envelope key set. The five conformance fixtures that exercised the
-  removed gate were deleted with it.
+  full envelope key set. The forbidden legacy aggregate-name prefixes the
+  gate also carried (`feature`, `feature_catalog`) are re-homed onto the
+  same profile — `strict.FORBIDDEN_LEGACY_AGGREGATE_NAMES` rejects them with
+  the new `FORBIDDEN_AGGREGATE_NAME` error code (issue #10) — so a strictly
+  validated live path fails closed on every legacy surface again.
+  `validate_event` itself stays lenient. The five conformance fixtures that
+  exercised the removed gate were deleted with it; the moved boundary is
+  pinned by `conformance/fixtures/cutover_boundary/`.
 - Removed fixture categories: `sync`, `legacy`, and the top-level `replay`
   streams; `load_fixtures("sync")` now raises `ValueError`.
 - Consumers must pin `>=8.0.0`; there are no compatibility aliases.

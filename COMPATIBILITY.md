@@ -37,7 +37,9 @@ keys/names at envelope level, can now pass `validate_event` when its payload
 shape validates. Fail-closed envelope validation still exists as the opt-in
 strict profile — `validate_strict_envelope()` enforces
 `schema_version == "3.0.0"`, the recursive forbidden-key walk
-(`forbidden_keys.find_forbidden_keys`), and the full envelope key set.
+(`forbidden_keys.find_forbidden_keys`), the full envelope key set, and the
+forbidden legacy aggregate-name prefixes (`strict.FORBIDDEN_LEGACY_AGGREGATE_NAMES`,
+re-homed from the deleted artifact per issue #10).
 Producers and ingress paths that relied on `validate_event` for the gate
 must switch to the strict profile.
 
@@ -115,6 +117,8 @@ following are true:
 - the envelope is missing `schema_version`
 - `schema_version` does not equal `3.0.0`
 - the envelope or nested payload contains forbidden legacy keys (recursive walk)
+- `aggregate_id` uses a forbidden legacy aggregate name (`feature`,
+  `feature_catalog`) — rejected with `FORBIDDEN_AGGREGATE_NAME`
 
 ## Forbidden Legacy Surfaces
 
@@ -125,10 +129,14 @@ the strict profile / forbidden-key walker rather than `validate_event`):
   — rejected at any depth by `forbidden_keys.find_forbidden_keys`.
 - event names: `FeatureCreated`, `FeatureClosed` — not members of
   `STRICT_EVENT_TYPES`, so the strict profile rejects them.
-- aggregate prefixes: `feature`, `feature_catalog`. The dedicated prefix
-  check shipped with the cutover artifact and was removed with it in
-  `8.0.0`; such envelopes are rejected only if they fail another rule.
-  Offline rewrite jobs should still convert them.
+- aggregate name prefixes: `feature`, `feature_catalog` — the dedicated
+  prefix check shipped with the cutover artifact and left `validate_event`
+  with it in `8.0.0`; it was deliberately **re-homed onto the strict
+  profile** (`strict.FORBIDDEN_LEGACY_AGGREGATE_NAMES`, error code
+  `FORBIDDEN_AGGREGATE_NAME`) rather than dropped, so a live path that
+  validates strictly still fails closed on `aggregate_id="feature/WP01"`
+  (issue #10). `validate_event` stays lenient; offline rewrite jobs should
+  still convert such ids.
 
 ## Canonical Mission And Build Taxonomy
 

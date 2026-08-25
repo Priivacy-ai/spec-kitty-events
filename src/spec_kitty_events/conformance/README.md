@@ -48,7 +48,10 @@ removed the cutover gate from `validate_event`
   exactly the moved property.
 - `rejected_by_strict_profile/` — full strict-profile envelopes carrying
   exactly one boundary defect, which `validate_strict_envelope` must
-  reject; each file pins its exact `expected_error_codes`.
+  reject; each file pins its exact `expected_error_codes` (missing/wrong
+  `schema_version`, top-level or payload-nested forbidden key, forbidden
+  legacy event name, and — re-homed from the deleted artifact per issue
+  #10 — a forbidden legacy aggregate-name prefix).
 
 Both sides are asserted inside the packaged entrypoint
 (`test_pyargs_entrypoint.py`), so consumers running
