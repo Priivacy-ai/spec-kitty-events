@@ -85,6 +85,34 @@
       "title": "Agent Id",
       "type": "string"
     },
+    "mission_id": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Canonical machine-facing mission identity (ULID) the run belongs to",
+      "title": "Mission Id"
+    },
+    "mission_slug": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Canonical mission slug (display; mission_id is the identity)",
+      "title": "Mission Slug"
+    },
     "run_id": {
       "description": "Run identifier",
       "minLength": 1,

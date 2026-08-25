@@ -23,7 +23,7 @@
     "run_id": "run-01",
     "step_id": "step-07",
     "agent_id": "agent-a",
-    "actor": "Ox Alpha"
+    "actor": "actor-01"
   },
   "expected_ref": "run-01",
   "notes": "Run-scoped step moment; the structured actor rides as its single label."

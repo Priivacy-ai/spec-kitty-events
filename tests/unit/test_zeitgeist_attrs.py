@@ -7,6 +7,7 @@ from datetime import datetime, timezone
 from uuid import UUID
 
 import pytest
+from pydantic import BaseModel
 
 from spec_kitty_events import zeitgeist_attrs
 from spec_kitty_events.forbidden_keys import FORBIDDEN_LEGACY_KEYS
@@ -117,11 +118,15 @@ def test_unbroadcast_fields_exist_on_their_models() -> None:
 def test_every_structured_actor_family_projects_to_a_single_label() -> None:
     """No family broadcasts a structured actor field-for-field: producer-
     asserted identity would duplicate what the relay attests itself.
-    Families whose ``actor`` is a plain string need no projection."""
+    Families whose ``actor`` is a plain (optionally absent) string need no
+    projection — the value itself rides under the ``actor`` key."""
     for event_type in VOLATILE_EVENT_TYPES:
         model = PAYLOAD_MODEL_BY_EVENT_TYPE[event_type]
         field = model.model_fields.get("actor")
-        if field is None or field.annotation is str:
+        if field is None:
+            continue
+        base = zeitgeist_attrs._unwrap_optional(field.annotation)
+        if not (isinstance(base, type) and issubclass(base, BaseModel)):
             continue
         assert PROJECTED_FIELD_BY_EVENT_TYPE[event_type].get("actor") == "actor_label", (
             event_type,
@@ -129,10 +134,27 @@ def test_every_structured_actor_family_projects_to_a_single_label() -> None:
         )
 
 
-def test_actor_label_prefers_display_name_over_machine_id() -> None:
-    assert _identity().actor_label == "Robert Douglass"
+def test_actor_label_is_exactly_the_opaque_machine_id() -> None:
+    """Identifiers only: the label never derives from free text."""
+    assert _identity().actor_label == "rob@robshouse.net"
     bare = RuntimeActorIdentity(actor_id="svc-1", actor_type="service")
     assert bare.actor_label == "svc-1"
+
+
+def test_oversize_display_name_never_drops_the_moment() -> None:
+    """Regression pin: a label sourced from unbounded prose made any oversize
+    display name raise at the bound and silently kill the whole broadcast."""
+    identity = RuntimeActorIdentity(
+        actor_id="svc-1",
+        actor_type="service",
+        display_name="Dr. " + "X" * 250,
+    )
+    payload = MissionRunStartedPayload(
+        run_id="run-01", mission_type="software-dev", actor=identity
+    )
+    attrs = to_zeitgeist_attrs(payload, _envelope("MissionRunStarted"))
+    assert attrs["actor"] == "svc-1"
+    assert "Dr." not in " ".join(attrs.values())
 
 
 def test_forbidden_keys_union_the_zeitgeist_mirror_and_legacy_set() -> None:
@@ -197,8 +219,61 @@ def test_mission_run_actor_rides_as_one_label_never_as_identity_breakdown() -> N
         actor=_identity(),
     )
     attrs = to_zeitgeist_attrs(payload, _envelope("MissionRunStarted"))
-    assert attrs["actor"] == "Robert Douglass"
+    assert attrs["actor"] == "rob@robshouse.net"
     assert not any(key.startswith("actor.") for key in attrs)
+
+
+def test_mission_level_actor_rides_as_an_opaque_identifier() -> None:
+    """The mission-level moments can say WHO: the optional plain-string
+    ``actor`` rides under the same ``actor`` key every other family uses,
+    and an absent actor emits no key (pre-8.0 producers stay valid)."""
+    from spec_kitty_events.lifecycle import MissionCreatedPayload
+
+    created = MissionCreatedPayload(
+        mission_slug="demo-mission",
+        mission_number=12,
+        mission_type="software-dev",
+        target_branch="main",
+        wp_count=3,
+        friendly_name="Demo",
+        purpose_tldr="Demo",
+        purpose_context="Demo",
+        actor="rob@robshouse.net",
+    )
+    attrs = to_zeitgeist_attrs(created, _envelope("MissionCreated"))
+    assert attrs["actor"] == "rob@robshouse.net"
+    moment = from_zeitgeist_attrs("MissionCreated", attrs)
+    assert moment.attrs["actor"] == "rob@robshouse.net"
+
+    closed = MissionClosedPayload(
+        mission_slug="demo-mission", mission_number=12,
+        mission_type="software-dev", actor="merge-agent",
+    )
+    closed_attrs = to_zeitgeist_attrs(closed, _envelope("MissionClosed"))
+    assert closed_attrs["actor"] == "merge-agent"
+
+
+def test_mission_run_identity_keys_admitted_both_directions() -> None:
+    """The live CLI emitter injects mission_id/mission_slug post-hoc into the
+    six mission-run payloads; both keys must ride and decode as identifiers."""
+    payload = MissionRunStartedPayload(
+        run_id="run-01",
+        mission_type="software-dev",
+        actor=_identity(),
+        mission_id="mission-demo",
+        mission_slug="demo-mission",
+    )
+    attrs = to_zeitgeist_attrs(payload, _envelope("MissionRunStarted"))
+    assert attrs["mission_id"] == "mission-demo"
+    assert attrs["mission_slug"] == "demo-mission"
+    moment = from_zeitgeist_attrs("MissionRunStarted", attrs)
+    assert moment.attrs["mission_slug"] == "demo-mission"
+
+    bare = MissionRunStartedPayload(
+        run_id="run-01", mission_type="software-dev", actor=_identity()
+    )
+    bare_attrs = to_zeitgeist_attrs(bare, _envelope("MissionRunStarted"))
+    assert "mission_id" not in bare_attrs and "mission_slug" not in bare_attrs
 
 
 def test_no_volatile_projection_emits_dotted_keys() -> None:

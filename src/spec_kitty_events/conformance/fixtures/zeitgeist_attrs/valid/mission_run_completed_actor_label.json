@@ -21,7 +21,7 @@
     "occurred_at": "2026-08-25T09:00:00+00:00",
     "run_id": "run-01",
     "mission_type": "software-dev",
-    "actor": "Ox Alpha"
+    "actor": "actor-01"
   },
   "expected_ref": "run-01",
   "notes": "Run completion closes the ephemeral run narrative."

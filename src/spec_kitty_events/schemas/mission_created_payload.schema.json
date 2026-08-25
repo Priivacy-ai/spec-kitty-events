@@ -2,8 +2,22 @@
   "$id": "spec-kitty-events/mission_created_payload",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
-  "description": "Typed payload for MissionCreated catalog events.",
+  "description": "Typed payload for MissionCreated catalog events.\n\n``actor`` (8.0.0) carries the opaque identifier of whoever created the\nmission so the broadcast moment can say WHO (E2E-MVP \u00a71.1 renders\n\"<actor> created mission <slug>\"). Optional \u2014 not required \u2014 because the\nlive producer built these payloads without it before 8.0.0; requiring it\nwould fail every in-flight emission at upgrade instead of enriching the\nmoment once producers catch up.",
   "properties": {
+    "actor": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Opaque actor identifier of who created the mission (broadcast under the moment's ``actor`` key)",
+      "title": "Actor"
+    },
     "created_at": {
       "anyOf": [
         {

@@ -54,13 +54,17 @@ Actor narrowing
 ---------------
 Every family projects its ``actor`` to a single label string under the key
 ``actor``: :class:`~spec_kitty_events.status.StatusTransitionPayload` via
-its ``actor_label`` property, and the mission-run family via the matching
-property on :class:`~spec_kitty_events.mission_next.RuntimeActorIdentity`.
-A structured actor never rides field-for-field: the relay has no actor
-member (it attests identity itself from the credential), so broadcasting
-producer-asserted ids, providers, or model names would re-introduce under
-dotted keys exactly what zeitgeist forbids flatly, while duplicating the
-server-attested value.
+its ``actor_label`` property, and the mission-run family via
+:class:`~spec_kitty_events.mission_next.RuntimeActorIdentity.actor_label` —
+exactly the opaque ``actor_id``, never ``display_name`` or any other
+free-text field. The mission-level payloads
+(``MissionCreated`` / ``MissionClosed``) carry that label directly as their
+optional plain-string ``actor`` field, so it rides under the same key with
+no projection at all. A structured actor never rides field-for-field: the
+relay has no actor member (it attests identity itself from the credential),
+so broadcasting producer-asserted ids, providers, or model names would
+re-introduce under dotted keys exactly what zeitgeist forbids flatly, while
+duplicating the server-attested value.
 
 Forbidden keys
 --------------

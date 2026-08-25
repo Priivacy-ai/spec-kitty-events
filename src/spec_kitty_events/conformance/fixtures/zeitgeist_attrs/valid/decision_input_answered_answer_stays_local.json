@@ -22,7 +22,7 @@
     "occurred_at": "2026-08-25T09:00:00+00:00",
     "run_id": "run-01",
     "decision_id": "dec-01",
-    "actor": "Ox Alpha"
+    "actor": "actor-01"
   },
   "expected_ref": "run-01",
   "notes": "The answer is free text and stays local like every other prose field; the broadcast fact is 'dec-01 was answered by this actor at this time'."

@@ -25,7 +25,7 @@
     "step_id": "step-07",
     "agent_id": "agent-a",
     "result": "success",
-    "actor": "Ox Alpha"
+    "actor": "actor-01"
   },
   "expected_ref": "run-01",
   "notes": "Auto-completion's result is a transition fact (not prose) and rides verbatim next to the actor label."

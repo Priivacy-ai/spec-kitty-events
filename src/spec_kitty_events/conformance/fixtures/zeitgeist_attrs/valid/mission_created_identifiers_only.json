@@ -11,6 +11,7 @@
     "mission_type": "software-dev",
     "target_branch": "main",
     "wp_count": 3,
+    "actor": "robert",
     "friendly_name": "Board approved 40M for the counterparty rollout",
     "purpose_tldr": "Bob Smith (bob@acme.com) is the counterparty contact.",
     "purpose_context": "Broadcast through the team relay for 72 hours.",
@@ -23,8 +24,9 @@
     "mission_number": "12",
     "mission_type": "software-dev",
     "target_branch": "main",
-    "wp_count": "3"
+    "wp_count": "3",
+    "actor": "robert"
   },
   "expected_ref": "demo-mission",
-  "notes": "Int fields pin the str() encoding; friendly_name/purpose_tldr/purpose_context are prose and stay local — none of their text may appear in the attrs."
+  "notes": "Int fields pin the str() encoding; friendly_name/purpose_tldr/purpose_context are prose and stay local — none of their text may appear in the attrs. The optional actor is an opaque identifier and rides under the moment's ``actor`` key so the moment can say WHO created the mission."
 }

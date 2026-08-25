@@ -30,7 +30,7 @@
     "run_id": "run-01",
     "decision_id": "dec-01",
     "step_id": "step-07",
-    "actor": "Ox Alpha"
+    "actor": "actor-01"
   },
   "expected_ref": "run-01",
   "notes": "The question and the suggested options are both prose/hints and stay local; the moment carries the decision's identity so a reader can go ask (or find the answer locally)."

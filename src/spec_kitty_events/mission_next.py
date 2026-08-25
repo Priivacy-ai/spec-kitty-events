@@ -66,13 +66,13 @@ class RuntimeActorIdentity(BaseModel):
     def actor_label(self) -> str:
         """Canonical string form of the actor for moments, logs, and display.
 
-        Prefers the human-readable display name and falls back to the
-        required machine id — the same single-label projection
-        ``StatusTransitionPayload.actor_label`` gives structured actors, so
-        every volatile moment carries exactly one actor label and never a
-        producer-asserted identity breakdown.
+        Exactly the required opaque ``actor_id`` — never ``display_name``
+        (or any other free-text field): moments are identifiers and
+        transition facts, and a label derived from prose would both leak
+        that text onto the team relay for the whole retention window and
+        make an oversize name drop the entire moment at the bound.
         """
-        return self.display_name or self.actor_id
+        return self.actor_id
 
 
 # ── Section 3: Enum ──────────────────────────────────────────────────────────
@@ -91,6 +91,12 @@ TERMINAL_RUN_STATUSES: FrozenSet[MissionRunStatus] = frozenset({
 
 # ── Section 4: Payload Models ────────────────────────────────────────────────
 
+# Every payload below carries optional ``mission_id``/``mission_slug``: the
+# live CLI producer (specify_cli/sync/emitter.py) injects both keys post-hoc
+# into each mission-run payload it emits, so ``extra="forbid"`` models
+# without those fields would reject real ingress on both sides of the wire.
+# They stay optional so pre-8.0 journals keep validating.
+
 
 class MissionRunStartedPayload(BaseModel):
     """Payload for MissionRunStarted event."""
@@ -103,6 +109,16 @@ class MissionRunStartedPayload(BaseModel):
     )
     actor: RuntimeActorIdentity = Field(
         ..., description="Actor who started the run"
+    )
+    mission_id: str | None = Field(
+        None,
+        min_length=1,
+        description="Canonical machine-facing mission identity (ULID) the run belongs to",
+    )
+    mission_slug: str | None = Field(
+        None,
+        min_length=1,
+        description="Canonical mission slug (display; mission_id is the identity)",
     )
 
     @property
@@ -123,6 +139,16 @@ class NextStepIssuedPayload(BaseModel):
     )
     actor: RuntimeActorIdentity = Field(
         ..., description="Actor who issued the step"
+    )
+    mission_id: str | None = Field(
+        None,
+        min_length=1,
+        description="Canonical machine-facing mission identity (ULID) the run belongs to",
+    )
+    mission_slug: str | None = Field(
+        None,
+        min_length=1,
+        description="Canonical mission slug (display; mission_id is the identity)",
     )
 
     @property
@@ -146,6 +172,16 @@ class NextStepAutoCompletedPayload(BaseModel):
     )
     actor: RuntimeActorIdentity = Field(
         ..., description="Actor context for the completion"
+    )
+    mission_id: str | None = Field(
+        None,
+        min_length=1,
+        description="Canonical machine-facing mission identity (ULID) the run belongs to",
+    )
+    mission_slug: str | None = Field(
+        None,
+        min_length=1,
+        description="Canonical mission slug (display; mission_id is the identity)",
     )
 
     @property
@@ -178,6 +214,16 @@ class DecisionInputRequestedPayload(BaseModel):
     actor: RuntimeActorIdentity = Field(
         ..., description="Actor who requested the decision"
     )
+    mission_id: str | None = Field(
+        None,
+        min_length=1,
+        description="Canonical machine-facing mission identity (ULID) the run belongs to",
+    )
+    mission_slug: str | None = Field(
+        None,
+        min_length=1,
+        description="Canonical mission slug (display; mission_id is the identity)",
+    )
 
     @property
     def actor_label(self) -> str:
@@ -200,6 +246,16 @@ class DecisionInputAnsweredPayload(BaseModel):
     actor: RuntimeActorIdentity = Field(
         ..., description="Actor who answered the decision"
     )
+    mission_id: str | None = Field(
+        None,
+        min_length=1,
+        description="Canonical machine-facing mission identity (ULID) the run belongs to",
+    )
+    mission_slug: str | None = Field(
+        None,
+        min_length=1,
+        description="Canonical mission slug (display; mission_id is the identity)",
+    )
 
     @property
     def actor_label(self) -> str:
@@ -218,6 +274,16 @@ class MissionRunCompletedPayload(BaseModel):
     )
     actor: RuntimeActorIdentity = Field(
         ..., description="Actor context for the completion"
+    )
+    mission_id: str | None = Field(
+        None,
+        min_length=1,
+        description="Canonical machine-facing mission identity (ULID) the run belongs to",
+    )
+    mission_slug: str | None = Field(
+        None,
+        min_length=1,
+        description="Canonical mission slug (display; mission_id is the identity)",
     )
 
     @property
