@@ -84,6 +84,44 @@ def test_every_valid_fixture_covers_one_volatile_event_type(
     assert valid_types == set(PAYLOAD_MODEL_BY_EVENT_TYPE)
 
 
+def test_codec_fixtures_stay_out_of_the_packaged_event_gate() -> None:
+    """In-repo mirror of the packaged gate's own regression guard.
+
+    ``conformance/test_pyargs_entrypoint.py`` guards its ``zeitgeist_attrs``
+    exclusion with ``test_zeitgeist_attrs_codec_fixtures_stay_out_of_the_
+    event_gate``, but ``pyproject.toml`` sets ``testpaths = ["tests"]``, so
+    neither this suite nor CI ever collects that module: a regression in its
+    two filter lines would leave every in-repo run green while ``pytest
+    --pyargs spec_kitty_events.conformance`` fails every codec entry for
+    every downstream consumer. Importing the packaged module's collector and
+    pinning the same two facts here puts the guard where it is watched.
+    """
+    from spec_kitty_events.conformance.test_pyargs_entrypoint import (
+        _MANIFEST,
+        _event_fixture_entries,
+    )
+
+    manifest_paths = {
+        f["path"]
+        for f in _MANIFEST["fixtures"]
+        if f["path"].startswith("zeitgeist_attrs/")
+    }
+    assert manifest_paths, (
+        "zeitgeist_attrs codec fixtures vanished from the manifest; if the "
+        "category was renamed on purpose, update this guard with it"
+    )
+    leaked = sorted(
+        f["path"]
+        for f in _event_fixture_entries()
+        if f["path"].startswith("zeitgeist_attrs/")
+    )
+    assert not leaked, (
+        "codec fixtures reached the packaged event gate; validating them as "
+        "envelopes turns pytest --pyargs spec_kitty_events.conformance red "
+        f"for every consumer: {leaked}"
+    )
+
+
 @pytest.mark.parametrize(
     "fixture",
     [f for f in load_fixtures("zeitgeist_attrs") if f.expected_valid],
