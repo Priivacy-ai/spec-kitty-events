@@ -174,6 +174,18 @@ from spec_kitty_events.strict import (
     support_matrix_digest,
 )
 
+# Zeitgeist attrs codecs for the volatile mission/WP families (E2). The
+# single owner of the payload <-> bounded-attrs mapping the ephemeral
+# status loop broadcasts through each team's relay.
+from spec_kitty_events.zeitgeist_attrs import (
+    VOLATILE_EVENT_TYPES,
+    VolatileMoment,
+    ZEITGEIST_ATTRS_MAX_BYTES,
+    ZEITGEIST_ATTRS_MAX_KEYS,
+    from_zeitgeist_attrs,
+    to_zeitgeist_attrs,
+)
+
 # Machine-readable classification surface for event types that are NOT
 # routed through the SaaS-bound producer path. Empty in this release —
 # every CLI-emitted event audited as of spec-kitty 43305c12c routes
@@ -884,4 +896,11 @@ __all__ = [
     "SupportRow",
     "SUPPORT_MATRIX",
     "support_matrix_digest",
+    # Zeitgeist attrs codecs for the volatile families (E2).
+    "VOLATILE_EVENT_TYPES",
+    "VolatileMoment",
+    "ZEITGEIST_ATTRS_MAX_BYTES",
+    "ZEITGEIST_ATTRS_MAX_KEYS",
+    "from_zeitgeist_attrs",
+    "to_zeitgeist_attrs",
 ]

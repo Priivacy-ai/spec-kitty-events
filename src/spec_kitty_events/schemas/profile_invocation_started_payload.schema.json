@@ -1,6 +1,7 @@
 {
   "$defs": {
     "RuntimeActorIdentity": {
+      "additionalProperties": false,
       "description": "Identity of a runtime actor (human, LLM, or service).",
       "properties": {
         "actor_id": {

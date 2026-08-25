@@ -42,6 +42,10 @@ _REQUIRED_MEMBERS = (
     "spec_kitty_events/conformance/fixtures/harness_observation/replay/lifecycle_with_observations.jsonl",
     "spec_kitty_events/conformance/fixtures/harness_observation/replay/lifecycle_with_observations_output.json",
     "spec_kitty_events/conformance/fixtures/class_taxonomy/envelope_strict_journal/valid_mission_started_with_slug.json",
+    # E2: volatile mission/WP moment codecs ship their fixture goldens.
+    "spec_kitty_events/zeitgeist_attrs.py",
+    "spec_kitty_events/conformance/fixtures/zeitgeist_attrs/valid/wp_status_changed_planned_doing.json",
+    "spec_kitty_events/conformance/fixtures/zeitgeist_attrs/invalid/wp_status_changed_unknown_attr.json",
 )
 
 

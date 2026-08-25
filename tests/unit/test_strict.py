@@ -110,19 +110,27 @@ def test_strict_envelope_keys_are_exactly_the_14_event_fields() -> None:
     )
 
 
-def test_strict_event_types_has_exactly_19_members() -> None:
-    assert len(STRICT_EVENT_TYPES) == 19
+def test_strict_event_types_has_exactly_25_members() -> None:
+    assert len(STRICT_EVENT_TYPES) == 25
     assert STRICT_EVENT_TYPES == frozenset(
         {
             "MissionCreated", "MissionClosed", "MissionStarted", "MissionCompleted",
             "MissionCancelled", "PhaseEntered", "ReviewRollback", "MissionReopened",
             "FollowUpRecorded",
+            # mission-run family, admitted by E2 (volatile vocabulary)
+            "MissionRunStarted", "NextStepIssued", "NextStepAutoCompleted",
+            "DecisionInputRequested", "DecisionInputAnswered", "MissionRunCompleted",
             "WPStatusChanged",
             "WPCreated", "ProjectInitialized", "SpecifyStarted", "SpecifyCompleted",
             "PlanStarted", "PlanCompleted", "TasksStarted", "TasksCompleted",
             "HarnessObservation",
         }
     )
+
+
+def test_strict_event_types_exclude_reserved_mission_next_type() -> None:
+    """``NextStepPlanned`` has no payload contract yet: fail closed."""
+    assert "NextStepPlanned" not in STRICT_EVENT_TYPES
 
 
 def test_excluded_names_not_admitted() -> None:

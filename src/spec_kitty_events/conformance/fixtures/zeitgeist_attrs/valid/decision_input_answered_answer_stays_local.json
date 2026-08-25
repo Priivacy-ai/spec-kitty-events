@@ -1,0 +1,29 @@
+{
+  "event_type": "DecisionInputAnswered",
+  "envelope": {
+    "event_id": "e2e00000-0000-4000-8000-000000000011",
+    "timestamp": "2026-08-25T09:00:00+00:00"
+  },
+  "payload": {
+    "run_id": "run-01",
+    "decision_id": "dec-01",
+    "answer": "hold — unredacted customer emails in the thread",
+    "actor": {
+      "actor_id": "actor-01",
+      "actor_type": "llm",
+      "display_name": "Ox Alpha",
+      "provider": "anthropic",
+      "model": "ox-alpha",
+      "tool": "claude-code"
+    }
+  },
+  "expected_attrs": {
+    "event_id": "e2e00000-0000-4000-8000-000000000011",
+    "occurred_at": "2026-08-25T09:00:00+00:00",
+    "run_id": "run-01",
+    "decision_id": "dec-01",
+    "actor": "actor-01"
+  },
+  "expected_ref": "run-01",
+  "notes": "The answer is free text and stays local like every other prose field; the broadcast fact is 'dec-01 was answered by this actor at this time'."
+}

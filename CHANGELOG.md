@@ -49,6 +49,85 @@ Any code importing `spec_kitty_events.sync`, `.legacy`, or `.cutover`
 must be deleted or re-homed onto the strict profile / `forbidden_keys`
 modules.
 
+E2 (spec-kitty-rearchitecture): volatile mission/WP vocabulary + zeitgeist attrs codecs.
+
+### Changed
+
+- **Breaking:** the support matrix moved `WPStatusChanged`, `MissionCreated`,
+  `MissionClosed`, and `PhaseEntered` from `journal` to `volatile`
+  durability, and added six volatile rows for the mission-run family
+  (`MissionRunStarted`, `NextStepIssued`, `NextStepAutoCompleted`,
+  `DecisionInputRequested`, `DecisionInputAnswered`, `MissionRunCompleted`;
+  `introduced_in=2.3.0`). `SUPPORT_MATRIX` is now 30 rows (14 journal +
+  16 volatile) and `support_matrix_digest()` changed accordingly —
+  downstream candidates pinning the digest must re-pin.
+- The strict journal profile (`STRICT_EVENT_TYPES`, now 25 types) admits the
+  six mission-run types. `NextStepPlanned` stays excluded: its payload
+  contract is reserved. `validate_strict_envelope` therefore accepts
+  mission-run envelopes with `schema_version="3.0.0"`.
+- `RuntimeActorIdentity` and the six `mission_next` payload models now
+  reject unknown extra fields (`extra="forbid"`), matching every other
+  strict payload family; their generated JSON schemas gained
+  `additionalProperties: false`.
+
+### Added
+
+- `spec_kitty_events.zeitgeist_attrs`: the single owner of the mapping
+  between the volatile families and zeitgeist's bounded event-frame attrs
+  (`{str: str}`, ≤16 keys, ≤240 B per key/value, no forbidden keys).
+  `to_zeitgeist_attrs(payload, envelope)` projects a volatile payload onto
+  deterministic bounded attrs, leading with two envelope-sourced entries —
+  `event_id` (Team Kitty dedupes moments on it) and `occurred_at` (the
+  producer-declared occurrence time; relay receipt time carries neither).
+  `from_zeitgeist_attrs()` validates inbound attrs against the kind's
+  closed key vocabulary and returns a frozen `VolatileMoment`
+  (`kind`, `ref`, `attrs`). Encoding never truncates: an oversize value
+  raises instead, so that moment does not broadcast.
+- Moments are identifiers and transition facts only. Declared unbroadcast —
+  they stay in the local journal and are never part of any moment:
+  structured shapes (`StatusTransitionPayload.evidence`,
+  `DecisionInputRequestedPayload.options`) and free-text prose
+  (`friendly_name`, `purpose_tldr`, `purpose_context`, a decision's
+  `question` and `answer`, a forced transition's `reason`). Every family
+  carries its actor as one canonical label string under `actor`
+  (`actor_label`) — never as a field-for-field identity breakdown.
+- Conformance fixtures for both codec directions under
+  `conformance/fixtures/zeitgeist_attrs/` (13 valid goldens pinning exact
+  attrs bytes per volatile type, 4 invalid rejections), registered in
+  `manifest.json` under the new `zeitgeist_attrs` category.
+- `MissionCreatedPayload` and `MissionClosedPayload` gained an optional
+  plain-string `actor` (opaque identifier of who created/closed the
+  mission). Optional — not required — because producers built these
+  payloads without it before 8.0.0; requiring it would fail every in-flight
+  emission at upgrade. It rides under the moment's `actor` key so a
+  MissionCreated/Closed moment can say WHO (E2E-MVP §1.1).
+
+### Fixed (PR #11 fix round 3)
+
+- `RuntimeActorIdentity.actor_label` is exactly the required opaque
+  `actor_id`; it no longer falls back to `display_name`. The previous
+  display-name preference leaked free text onto the relay and made any
+  oversize `display_name` raise at the 240-byte bound, dropping the whole
+  moment. Goldens that pinned a display name now pin the actor id.
+- The six mission-run payloads (`MissionRunStarted`, `NextStepIssued`,
+  `NextStepAutoCompleted`, `DecisionInputRequested`,
+  `DecisionInputAnswered`, `MissionRunCompleted`) gained optional
+  `mission_id` / `mission_slug`. Without them, `extra="forbid"` rejected
+  every mission-run event the live CLI producer emits
+  (`specify_cli/sync/emitter.py` injects both keys post-hoc), breaking the
+  CLI→Teamspace ingress under both strict and lenient validation; both keys
+  now also ride/decode as moment identifiers.
+- `conformance/test_pyargs_entrypoint.py` excludes the `zeitgeist_attrs`
+  codec category from its event-fixture collection (those documents are
+  `{payload, expected_attrs}` codec specifications, not envelopes) and pins
+  the exclusion with a guard test: without it,
+  `pytest --pyargs spec_kitty_events.conformance` failed all 13 codec
+  entries while the in-repo suite stayed green.
+- Known consumer follow-up: spec-kitty-saas#73 — stray `mission_key` in
+  `apps/collaboration/tests/test_mission_next_conformance.py` (:24, :93,
+  :113) fails `extra_forbidden` against 8.0.0; drop it when bumping this
+  package there.
+
 ## [7.0.0] - 2026-08-21
 
 F1-T1 (spec-kitty-rearchitecture, M1): strict journal profile + HarnessObservation.

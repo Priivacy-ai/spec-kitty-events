@@ -83,9 +83,17 @@ def _event_fixture_entries() -> List[Dict[str, Any]]:
     - Diagnostic-taxonomy fixtures whose event_type is a sentinel (e.g.
       "<missing>", "<wrong>") used only to label the class; the
       class-taxonomy suite asserts on them via a different code path.
+    - zeitgeist_attrs codec documents (E2): a document there is a
+      {payload, expected_attrs, envelope?} codec specification, not an
+      event envelope — validating the document itself as its named event
+      would fail every entry. Both codec directions are exercised by
+      tests/test_zeitgeist_attrs_conformance.py via
+      load_fixtures("zeitgeist_attrs").
     """
     def _included(f: dict[str, Any]) -> bool:
         if f["event_type"] == "LaneMapping":
+            return False
+        if f["path"].startswith("zeitgeist_attrs/"):
             return False
         if f.get("fixture_type") in (
             "replay_stream",
@@ -114,6 +122,36 @@ def _event_fixture_entries() -> List[Dict[str, Any]]:
 
 def _event_fixture_ids() -> List[str]:
     return [f["id"] for f in _event_fixture_entries()]
+
+
+def test_zeitgeist_attrs_codec_fixtures_stay_out_of_the_event_gate() -> None:
+    """Regression guard for the zeitgeist_attrs exclusion above.
+
+    The filter is load-bearing for every downstream consumer: if it regresses,
+    the in-repo suite stays green (it reads codec documents through
+    ``load_fixtures("zeitgeist_attrs")`` and never collects this module's
+    event tests against them) while ``pytest --pyargs
+    spec_kitty_events.conformance`` fails every codec entry by validating a
+    ``{payload, expected_attrs}`` document as an event envelope. Both halves
+    are pinned: the category exists in the manifest, and none of it is
+    collected here.
+    """
+    manifest_paths = {
+        f["path"]
+        for f in _MANIFEST["fixtures"]
+        if f["path"].startswith("zeitgeist_attrs/")
+    }
+    assert manifest_paths, (
+        "zeitgeist_attrs codec fixtures vanished from the manifest; if the "
+        "category was renamed on purpose, update this guard with it"
+    )
+    collected_paths = {f["path"] for f in _event_fixture_entries()}
+    leaked = sorted(manifest_paths & collected_paths)
+    assert not leaked, (
+        "codec fixtures reached the event gate; validating them as envelopes "
+        "turns the packaged conformance entrypoint red for every consumer: "
+        f"{leaked}"
+    )
 
 
 def _event_fixture_params() -> List[Dict[str, Any]]:

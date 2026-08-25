@@ -2,8 +2,22 @@
   "$id": "spec-kitty-events/mission_closed_payload",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
-  "description": "Typed payload for MissionClosed catalog events.",
+  "description": "Typed payload for MissionClosed catalog events.\n\n``actor`` (8.0.0) mirrors ``MissionCreatedPayload.actor`` \u2014 the opaque\nidentifier of whoever closed the mission \u2014 optional for the same\nback-compat reason.",
   "properties": {
+    "actor": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Opaque actor identifier of who closed the mission (broadcast under the moment's ``actor`` key)",
+      "title": "Actor"
+    },
     "mission_number": {
       "description": "Canonical mission number",
       "minimum": 1,

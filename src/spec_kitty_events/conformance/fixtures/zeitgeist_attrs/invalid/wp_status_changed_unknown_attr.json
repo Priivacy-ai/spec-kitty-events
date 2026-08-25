@@ -1,0 +1,15 @@
+{
+  "event_type": "WPStatusChanged",
+  "attrs": {
+    "mission_slug": "demo-mission",
+    "wp_id": "WP01",
+    "to_lane": "in_progress",
+    "actor": "robert",
+    "force": "false",
+    "execution_mode": "worktree",
+    "evidence_ref": "nope"
+  },
+  "direction": "from",
+  "expected_error": "ZeitgeistAttrsError",
+  "notes": "Keys outside the kind's closed schema are rejected, so vocabulary drift cannot smuggle fields past the reader."
+}

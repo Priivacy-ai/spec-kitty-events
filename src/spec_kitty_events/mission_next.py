@@ -40,7 +40,7 @@ MISSION_NEXT_EVENT_TYPES: FrozenSet[str] = frozenset({
 class RuntimeActorIdentity(BaseModel):
     """Identity of a runtime actor (human, LLM, or service)."""
 
-    model_config = ConfigDict(frozen=True)
+    model_config = ConfigDict(frozen=True, extra="forbid")
 
     actor_id: str = Field(
         ..., min_length=1, description="Unique actor identifier"
@@ -62,6 +62,18 @@ class RuntimeActorIdentity(BaseModel):
         None, description="Tool identifier"
     )
 
+    @property
+    def actor_label(self) -> str:
+        """Canonical string form of the actor for moments, logs, and display.
+
+        Exactly the required opaque ``actor_id`` — never ``display_name``
+        (or any other free-text field): moments are identifiers and
+        transition facts, and a label derived from prose would both leak
+        that text onto the team relay for the whole retention window and
+        make an oversize name drop the entire moment at the bound.
+        """
+        return self.actor_id
+
 
 # ── Section 3: Enum ──────────────────────────────────────────────────────────
 
@@ -79,11 +91,17 @@ TERMINAL_RUN_STATUSES: FrozenSet[MissionRunStatus] = frozenset({
 
 # ── Section 4: Payload Models ────────────────────────────────────────────────
 
+# Every payload below carries optional ``mission_id``/``mission_slug``: the
+# live CLI producer (specify_cli/sync/emitter.py) injects both keys post-hoc
+# into each mission-run payload it emits, so ``extra="forbid"`` models
+# without those fields would reject real ingress on both sides of the wire.
+# They stay optional so pre-8.0 journals keep validating.
+
 
 class MissionRunStartedPayload(BaseModel):
     """Payload for MissionRunStarted event."""
 
-    model_config = ConfigDict(frozen=True)
+    model_config = ConfigDict(frozen=True, extra="forbid")
 
     run_id: str = Field(..., min_length=1, description="Unique run identifier")
     mission_type: str = Field(
@@ -92,12 +110,27 @@ class MissionRunStartedPayload(BaseModel):
     actor: RuntimeActorIdentity = Field(
         ..., description="Actor who started the run"
     )
+    mission_id: str | None = Field(
+        None,
+        min_length=1,
+        description="Canonical machine-facing mission identity (ULID) the run belongs to",
+    )
+    mission_slug: str | None = Field(
+        None,
+        min_length=1,
+        description="Canonical mission slug (display; mission_id is the identity)",
+    )
+
+    @property
+    def actor_label(self) -> str:
+        """Single-label projection of ``actor`` (zeitgeist_attrs contract)."""
+        return self.actor.actor_label
 
 
 class NextStepIssuedPayload(BaseModel):
     """Payload for NextStepIssued event."""
 
-    model_config = ConfigDict(frozen=True)
+    model_config = ConfigDict(frozen=True, extra="forbid")
 
     run_id: str = Field(..., min_length=1, description="Run identifier")
     step_id: str = Field(..., min_length=1, description="Step being issued")
@@ -107,12 +140,27 @@ class NextStepIssuedPayload(BaseModel):
     actor: RuntimeActorIdentity = Field(
         ..., description="Actor who issued the step"
     )
+    mission_id: str | None = Field(
+        None,
+        min_length=1,
+        description="Canonical machine-facing mission identity (ULID) the run belongs to",
+    )
+    mission_slug: str | None = Field(
+        None,
+        min_length=1,
+        description="Canonical mission slug (display; mission_id is the identity)",
+    )
+
+    @property
+    def actor_label(self) -> str:
+        """Single-label projection of ``actor`` (zeitgeist_attrs contract)."""
+        return self.actor.actor_label
 
 
 class NextStepAutoCompletedPayload(BaseModel):
     """Payload for NextStepAutoCompleted event."""
 
-    model_config = ConfigDict(frozen=True)
+    model_config = ConfigDict(frozen=True, extra="forbid")
 
     run_id: str = Field(..., min_length=1, description="Run identifier")
     step_id: str = Field(..., min_length=1, description="Step that completed")
@@ -125,12 +173,27 @@ class NextStepAutoCompletedPayload(BaseModel):
     actor: RuntimeActorIdentity = Field(
         ..., description="Actor context for the completion"
     )
+    mission_id: str | None = Field(
+        None,
+        min_length=1,
+        description="Canonical machine-facing mission identity (ULID) the run belongs to",
+    )
+    mission_slug: str | None = Field(
+        None,
+        min_length=1,
+        description="Canonical mission slug (display; mission_id is the identity)",
+    )
+
+    @property
+    def actor_label(self) -> str:
+        """Single-label projection of ``actor`` (zeitgeist_attrs contract)."""
+        return self.actor.actor_label
 
 
 class DecisionInputRequestedPayload(BaseModel):
     """Payload for DecisionInputRequested event."""
 
-    model_config = ConfigDict(frozen=True)
+    model_config = ConfigDict(frozen=True, extra="forbid")
 
     run_id: str = Field(..., min_length=1, description="Run identifier")
     decision_id: str = Field(
@@ -151,12 +214,27 @@ class DecisionInputRequestedPayload(BaseModel):
     actor: RuntimeActorIdentity = Field(
         ..., description="Actor who requested the decision"
     )
+    mission_id: str | None = Field(
+        None,
+        min_length=1,
+        description="Canonical machine-facing mission identity (ULID) the run belongs to",
+    )
+    mission_slug: str | None = Field(
+        None,
+        min_length=1,
+        description="Canonical mission slug (display; mission_id is the identity)",
+    )
+
+    @property
+    def actor_label(self) -> str:
+        """Single-label projection of ``actor`` (zeitgeist_attrs contract)."""
+        return self.actor.actor_label
 
 
 class DecisionInputAnsweredPayload(BaseModel):
     """Payload for DecisionInputAnswered event."""
 
-    model_config = ConfigDict(frozen=True)
+    model_config = ConfigDict(frozen=True, extra="forbid")
 
     run_id: str = Field(..., min_length=1, description="Run identifier")
     decision_id: str = Field(
@@ -168,12 +246,27 @@ class DecisionInputAnsweredPayload(BaseModel):
     actor: RuntimeActorIdentity = Field(
         ..., description="Actor who answered the decision"
     )
+    mission_id: str | None = Field(
+        None,
+        min_length=1,
+        description="Canonical machine-facing mission identity (ULID) the run belongs to",
+    )
+    mission_slug: str | None = Field(
+        None,
+        min_length=1,
+        description="Canonical mission slug (display; mission_id is the identity)",
+    )
+
+    @property
+    def actor_label(self) -> str:
+        """Single-label projection of ``actor`` (zeitgeist_attrs contract)."""
+        return self.actor.actor_label
 
 
 class MissionRunCompletedPayload(BaseModel):
     """Payload for MissionRunCompleted event."""
 
-    model_config = ConfigDict(frozen=True)
+    model_config = ConfigDict(frozen=True, extra="forbid")
 
     run_id: str = Field(..., min_length=1, description="Run identifier")
     mission_type: str = Field(
@@ -182,6 +275,21 @@ class MissionRunCompletedPayload(BaseModel):
     actor: RuntimeActorIdentity = Field(
         ..., description="Actor context for the completion"
     )
+    mission_id: str | None = Field(
+        None,
+        min_length=1,
+        description="Canonical machine-facing mission identity (ULID) the run belongs to",
+    )
+    mission_slug: str | None = Field(
+        None,
+        min_length=1,
+        description="Canonical mission slug (display; mission_id is the identity)",
+    )
+
+    @property
+    def actor_label(self) -> str:
+        """Single-label projection of ``actor`` (zeitgeist_attrs contract)."""
+        return self.actor.actor_label
 
 
 # ── Section 5: Reducer Output Models ─────────────────────────────────────────

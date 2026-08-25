@@ -118,7 +118,15 @@ class MissionStartedPayload(BaseModel):
 
 
 class MissionCreatedPayload(BaseModel):
-    """Typed payload for MissionCreated catalog events."""
+    """Typed payload for MissionCreated catalog events.
+
+    ``actor`` (8.0.0) carries the opaque identifier of whoever created the
+    mission so the broadcast moment can say WHO (E2E-MVP §1.1 renders
+    "<actor> created mission <slug>"). Optional — not required — because the
+    live producer built these payloads without it before 8.0.0; requiring it
+    would fail every in-flight emission at upgrade instead of enriching the
+    moment once producers catch up.
+    """
 
     model_config = ConfigDict(frozen=True, extra="forbid")
 
@@ -140,6 +148,14 @@ class MissionCreatedPayload(BaseModel):
     wp_count: int = Field(
         ..., ge=0, description="Work-package count at mission creation time"
     )
+    actor: str | None = Field(
+        None,
+        min_length=1,
+        description=(
+            "Opaque actor identifier of who created the mission "
+            "(broadcast under the moment's ``actor`` key)"
+        ),
+    )
     friendly_name: str = Field(
         ..., min_length=1, description="Human-friendly mission title"
     )
@@ -155,7 +171,12 @@ class MissionCreatedPayload(BaseModel):
 
 
 class MissionClosedPayload(BaseModel):
-    """Typed payload for MissionClosed catalog events."""
+    """Typed payload for MissionClosed catalog events.
+
+    ``actor`` (8.0.0) mirrors ``MissionCreatedPayload.actor`` — the opaque
+    identifier of whoever closed the mission — optional for the same
+    back-compat reason.
+    """
 
     model_config = ConfigDict(frozen=True, extra="forbid")
 
@@ -167,6 +188,14 @@ class MissionClosedPayload(BaseModel):
     )
     mission_type: str = Field(
         ..., min_length=1, description="Canonical mission workflow/template type"
+    )
+    actor: str | None = Field(
+        None,
+        min_length=1,
+        description=(
+            "Opaque actor identifier of who closed the mission "
+            "(broadcast under the moment's ``actor`` key)"
+        ),
     )
 
 

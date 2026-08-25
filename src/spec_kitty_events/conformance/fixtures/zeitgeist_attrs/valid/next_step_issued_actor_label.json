@@ -1,0 +1,30 @@
+{
+  "event_type": "NextStepIssued",
+  "envelope": {
+    "event_id": "e2e00000-0000-4000-8000-000000000009",
+    "timestamp": "2026-08-25T09:00:00+00:00"
+  },
+  "payload": {
+    "run_id": "run-01",
+    "step_id": "step-07",
+    "agent_id": "agent-a",
+    "actor": {
+      "actor_id": "actor-01",
+      "actor_type": "llm",
+      "display_name": "Ox Alpha",
+      "provider": "anthropic",
+      "model": "ox-alpha",
+      "tool": "claude-code"
+    }
+  },
+  "expected_attrs": {
+    "event_id": "e2e00000-0000-4000-8000-000000000009",
+    "occurred_at": "2026-08-25T09:00:00+00:00",
+    "run_id": "run-01",
+    "step_id": "step-07",
+    "agent_id": "agent-a",
+    "actor": "actor-01"
+  },
+  "expected_ref": "run-01",
+  "notes": "Run-scoped step moment; the structured actor rides as its single label."
+}

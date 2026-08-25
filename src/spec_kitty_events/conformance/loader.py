@@ -22,6 +22,7 @@ _VALID_CATEGORIES = frozenset({
     "connector",
     "profile_invocation", "retrospective",  # 3.1.0
     "harness_observation",  # F1-T1 (7.0.0)
+    "zeitgeist_attrs",  # E2: volatile mission/WP moment codecs
 })
 
 # Replay stream fixture type sentinel

@@ -1,6 +1,7 @@
 {
   "$defs": {
     "RuntimeActorIdentity": {
+      "additionalProperties": false,
       "description": "Identity of a runtime actor (human, LLM, or service).",
       "properties": {
         "actor_id": {
@@ -71,6 +72,7 @@
   },
   "$id": "spec-kitty-events/decision_input_answered_payload",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
   "description": "Payload for DecisionInputAnswered event.",
   "properties": {
     "actor": {
@@ -88,6 +90,34 @@
       "minLength": 1,
       "title": "Decision Id",
       "type": "string"
+    },
+    "mission_id": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Canonical machine-facing mission identity (ULID) the run belongs to",
+      "title": "Mission Id"
+    },
+    "mission_slug": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Canonical mission slug (display; mission_id is the identity)",
+      "title": "Mission Slug"
     },
     "run_id": {
       "description": "Run identifier",

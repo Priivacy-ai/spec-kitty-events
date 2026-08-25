@@ -1,6 +1,6 @@
 [
   {
-    "durability": "journal",
+    "durability": "volatile",
     "event_type": "MissionCreated",
     "family": "lifecycle",
     "introduced_in": "3.0.0",
@@ -14,7 +14,7 @@
     "strict_since": "3.0.0"
   },
   {
-    "durability": "journal",
+    "durability": "volatile",
     "event_type": "MissionClosed",
     "family": "lifecycle",
     "introduced_in": "3.0.0",
@@ -70,7 +70,7 @@
     "strict_since": "7.0.0"
   },
   {
-    "durability": "journal",
+    "durability": "volatile",
     "event_type": "PhaseEntered",
     "family": "lifecycle",
     "introduced_in": "0.3.0-alpha",
@@ -126,7 +126,7 @@
     "strict_since": "6.1.0"
   },
   {
-    "durability": "journal",
+    "durability": "volatile",
     "event_type": "WPStatusChanged",
     "family": "wp",
     "introduced_in": "0.2.0-alpha",
@@ -250,6 +250,90 @@
     "status": "supported",
     "strict": true,
     "strict_since": "5.1.0"
+  },
+  {
+    "durability": "volatile",
+    "event_type": "MissionRunStarted",
+    "family": "mission_run",
+    "introduced_in": "2.3.0",
+    "kind": null,
+    "min_consumer_package": "7.0.0",
+    "model": "spec_kitty_events.mission_next.MissionRunStartedPayload",
+    "payload_id": null,
+    "schema": "mission_run_started_payload.schema.json",
+    "status": "supported",
+    "strict": true,
+    "strict_since": "8.0.0"
+  },
+  {
+    "durability": "volatile",
+    "event_type": "NextStepIssued",
+    "family": "mission_run",
+    "introduced_in": "2.3.0",
+    "kind": null,
+    "min_consumer_package": "7.0.0",
+    "model": "spec_kitty_events.mission_next.NextStepIssuedPayload",
+    "payload_id": null,
+    "schema": "next_step_issued_payload.schema.json",
+    "status": "supported",
+    "strict": true,
+    "strict_since": "8.0.0"
+  },
+  {
+    "durability": "volatile",
+    "event_type": "NextStepAutoCompleted",
+    "family": "mission_run",
+    "introduced_in": "2.3.0",
+    "kind": null,
+    "min_consumer_package": "7.0.0",
+    "model": "spec_kitty_events.mission_next.NextStepAutoCompletedPayload",
+    "payload_id": null,
+    "schema": "next_step_auto_completed_payload.schema.json",
+    "status": "supported",
+    "strict": true,
+    "strict_since": "8.0.0"
+  },
+  {
+    "durability": "volatile",
+    "event_type": "DecisionInputRequested",
+    "family": "mission_run",
+    "introduced_in": "2.3.0",
+    "kind": null,
+    "min_consumer_package": "7.0.0",
+    "model": "spec_kitty_events.mission_next.DecisionInputRequestedPayload",
+    "payload_id": null,
+    "schema": "decision_input_requested_payload.schema.json",
+    "status": "supported",
+    "strict": true,
+    "strict_since": "8.0.0"
+  },
+  {
+    "durability": "volatile",
+    "event_type": "DecisionInputAnswered",
+    "family": "mission_run",
+    "introduced_in": "2.3.0",
+    "kind": null,
+    "min_consumer_package": "7.0.0",
+    "model": "spec_kitty_events.mission_next.DecisionInputAnsweredPayload",
+    "payload_id": null,
+    "schema": "decision_input_answered_payload.schema.json",
+    "status": "supported",
+    "strict": true,
+    "strict_since": "8.0.0"
+  },
+  {
+    "durability": "volatile",
+    "event_type": "MissionRunCompleted",
+    "family": "mission_run",
+    "introduced_in": "2.3.0",
+    "kind": null,
+    "min_consumer_package": "7.0.0",
+    "model": "spec_kitty_events.mission_next.MissionRunCompletedPayload",
+    "payload_id": null,
+    "schema": "mission_run_completed_payload.schema.json",
+    "status": "supported",
+    "strict": true,
+    "strict_since": "8.0.0"
   },
   {
     "durability": "volatile",

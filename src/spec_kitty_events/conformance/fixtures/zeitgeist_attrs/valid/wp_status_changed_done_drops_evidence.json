@@ -1,0 +1,47 @@
+{
+  "event_type": "WPStatusChanged",
+  "envelope": {
+    "event_id": "e2e00000-0000-4000-8000-000000000003",
+    "timestamp": "2026-08-25T09:00:00+00:00"
+  },
+  "payload": {
+    "mission_slug": "demo-mission",
+    "wp_id": "WP03",
+    "from_lane": "for_review",
+    "to_lane": "done",
+    "actor": "robert",
+    "force": false,
+    "reason": null,
+    "execution_mode": "worktree",
+    "review_ref": null,
+    "evidence": {
+      "repos": [
+        {
+          "repo": "demo-repo",
+          "branch": "mission/demo-mission",
+          "commit": "cccccccccccccccccccccccccccccccccccccccc",
+          "files_touched": null
+        }
+      ],
+      "verification": [],
+      "review": {
+        "reviewer": "robert",
+        "verdict": "approved",
+        "reference": null
+      }
+    }
+  },
+  "expected_attrs": {
+    "event_id": "e2e00000-0000-4000-8000-000000000003",
+    "occurred_at": "2026-08-25T09:00:00+00:00",
+    "mission_slug": "demo-mission",
+    "wp_id": "WP03",
+    "from_lane": "for_review",
+    "to_lane": "done",
+    "actor": "robert",
+    "force": "false",
+    "execution_mode": "worktree"
+  },
+  "expected_ref": "demo-mission",
+  "notes": "Terminal-lane transition whose evidence bundle stays in the journal: UNBROADCAST_FIELDS excludes it before encoding, so projection succeeds."
+}

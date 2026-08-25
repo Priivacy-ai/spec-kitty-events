@@ -1,0 +1,503 @@
+"""Unit tests for the zeitgeist attrs codecs (E2)."""
+
+from __future__ import annotations
+
+import dataclasses
+from datetime import datetime, timezone
+from uuid import UUID
+
+import pytest
+from pydantic import BaseModel
+
+from spec_kitty_events import zeitgeist_attrs
+from spec_kitty_events.forbidden_keys import FORBIDDEN_LEGACY_KEYS
+from spec_kitty_events.lifecycle import MissionClosedPayload, MissionStartedPayload
+from spec_kitty_events.mission_next import (
+    DecisionInputAnsweredPayload,
+    DecisionInputRequestedPayload,
+    MissionRunCompletedPayload,
+    MissionRunStartedPayload,
+    NextStepAutoCompletedPayload,
+    NextStepIssuedPayload,
+    RuntimeActorIdentity,
+)
+from spec_kitty_events.models import Event
+from spec_kitty_events.status import StatusTransitionPayload
+from spec_kitty_events.zeitgeist_attrs import (
+    FORBIDDEN_ATTR_KEYS,
+    PAYLOAD_MODEL_BY_EVENT_TYPE,
+    PROJECTED_FIELD_BY_EVENT_TYPE,
+    REF_FIELD_BY_EVENT_TYPE,
+    UNBROADCAST_FIELDS,
+    VOLATILE_EVENT_TYPES,
+    ZEITGEIST_ATTRS_MAX_BYTES,
+    ZEITGEIST_ATTRS_MAX_KEYS,
+    ZEITGEIST_FORBIDDEN_KEYS_V1,
+    UnencodableFieldValueError,
+    UnknownVolatileEventTypeError,
+    VolatileMoment,
+    ZeitgeistAttrsError,
+    ZeitgeistAttrsForbiddenKeyError,
+    ZeitgeistAttrsOverflowError,
+    from_zeitgeist_attrs,
+    to_zeitgeist_attrs,
+    zeitgeist_ref_for,
+)
+
+_EVENT_ID = "01JME2E2E2E2E2E2E2E2E2E2E2"
+_CORRELATION_ID = "01JMC0RRC0RRC0RRC0RRC0RRC0"
+_PROJECT_UUID = UUID("550e8400-e29b-41d4-a716-446655440000")
+
+
+def _envelope(event_type: str, *, event_id: str = _EVENT_ID) -> Event:
+    return Event(
+        event_id=event_id,
+        event_type=event_type,
+        aggregate_id="agg",
+        timestamp=datetime(2026, 8, 25, 9, 0, 0, tzinfo=timezone.utc),
+        build_id="build-unit",
+        node_id="node-unit",
+        lamport_clock=1,
+        project_uuid=_PROJECT_UUID,
+        correlation_id=_CORRELATION_ID,
+    )
+
+
+def _transition(**overrides) -> StatusTransitionPayload:
+    fields = {
+        "mission_slug": "demo-mission",
+        "wp_id": "WP01",
+        "to_lane": "doing",
+        "actor": "robert",
+        "execution_mode": "worktree",
+    }
+    fields.update(overrides)
+    return StatusTransitionPayload(**fields)
+
+
+def _identity() -> RuntimeActorIdentity:
+    return RuntimeActorIdentity(
+        actor_id="rob@robshouse.net",
+        actor_type="human",
+        display_name="Robert Douglass",
+        provider=None,
+        model=None,
+        tool=None,
+    )
+
+
+# ── closed vocabulary ────────────────────────────────────────────────────────
+
+
+def test_volatile_vocabulary_is_the_ephemeral_design_set() -> None:
+    assert VOLATILE_EVENT_TYPES == {
+        "WPStatusChanged", "MissionCreated", "MissionClosed", "PhaseEntered",
+        "MissionRunStarted", "NextStepIssued", "NextStepAutoCompleted",
+        "DecisionInputRequested", "DecisionInputAnswered", "MissionRunCompleted",
+    }
+
+
+def test_dispatch_table_covers_exactly_the_volatile_types() -> None:
+    assert set(PAYLOAD_MODEL_BY_EVENT_TYPE) == VOLATILE_EVENT_TYPES
+
+
+def test_every_ref_field_is_a_declared_field_of_its_model() -> None:
+    for event_type, ref_field in REF_FIELD_BY_EVENT_TYPE.items():
+        model = PAYLOAD_MODEL_BY_EVENT_TYPE[event_type]
+        assert ref_field in model.model_fields, event_type
+
+
+def test_unbroadcast_fields_exist_on_their_models() -> None:
+    """The skip lists cannot silently rot when a payload is renamed."""
+    for event_type, fields in UNBROADCAST_FIELDS.items():
+        model = PAYLOAD_MODEL_BY_EVENT_TYPE[event_type]
+        for name in fields:
+            assert name in model.model_fields, (event_type, name)
+
+
+def test_every_structured_actor_family_projects_to_a_single_label() -> None:
+    """No family broadcasts a structured actor field-for-field: producer-
+    asserted identity would duplicate what the relay attests itself.
+    Families whose ``actor`` is a plain (optionally absent) string need no
+    projection — the value itself rides under the ``actor`` key."""
+    for event_type in VOLATILE_EVENT_TYPES:
+        model = PAYLOAD_MODEL_BY_EVENT_TYPE[event_type]
+        field = model.model_fields.get("actor")
+        if field is None:
+            continue
+        base = zeitgeist_attrs._unwrap_optional(field.annotation)
+        if not (isinstance(base, type) and issubclass(base, BaseModel)):
+            continue
+        assert PROJECTED_FIELD_BY_EVENT_TYPE[event_type].get("actor") == "actor_label", (
+            event_type,
+            field.annotation,
+        )
+
+
+def test_actor_label_is_exactly_the_opaque_machine_id() -> None:
+    """Identifiers only: the label never derives from free text."""
+    assert _identity().actor_label == "rob@robshouse.net"
+    bare = RuntimeActorIdentity(actor_id="svc-1", actor_type="service")
+    assert bare.actor_label == "svc-1"
+
+
+def test_oversize_display_name_never_drops_the_moment() -> None:
+    """Regression pin: a label sourced from unbounded prose made any oversize
+    display name raise at the bound and silently kill the whole broadcast."""
+    identity = RuntimeActorIdentity(
+        actor_id="svc-1",
+        actor_type="service",
+        display_name="Dr. " + "X" * 250,
+    )
+    payload = MissionRunStartedPayload(
+        run_id="run-01", mission_type="software-dev", actor=identity
+    )
+    attrs = to_zeitgeist_attrs(payload, _envelope("MissionRunStarted"))
+    assert attrs["actor"] == "svc-1"
+    assert "Dr." not in " ".join(attrs.values())
+
+
+def test_forbidden_keys_union_the_zeitgeist_mirror_and_legacy_set() -> None:
+    assert FORBIDDEN_ATTR_KEYS == ZEITGEIST_FORBIDDEN_KEYS_V1 | FORBIDDEN_LEGACY_KEYS
+
+
+def test_no_declared_field_name_is_forbidden() -> None:
+    """Structural guarantee behind "never emit forbidden keys": today's
+    vocabulary cannot collide; if a future field does, this fails first."""
+    for model in PAYLOAD_MODEL_BY_EVENT_TYPE.values():
+        for name in model.model_fields:
+            assert name not in FORBIDDEN_ATTR_KEYS, (model.__name__, name)
+
+
+# ── encode ───────────────────────────────────────────────────────────────────
+
+
+def test_projection_is_deterministic() -> None:
+    first = to_zeitgeist_attrs(_transition(), _envelope("WPStatusChanged"))
+    second = to_zeitgeist_attrs(_transition(), _envelope("WPStatusChanged"))
+    assert first == second
+    assert list(first) == list(second)
+
+
+def test_envelope_identity_leads_the_projection() -> None:
+    attrs = to_zeitgeist_attrs(_transition(), _envelope("WPStatusChanged"))
+    assert list(attrs)[:2] == ["event_id", "occurred_at"]
+    assert attrs["event_id"] == _EVENT_ID
+    assert attrs["occurred_at"] == "2026-08-25T09:00:00+00:00"
+
+
+def test_occurred_at_comes_from_the_envelope_not_receipt_time() -> None:
+    envelope = _envelope("MissionClosed")
+    payload = MissionClosedPayload(mission_slug="s", mission_number=1,
+                                   mission_type="software-dev")
+    attrs = to_zeitgeist_attrs(payload, envelope)
+    assert attrs["occurred_at"] == envelope.timestamp.isoformat()
+
+
+def test_envelope_event_type_must_match_the_payload_family() -> None:
+    with pytest.raises(ZeitgeistAttrsError):
+        to_zeitgeist_attrs(_transition(), _envelope("MissionCreated"))
+
+
+def test_absent_optionals_emit_no_key() -> None:
+    attrs = to_zeitgeist_attrs(_transition(), _envelope("WPStatusChanged"))
+    assert "from_lane" not in attrs
+    assert "review_ref" not in attrs
+
+
+def test_structured_actor_projects_to_actor_label() -> None:
+    structured = _transition(actor={"role": "implementer", "profile": "ox"})
+    plain = _transition(actor=structured.actor_label)
+    assert to_zeitgeist_attrs(structured, _envelope("WPStatusChanged"))["actor"] == structured.actor_label
+    assert to_zeitgeist_attrs(plain, _envelope("WPStatusChanged"))["actor"] == structured.actor_label
+
+
+def test_mission_run_actor_rides_as_one_label_never_as_identity_breakdown() -> None:
+    payload = MissionRunStartedPayload(
+        run_id="run-01",
+        mission_type="software-dev",
+        actor=_identity(),
+    )
+    attrs = to_zeitgeist_attrs(payload, _envelope("MissionRunStarted"))
+    assert attrs["actor"] == "rob@robshouse.net"
+    assert not any(key.startswith("actor.") for key in attrs)
+
+
+def test_mission_level_actor_rides_as_an_opaque_identifier() -> None:
+    """The mission-level moments can say WHO: the optional plain-string
+    ``actor`` rides under the same ``actor`` key every other family uses,
+    and an absent actor emits no key (pre-8.0 producers stay valid)."""
+    from spec_kitty_events.lifecycle import MissionCreatedPayload
+
+    created = MissionCreatedPayload(
+        mission_slug="demo-mission",
+        mission_number=12,
+        mission_type="software-dev",
+        target_branch="main",
+        wp_count=3,
+        friendly_name="Demo",
+        purpose_tldr="Demo",
+        purpose_context="Demo",
+        actor="rob@robshouse.net",
+    )
+    attrs = to_zeitgeist_attrs(created, _envelope("MissionCreated"))
+    assert attrs["actor"] == "rob@robshouse.net"
+    moment = from_zeitgeist_attrs("MissionCreated", attrs)
+    assert moment.attrs["actor"] == "rob@robshouse.net"
+
+    closed = MissionClosedPayload(
+        mission_slug="demo-mission", mission_number=12,
+        mission_type="software-dev", actor="merge-agent",
+    )
+    closed_attrs = to_zeitgeist_attrs(closed, _envelope("MissionClosed"))
+    assert closed_attrs["actor"] == "merge-agent"
+
+
+def test_mission_run_identity_keys_admitted_both_directions() -> None:
+    """The live CLI emitter injects mission_id/mission_slug post-hoc into the
+    six mission-run payloads; both keys must ride and decode as identifiers."""
+    payload = MissionRunStartedPayload(
+        run_id="run-01",
+        mission_type="software-dev",
+        actor=_identity(),
+        mission_id="mission-demo",
+        mission_slug="demo-mission",
+    )
+    attrs = to_zeitgeist_attrs(payload, _envelope("MissionRunStarted"))
+    assert attrs["mission_id"] == "mission-demo"
+    assert attrs["mission_slug"] == "demo-mission"
+    moment = from_zeitgeist_attrs("MissionRunStarted", attrs)
+    assert moment.attrs["mission_slug"] == "demo-mission"
+
+    bare = MissionRunStartedPayload(
+        run_id="run-01", mission_type="software-dev", actor=_identity()
+    )
+    bare_attrs = to_zeitgeist_attrs(bare, _envelope("MissionRunStarted"))
+    assert "mission_id" not in bare_attrs and "mission_slug" not in bare_attrs
+
+
+def test_no_volatile_projection_emits_dotted_keys() -> None:
+    """The flat key space must stay flat: dotted names are how producer-
+    asserted identity sneaks past a flat-key check."""
+    payloads = [
+        (_transition(actor={"role": "implementer", "profile": "ox"}), "WPStatusChanged"),
+        (MissionRunStartedPayload(run_id="r", mission_type="t", actor=_identity()), "MissionRunStarted"),
+        (
+            NextStepIssuedPayload(
+                run_id="r", step_id="s", agent_id="a", actor=_identity()
+            ),
+            "NextStepIssued",
+        ),
+        (
+            NextStepAutoCompletedPayload(
+                run_id="r", step_id="s", agent_id="a", result="success", actor=_identity()
+            ),
+            "NextStepAutoCompleted",
+        ),
+        (
+            DecisionInputRequestedPayload(
+                run_id="r", decision_id="d", step_id="s", question="Ship?",
+                options=("yes",), actor=_identity(),
+            ),
+            "DecisionInputRequested",
+        ),
+        (
+            __import__("spec_kitty_events.mission_next", fromlist=["DecisionInputAnsweredPayload"]).DecisionInputAnsweredPayload(
+                run_id="r", decision_id="d", answer="yes", actor=_identity(),
+            ),
+            "DecisionInputAnswered",
+        ),
+        (
+            MissionRunCompletedPayload(run_id="r", mission_type="t", actor=_identity()),
+            "MissionRunCompleted",
+        ),
+    ]
+    for payload, event_type in payloads:
+        attrs = to_zeitgeist_attrs(payload, _envelope(event_type))
+        assert not any("." in key for key in attrs), (event_type, sorted(attrs))
+
+
+def test_prose_never_reaches_the_broadcast() -> None:
+    """Identifiers only: none of the free-text payload content may appear in
+    the attrs — not as keys and not as values (the 72 h relay is public-ish
+    real estate; the journal is where prose lives)."""
+    from spec_kitty_events.lifecycle import MissionCreatedPayload
+
+    payload = MissionCreatedPayload(
+        mission_slug="demo-mission",
+        mission_number=12,
+        mission_type="software-dev",
+        target_branch="main",
+        wp_count=3,
+        friendly_name="Board approved 40M for the rollout",
+        purpose_tldr="Bob Smith (bob@acme.com) is the counterparty contact.",
+        purpose_context="Broadcast through the team relay for 72 hours.",
+    )
+    attrs = to_zeitgeist_attrs(payload, _envelope("MissionCreated"))
+    blob = " ".join(attrs.values())
+    assert "friendly_name" not in attrs and "40M" not in blob
+    assert "purpose_tldr" not in attrs and "bob@acme.com" not in blob
+    assert "purpose_context" not in attrs and "72 hours" not in blob
+
+
+def test_decision_question_and_answer_stay_local() -> None:
+    requested = DecisionInputRequestedPayload(
+        run_id="run-01", decision_id="dec-01", step_id="step-07",
+        question="Ship WP01 to done now?", options=("yes", "no"),
+        actor=_identity(),
+    )
+    attrs = to_zeitgeist_attrs(requested, _envelope("DecisionInputRequested"))
+    assert "question" not in attrs and "options" not in attrs
+
+    answered = DecisionInputAnsweredPayload(
+        run_id="run-01", decision_id="dec-01", answer="yes, but keep it quiet",
+        actor=_identity(),
+    )
+    attrs = to_zeitgeist_attrs(answered, _envelope("DecisionInputAnswered"))
+    assert "answer" not in attrs
+    assert "keep it quiet" not in " ".join(attrs.values())
+
+
+def test_unknown_payload_type_fails_closed() -> None:
+    with pytest.raises(UnknownVolatileEventTypeError):
+        to_zeitgeist_attrs(
+            MissionStartedPayload(mission_id="m1", mission_type="t",
+                                  initial_phase="p", actor="a"),
+            _envelope("MissionStarted"),
+        )
+    with pytest.raises(UnknownVolatileEventTypeError):
+        to_zeitgeist_attrs("not even a model", _envelope("WPStatusChanged"))  # type: ignore[arg-type]
+
+
+def test_oversize_value_raises_rather_than_truncating() -> None:
+    payload = MissionClosedPayload(mission_slug="s" * 241, mission_number=1,
+                                   mission_type="software-dev")
+    with pytest.raises(ZeitgeistAttrsOverflowError):
+        to_zeitgeist_attrs(payload, _envelope("MissionClosed"))
+
+
+def test_key_count_bound(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(zeitgeist_attrs, "ZEITGEIST_ATTRS_MAX_KEYS", 3)
+    with pytest.raises(ZeitgeistAttrsOverflowError):
+        to_zeitgeist_attrs(_transition(), _envelope("WPStatusChanged"))
+
+
+def test_emit_refuses_a_future_field_collision(monkeypatch: pytest.MonkeyPatch) -> None:
+    """If a future vocabulary field collides with the forbidden set, encode
+    refuses rather than broadcasting it."""
+    monkeypatch.setattr(zeitgeist_attrs, "FORBIDDEN_ATTR_KEYS", frozenset({"wp_id"}))
+    with pytest.raises(ZeitgeistAttrsForbiddenKeyError):
+        to_zeitgeist_attrs(_transition(), _envelope("WPStatusChanged"))
+
+
+def test_unbroadcast_evidence_never_appears_in_attrs() -> None:
+    from spec_kitty_events.status import DoneEvidence, RepoEvidence, ReviewVerdict
+
+    payload = _transition(
+        to_lane="done",
+        from_lane="for_review",
+        evidence=DoneEvidence(
+            repos=[RepoEvidence(repo="r", branch="b", commit="c")],
+            verification=[], review=ReviewVerdict(reviewer="robert", verdict="ok"),
+        ),
+    )
+    attrs = to_zeitgeist_attrs(payload, _envelope("WPStatusChanged"))
+    assert not any(key.startswith("evidence") for key in attrs)
+
+
+def test_value_types_without_an_encoding_fail_closed() -> None:
+    """The encoder handles str/int/bool/str-Enum/nested models only. If a
+    future field introduces any other scalar (float, datetime, ...), emit
+    refuses rather than guessing an encoding."""
+    payload = MissionClosedPayload(mission_slug="s", mission_number=1,
+                                   mission_type="software-dev")
+    object.__setattr__(payload, "mission_number", 1.5)  # bypass frozen: force an exotic type
+    with pytest.raises(UnencodableFieldValueError):
+        to_zeitgeist_attrs(payload, _envelope("MissionClosed"))
+
+
+def test_ref_derival_and_mismatch_fail_closed() -> None:
+    assert zeitgeist_ref_for("WPStatusChanged", _transition()) == "demo-mission"
+    with pytest.raises(UnknownVolatileEventTypeError):
+        zeitgeist_ref_for("MissionClosed", _transition())
+
+
+def test_bounds_constants_match_the_zeitgeist_frame_contract() -> None:
+    assert ZEITGEIST_ATTRS_MAX_KEYS == 16
+    assert ZEITGEIST_ATTRS_MAX_BYTES == 240
+
+
+# ── decode ───────────────────────────────────────────────────────────────────
+
+
+def test_decode_returns_the_validated_moment() -> None:
+    payload = _transition(from_lane="planned")
+    attrs = to_zeitgeist_attrs(payload, _envelope("WPStatusChanged"))
+    moment = from_zeitgeist_attrs("WPStatusChanged", attrs)
+    assert moment == VolatileMoment(kind="WPStatusChanged", ref="demo-mission",
+                                    attrs=dict(attrs))
+
+
+def test_decode_admits_envelope_identity_attrs() -> None:
+    attrs = to_zeitgeist_attrs(_transition(), _envelope("WPStatusChanged"))
+    moment = from_zeitgeist_attrs("WPStatusChanged", attrs)
+    assert moment.attrs["event_id"] == _EVENT_ID
+    assert moment.attrs["occurred_at"] == "2026-08-25T09:00:00+00:00"
+
+
+def test_decode_rejects_unknown_keys() -> None:
+    with pytest.raises(ZeitgeistAttrsError):
+        from_zeitgeist_attrs("WPStatusChanged", {"not_in_schema": "x"})
+
+
+def test_decode_rejects_non_string_values() -> None:
+    with pytest.raises(ZeitgeistAttrsError):
+        from_zeitgeist_attrs("MissionClosed", {"mission_number": 12})  # type: ignore[dict-item]
+
+
+def test_decode_rejects_oversize_values() -> None:
+    attrs = to_zeitgeist_attrs(_transition(), _envelope("WPStatusChanged"))
+    attrs["actor"] = "r" * 241
+    with pytest.raises(ZeitgeistAttrsOverflowError):
+        from_zeitgeist_attrs("WPStatusChanged", attrs)
+
+
+def test_decode_rejects_unknown_event_type() -> None:
+    with pytest.raises(UnknownVolatileEventTypeError):
+        from_zeitgeist_attrs("MissionStarted", {"mission_id": "m1"})
+
+
+def test_decode_forbidden_guard_wins_when_a_key_is_schema_legal(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Defense-in-depth ordering: even if the closed key set ever admitted a
+    forbidden name, the forbidden-key check still refuses it."""
+    monkeypatch.setitem(
+        zeitgeist_attrs._ALLOWED_KEYS_BY_EVENT_TYPE, "MissionClosed", frozenset({"team"})
+    )
+    with pytest.raises(ZeitgeistAttrsForbiddenKeyError):
+        from_zeitgeist_attrs("MissionClosed", {"team": "t"})
+
+
+def test_decode_key_count_overflow_is_rejected(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Decode-side bound: more entries than the frame allows never decode,
+    regardless of how small each one is."""
+    monkeypatch.setattr(zeitgeist_attrs, "_ALLOWED_KEYS_BY_EVENT_TYPE",
+                        dict(zeitgeist_attrs._ALLOWED_KEYS_BY_EVENT_TYPE))
+    monkeypatch.setitem(
+        zeitgeist_attrs._ALLOWED_KEYS_BY_EVENT_TYPE,
+        "WPStatusChanged",
+        frozenset({f"k{i}" for i in range(20)}),
+    )
+    attrs = {f"k{i}": "v" for i in range(zeitgeist_attrs.ZEITGEIST_ATTRS_MAX_KEYS + 1)}
+    with pytest.raises(ZeitgeistAttrsOverflowError):
+        from_zeitgeist_attrs("WPStatusChanged", attrs)
+
+
+def test_moment_is_frozen() -> None:
+    moment = from_zeitgeist_attrs(
+        "WPStatusChanged",
+        to_zeitgeist_attrs(_transition(), _envelope("WPStatusChanged")),
+    )
+    with pytest.raises(dataclasses.FrozenInstanceError):
+        moment.kind = "MissionClosed"  # type: ignore[misc]
