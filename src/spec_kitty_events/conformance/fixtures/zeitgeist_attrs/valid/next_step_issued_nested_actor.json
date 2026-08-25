@@ -1,0 +1,29 @@
+{
+  "event_type": "NextStepIssued",
+  "payload": {
+    "run_id": "run-01",
+    "step_id": "step-07",
+    "agent_id": "agent-a",
+    "actor": {
+      "actor_id": "actor-01",
+      "actor_type": "llm",
+      "display_name": "Ox Alpha",
+      "provider": "anthropic",
+      "model": "ox-alpha",
+      "tool": "claude-code"
+    }
+  },
+  "expected_attrs": {
+    "run_id": "run-01",
+    "step_id": "step-07",
+    "agent_id": "agent-a",
+    "actor.actor_id": "actor-01",
+    "actor.actor_type": "llm",
+    "actor.display_name": "Ox Alpha",
+    "actor.provider": "anthropic",
+    "actor.model": "ox-alpha",
+    "actor.tool": "claude-code"
+  },
+  "expected_ref": "run-01",
+  "notes": "Run-scoped step moment with nested actor identity."
+}

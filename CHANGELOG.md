@@ -49,6 +49,45 @@ Any code importing `spec_kitty_events.sync`, `.legacy`, or `.cutover`
 must be deleted or re-homed onto the strict profile / `forbidden_keys`
 modules.
 
+E2 (spec-kitty-rearchitecture): volatile mission/WP vocabulary + zeitgeist attrs codecs.
+
+### Changed
+
+- **Breaking:** the support matrix moved `WPStatusChanged`, `MissionCreated`,
+  `MissionClosed`, and `PhaseEntered` from `journal` to `volatile`
+  durability, and added six volatile rows for the mission-run family
+  (`MissionRunStarted`, `NextStepIssued`, `NextStepAutoCompleted`,
+  `DecisionInputRequested`, `DecisionInputAnswered`, `MissionRunCompleted`;
+  `introduced_in=2.3.0`). `SUPPORT_MATRIX` is now 30 rows (14 journal +
+  16 volatile) and `support_matrix_digest()` changed accordingly —
+  downstream candidates pinning the digest must re-pin.
+- The strict journal profile (`STRICT_EVENT_TYPES`, now 25 types) admits the
+  six mission-run types. `NextStepPlanned` stays excluded: its payload
+  contract is reserved. `validate_strict_envelope` therefore accepts
+  mission-run envelopes with `schema_version="3.0.0"`.
+- `RuntimeActorIdentity` and the six `mission_next` payload models now
+  reject unknown extra fields (`extra="forbid"`), matching every other
+  strict payload family; their generated JSON schemas gained
+  `additionalProperties: false`.
+
+### Added
+
+- `spec_kitty_events.zeitgeist_attrs`: the single owner of the mapping
+  between the volatile families and zeitgeist's bounded event-frame attrs
+  (`{str: str}`, ≤16 keys, ≤240 B per key/value, no forbidden keys).
+  `to_zeitgeist_attrs()` projects a volatile payload onto deterministic
+  bounded attrs; `from_zeitgeist_attrs()` validates inbound attrs against
+  the kind's closed key vocabulary and returns a frozen `VolatileMoment`
+  (`kind`, `ref`, `attrs`). Encoding never truncates: an oversize value
+  raises instead, so that moment does not broadcast. `StatusTransitionPayload.evidence`
+  and `DecisionInputRequestedPayload.options` are declared unbroadcast —
+  they stay in the local journal and are not part of any moment.
+- Conformance fixtures for both codec directions under
+  `conformance/fixtures/zeitgeist_attrs/` (13 valid goldens pinning exact
+  attrs bytes per volatile type, 4 invalid rejections), registered in
+  `manifest.json` under the new `zeitgeist_attrs` category.
+)
+
 ## [7.0.0] - 2026-08-21
 
 F1-T1 (spec-kitty-rearchitecture, M1): strict journal profile + HarnessObservation.

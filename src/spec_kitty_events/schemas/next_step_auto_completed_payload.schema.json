@@ -1,6 +1,7 @@
 {
   "$defs": {
     "RuntimeActorIdentity": {
+      "additionalProperties": false,
       "description": "Identity of a runtime actor (human, LLM, or service).",
       "properties": {
         "actor_id": {
@@ -71,6 +72,7 @@
   },
   "$id": "spec-kitty-events/next_step_auto_completed_payload",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
   "description": "Payload for NextStepAutoCompleted event.",
   "properties": {
     "actor": {

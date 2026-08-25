@@ -1,0 +1,25 @@
+{
+  "event_type": "WPStatusChanged",
+  "payload": {
+    "mission_slug": "demo-mission",
+    "wp_id": "WP01",
+    "from_lane": null,
+    "to_lane": "in_progress",
+    "actor": "robert",
+    "force": false,
+    "reason": null,
+    "execution_mode": "worktree",
+    "review_ref": null,
+    "evidence": null
+  },
+  "expected_attrs": {
+    "mission_slug": "demo-mission",
+    "wp_id": "WP01",
+    "to_lane": "in_progress",
+    "actor": "robert",
+    "force": "false",
+    "execution_mode": "worktree"
+  },
+  "expected_ref": "demo-mission",
+  "notes": "The MVP moment: a WP moves to doing; from_lane absent (key omitted) because the transition had no recorded origin lane."
+}

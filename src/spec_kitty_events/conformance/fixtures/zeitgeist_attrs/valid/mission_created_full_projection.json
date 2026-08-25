@@ -1,0 +1,27 @@
+{
+  "event_type": "MissionCreated",
+  "payload": {
+    "mission_id": null,
+    "mission_slug": "demo-mission",
+    "mission_number": 12,
+    "mission_type": "software-dev",
+    "target_branch": "main",
+    "wp_count": 3,
+    "friendly_name": "Demo Mission",
+    "purpose_tldr": "Show the ephemeral status loop.",
+    "purpose_context": "Broadcast through the team relay.",
+    "created_at": null
+  },
+  "expected_attrs": {
+    "mission_slug": "demo-mission",
+    "mission_number": "12",
+    "mission_type": "software-dev",
+    "target_branch": "main",
+    "wp_count": "3",
+    "friendly_name": "Demo Mission",
+    "purpose_tldr": "Show the ephemeral status loop.",
+    "purpose_context": "Broadcast through the team relay."
+  },
+  "expected_ref": "demo-mission",
+  "notes": "Int fields pin the str() encoding; every field rides because the family has no unbroadcast member."
+}

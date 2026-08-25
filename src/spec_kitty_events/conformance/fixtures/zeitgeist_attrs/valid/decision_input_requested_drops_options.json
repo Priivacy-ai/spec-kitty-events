@@ -1,0 +1,37 @@
+{
+  "event_type": "DecisionInputRequested",
+  "payload": {
+    "run_id": "run-01",
+    "decision_id": "dec-01",
+    "step_id": "step-07",
+    "question": "Ship as-is?",
+    "options": [
+      "yes",
+      "no",
+      "revise"
+    ],
+    "input_key": null,
+    "actor": {
+      "actor_id": "actor-01",
+      "actor_type": "llm",
+      "display_name": "Ox Alpha",
+      "provider": "anthropic",
+      "model": "ox-alpha",
+      "tool": "claude-code"
+    }
+  },
+  "expected_attrs": {
+    "run_id": "run-01",
+    "decision_id": "dec-01",
+    "step_id": "step-07",
+    "question": "Ship as-is?",
+    "actor.actor_id": "actor-01",
+    "actor.actor_type": "llm",
+    "actor.display_name": "Ox Alpha",
+    "actor.provider": "anthropic",
+    "actor.model": "ox-alpha",
+    "actor.tool": "claude-code"
+  },
+  "expected_ref": "run-01",
+  "notes": "Suggested options are display hints of unbounded length and stay local (UNBROADCAST_FIELDS); the question itself must fit the bound."
+}

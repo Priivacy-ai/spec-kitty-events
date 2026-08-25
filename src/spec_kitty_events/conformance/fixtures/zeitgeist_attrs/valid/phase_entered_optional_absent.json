@@ -1,0 +1,18 @@
+{
+  "event_type": "PhaseEntered",
+  "payload": {
+    "mission_id": "mission-demo",
+    "phase_name": "build",
+    "previous_phase": null,
+    "actor": "robert",
+    "mission_slug": "demo-mission"
+  },
+  "expected_attrs": {
+    "mission_id": "mission-demo",
+    "phase_name": "build",
+    "actor": "robert",
+    "mission_slug": "demo-mission"
+  },
+  "expected_ref": "demo-mission",
+  "notes": "previous_phase None: key omitted on emit, default restored on read."
+}

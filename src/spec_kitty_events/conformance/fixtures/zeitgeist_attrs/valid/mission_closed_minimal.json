@@ -1,0 +1,15 @@
+{
+  "event_type": "MissionClosed",
+  "payload": {
+    "mission_slug": "demo-mission",
+    "mission_number": 12,
+    "mission_type": "software-dev"
+  },
+  "expected_attrs": {
+    "mission_slug": "demo-mission",
+    "mission_number": "12",
+    "mission_type": "software-dev"
+  },
+  "expected_ref": "demo-mission",
+  "notes": "Smallest family: full fidelity in three attrs."
+}

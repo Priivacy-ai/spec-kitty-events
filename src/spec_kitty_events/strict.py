@@ -32,6 +32,14 @@ from spec_kitty_events.harness_observation import (
     PAYLOAD_ID_BY_KIND,
 )
 from spec_kitty_events.lifecycle import MISSION_EVENT_TYPES
+from spec_kitty_events.mission_next import (
+    DECISION_INPUT_ANSWERED,
+    DECISION_INPUT_REQUESTED,
+    MISSION_RUN_COMPLETED,
+    MISSION_RUN_STARTED,
+    NEXT_STEP_AUTO_COMPLETED,
+    NEXT_STEP_ISSUED,
+)
 from spec_kitty_events.models import Event
 from spec_kitty_events.project_lifecycle import (
     PLAN_COMPLETED,
@@ -73,10 +81,20 @@ STRICT_ENVELOPE_KEYS: frozenset[str] = frozenset(
     }
 )
 
-# 9 mission + 1 WP-lane + 8 project/artifact + 1 observation = 19 (draft
-# §3.2, exhaustive; excluded names are listed in that section's prose).
+# 9 mission + 6 mission-run (volatile, E2) + 1 WP-lane + 8 project/artifact
+# + 1 observation = 25 (exhaustive; excluded names are listed in the draft's
+# prose). ``NextStepPlanned`` stays excluded: its payload contract is
+# reserved, so a strict envelope of that type could not be payload-validated.
 STRICT_EVENT_TYPES: frozenset[str] = frozenset(
     MISSION_EVENT_TYPES
+    | {
+        MISSION_RUN_STARTED,
+        NEXT_STEP_ISSUED,
+        NEXT_STEP_AUTO_COMPLETED,
+        DECISION_INPUT_REQUESTED,
+        DECISION_INPUT_ANSWERED,
+        MISSION_RUN_COMPLETED,
+    }
     | {WP_STATUS_CHANGED}
     | {
         WP_CREATED,
@@ -95,6 +113,13 @@ STRICT_TIMESTAMP_RULES: str = "iso8601-tz-aware"
 
 _REQUIRED_SCHEMA_VERSION = "3.0.0"
 
+# E2 lands inside the same unreleased wave as epic E2's major bump
+# (planning repo issue #3: delete sync/legacy/cutover, "new major; both
+# consumers bump"). The mission-run rows are first strict-admitted by that
+# release, not by 2.3.0 where their models appeared. Move this value with
+# the release number if it changes.
+_E2_STRICT_SINCE = "8.0.0"
+
 
 # ── Support matrix (draft §3.4) ──────────────────────────────────────────────
 #
@@ -108,10 +133,12 @@ _REQUIRED_SCHEMA_VERSION = "3.0.0"
 class SupportRow(BaseModel):
     """One row of the machine-readable support matrix.
 
-    18 journal rows (keyed by `event_type`, `payload_id=None`, `kind=None`)
-    + 6 observation rows (keyed by `event_type="HarnessObservation"` x
-    `kind`, each with its own payload ID) = 24 rows, exactly six distinct
-    payload IDs.
+    E2 (volatile mission/WP vocabulary): the ``WPStatusChanged``,
+    ``MissionCreated``, ``MissionClosed``, and ``PhaseEntered`` rows moved
+    from ``journal`` to ``volatile`` durability, and the mission-run family
+    (``mission_next``) joined as six new volatile rows — 14 journal + 16
+    volatile = 30 rows, exactly six distinct payload IDs (the observation
+    ones).
     """
 
     # populate_by_name=True: `schema_` is a Python-side rename (pydantic's
@@ -124,7 +151,7 @@ class SupportRow(BaseModel):
     event_type: str
     kind: Optional[str] = None
     payload_id: Optional[str] = None
-    family: Literal["lifecycle", "wp", "project", "harness"]
+    family: Literal["lifecycle", "wp", "project", "mission_run", "harness"]
     durability: Literal["journal", "volatile"]
     model: str
     schema_: str = Field(alias="schema")
@@ -150,6 +177,37 @@ def _journal_row(
         payload_id=None,
         family=family,
         durability="journal",
+        model=model,
+        schema=schema,
+        strict=True,
+        introduced_in=introduced_in,
+        strict_since=strict_since or introduced_in,
+        status="supported",
+        min_consumer_package="7.0.0",
+    )
+
+
+def _volatile_row(
+    *,
+    event_type: str,
+    family: Literal["lifecycle", "wp", "mission_run"],
+    model: str,
+    schema: str,
+    introduced_in: str,
+    strict_since: Optional[str] = None,
+) -> SupportRow:
+    """A row of the ephemeral, broadcast-only vocabulary (E2).
+
+    Volatile families are carried through each team's Zeitgeist relay as
+    bounded attrs (``spec_kitty_events.zeitgeist_attrs``) and observed for
+    the retention window only; they never form durable server-side state.
+    """
+    return SupportRow(
+        event_type=event_type,
+        kind=None,
+        payload_id=None,
+        family=family,
+        durability="volatile",
         model=model,
         schema=schema,
         strict=True,
@@ -196,12 +254,15 @@ def _observation_row(kind: ObservationKind) -> SupportRow:
 #     module by name -- a pre-existing documentation gap, not introduced by
 #     this row).
 SUPPORT_MATRIX: Tuple[SupportRow, ...] = (
-    _journal_row(
+    # Volatile since E2 (Ephemeral Team Status): the mission/WP moment
+    # vocabulary broadcasts through the team's Zeitgeist relay instead of
+    # syncing into durable server-side state.
+    _volatile_row(
         event_type="MissionCreated", family="lifecycle",
         model="spec_kitty_events.lifecycle.MissionCreatedPayload",
         schema="mission_created_payload.schema.json", introduced_in="3.0.0",
     ),
-    _journal_row(
+    _volatile_row(
         event_type="MissionClosed", family="lifecycle",
         model="spec_kitty_events.lifecycle.MissionClosedPayload",
         schema="mission_closed_payload.schema.json", introduced_in="3.0.0",
@@ -224,7 +285,7 @@ SUPPORT_MATRIX: Tuple[SupportRow, ...] = (
         schema="mission_cancelled_payload.schema.json", introduced_in="0.3.0-alpha",
         strict_since="7.0.0",
     ),
-    _journal_row(
+    _volatile_row(
         event_type="PhaseEntered", family="lifecycle",
         model="spec_kitty_events.lifecycle.PhaseEnteredPayload",
         schema="phase_entered_payload.schema.json", introduced_in="0.3.0-alpha",
@@ -246,7 +307,7 @@ SUPPORT_MATRIX: Tuple[SupportRow, ...] = (
         model="spec_kitty_events.lifecycle.FollowUpRecordedPayload",
         schema="follow_up_recorded_payload.schema.json", introduced_in="6.1.0",
     ),
-    _journal_row(
+    _volatile_row(
         event_type="WPStatusChanged", family="wp",
         model="spec_kitty_events.status.StatusTransitionPayload",
         schema="status_transition_payload.schema.json", introduced_in="0.2.0-alpha",
@@ -291,10 +352,49 @@ SUPPORT_MATRIX: Tuple[SupportRow, ...] = (
         model="spec_kitty_events.project_lifecycle.TasksCompletedPayload",
         schema="tasks_completed_payload.schema.json", introduced_in="5.1.0",
     ),
+    # Mission-run runtime family (mission_next), volatile since E2: run-scoped
+    # execution moments broadcast with the rest of the ephemeral vocabulary.
+    # ``NextStepPlanned`` has no row — its payload contract is reserved.
+    _volatile_row(
+        event_type=MISSION_RUN_STARTED, family="mission_run",
+        model="spec_kitty_events.mission_next.MissionRunStartedPayload",
+        schema="mission_run_started_payload.schema.json", introduced_in="2.3.0",
+        strict_since=_E2_STRICT_SINCE,
+    ),
+    _volatile_row(
+        event_type=NEXT_STEP_ISSUED, family="mission_run",
+        model="spec_kitty_events.mission_next.NextStepIssuedPayload",
+        schema="next_step_issued_payload.schema.json", introduced_in="2.3.0",
+        strict_since=_E2_STRICT_SINCE,
+    ),
+    _volatile_row(
+        event_type=NEXT_STEP_AUTO_COMPLETED, family="mission_run",
+        model="spec_kitty_events.mission_next.NextStepAutoCompletedPayload",
+        schema="next_step_auto_completed_payload.schema.json", introduced_in="2.3.0",
+        strict_since=_E2_STRICT_SINCE,
+    ),
+    _volatile_row(
+        event_type=DECISION_INPUT_REQUESTED, family="mission_run",
+        model="spec_kitty_events.mission_next.DecisionInputRequestedPayload",
+        schema="decision_input_requested_payload.schema.json", introduced_in="2.3.0",
+        strict_since=_E2_STRICT_SINCE,
+    ),
+    _volatile_row(
+        event_type=DECISION_INPUT_ANSWERED, family="mission_run",
+        model="spec_kitty_events.mission_next.DecisionInputAnsweredPayload",
+        schema="decision_input_answered_payload.schema.json", introduced_in="2.3.0",
+        strict_since=_E2_STRICT_SINCE,
+    ),
+    _volatile_row(
+        event_type=MISSION_RUN_COMPLETED, family="mission_run",
+        model="spec_kitty_events.mission_next.MissionRunCompletedPayload",
+        schema="mission_run_completed_payload.schema.json", introduced_in="2.3.0",
+        strict_since=_E2_STRICT_SINCE,
+    ),
     *(_observation_row(kind) for kind in ObservationKind),
 )
-"""24 rows: 18 journal + 6 observation (draft §3.4). Order is fixed (source
-order above) so `support_matrix_digest()` and the generated
+"""30 rows: 14 journal + 16 volatile (draft §3.4 as amended by E2). Order is
+fixed (source order above) so `support_matrix_digest()` and the generated
 `support_matrix.json` are byte-stable across runs without an explicit sort."""
 
 

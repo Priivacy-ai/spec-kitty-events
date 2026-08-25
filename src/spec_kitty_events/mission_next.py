@@ -40,7 +40,7 @@ MISSION_NEXT_EVENT_TYPES: FrozenSet[str] = frozenset({
 class RuntimeActorIdentity(BaseModel):
     """Identity of a runtime actor (human, LLM, or service)."""
 
-    model_config = ConfigDict(frozen=True)
+    model_config = ConfigDict(frozen=True, extra="forbid")
 
     actor_id: str = Field(
         ..., min_length=1, description="Unique actor identifier"
@@ -83,7 +83,7 @@ TERMINAL_RUN_STATUSES: FrozenSet[MissionRunStatus] = frozenset({
 class MissionRunStartedPayload(BaseModel):
     """Payload for MissionRunStarted event."""
 
-    model_config = ConfigDict(frozen=True)
+    model_config = ConfigDict(frozen=True, extra="forbid")
 
     run_id: str = Field(..., min_length=1, description="Unique run identifier")
     mission_type: str = Field(
@@ -97,7 +97,7 @@ class MissionRunStartedPayload(BaseModel):
 class NextStepIssuedPayload(BaseModel):
     """Payload for NextStepIssued event."""
 
-    model_config = ConfigDict(frozen=True)
+    model_config = ConfigDict(frozen=True, extra="forbid")
 
     run_id: str = Field(..., min_length=1, description="Run identifier")
     step_id: str = Field(..., min_length=1, description="Step being issued")
@@ -112,7 +112,7 @@ class NextStepIssuedPayload(BaseModel):
 class NextStepAutoCompletedPayload(BaseModel):
     """Payload for NextStepAutoCompleted event."""
 
-    model_config = ConfigDict(frozen=True)
+    model_config = ConfigDict(frozen=True, extra="forbid")
 
     run_id: str = Field(..., min_length=1, description="Run identifier")
     step_id: str = Field(..., min_length=1, description="Step that completed")
@@ -130,7 +130,7 @@ class NextStepAutoCompletedPayload(BaseModel):
 class DecisionInputRequestedPayload(BaseModel):
     """Payload for DecisionInputRequested event."""
 
-    model_config = ConfigDict(frozen=True)
+    model_config = ConfigDict(frozen=True, extra="forbid")
 
     run_id: str = Field(..., min_length=1, description="Run identifier")
     decision_id: str = Field(
@@ -156,7 +156,7 @@ class DecisionInputRequestedPayload(BaseModel):
 class DecisionInputAnsweredPayload(BaseModel):
     """Payload for DecisionInputAnswered event."""
 
-    model_config = ConfigDict(frozen=True)
+    model_config = ConfigDict(frozen=True, extra="forbid")
 
     run_id: str = Field(..., min_length=1, description="Run identifier")
     decision_id: str = Field(
@@ -173,7 +173,7 @@ class DecisionInputAnsweredPayload(BaseModel):
 class MissionRunCompletedPayload(BaseModel):
     """Payload for MissionRunCompleted event."""
 
-    model_config = ConfigDict(frozen=True)
+    model_config = ConfigDict(frozen=True, extra="forbid")
 
     run_id: str = Field(..., min_length=1, description="Run identifier")
     mission_type: str = Field(

@@ -1,0 +1,16 @@
+{
+  "event_type": "MissionCreated",
+  "payload": {
+    "mission_slug": "sssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss",
+    "mission_number": 1,
+    "mission_type": "software-dev",
+    "target_branch": "main",
+    "wp_count": 0,
+    "friendly_name": "Too long",
+    "purpose_tldr": "t",
+    "purpose_context": "c"
+  },
+  "direction": "to",
+  "expected_error": "ZeitgeistAttrsOverflowError",
+  "notes": "A 241-byte value exceeds the 240 B bound; encoding raises instead of truncating, so this creation moment does not broadcast."
+}

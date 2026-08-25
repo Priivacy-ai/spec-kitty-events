@@ -1,0 +1,29 @@
+{
+  "event_type": "WPStatusChanged",
+  "payload": {
+    "mission_slug": "demo-mission",
+    "wp_id": "WP02",
+    "from_lane": "claimed",
+    "to_lane": "for_review",
+    "actor": {
+      "role": "implementer",
+      "profile": "ox-alpha"
+    },
+    "force": false,
+    "reason": null,
+    "execution_mode": "direct_repo",
+    "review_ref": null,
+    "evidence": null
+  },
+  "expected_attrs": {
+    "mission_slug": "demo-mission",
+    "wp_id": "WP02",
+    "from_lane": "claimed",
+    "to_lane": "for_review",
+    "actor": "ox-alpha",
+    "force": "false",
+    "execution_mode": "direct_repo"
+  },
+  "expected_ref": "demo-mission",
+  "notes": "Structured actor projects to the canonical actor_label string (see module docstring); decode is label-faithful, not dict-faithful."
+}

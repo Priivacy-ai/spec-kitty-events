@@ -1941,6 +1941,142 @@
       "event_type": "MissionCreated",
       "notes": "envelope_strict_journal class. X10: the actual spec-kitty local-appender envelope shape; three collect-all errors.",
       "min_version": "7.0.0"
+    },
+    {
+      "id": "wp_status_changed_planned_doing",
+      "path": "zeitgeist_attrs/valid/wp_status_changed_planned_doing.json",
+      "expected_result": "valid",
+      "event_type": "WPStatusChanged",
+      "notes": "The MVP moment: a WP moves to doing; from_lane absent (key omitted) because the transition had no recorded origin lane.",
+      "min_version": "7.0.0"
+    },
+    {
+      "id": "wp_status_changed_structured_actor_label",
+      "path": "zeitgeist_attrs/valid/wp_status_changed_structured_actor_label.json",
+      "expected_result": "valid",
+      "event_type": "WPStatusChanged",
+      "notes": "Structured actor projects to the canonical actor_label string (see module docstring); decode is label-faithful, not dict-faithful.",
+      "min_version": "7.0.0"
+    },
+    {
+      "id": "wp_status_changed_done_drops_evidence",
+      "path": "zeitgeist_attrs/valid/wp_status_changed_done_drops_evidence.json",
+      "expected_result": "valid",
+      "event_type": "WPStatusChanged",
+      "notes": "Terminal-lane transition whose evidence bundle stays in the journal: UNBROADCAST_FIELDS excludes it before encoding, so projection succeeds.",
+      "min_version": "7.0.0"
+    },
+    {
+      "id": "wp_status_changed_forced_with_reason",
+      "path": "zeitgeist_attrs/valid/wp_status_changed_forced_with_reason.json",
+      "expected_result": "valid",
+      "event_type": "WPStatusChanged",
+      "notes": "Forced transition carries its short reason verbatim.",
+      "min_version": "7.0.0"
+    },
+    {
+      "id": "mission_created_full_projection",
+      "path": "zeitgeist_attrs/valid/mission_created_full_projection.json",
+      "expected_result": "valid",
+      "event_type": "MissionCreated",
+      "notes": "Int fields pin the str() encoding; every field rides because the family has no unbroadcast member.",
+      "min_version": "7.0.0"
+    },
+    {
+      "id": "mission_closed_minimal",
+      "path": "zeitgeist_attrs/valid/mission_closed_minimal.json",
+      "expected_result": "valid",
+      "event_type": "MissionClosed",
+      "notes": "Smallest family: full fidelity in three attrs.",
+      "min_version": "7.0.0"
+    },
+    {
+      "id": "phase_entered_optional_absent",
+      "path": "zeitgeist_attrs/valid/phase_entered_optional_absent.json",
+      "expected_result": "valid",
+      "event_type": "PhaseEntered",
+      "notes": "previous_phase None: key omitted on emit, default restored on read.",
+      "min_version": "7.0.0"
+    },
+    {
+      "id": "mission_run_started_nested_actor",
+      "path": "zeitgeist_attrs/valid/mission_run_started_nested_actor.json",
+      "expected_result": "valid",
+      "event_type": "MissionRunStarted",
+      "notes": "RuntimeActorIdentity rides flattened as actor.<field> keys; fully scalar, so this round-trips exactly.",
+      "min_version": "7.0.0"
+    },
+    {
+      "id": "next_step_issued_nested_actor",
+      "path": "zeitgeist_attrs/valid/next_step_issued_nested_actor.json",
+      "expected_result": "valid",
+      "event_type": "NextStepIssued",
+      "notes": "Run-scoped step moment with nested actor identity.",
+      "min_version": "7.0.0"
+    },
+    {
+      "id": "decision_input_requested_drops_options",
+      "path": "zeitgeist_attrs/valid/decision_input_requested_drops_options.json",
+      "expected_result": "valid",
+      "event_type": "DecisionInputRequested",
+      "notes": "Suggested options are display hints of unbounded length and stay local (UNBROADCAST_FIELDS); the question itself must fit the bound.",
+      "min_version": "7.0.0"
+    },
+    {
+      "id": "decision_input_answered_answer_rides",
+      "path": "zeitgeist_attrs/valid/decision_input_answered_answer_rides.json",
+      "expected_result": "valid",
+      "event_type": "DecisionInputAnswered",
+      "notes": "The answer is the fact of the moment and always rides.",
+      "min_version": "7.0.0"
+    },
+    {
+      "id": "mission_run_completed_nested_actor",
+      "path": "zeitgeist_attrs/valid/mission_run_completed_nested_actor.json",
+      "expected_result": "valid",
+      "event_type": "MissionRunCompleted",
+      "notes": "Run completion closes the ephemeral run narrative.",
+      "min_version": "7.0.0"
+    },
+    {
+      "id": "mission_created_value_over_bound",
+      "path": "zeitgeist_attrs/invalid/mission_created_value_over_bound.json",
+      "expected_result": "invalid",
+      "event_type": "MissionCreated",
+      "notes": "A 241-byte value exceeds the 240 B bound; encoding raises instead of truncating, so this creation moment does not broadcast.",
+      "min_version": "7.0.0"
+    },
+    {
+      "id": "decision_input_question_over_bound",
+      "path": "zeitgeist_attrs/invalid/decision_input_question_over_bound.json",
+      "expected_result": "invalid",
+      "event_type": "DecisionInputRequested",
+      "notes": "Inbound attrs are bound-checked against the same limit as emit.",
+      "min_version": "7.0.0"
+    },
+    {
+      "id": "wp_status_changed_unknown_attr",
+      "path": "zeitgeist_attrs/invalid/wp_status_changed_unknown_attr.json",
+      "expected_result": "invalid",
+      "event_type": "WPStatusChanged",
+      "notes": "Keys outside the kind's closed schema are rejected, so vocabulary drift cannot smuggle fields past the reader.",
+      "min_version": "7.0.0"
+    },
+    {
+      "id": "unknown_event_type",
+      "path": "zeitgeist_attrs/invalid/unknown_event_type.json",
+      "expected_result": "invalid",
+      "event_type": "MissionOriginBound",
+      "notes": "Only the volatile vocabulary decodes; journal families have no attrs codec and fail closed.",
+      "min_version": "7.0.0"
+    },
+    {
+      "id": "next_step_auto_completed_nested_actor",
+      "path": "zeitgeist_attrs/valid/next_step_auto_completed_nested_actor.json",
+      "expected_result": "valid",
+      "event_type": "NextStepAutoCompleted",
+      "notes": "Auto-completion carries its result string verbatim.",
+      "min_version": "7.0.0"
     }
   ],
   "classes": {

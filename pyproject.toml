@@ -87,6 +87,8 @@ spec_kitty_events = [
     "conformance/fixtures/harness_observation/invalid/*.json",
     "conformance/fixtures/harness_observation/replay/*.jsonl",
     "conformance/fixtures/harness_observation/replay/*.json",
+    "conformance/fixtures/zeitgeist_attrs/valid/*.json",
+    "conformance/fixtures/zeitgeist_attrs/invalid/*.json",
 ]
 
 [tool.pytest.ini_options]
