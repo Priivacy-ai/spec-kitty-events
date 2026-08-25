@@ -1,0 +1,32 @@
+{
+  "expected": "invalid",
+  "profile": "journal/v1",
+  "event_type": "MissionCreated",
+  "expected_error_codes": ["ENVELOPE_SHAPE_INVALID", "UNSUPPORTED_SCHEMA_VERSION"],
+  "input": {
+    "event_id": "01J00000000000000000000001",
+    "event_type": "MissionCreated",
+    "aggregate_id": "mission/01J0000000000000000000MS1",
+    "payload": {
+      "mission_id": "01J0000000000000000000MS1",
+      "mission_slug": "fixture-mission",
+      "mission_number": 1,
+      "mission_type": "software-dev",
+      "target_branch": "main",
+      "wp_count": 3,
+      "friendly_name": "Fixture Mission",
+      "purpose_tldr": "Strict boundary: envelope without schema_version.",
+      "purpose_context": "Full strict-profile envelope (all 14 keys) except that schema_version is absent. validate_event accepts this envelope since 8.0.0; the strict profile must still fail closed."
+    },
+    "timestamp": "2026-01-01T00:00:00+00:00",
+    "build_id": "build-2026-01-01-fixture",
+    "node_id": "fixture-node",
+    "lamport_clock": 1,
+    "causation_id": null,
+    "project_uuid": "00000000-0000-0000-0000-000000000001",
+    "project_slug": null,
+    "correlation_id": "01J0000000000000000000CR01",
+    "data_tier": 0
+  },
+  "notes": "ENVELOPE_SHAPE_INVALID reports the missing key and UNSUPPORTED_SCHEMA_VERSION reports the absent cutover signal; both are deterministic collect-all outputs of validate_strict_envelope."
+}

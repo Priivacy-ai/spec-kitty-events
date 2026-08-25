@@ -50,6 +50,7 @@ spec_kitty_events = [
     "conformance/fixtures/events/invalid/*.json",
     "conformance/fixtures/class_taxonomy/*/*.json",
     "conformance/fixtures/class_taxonomy/*/*/*.json",
+    "conformance/fixtures/cutover_boundary/*/*.json",
     "conformance/fixtures/lane_mapping/valid/*.json",
     "conformance/fixtures/lane_mapping/invalid/*.json",
     "conformance/fixtures/edge_cases/valid/*.json",

@@ -9,7 +9,12 @@ Canonical event contracts for Spec Kitty mission state, mission runtime, conform
 `8.0.0` deletes the offline sync/replay surfaces:
 `spec_kitty_events.sync`, `spec_kitty_events.legacy`
 (`legacy_envelope_v1`), and `spec_kitty_events.cutover`
-(`CUTOVER_ARTIFACT`). None had production consumers anymore. One
+(`CUTOVER_ARTIFACT`). Only `.sync` had no consumers left: `.cutover`
+and `.legacy` are still imported by `spec-kitty-saas`'s `apps/sync`
+adapters (inert today only because that repo pins `==6.1.0`;
+`apps/sync` itself is deleted by epic E6) and by `spec-kitty`'s
+consumer-contract test suite — both repos must drop or port those
+imports before pinning `==8.0.0`. One
 behaviour change rides along: `validate_event()` no longer applies the
 envelope-level cutover gate (missing/wrong `schema_version`, forbidden
 legacy names) — fail-closed envelope gating lives in
@@ -130,16 +135,7 @@ assert result.valid
 
 ### Validate a Full Envelope
 
-`validate_event` checks payload shape against the canonical contract. For
-fail-closed envelope gating (`schema_version == "3.0.0"`, full key set,
-recursive forbidden-key walk), use the strict profile:
-
-```python
-from spec_kitty_events.strict import validate_strict_envelope
-
-errors = validate_strict_envelope(envelope)
-assert not errors
-```
+Build the envelope, then validate it:
 
 ```python
 from spec_kitty_events.conformance import validate_event
@@ -153,8 +149,11 @@ envelope = {
     "node_id": "runner-01",
     "lamport_clock": 1,
     "project_uuid": "12345678-1234-5678-1234-567812345678",
+    "project_slug": None,
     "correlation_id": "01ARZ3NDEKTSV4RRFFQ69G5FAV",
+    "causation_id": None,
     "schema_version": "3.0.0",
+    "data_tier": 0,
     "payload": {
         "mission_slug": "mission-001",
         "wp_id": "WP01",
@@ -167,6 +166,19 @@ envelope = {
 
 result = validate_event(envelope, "WPStatusChanged", strict=True)
 assert result.valid
+```
+
+For fail-closed envelope gating (`schema_version == "3.0.0"`, full key
+set, recursive forbidden-key walk), use the strict profile —
+`validate_event` does not enforce it itself (the example above carries
+all 14 `STRICT_ENVELOPE_KEYS`, so the strict-profile check below also
+passes):
+
+```python
+from spec_kitty_events.strict import validate_strict_envelope
+
+errors = validate_strict_envelope(envelope)
+assert not errors
 ```
 
 ## Schemas And Conformance
