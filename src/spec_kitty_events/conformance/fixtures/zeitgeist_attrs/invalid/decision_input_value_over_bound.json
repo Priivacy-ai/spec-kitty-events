@@ -1,0 +1,14 @@
+{
+  "event_type": "DecisionInputRequested",
+  "attrs": {
+    "event_id": "e2e00000-0000-4000-8000-000000000015",
+    "occurred_at": "2026-08-25T09:00:00+00:00",
+    "run_id": "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr",
+    "decision_id": "dec-01",
+    "step_id": "step-07",
+    "actor": "Ox Alpha"
+  },
+  "direction": "from",
+  "expected_error": "ZeitgeistAttrsOverflowError",
+  "notes": "Inbound attrs are bound-checked against the same limit as emit, on a schema-legal key (the question itself is unbroadcast since the prose exclusion)."
+}

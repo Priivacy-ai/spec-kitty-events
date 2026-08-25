@@ -1,10 +1,13 @@
 {
-  "event_type": "NextStepAutoCompleted",
+  "event_type": "NextStepIssued",
+  "envelope": {
+    "event_id": "e2e00000-0000-4000-8000-000000000009",
+    "timestamp": "2026-08-25T09:00:00+00:00"
+  },
   "payload": {
     "run_id": "run-01",
     "step_id": "step-07",
     "agent_id": "agent-a",
-    "result": "success",
     "actor": {
       "actor_id": "actor-01",
       "actor_type": "llm",
@@ -15,17 +18,13 @@
     }
   },
   "expected_attrs": {
+    "event_id": "e2e00000-0000-4000-8000-000000000009",
+    "occurred_at": "2026-08-25T09:00:00+00:00",
     "run_id": "run-01",
     "step_id": "step-07",
     "agent_id": "agent-a",
-    "result": "success",
-    "actor.actor_id": "actor-01",
-    "actor.actor_type": "llm",
-    "actor.display_name": "Ox Alpha",
-    "actor.provider": "anthropic",
-    "actor.model": "ox-alpha",
-    "actor.tool": "claude-code"
+    "actor": "Ox Alpha"
   },
   "expected_ref": "run-01",
-  "notes": "Auto-completion carries its result string verbatim."
+  "notes": "Run-scoped step moment; the structured actor rides as its single label."
 }

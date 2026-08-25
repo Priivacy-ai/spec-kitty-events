@@ -15,10 +15,13 @@ fixture document (``direction`` says which side of the codec it exercises).
 from __future__ import annotations
 
 import importlib
+from datetime import datetime
+from uuid import UUID
 
 import pytest
 
 from spec_kitty_events.conformance.loader import FixtureCase, load_fixtures
+from spec_kitty_events.models import Event
 from spec_kitty_events.zeitgeist_attrs import (
     PAYLOAD_MODEL_BY_EVENT_TYPE,
     UnknownVolatileEventTypeError,
@@ -36,6 +39,28 @@ _ERROR_CLASSES = {
         "spec_kitty_events.zeitgeist_attrs"
     ).ZeitgeistAttrsOverflowError,
 }
+
+# Constants for the envelope fields the fixture documents do not vary: only
+# event_id and timestamp affect the projection, so the rest are fixed.
+_FIXTURE_BUILD_ID = "build-zeitgeist-attrs-conformance"
+_FIXTURE_NODE_ID = "node-conformance"
+_FIXTURE_PROJECT_UUID = UUID("550e8400-e29b-41d4-a716-446655440000")
+
+
+def _fixture_envelope(event_type: str, case: dict) -> Event:
+    """Build the journal envelope a fixture document declares."""
+    envelope = case["envelope"]
+    return Event(
+        event_id=envelope["event_id"],
+        event_type=event_type,
+        aggregate_id=f"agg-{case.get('expected_ref', 'conformance')}",
+        timestamp=datetime.fromisoformat(envelope["timestamp"]),
+        build_id=_FIXTURE_BUILD_ID,
+        node_id=_FIXTURE_NODE_ID,
+        lamport_clock=1,
+        project_uuid=_FIXTURE_PROJECT_UUID,
+        correlation_id=envelope["event_id"],
+    )
 
 
 @pytest.fixture
@@ -69,9 +94,10 @@ def test_zeitgeist_attrs_both_directions(fixture: FixtureCase) -> None:
     case = fixture.payload
     model = PAYLOAD_MODEL_BY_EVENT_TYPE[fixture.event_type]
     payload = model(**case["payload"])
+    envelope = _fixture_envelope(fixture.event_type, case)
 
     # to-direction: bounded projection matches the committed bytes exactly.
-    attrs = to_zeitgeist_attrs(payload)
+    attrs = to_zeitgeist_attrs(payload, envelope)
     assert attrs == case["expected_attrs"]
     assert zeitgeist_ref_for(fixture.event_type, payload) == case["expected_ref"]
 
@@ -96,8 +122,9 @@ def test_zeitgeist_attrs_rejections(fixture: FixtureCase) -> None:
     if case["direction"] == "to":
         model = PAYLOAD_MODEL_BY_EVENT_TYPE[fixture.event_type]
         payload = model(**case["payload"])
+        envelope = _fixture_envelope(fixture.event_type, case)
         with pytest.raises(expected_error):
-            to_zeitgeist_attrs(payload)
+            to_zeitgeist_attrs(payload, envelope)
     else:
         assert case["direction"] == "from"
         with pytest.raises(expected_error):

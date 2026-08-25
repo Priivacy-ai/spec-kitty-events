@@ -62,6 +62,18 @@ class RuntimeActorIdentity(BaseModel):
         None, description="Tool identifier"
     )
 
+    @property
+    def actor_label(self) -> str:
+        """Canonical string form of the actor for moments, logs, and display.
+
+        Prefers the human-readable display name and falls back to the
+        required machine id — the same single-label projection
+        ``StatusTransitionPayload.actor_label`` gives structured actors, so
+        every volatile moment carries exactly one actor label and never a
+        producer-asserted identity breakdown.
+        """
+        return self.display_name or self.actor_id
+
 
 # ── Section 3: Enum ──────────────────────────────────────────────────────────
 
@@ -93,6 +105,11 @@ class MissionRunStartedPayload(BaseModel):
         ..., description="Actor who started the run"
     )
 
+    @property
+    def actor_label(self) -> str:
+        """Single-label projection of ``actor`` (zeitgeist_attrs contract)."""
+        return self.actor.actor_label
+
 
 class NextStepIssuedPayload(BaseModel):
     """Payload for NextStepIssued event."""
@@ -107,6 +124,11 @@ class NextStepIssuedPayload(BaseModel):
     actor: RuntimeActorIdentity = Field(
         ..., description="Actor who issued the step"
     )
+
+    @property
+    def actor_label(self) -> str:
+        """Single-label projection of ``actor`` (zeitgeist_attrs contract)."""
+        return self.actor.actor_label
 
 
 class NextStepAutoCompletedPayload(BaseModel):
@@ -125,6 +147,11 @@ class NextStepAutoCompletedPayload(BaseModel):
     actor: RuntimeActorIdentity = Field(
         ..., description="Actor context for the completion"
     )
+
+    @property
+    def actor_label(self) -> str:
+        """Single-label projection of ``actor`` (zeitgeist_attrs contract)."""
+        return self.actor.actor_label
 
 
 class DecisionInputRequestedPayload(BaseModel):
@@ -152,6 +179,11 @@ class DecisionInputRequestedPayload(BaseModel):
         ..., description="Actor who requested the decision"
     )
 
+    @property
+    def actor_label(self) -> str:
+        """Single-label projection of ``actor`` (zeitgeist_attrs contract)."""
+        return self.actor.actor_label
+
 
 class DecisionInputAnsweredPayload(BaseModel):
     """Payload for DecisionInputAnswered event."""
@@ -169,6 +201,11 @@ class DecisionInputAnsweredPayload(BaseModel):
         ..., description="Actor who answered the decision"
     )
 
+    @property
+    def actor_label(self) -> str:
+        """Single-label projection of ``actor`` (zeitgeist_attrs contract)."""
+        return self.actor.actor_label
+
 
 class MissionRunCompletedPayload(BaseModel):
     """Payload for MissionRunCompleted event."""
@@ -182,6 +219,11 @@ class MissionRunCompletedPayload(BaseModel):
     actor: RuntimeActorIdentity = Field(
         ..., description="Actor context for the completion"
     )
+
+    @property
+    def actor_label(self) -> str:
+        """Single-label projection of ``actor`` (zeitgeist_attrs contract)."""
+        return self.actor.actor_label
 
 
 # ── Section 5: Reducer Output Models ─────────────────────────────────────────

@@ -1,5 +1,9 @@
 {
   "event_type": "MissionCreated",
+  "envelope": {
+    "event_id": "e2e00000-0000-4000-8000-000000000014",
+    "timestamp": "2026-08-25T09:00:00+00:00"
+  },
   "payload": {
     "mission_slug": "sssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss",
     "mission_number": 1,

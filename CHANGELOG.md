@@ -75,18 +75,26 @@ E2 (spec-kitty-rearchitecture): volatile mission/WP vocabulary + zeitgeist attrs
 - `spec_kitty_events.zeitgeist_attrs`: the single owner of the mapping
   between the volatile families and zeitgeist's bounded event-frame attrs
   (`{str: str}`, ≤16 keys, ≤240 B per key/value, no forbidden keys).
-  `to_zeitgeist_attrs()` projects a volatile payload onto deterministic
-  bounded attrs; `from_zeitgeist_attrs()` validates inbound attrs against
-  the kind's closed key vocabulary and returns a frozen `VolatileMoment`
+  `to_zeitgeist_attrs(payload, envelope)` projects a volatile payload onto
+  deterministic bounded attrs, leading with two envelope-sourced entries —
+  `event_id` (Team Kitty dedupes moments on it) and `occurred_at` (the
+  producer-declared occurrence time; relay receipt time carries neither).
+  `from_zeitgeist_attrs()` validates inbound attrs against the kind's
+  closed key vocabulary and returns a frozen `VolatileMoment`
   (`kind`, `ref`, `attrs`). Encoding never truncates: an oversize value
-  raises instead, so that moment does not broadcast. `StatusTransitionPayload.evidence`
-  and `DecisionInputRequestedPayload.options` are declared unbroadcast —
-  they stay in the local journal and are not part of any moment.
+  raises instead, so that moment does not broadcast.
+- Moments are identifiers and transition facts only. Declared unbroadcast —
+  they stay in the local journal and are never part of any moment:
+  structured shapes (`StatusTransitionPayload.evidence`,
+  `DecisionInputRequestedPayload.options`) and free-text prose
+  (`friendly_name`, `purpose_tldr`, `purpose_context`, a decision's
+  `question` and `answer`, a forced transition's `reason`). Every family
+  carries its actor as one canonical label string under `actor`
+  (`actor_label`) — never as a field-for-field identity breakdown.
 - Conformance fixtures for both codec directions under
   `conformance/fixtures/zeitgeist_attrs/` (13 valid goldens pinning exact
   attrs bytes per volatile type, 4 invalid rejections), registered in
   `manifest.json` under the new `zeitgeist_attrs` category.
-)
 
 ## [7.0.0] - 2026-08-21
 

@@ -194,7 +194,7 @@ def _volatile_row(
     model: str,
     schema: str,
     introduced_in: str,
-    strict_since: Optional[str] = None,
+    strict_since: str | None = None,
 ) -> SupportRow:
     """A row of the ephemeral, broadcast-only vocabulary (E2).
 

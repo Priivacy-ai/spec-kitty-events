@@ -1,0 +1,32 @@
+{
+  "event_type": "NextStepAutoCompleted",
+  "envelope": {
+    "event_id": "e2e00000-0000-4000-8000-000000000012",
+    "timestamp": "2026-08-25T09:00:00+00:00"
+  },
+  "payload": {
+    "run_id": "run-01",
+    "step_id": "step-07",
+    "agent_id": "agent-a",
+    "result": "success",
+    "actor": {
+      "actor_id": "actor-01",
+      "actor_type": "llm",
+      "display_name": "Ox Alpha",
+      "provider": "anthropic",
+      "model": "ox-alpha",
+      "tool": "claude-code"
+    }
+  },
+  "expected_attrs": {
+    "event_id": "e2e00000-0000-4000-8000-000000000012",
+    "occurred_at": "2026-08-25T09:00:00+00:00",
+    "run_id": "run-01",
+    "step_id": "step-07",
+    "agent_id": "agent-a",
+    "result": "success",
+    "actor": "Ox Alpha"
+  },
+  "expected_ref": "run-01",
+  "notes": "Auto-completion's result is a transition fact (not prose) and rides verbatim next to the actor label."
+}

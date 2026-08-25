@@ -1,0 +1,30 @@
+{
+  "event_type": "MissionCreated",
+  "envelope": {
+    "event_id": "e2e00000-0000-4000-8000-000000000005",
+    "timestamp": "2026-08-25T09:00:00+00:00"
+  },
+  "payload": {
+    "mission_id": null,
+    "mission_slug": "demo-mission",
+    "mission_number": 12,
+    "mission_type": "software-dev",
+    "target_branch": "main",
+    "wp_count": 3,
+    "friendly_name": "Board approved 40M for the counterparty rollout",
+    "purpose_tldr": "Bob Smith (bob@acme.com) is the counterparty contact.",
+    "purpose_context": "Broadcast through the team relay for 72 hours.",
+    "created_at": null
+  },
+  "expected_attrs": {
+    "event_id": "e2e00000-0000-4000-8000-000000000005",
+    "occurred_at": "2026-08-25T09:00:00+00:00",
+    "mission_slug": "demo-mission",
+    "mission_number": "12",
+    "mission_type": "software-dev",
+    "target_branch": "main",
+    "wp_count": "3"
+  },
+  "expected_ref": "demo-mission",
+  "notes": "Int fields pin the str() encoding; friendly_name/purpose_tldr/purpose_context are prose and stay local — none of their text may appear in the attrs."
+}

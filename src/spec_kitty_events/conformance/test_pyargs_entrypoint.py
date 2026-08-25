@@ -79,9 +79,17 @@ def _event_fixture_entries() -> List[Dict[str, Any]]:
     - Diagnostic-taxonomy fixtures whose event_type is a sentinel (e.g.
       "<missing>", "<wrong>") used only to label the class; the
       class-taxonomy suite asserts on them via a different code path.
+    - zeitgeist_attrs codec documents (E2): a document there is a
+      {payload, expected_attrs, envelope?} codec specification, not an
+      event envelope — validating the document itself as its named event
+      would fail every entry. Both codec directions are exercised by
+      tests/test_zeitgeist_attrs_conformance.py via
+      load_fixtures("zeitgeist_attrs").
     """
     def _included(f: Dict[str, Any]) -> bool:
         if f["event_type"] == "LaneMapping":
+            return False
+        if f["path"].startswith("zeitgeist_attrs/"):
             return False
         if f.get("fixture_type") in (
             "replay_stream",

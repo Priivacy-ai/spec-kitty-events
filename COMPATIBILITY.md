@@ -66,7 +66,7 @@ and drift-checked alongside every other schema — is the authority for
 16 volatile rows (the Ephemeral Team Status vocabulary — `WPStatusChanged`,
 `MissionCreated`, `MissionClosed`, `PhaseEntered`, the six `mission_next`
 mission-run types — plus 6 observation rows, one per `ObservationKind`,
-each with its payload ID). See the `[Unreleased]` CHANGELOG section for the
+each with its payload ID). See the `[8.0.0]` CHANGELOG section for the
 E2 durability promotion and the `zeitgeist_attrs` codecs.
 `spec_kitty_events.strict.support_matrix_digest()` is what downstream
 candidates pin in `declared_dependency_contracts` (see

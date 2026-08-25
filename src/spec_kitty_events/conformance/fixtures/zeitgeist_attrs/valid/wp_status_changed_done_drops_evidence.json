@@ -1,5 +1,9 @@
 {
   "event_type": "WPStatusChanged",
+  "envelope": {
+    "event_id": "e2e00000-0000-4000-8000-000000000003",
+    "timestamp": "2026-08-25T09:00:00+00:00"
+  },
   "payload": {
     "mission_slug": "demo-mission",
     "wp_id": "WP03",
@@ -28,6 +32,8 @@
     }
   },
   "expected_attrs": {
+    "event_id": "e2e00000-0000-4000-8000-000000000003",
+    "occurred_at": "2026-08-25T09:00:00+00:00",
     "mission_slug": "demo-mission",
     "wp_id": "WP03",
     "from_lane": "for_review",
