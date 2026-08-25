@@ -1,10 +1,10 @@
 # Compatibility Guide
 
-**Current package version**: `7.0.0`
+**Current package version**: `8.0.0`
 
-The on-wire envelope schema version is `3.0.0` (the cutover-contract version
-pinned by `cutover.py`) and has been unchanged since the cutover. The package
-version and the envelope schema version move independently — see
+The on-wire envelope schema version is `3.0.0` and has been unchanged since
+the cutover. The package version and the envelope schema version move
+independently — see
 [`contracts/versioning-and-compatibility.md`](contracts/versioning-and-compatibility.md).
 
 `spec-kitty-events` is a fail-closed contract package. Sections below are
@@ -19,6 +19,31 @@ This document is the public compatibility policy for consumers of:
 - `spec-kitty-events`
 - `spec-kitty-saas`
 - `spec-kitty`
+
+## `8.0.0` — Sync, legacy-envelope, and cutover surfaces deleted
+
+`8.0.0` deletes three modules whose only consumer was the offline
+CLI→SaaS sync/replay story that the programme retired:
+
+- `spec_kitty_events.sync` (Sync lifecycle contracts + reducer) — had no
+  production consumers.
+- `spec_kitty_events.legacy` (`legacy_envelope_v1` normalizer).
+- `spec_kitty_events.cutover` (`CUTOVER_ARTIFACT` and helpers).
+
+Consumer-visible consequence beyond the missing imports: `validate_event()`
+no longer applies the envelope-level cutover gate. An envelope with a
+missing or non-canonical `schema_version`, or one carrying forbidden legacy
+keys/names at envelope level, can now pass `validate_event` when its payload
+shape validates. Fail-closed envelope validation still exists as the opt-in
+strict profile — `validate_strict_envelope()` enforces
+`schema_version == "3.0.0"`, the recursive forbidden-key walk
+(`forbidden_keys.find_forbidden_keys`), and the full envelope key set.
+Producers and ingress paths that relied on `validate_event` for the gate
+must switch to the strict profile.
+
+Migration: pin `>=8.0.0`; delete or re-home any import of the three
+modules. There are no aliases. See `CHANGELOG.md` (`### Breaking`) for the
+full removed-name list.
 
 ## `7.0.0` — Strict journal profile + HarnessObservation
 
@@ -70,33 +95,37 @@ release (tracked for the journal-writer work that consumes this contract).
 
 ## Canonical On-Wire Policy
 
-The authoritative cutover artifact ships in the package
-(`spec_kitty_events.cutover.CUTOVER_ARTIFACT`) and defines the live
-compatibility gate. Note: the **envelope schema on the wire** is at version
-`3.0.0`, which is not the package version declared at the top of this document.
-The two are intentionally distinct (see the bump-rationale section below).
+Note: the **envelope schema on the wire** is at version `3.0.0`, which is not
+the package version declared at the top of this document. The two are
+intentionally distinct (see the bump-rationale section below).
 
 - Signal field: `schema_version`
 - Signal location: event envelope
-- Required cutover value: `3.0.0`
-- Accepted major: `3`
+- Required value: `3.0.0`
 
-Live ingestion paths fail closed when any of the following are true:
+Since `8.0.0` removed the cutover artifact, this gate is enforced by the
+strict profile (`validate_strict_envelope`) and by the recursive
+forbidden-key walker (`spec_kitty_events.forbidden_keys`), not by
+`validate_event`. Live ingestion paths fail closed when any of the
+following are true:
 
 - the envelope is missing `schema_version`
-- `schema_version` has the wrong accepted major
 - `schema_version` does not equal `3.0.0`
 - the envelope or nested payload contains forbidden legacy keys (recursive walk)
-- the envelope uses forbidden legacy event names
-- the envelope uses forbidden legacy aggregate prefixes
 
 ## Forbidden Legacy Surfaces
 
-The `4.0.0` release rejects these legacy mission-domain surfaces on live paths:
+Legacy mission-domain surfaces rejected on live paths (as of `8.0.0`, by
+the strict profile / forbidden-key walker rather than `validate_event`):
 
-- keys: `feature_slug`, `feature_number`, `mission_key`
-- event names: `FeatureCreated`, `FeatureClosed`
-- aggregate prefixes: `feature`, `feature_catalog`
+- keys: `feature_slug`, `feature_number`, `mission_key`, `legacy_aggregate_id`
+  — rejected at any depth by `forbidden_keys.find_forbidden_keys`.
+- event names: `FeatureCreated`, `FeatureClosed` — not members of
+  `STRICT_EVENT_TYPES`, so the strict profile rejects them.
+- aggregate prefixes: `feature`, `feature_catalog`. The dedicated prefix
+  check shipped with the cutover artifact and was removed with it in
+  `8.0.0`; such envelopes are rejected only if they fail another rule.
+  Offline rewrite jobs should still convert them.
 
 ## Canonical Mission And Build Taxonomy
 
@@ -134,7 +163,7 @@ There are no runtime compatibility bridges in live ingestion.
 
 If you operate a producer:
 
-- emit `schema_version="3.0.0"` (the cutover-contract version; see note above)
+- emit `schema_version="3.0.0"` (see the note above)
 - emit `build_id`
 - emit canonical mission-domain fields only
 
@@ -298,23 +327,22 @@ ingress (canonical mission-domain fields, canonical lane vocabulary including
 > **Package version vs envelope schema version (read this carefully).**
 > The **package version** is the value in `pyproject.toml` and
 > `__version__`, declared once at the top of this document. The
-> **envelope schema version on the wire** is **`3.0.0`** — the
-> cutover-contract version pinned by
-> `cutover.py::CUTOVER_ARTIFACT.cutover_contract_version`, and the default
-> for `Event.schema_version`. They are not the same number and they do not
-> move together. The major package bump from `4.x` to `5.0.0` reflected
-> contract behaviour changes (`in_review` canonical, payload
-> reconciliation, recursive forbidden-key validator), NOT a wire-format
-> envelope-version bump; `6.0.0` likewise. Producers must continue to
-> emit `schema_version="3.0.0"` on the envelope regardless of the package
-> major; the cutover gate will reject anything else.
+> **envelope schema version on the wire** is **`3.0.0`** — the default
+> for `Event.schema_version` (and the value the strict profile requires).
+> They are not the same number and they do not move together. The major
+> package bump from `4.x` to `5.0.0` reflected contract behaviour changes
+> (`in_review` canonical, payload reconciliation, recursive forbidden-key
+> validator), NOT a wire-format envelope-version bump; `6.0.0`, `7.0.0`,
+> and `8.0.0` likewise. Producers must continue to emit
+> `schema_version="3.0.0"` on the envelope regardless of the package
+> major; the strict profile rejects anything else.
 
 ### The documented bridge
 
 The bridge between these two domains is the **CLI canonicalizer** that ships in
 `spec-kitty` Tranche B. The canonicalizer reads historical `status.events.jsonl`
 rows and produces canonical envelopes (`schema_version="3.0.0"`, accepted by
-the cutover gate) suitable for ingress. Producers that need to
+the strict profile) suitable for ingress. Producers that need to
 forward historical data into TeamSpace MUST run it through the canonicalizer
 first; ingress will not accept raw historical rows. Consumers that read locally
 MUST NOT assume their local-disk rows have already been canonicalized.

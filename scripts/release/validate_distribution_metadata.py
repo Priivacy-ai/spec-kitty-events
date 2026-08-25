@@ -13,7 +13,6 @@ from typing import List
 MIT_CLASSIFIER = "License :: OSI Approved :: MIT License"
 
 REQUIRED_WHEEL_SUFFIXES = (
-    "spec_kitty_events/cutover.py",
     "spec_kitty_events/forbidden_keys.py",
     "spec_kitty_events/conformance/README.md",
     "spec_kitty_events/conformance/fixtures/manifest.json",

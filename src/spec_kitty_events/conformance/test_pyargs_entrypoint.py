@@ -66,21 +66,27 @@ def _event_fixture_entries() -> List[Dict[str, Any]]:
 
     Excludes:
     - LaneMapping fixtures (handled by lane-mapping parametrized tests).
-    - LegacyEnvelope fixtures (exercised by tests/unit/test_legacy_normalizer.py,
-      not by validate_event). Mission:
-      canonical-producer-contracts-legacy-envelope-01KS7JM3.
     - Special fixture_type kinds (replay_stream, reducer_output,
-      timestamp_semantics, legacy_normalization) that are not raw envelope
-      payloads to validate.
+      timestamp_semantics) that are not raw envelope payloads to validate.
+    - Forbidden-key class fixtures: they assert rejection with code
+      FORBIDDEN_KEY from the recursive walker
+      (forbidden_keys.find_forbidden_keys), enforced by the strict profile
+      and by tests/test_conformance_classes.py's own validator. 8.0.0
+      removed the cutover gate from validate_event, so this generic
+      entrypoint no longer rejects such envelopes (and for payload-level
+      variants it would only reject them incidentally via extra='forbid',
+      asserting nothing about the walker).
+    - Diagnostic-taxonomy fixtures whose event_type is a sentinel (e.g.
+      "<missing>", "<wrong>") used only to label the class; the
+      class-taxonomy suite asserts on them via a different code path.
     """
-    return [
-        f for f in _MANIFEST["fixtures"]
-        if f["event_type"] not in ("LaneMapping", "LegacyEnvelope")
-        and f.get("fixture_type") not in (
+    def _included(f: Dict[str, Any]) -> bool:
+        if f["event_type"] == "LaneMapping":
+            return False
+        if f.get("fixture_type") in (
             "replay_stream",
             "reducer_output",
             "timestamp_semantics",
-            "legacy_normalization",
             # envelope_strict_journal (F1-T1) class_taxonomy fixtures: these
             # assert strict-profile-only rejections (e.g. an envelope-level
             # extra key, a naive timestamp) that the lenient Event model /
@@ -91,14 +97,13 @@ def _event_fixture_entries() -> List[Dict[str, Any]]:
             # spec_kitty_events.strict.validate_strict_envelope in
             # tests/test_envelope_strict_journal_class.py instead.
             "strict_profile_only",
-        )
-        # Skip diagnostic-taxonomy fixtures whose event_type is a sentinel
-        # (e.g. "<missing>", "<wrong>") used only to label the class. These
-        # are not real events; the class-taxonomy test suite asserts on them
-        # via a different code path. Mission:
-        # canonical-producer-contracts-legacy-envelope-01KS7JM3.
-        and f["event_type"] in _EVENT_TYPE_TO_MODEL
-    ]
+        ):
+            return False
+        if f["path"].startswith("class_taxonomy/envelope_invalid_forbidden_key/"):
+            return False
+        return f["event_type"] in _EVENT_TYPE_TO_MODEL
+
+    return [f for f in _MANIFEST["fixtures"] if _included(f)]
 
 
 def _event_fixture_ids() -> List[str]:

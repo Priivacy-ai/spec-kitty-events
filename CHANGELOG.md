@@ -7,6 +7,48 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [8.0.0] - 2026-08-25
+
+E2 (EXPERIMENTAL-spec-kitty-planning#3): the offline sync/replay story is
+deleted. The CLI→SaaS sync transport it served is no longer part of the
+design (see `design/ephemeral-team-status.html` in the planning repo) —
+mission/WP status reaches Team Kitty through each team's own Zeitgeist
+relay, not through this package's sync contracts.
+
+### Breaking
+
+- **Removed `spec_kitty_events.sync`** — `SYNC_*` constants,
+  `SyncIngest*`/`SyncRetryScheduled`/`SyncDeadLettered`/`SyncReplayCompleted`
+  and `ExternalReferenceLinked` payloads, `ReducedSyncState`,
+  `reduce_sync_events`, and their JSON schemas. It had no production
+  consumers.
+- **Removed `spec_kitty_events.legacy`** (`legacy_envelope_v1`):
+  `LegacyEnvelopeNormalizer`, `NormalizedEnvelope`,
+  `UnnormalizableLegacyDiagnostic`, `RECOGNIZED_LEGACY_SHAPES`. Legacy-shape
+  promotion was only ever consumed by the offline replay path.
+- **Removed `spec_kitty_events.cutover`**: `CUTOVER_ARTIFACT`,
+  `assert_canonical_cutover_signal`, and the rest of the artifact API.
+  Consequence for consumers of `validate_event`: the envelope-level
+  cutover gate (missing/wrong `schema_version`, forbidden legacy keys or
+  event/aggregate names) is gone from that function's result — envelopes
+  with a missing or non-canonical `schema_version="3.0.0"` signal can now
+  pass `validate_event` when their payload shape validates. Fail-closed
+  envelope gating still exists as the opt-in strict profile:
+  `spec_kitty_events.strict.validate_strict_envelope` enforces
+  `schema_version == "3.0.0"`, the recursive forbidden-key walk, and the
+  full envelope key set. The five conformance fixtures that exercised the
+  removed gate were deleted with it.
+- Removed fixture categories: `sync`, `legacy`, and the top-level `replay`
+  streams; `load_fixtures("sync")` now raises `ValueError`.
+- Consumers must pin `>=8.0.0`; there are no compatibility aliases.
+
+### Required consumer action
+
+Bump to `spec-kitty-events==8.0.0` in `spec-kitty` and `spec-kitty-saas`.
+Any code importing `spec_kitty_events.sync`, `.legacy`, or `.cutover`
+must be deleted or re-homed onto the strict profile / `forbidden_keys`
+modules.
+
 ## [7.0.0] - 2026-08-21
 
 F1-T1 (spec-kitty-rearchitecture, M1): strict journal profile + HarnessObservation.

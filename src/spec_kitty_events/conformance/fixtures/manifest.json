@@ -186,46 +186,6 @@
       "min_version": "2.0.0"
     },
     {
-      "id": "event-missing-schema-version",
-      "path": "events/invalid/event_missing_schema_version.json",
-      "expected_result": "invalid",
-      "event_type": "Event",
-      "notes": "Event envelope missing the canonical cutover signal schema_version",
-      "min_version": "3.0.0"
-    },
-    {
-      "id": "event-wrong-cutover-major",
-      "path": "events/invalid/event_wrong_cutover_major.json",
-      "expected_result": "invalid",
-      "event_type": "Event",
-      "notes": "Event envelope uses unsupported cutover major version 2.x",
-      "min_version": "3.0.0"
-    },
-    {
-      "id": "event-forbidden-legacy-key",
-      "path": "events/invalid/event_forbidden_legacy_key.json",
-      "expected_result": "invalid",
-      "event_type": "Event",
-      "notes": "Event envelope payload contains forbidden legacy mission-domain key feature_slug",
-      "min_version": "3.0.0"
-    },
-    {
-      "id": "event-forbidden-legacy-event-name",
-      "path": "events/invalid/event_forbidden_legacy_event_name.json",
-      "expected_result": "invalid",
-      "event_type": "Event",
-      "notes": "Event envelope uses forbidden legacy event name FeatureCreated",
-      "min_version": "3.0.0"
-    },
-    {
-      "id": "event-forbidden-legacy-aggregate-name",
-      "path": "events/invalid/event_forbidden_legacy_aggregate_name.json",
-      "expected_result": "invalid",
-      "event_type": "Event",
-      "notes": "Event envelope uses forbidden legacy aggregate prefix feature/",
-      "min_version": "3.0.0"
-    },
-    {
       "id": "wp-status-changed-invalid-lane",
       "path": "events/invalid/wp_status_changed_invalid_lane.json",
       "expected_result": "invalid",
@@ -647,7 +607,7 @@
       "path": "dossier/invalid/dossier_artifact_indexed_missing_path.json",
       "event_type": "MissionDossierArtifactIndexed",
       "expected_result": "invalid",
-      "notes": "artifact_id.path is absent \u2014 Pydantic must reject",
+      "notes": "artifact_id.path is absent — Pydantic must reject",
       "min_version": "2.4.0"
     },
     {
@@ -746,7 +706,7 @@
       "path": "mission_audit/invalid/mission_audit_completed_missing_verdict.json",
       "event_type": "MissionAuditCompleted",
       "expected_result": "invalid",
-      "notes": "verdict field absent \u2014 Pydantic must reject with missing field violation",
+      "notes": "verdict field absent — Pydantic must reject with missing field violation",
       "min_version": "2.5.0"
     },
     {
@@ -754,7 +714,7 @@
       "path": "mission_audit/invalid/mission_audit_completed_missing_artifact_ref.json",
       "event_type": "MissionAuditCompleted",
       "expected_result": "invalid",
-      "notes": "artifact_ref absent \u2014 required (not Optional) per FR-006; Pydantic must reject",
+      "notes": "artifact_ref absent — required (not Optional) per FR-006; Pydantic must reject",
       "min_version": "2.5.0"
     },
     {
@@ -770,7 +730,7 @@
       "path": "mission_audit/invalid/mission_audit_decision_missing_id.json",
       "event_type": "MissionAuditDecisionRequested",
       "expected_result": "invalid",
-      "notes": "decision_id field absent \u2014 required with min_length=1",
+      "notes": "decision_id field absent — required with min_length=1",
       "min_version": "2.5.0"
     },
     {
@@ -779,7 +739,7 @@
       "fixture_type": "replay_stream",
       "event_type": "mixed",
       "expected_result": "valid",
-      "notes": "3-event pass lifecycle: Requested \u2192 Started \u2192 Completed(pass)",
+      "notes": "3-event pass lifecycle: Requested → Started → Completed(pass)",
       "min_version": "2.5.0"
     },
     {
@@ -788,7 +748,7 @@
       "fixture_type": "replay_stream",
       "event_type": "mixed",
       "expected_result": "valid",
-      "notes": "3-event fail lifecycle: Requested \u2192 Started \u2192 Failed(TIMEOUT)",
+      "notes": "3-event fail lifecycle: Requested → Started → Failed(TIMEOUT)",
       "min_version": "2.5.0"
     },
     {
@@ -797,7 +757,7 @@
       "fixture_type": "replay_stream",
       "event_type": "mixed",
       "expected_result": "valid",
-      "notes": "4-event decision checkpoint: Requested \u2192 Started \u2192 DecisionRequested \u2192 Completed",
+      "notes": "4-event decision checkpoint: Requested → Started → DecisionRequested → Completed",
       "min_version": "2.5.0"
     },
     {
@@ -806,7 +766,7 @@
       "fixture_type": "reducer_output",
       "event_type": "MissionAuditState",
       "expected_result": "valid",
-      "notes": "Golden reducer output for mission_audit_replay_pass.jsonl \u2014 audit_status=completed, verdict=pass",
+      "notes": "Golden reducer output for mission_audit_replay_pass.jsonl — audit_status=completed, verdict=pass",
       "min_version": "2.5.0"
     },
     {
@@ -815,7 +775,7 @@
       "fixture_type": "reducer_output",
       "event_type": "MissionAuditState",
       "expected_result": "valid",
-      "notes": "Golden reducer output for mission_audit_replay_fail.jsonl \u2014 audit_status=failed",
+      "notes": "Golden reducer output for mission_audit_replay_fail.jsonl — audit_status=failed",
       "min_version": "2.5.0"
     },
     {
@@ -824,7 +784,7 @@
       "fixture_type": "reducer_output",
       "event_type": "MissionAuditState",
       "expected_result": "valid",
-      "notes": "Golden reducer output for mission_audit_replay_decision_checkpoint.jsonl \u2014 pending_decisions cleared on Completed",
+      "notes": "Golden reducer output for mission_audit_replay_decision_checkpoint.jsonl — pending_decisions cleared on Completed",
       "min_version": "2.5.0"
     },
     {
@@ -896,7 +856,7 @@
       "path": "decisionpoint/invalid/decision_point_missing_decision_point_id.json",
       "event_type": "DecisionPointOpened",
       "expected_result": "invalid",
-      "notes": "decision_point_id field absent \u2014 required with min_length=1; Pydantic must reject",
+      "notes": "decision_point_id field absent — required with min_length=1; Pydantic must reject",
       "min_version": "2.6.0"
     },
     {
@@ -904,7 +864,7 @@
       "path": "decisionpoint/invalid/decision_point_missing_rationale.json",
       "event_type": "DecisionPointOpened",
       "expected_result": "invalid",
-      "notes": "rationale field absent \u2014 required audit field; Pydantic must reject",
+      "notes": "rationale field absent — required audit field; Pydantic must reject",
       "min_version": "2.6.0"
     },
     {
@@ -920,7 +880,7 @@
       "path": "decisionpoint/invalid/decision_point_invalid_authority_role.json",
       "event_type": "DecisionPointOpened",
       "expected_result": "invalid",
-      "notes": "authority_role='admin' not in DecisionAuthorityRole enum \u2014 authority-policy failure",
+      "notes": "authority_role='admin' not in DecisionAuthorityRole enum — authority-policy failure",
       "min_version": "2.6.0"
     },
     {
@@ -928,7 +888,7 @@
       "path": "decisionpoint/invalid/decision_point_empty_alternatives.json",
       "event_type": "DecisionPointOpened",
       "expected_result": "invalid",
-      "notes": "alternatives_considered is empty list \u2014 violates min_length=1 constraint",
+      "notes": "alternatives_considered is empty list — violates min_length=1 constraint",
       "min_version": "2.6.0"
     },
     {
@@ -936,7 +896,7 @@
       "path": "decisionpoint/invalid/decision_point_empty_evidence_refs.json",
       "event_type": "DecisionPointOpened",
       "expected_result": "invalid",
-      "notes": "evidence_refs is empty list \u2014 violates min_length=1 constraint",
+      "notes": "evidence_refs is empty list — violates min_length=1 constraint",
       "min_version": "2.6.0"
     },
     {
@@ -1024,7 +984,7 @@
       "path": "decisionpoint/invalid/v1_resolved_missing_terminal_outcome.json",
       "event_type": "DecisionPointResolved",
       "expected_result": "invalid",
-      "notes": "V1 interview Resolved missing terminal_outcome \u2014 required field; Pydantic must reject",
+      "notes": "V1 interview Resolved missing terminal_outcome — required field; Pydantic must reject",
       "min_version": "4.0.0"
     },
     {
@@ -1032,7 +992,7 @@
       "path": "decisionpoint/invalid/v1_widened_missing_thread_ref.json",
       "event_type": "DecisionPointWidened",
       "expected_result": "invalid",
-      "notes": "V1 Widened missing thread_ref \u2014 required field; JSON Schema and Pydantic must reject",
+      "notes": "V1 Widened missing thread_ref — required field; JSON Schema and Pydantic must reject",
       "min_version": "4.0.0"
     },
     {
@@ -1040,7 +1000,7 @@
       "path": "decisionpoint/invalid/v1_opened_interview_missing_origin_flow.json",
       "event_type": "DecisionPointOpened",
       "expected_result": "invalid",
-      "notes": "V1 interview Opened missing origin_flow \u2014 required field; Pydantic must reject",
+      "notes": "V1 interview Opened missing origin_flow — required field; Pydantic must reject",
       "min_version": "4.0.0"
     },
     {
@@ -1048,7 +1008,7 @@
       "path": "decisionpoint/invalid/v1_participant_identity_empty_external_refs.json",
       "event_type": "DecisionPointWidened",
       "expected_result": "invalid",
-      "notes": "V1 Widened with ParticipantIdentity.external_refs={} \u2014 must set at least one of slack_user_id, slack_team_id, teamspace_member_id",
+      "notes": "V1 Widened with ParticipantIdentity.external_refs={} — must set at least one of slack_user_id, slack_team_id, teamspace_member_id",
       "min_version": "4.0.0"
     },
     {
@@ -1056,7 +1016,7 @@
       "path": "decisionpoint/invalid/v1_resolved_interview_deferred_with_final_answer.json",
       "event_type": "DecisionPointResolved",
       "expected_result": "invalid",
-      "notes": "V1 interview Resolved: terminal_outcome=deferred AND final_answer set \u2014 cross-field rule violation; Pydantic model_validator must reject",
+      "notes": "V1 interview Resolved: terminal_outcome=deferred AND final_answer set — cross-field rule violation; Pydantic model_validator must reject",
       "min_version": "4.0.0"
     },
     {
@@ -1065,7 +1025,7 @@
       "fixture_type": "replay_stream",
       "event_type": "mixed",
       "expected_result": "valid",
-      "notes": "4-event full lifecycle: Opened \u2192 Discussing \u2192 Resolved \u2192 Overridden",
+      "notes": "4-event full lifecycle: Opened → Discussing → Resolved → Overridden",
       "min_version": "2.6.0"
     },
     {
@@ -1074,7 +1034,7 @@
       "fixture_type": "replay_stream",
       "event_type": "mixed",
       "expected_result": "valid",
-      "notes": "2-event shortcut: Opened \u2192 Resolved (skipping Discussing)",
+      "notes": "2-event shortcut: Opened → Resolved (skipping Discussing)",
       "min_version": "2.6.0"
     },
     {
@@ -1083,7 +1043,7 @@
       "fixture_type": "replay_stream",
       "event_type": "mixed",
       "expected_result": "valid",
-      "notes": "4-event stream with event_after_terminal anomaly: Opened \u2192 Resolved \u2192 Overridden \u2192 Discussing(anomaly)",
+      "notes": "4-event stream with event_after_terminal anomaly: Opened → Resolved → Overridden → Discussing(anomaly)",
       "min_version": "2.6.0"
     },
     {
@@ -1092,7 +1052,7 @@
       "fixture_type": "reducer_output",
       "event_type": "DecisionPointState",
       "expected_result": "valid",
-      "notes": "Golden reducer output for decisionpoint_full_lifecycle.jsonl \u2014 state=overridden, 4 events, 0 anomalies",
+      "notes": "Golden reducer output for decisionpoint_full_lifecycle.jsonl — state=overridden, 4 events, 0 anomalies",
       "min_version": "2.6.0"
     },
     {
@@ -1101,7 +1061,7 @@
       "fixture_type": "reducer_output",
       "event_type": "DecisionPointState",
       "expected_result": "valid",
-      "notes": "Golden reducer output for decisionpoint_open_resolved.jsonl \u2014 state=resolved, 2 events, 0 anomalies",
+      "notes": "Golden reducer output for decisionpoint_open_resolved.jsonl — state=resolved, 2 events, 0 anomalies",
       "min_version": "2.6.0"
     },
     {
@@ -1110,7 +1070,7 @@
       "fixture_type": "reducer_output",
       "event_type": "DecisionPointState",
       "expected_result": "valid",
-      "notes": "Golden reducer output for decisionpoint_with_anomaly.jsonl \u2014 state=overridden, 1 anomaly (event_after_terminal)",
+      "notes": "Golden reducer output for decisionpoint_with_anomaly.jsonl — state=overridden, 1 anomaly (event_after_terminal)",
       "min_version": "2.6.0"
     },
     {
@@ -1199,7 +1159,7 @@
       "fixture_type": "replay_stream",
       "event_type": "mixed",
       "expected_result": "valid",
-      "notes": "6-event full connector lifecycle: Provisioned \u2192 HealthChecked(healthy) \u2192 Degraded \u2192 Reconnected \u2192 HealthChecked(healthy) \u2192 Revoked",
+      "notes": "6-event full connector lifecycle: Provisioned → HealthChecked(healthy) → Degraded → Reconnected → HealthChecked(healthy) → Revoked",
       "min_version": "2.7.0"
     },
     {
@@ -1208,148 +1168,7 @@
       "fixture_type": "reducer_output",
       "event_type": "ReducedConnectorState",
       "expected_result": "valid",
-      "notes": "Golden reducer output for connector-lifecycle-full.jsonl \u2014 state=revoked, 6 events, 0 anomalies",
-      "min_version": "2.7.0"
-    },
-    {
-      "id": "sync-ingest-accepted-batch",
-      "path": "sync/valid/sync-ingest-accepted-batch.json",
-      "expected_result": "valid",
-      "event_type": "SyncIngestAccepted",
-      "notes": "SyncIngestAccepted with ingest_batch_id and ingested_count=15",
-      "min_version": "2.7.0"
-    },
-    {
-      "id": "sync-ingest-accepted-single",
-      "path": "sync/valid/sync-ingest-accepted-single.json",
-      "expected_result": "valid",
-      "event_type": "SyncIngestAccepted",
-      "notes": "SyncIngestAccepted with ingested_count=1",
-      "min_version": "2.7.0"
-    },
-    {
-      "id": "sync-ingest-rejected-schema-mismatch",
-      "path": "sync/valid/sync-ingest-rejected-schema-mismatch.json",
-      "expected_result": "valid",
-      "event_type": "SyncIngestRejected",
-      "notes": "SyncIngestRejected with rejection_reason=payload_schema_mismatch",
-      "min_version": "2.7.0"
-    },
-    {
-      "id": "sync-retry-scheduled-first-attempt",
-      "path": "sync/valid/sync-retry-scheduled-first-attempt.json",
-      "expected_result": "valid",
-      "event_type": "SyncRetryScheduled",
-      "notes": "SyncRetryScheduled with retry_attempt=1 and max_retries=3",
-      "min_version": "2.7.0"
-    },
-    {
-      "id": "sync-dead-lettered-max-retries",
-      "path": "sync/valid/sync-dead-lettered-max-retries.json",
-      "expected_result": "valid",
-      "event_type": "SyncDeadLettered",
-      "notes": "SyncDeadLettered with total_attempts=3 and failure_reason=max_retries_exceeded",
-      "min_version": "2.7.0"
-    },
-    {
-      "id": "sync-replay-completed-full",
-      "path": "sync/valid/sync-replay-completed-full.json",
-      "expected_result": "valid",
-      "event_type": "SyncReplayCompleted",
-      "notes": "SyncReplayCompleted with replayed_count=42 and replay_source=dead_letter_queue",
-      "min_version": "2.7.0"
-    },
-    {
-      "id": "external-ref-linked-github-pr",
-      "path": "sync/valid/external-ref-linked-github-pr.json",
-      "expected_result": "valid",
-      "event_type": "ExternalReferenceLinked",
-      "notes": "ExternalReferenceLinked binding a GitHub PR to a mission WP",
-      "min_version": "2.7.0"
-    },
-    {
-      "id": "external-ref-linked-jira-issue",
-      "path": "sync/valid/external-ref-linked-jira-issue.json",
-      "expected_result": "valid",
-      "event_type": "ExternalReferenceLinked",
-      "notes": "ExternalReferenceLinked binding a Jira issue to a mission",
-      "min_version": "2.7.0"
-    },
-    {
-      "id": "sync-missing-delivery-id",
-      "path": "sync/invalid/sync-missing-delivery-id.json",
-      "expected_result": "invalid",
-      "event_type": "SyncIngestAccepted",
-      "notes": "SyncIngestAccepted payload missing delivery_id field",
-      "min_version": "2.7.0"
-    },
-    {
-      "id": "sync-missing-source-fingerprint",
-      "path": "sync/invalid/sync-missing-source-fingerprint.json",
-      "expected_result": "invalid",
-      "event_type": "SyncIngestAccepted",
-      "notes": "SyncIngestAccepted payload missing source_event_fingerprint field",
-      "min_version": "2.7.0"
-    },
-    {
-      "id": "sync-negative-retry-attempt",
-      "path": "sync/invalid/sync-negative-retry-attempt.json",
-      "expected_result": "invalid",
-      "event_type": "SyncRetryScheduled",
-      "notes": "SyncRetryScheduled with retry_attempt=0 (must be >= 1)",
-      "min_version": "2.7.0"
-    },
-    {
-      "id": "sync-missing-failure-reason",
-      "path": "sync/invalid/sync-missing-failure-reason.json",
-      "expected_result": "invalid",
-      "event_type": "SyncDeadLettered",
-      "notes": "SyncDeadLettered payload missing failure_reason field",
-      "min_version": "2.7.0"
-    },
-    {
-      "id": "sync-ingest-lifecycle",
-      "path": "sync/replay/sync-ingest-lifecycle.jsonl",
-      "fixture_type": "replay_stream",
-      "event_type": "mixed",
-      "expected_result": "valid",
-      "notes": "7-event sync ingest lifecycle: Accepted \u2192 Accepted(different) \u2192 Rejected \u2192 RetryScheduled \u2192 RetryScheduled(attempt 2) \u2192 DeadLettered \u2192 ReplayCompleted",
-      "min_version": "2.7.0"
-    },
-    {
-      "id": "sync-ingest-lifecycle-output",
-      "path": "sync/replay/sync-ingest-lifecycle_output.json",
-      "fixture_type": "reducer_output",
-      "event_type": "ReducedSyncState",
-      "expected_result": "valid",
-      "notes": "Golden reducer output for sync-ingest-lifecycle.jsonl \u2014 7 events, all outcome types covered",
-      "min_version": "2.7.0"
-    },
-    {
-      "id": "mixed-connector-sync-lifecycle",
-      "path": "replay/mixed-connector-sync-lifecycle.jsonl",
-      "fixture_type": "replay_stream",
-      "event_type": "mixed",
-      "expected_result": "valid",
-      "notes": "10-event interleaved connector and sync lifecycle stream",
-      "min_version": "2.7.0"
-    },
-    {
-      "id": "mixed-connector-sync-lifecycle-connector-output",
-      "path": "replay/mixed-connector-sync-lifecycle_connector_output.json",
-      "fixture_type": "reducer_output",
-      "event_type": "ReducedConnectorState",
-      "expected_result": "valid",
-      "notes": "Golden connector reducer output for mixed-connector-sync-lifecycle.jsonl \u2014 state=healthy, 10 events",
-      "min_version": "2.7.0"
-    },
-    {
-      "id": "mixed-connector-sync-lifecycle-sync-output",
-      "path": "replay/mixed-connector-sync-lifecycle_sync_output.json",
-      "fixture_type": "reducer_output",
-      "event_type": "ReducedSyncState",
-      "expected_result": "valid",
-      "notes": "Golden sync reducer output for mixed-connector-sync-lifecycle.jsonl \u2014 10 events, 5 unique delivery pairs",
+      "notes": "Golden reducer output for connector-lifecycle-full.jsonl — state=revoked, 6 events, 0 anomalies",
       "min_version": "2.7.0"
     },
     {
@@ -1952,24 +1771,6 @@
       "expected_result": "valid",
       "event_type": "MissionOriginBound",
       "notes": "Canonical MissionOriginBoundPayload binding a mission to a GitHub issue.",
-      "min_version": "5.2.0"
-    },
-    {
-      "id": "legacy-envelope-v1-pre30-normalizes",
-      "path": "legacy/pre_3_0_envelope_normalizes.json",
-      "expected_result": "valid",
-      "event_type": "LegacyEnvelope",
-      "fixture_type": "legacy_normalization",
-      "notes": "Pre-3.0 envelope without project_uuid; normalizer promotes to canonical shape.",
-      "min_version": "5.2.0"
-    },
-    {
-      "id": "legacy-envelope-v1-unrecognized-diagnostic",
-      "path": "legacy/unrecognized_legacy_diagnostic.json",
-      "expected_result": "invalid",
-      "event_type": "LegacyEnvelope",
-      "fixture_type": "legacy_normalization",
-      "notes": "Envelope with no recognized legacy markers; normalizer surfaces UnnormalizableLegacyDiagnostic.",
       "min_version": "5.2.0"
     },
     {

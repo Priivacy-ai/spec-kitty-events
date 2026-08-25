@@ -39,7 +39,6 @@ from spec_kitty_events.project_lifecycle import (
     TasksStartedPayload,
     WPCreatedPayload,
 )
-from spec_kitty_events.cutover import CutoverArtifact
 from spec_kitty_events.harness_observation import HarnessObservationPayload
 from spec_kitty_events.gates import (
     GatePassedPayload,
@@ -129,14 +128,6 @@ from spec_kitty_events.connector import (
     UserConnectedPayload,
     UserDisconnectedPayload,
     UserConnectionStatus,
-)
-from spec_kitty_events.sync import (
-    SyncIngestAcceptedPayload,
-    SyncIngestRejectedPayload,
-    SyncRetryScheduledPayload,
-    SyncDeadLetteredPayload,
-    SyncReplayCompletedPayload,
-    ExternalReferenceLinkedPayload,
 )
 from spec_kitty_events.profile_invocation import (
     ProfileInvocationStartedPayload,
@@ -248,7 +239,6 @@ PYDANTIC_MODELS: List[tuple[str, Type[BaseModel]]] = [
     ("mission_audit_decision_requested_payload", MissionAuditDecisionRequestedPayload),
     ("mission_audit_completed_payload", MissionAuditCompletedPayload),
     ("mission_audit_failed_payload", MissionAuditFailedPayload),
-    ("cutover_artifact", CutoverArtifact),
     # DecisionPoint shared models (V1 / 4.0.0)
     ("summary_block", SummaryBlock),
     ("teamspace_ref", TeamspaceRef),
@@ -269,13 +259,6 @@ PYDANTIC_MODELS: List[tuple[str, Type[BaseModel]]] = [
     ("user_connected_payload", UserConnectedPayload),
     ("user_disconnected_payload", UserDisconnectedPayload),
     ("user_connection_status", UserConnectionStatus),
-    # Sync lifecycle contracts (2.7.0)
-    ("sync_ingest_accepted_payload", SyncIngestAcceptedPayload),
-    ("sync_ingest_rejected_payload", SyncIngestRejectedPayload),
-    ("sync_retry_scheduled_payload", SyncRetryScheduledPayload),
-    ("sync_dead_lettered_payload", SyncDeadLetteredPayload),
-    ("sync_replay_completed_payload", SyncReplayCompletedPayload),
-    ("external_reference_linked_payload", ExternalReferenceLinkedPayload),
     # Profile invocation contracts (3.1.0)
     ("profile_invocation_started_payload", ProfileInvocationStartedPayload),
     # Retrospective contracts (4.1.0)

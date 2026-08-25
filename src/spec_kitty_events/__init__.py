@@ -1,35 +1,21 @@
-"""Public package exports for the canonical 5.x TeamSpace migration release.
+"""Public package exports for the canonical TeamSpace event vocabulary.
 
-This release publishes the fail-closed cutover surface for:
+This release publishes:
 
 - canonical mission taxonomy: ``mission_slug``, ``mission_number``, ``mission_type``
 - canonical catalog events: ``MissionCreated`` and ``MissionClosed``
 - explicit envelope identity split: ``build_id`` versus ``node_id``
-- authoritative artifact-driven compatibility gating via ``spec_kitty_events.cutover``
 - Decision Moment V1: discriminated-union DecisionPoint payloads, Widened event,
   interview-origin fields, terminal outcome rules, and shared V1 models
-- TeamSpace migration readiness: canonical ``in_review`` lane handling,
-  reconciled mission payloads, recursive forbidden-key validation, and
-  historical-shape conformance fixtures.
+- TeamSpace readiness: canonical ``in_review`` lane handling and reconciled
+  mission payloads.
+
+The offline sync/cutover surfaces (``spec_kitty_events.sync``, ``legacy``,
+``cutover``) were removed in ``8.0.0``; envelope-level fail-closed gating now
+lives in ``spec_kitty_events.strict.validate_strict_envelope``.
 """
 
-__version__ = "7.0.0"
-
-from spec_kitty_events.cutover import (
-    CUTOVER_ARTIFACT,
-    CutoverArtifact,
-    accepted_major_matches,
-    assert_canonical_cutover_signal,
-    canonical_signal_field_name,
-    canonical_signal_location,
-    forbidden_legacy_aggregate_names,
-    forbidden_legacy_event_names,
-    forbidden_legacy_keys,
-    is_pre_cutover_payload,
-    load_cutover_artifact,
-    read_cutover_signal,
-    required_cutover_value_matches,
-)
+__version__ = "8.0.0"
 
 # Core data models
 from spec_kitty_events.models import (
@@ -158,18 +144,6 @@ from spec_kitty_events.build_lifecycle import (
     BUILD_LIFECYCLE_EVENT_TYPES,
     BuildRegisteredPayload,
     BuildHeartbeatPayload,
-)
-
-# Legacy envelope compatibility contract (legacy_envelope_v1, shipped by
-# mission canonical-producer-contracts-legacy-envelope-01KS7JM3).
-from spec_kitty_events import legacy
-from spec_kitty_events.legacy import (
-    LEGACY_ENVELOPE_CONTRACT_NAME,
-    RECOGNIZED_LEGACY_SHAPES,
-    NormalizedEnvelope,
-    UnnormalizableLegacyDiagnostic,
-    NormalizationResult,
-    LegacyEnvelopeNormalizer,
 )
 
 # HarnessObservation vocabulary (F1-T1, 7.0.0). F1 is the single owner of
@@ -462,28 +436,6 @@ from spec_kitty_events.connector import (
     reduce_connector_events as reduce_connector_events,
 )
 
-# Sync Lifecycle Contracts (2.7.0)
-from spec_kitty_events.sync import (
-    SYNC_SCHEMA_VERSION as SYNC_SCHEMA_VERSION,
-    SYNC_INGEST_ACCEPTED as SYNC_INGEST_ACCEPTED,
-    SYNC_INGEST_REJECTED as SYNC_INGEST_REJECTED,
-    SYNC_RETRY_SCHEDULED as SYNC_RETRY_SCHEDULED,
-    SYNC_DEAD_LETTERED as SYNC_DEAD_LETTERED,
-    SYNC_REPLAY_COMPLETED as SYNC_REPLAY_COMPLETED,
-    SYNC_EVENT_TYPES as SYNC_EVENT_TYPES,
-    EXTERNAL_REFERENCE_LINKED as EXTERNAL_REFERENCE_LINKED,
-    SyncOutcome as SyncOutcome,
-    SyncAnomaly as SyncAnomaly,
-    SyncIngestAcceptedPayload as SyncIngestAcceptedPayload,
-    SyncIngestRejectedPayload as SyncIngestRejectedPayload,
-    SyncRetryScheduledPayload as SyncRetryScheduledPayload,
-    SyncDeadLetteredPayload as SyncDeadLetteredPayload,
-    SyncReplayCompletedPayload as SyncReplayCompletedPayload,
-    ExternalReferenceLinkedPayload as ExternalReferenceLinkedPayload,
-    ReducedSyncState as ReducedSyncState,
-    reduce_sync_events as reduce_sync_events,
-)
-
 # Profile invocation contracts (3.1.0)
 from spec_kitty_events.profile_invocation import (
     PROFILE_INVOCATION_SCHEMA_VERSION as PROFILE_INVOCATION_SCHEMA_VERSION,
@@ -545,20 +497,6 @@ MissionDossierParityDriftDetected = MissionDossierParityDriftDetectedPayload
 __all__ = [
     # Version
     "__version__",
-    # Cutover artifact
-    "CUTOVER_ARTIFACT",
-    "CutoverArtifact",
-    "load_cutover_artifact",
-    "canonical_signal_field_name",
-    "canonical_signal_location",
-    "read_cutover_signal",
-    "accepted_major_matches",
-    "required_cutover_value_matches",
-    "forbidden_legacy_keys",
-    "forbidden_legacy_event_names",
-    "forbidden_legacy_aggregate_names",
-    "is_pre_cutover_payload",
-    "assert_canonical_cutover_signal",
     # Models
     "Event",
     "ErrorEntry",
@@ -859,25 +797,6 @@ __all__ = [
     "UserConnectionStatus",
     "ReducedConnectorState",
     "reduce_connector_events",
-    # Sync Lifecycle Contracts (2.7.0)
-    "SYNC_SCHEMA_VERSION",
-    "SYNC_INGEST_ACCEPTED",
-    "SYNC_INGEST_REJECTED",
-    "SYNC_RETRY_SCHEDULED",
-    "SYNC_DEAD_LETTERED",
-    "SYNC_REPLAY_COMPLETED",
-    "SYNC_EVENT_TYPES",
-    "EXTERNAL_REFERENCE_LINKED",
-    "SyncOutcome",
-    "SyncAnomaly",
-    "SyncIngestAcceptedPayload",
-    "SyncIngestRejectedPayload",
-    "SyncRetryScheduledPayload",
-    "SyncDeadLetteredPayload",
-    "SyncReplayCompletedPayload",
-    "ExternalReferenceLinkedPayload",
-    "ReducedSyncState",
-    "reduce_sync_events",
     # Profile invocation contracts (3.1.0)
     "PROFILE_INVOCATION_SCHEMA_VERSION",
     "PROFILE_INVOCATION_STARTED",
@@ -945,14 +864,6 @@ __all__ = [
     "BUILD_LIFECYCLE_EVENT_TYPES",
     "BuildRegisteredPayload",
     "BuildHeartbeatPayload",
-    # Legacy envelope compatibility (legacy_envelope_v1).
-    "legacy",
-    "LEGACY_ENVELOPE_CONTRACT_NAME",
-    "RECOGNIZED_LEGACY_SHAPES",
-    "NormalizedEnvelope",
-    "UnnormalizableLegacyDiagnostic",
-    "NormalizationResult",
-    "LegacyEnvelopeNormalizer",
     # Machine-readable classification surface.
     "LOCAL_ONLY_EVENT_TYPES",
     # HarnessObservation vocabulary (F1-T1, 7.0.0).

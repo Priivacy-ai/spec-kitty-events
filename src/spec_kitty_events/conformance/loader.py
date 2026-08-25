@@ -19,7 +19,7 @@ _VALID_CATEGORIES = frozenset({
     "collaboration", "glossary", "mission_next",
     "analytics",
     "dossier", "mission_audit", "decisionpoint",
-    "connector", "sync",
+    "connector",
     "profile_invocation", "retrospective",  # 3.1.0
     "harness_observation",  # F1-T1 (7.0.0)
 })
@@ -54,7 +54,7 @@ def load_fixtures(category: str) -> List[FixtureCase]:
     Args:
         category: One of ``"events"``, ``"lane_mapping"``, ``"edge_cases"``,
             ``"collaboration"``, ``"glossary"``, ``"mission_next"``, ``"dossier"``,
-            ``"analytics"``, ``"mission_audit"``, ``"decisionpoint"``, ``"connector"``, ``"sync"``,
+            ``"analytics"``, ``"mission_audit"``, ``"decisionpoint"``, ``"connector"``,
             ``"profile_invocation"``, or ``"retrospective"``.
 
     Returns:
