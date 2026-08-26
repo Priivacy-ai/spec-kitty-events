@@ -376,6 +376,12 @@ def test_oversize_value_raises_rather_than_truncating() -> None:
         to_zeitgeist_attrs(payload, _envelope("MissionClosed"))
 
 
+def test_emit_rejects_lone_surrogates_with_typed_error() -> None:
+    payload = _transition(actor="\ud800")
+    with pytest.raises(ZeitgeistAttrsError, match="attr 'actor' value"):
+        to_zeitgeist_attrs(payload, _envelope("WPStatusChanged"))
+
+
 def test_key_count_bound(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(zeitgeist_attrs, "ZEITGEIST_ATTRS_MAX_KEYS", 3)
     with pytest.raises(ZeitgeistAttrsOverflowError):
@@ -459,6 +465,13 @@ def test_decode_rejects_oversize_values() -> None:
     attrs = to_zeitgeist_attrs(_transition(), _envelope("WPStatusChanged"))
     attrs["actor"] = "r" * 241
     with pytest.raises(ZeitgeistAttrsOverflowError):
+        from_zeitgeist_attrs("WPStatusChanged", attrs)
+
+
+def test_decode_rejects_lone_surrogates_with_typed_error() -> None:
+    attrs = to_zeitgeist_attrs(_transition(), _envelope("WPStatusChanged"))
+    attrs["actor"] = "\ud800"
+    with pytest.raises(ZeitgeistAttrsError, match="attr 'actor' value"):
         from_zeitgeist_attrs("WPStatusChanged", attrs)
 
 
