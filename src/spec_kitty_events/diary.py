@@ -1409,6 +1409,27 @@ class State:
 
 _RETROSPECTIVE_EVENT_NAME_PREFIX = "retrospective."
 
+# Registration point: any new non-lane lifecycle event that uses the "type"
+# envelope shape MUST be added here, or this row will hit StatusEvent.from_dict
+# and raise as a malformed lane-transition row. Ported from the CLI's
+# `_RETROSPECTIVE_LIFECYCLE_EVENT_TYPES` (specify_cli/status/store.py).
+_RETROSPECTIVE_LIFECYCLE_EVENT_TYPES: frozenset[str] = frozenset({
+    "RetrospectiveCaptured",
+    "RetrospectiveCaptureFailed",
+    "RetrospectiveSkipped",
+})
+
+
+def _is_retrospective_lifecycle_event(obj: dict[str, Any]) -> bool:
+    """Return True for retrospective lifecycle rows using the ``type`` envelope.
+
+    These rows are written to status.events.jsonl by design and read back by
+    retrospective consumers; they are descriptive lifecycle events, not lane
+    transitions, and must be skipped in place — never removed.
+    """
+    event_type = obj.get("type")
+    return isinstance(event_type, str) and event_type in _RETROSPECTIVE_LIFECYCLE_EVENT_TYPES
+
 
 def _is_non_lane_row(obj: dict[str, Any]) -> bool:
     """Return True for diary rows that are ignored in place, never fatal.
@@ -1417,6 +1438,9 @@ def _is_non_lane_row(obj: dict[str, Any]) -> bool:
     than the status emitter:
 
     - retrospective.* diary entries (``event_name`` key);
+    - the three canonical retrospective lifecycle events which use a ``type``
+      field instead of ``event_name`` (RetrospectiveCaptured/CaptureFailed/
+      Skipped);
     - mission-level events carrying a top-level ``event_type`` key
       (DecisionPointOpened/Resolved/Deferred/Canceled/Widened and any future
       event-type written by a non-status-emitter subsystem). Two cooperating
@@ -1436,6 +1460,8 @@ def _is_non_lane_row(obj: dict[str, Any]) -> bool:
     if isinstance(event_name, str) and event_name.startswith(
         _RETROSPECTIVE_EVENT_NAME_PREFIX
     ):
+        return True
+    if _is_retrospective_lifecycle_event(obj):
         return True
     return "event_type" in obj
 

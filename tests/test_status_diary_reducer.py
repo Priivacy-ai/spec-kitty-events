@@ -650,6 +650,24 @@ class TestRowPartition:
         state = reduce([*noise, _row(_ulid(1))])
         assert state.event_count == 1
 
+    @pytest.mark.parametrize(
+        "event_type",
+        ["RetrospectiveCaptured", "RetrospectiveCaptureFailed", "RetrospectiveSkipped"],
+    )
+    def test_type_envelope_retrospective_lifecycle_rows_are_ignored(
+        self, event_type: str
+    ) -> None:
+        """The CLI's top-level `type` retrospective lifecycle rows are non-lane (#41/#42)."""
+        lifecycle_row = {
+            "type": event_type,
+            "event_id": "01KS049J4V9CSWBKJHTY2FB014",
+            "mission_slug": "demo",
+            "wp_id": None,
+            "at": "2026-05-01T10:25:00+00:00",
+        }
+        state = reduce([lifecycle_row, _row(_ulid(1))])
+        assert state.event_count == 1
+
     def test_malformed_lane_row_fails_loud(self) -> None:
         with pytest.raises(DiaryError, match="Invalid lane-transition row"):
             reduce([{"wp_id": "WP01"}])  # missing every required key
