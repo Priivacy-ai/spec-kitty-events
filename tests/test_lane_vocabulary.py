@@ -19,6 +19,7 @@ from pathlib import Path
 from typing import FrozenSet, Set
 
 from spec_kitty_events import Lane
+from spec_kitty_events.diary import Lane as DiaryLane
 
 # ---------------------------------------------------------------------------
 # Pinned canonical vocabulary
@@ -70,6 +71,35 @@ def test_canonical_lane_set_is_pinned() -> None:
     )
 
 
+def test_diary_lane_vocabulary_is_pinned() -> None:
+    """The diary FSM vocabulary is pinned exactly (issue #41).
+
+    ``spec_kitty_events.diary.Lane`` is the CLI's work-package FSM
+    vocabulary, moved verbatim from ``specify_cli/status/models.py`` so the
+    CLI and the repo dossier reduce ``status.events.jsonl`` with one
+    implementation. It is deliberately a SECOND, distinct vocabulary: it adds
+    ``uninitialized`` -- the non-display read sentinel for a WP absent from
+    the reduced snapshot -- which the envelope-level canonical ``Lane``
+    intentionally does not carry. Unifying the two is an envelope contract
+    change subject to the major-bump rule, not something a reducer move may
+    do silently; until then BOTH sets are pinned here so neither can drift.
+    """
+    expected = EXPECTED_CANONICAL_LANES | {"uninitialized"}
+    actual = frozenset(member.value for member in DiaryLane)
+    assert actual == expected, (
+        f"Diary lane vocabulary drifted. "
+        f"New: {sorted(actual - expected)}, "
+        f"Removed: {sorted(expected - actual)}. "
+        f"The diary vocabulary is the CLI's pinned FSM set "
+        f"(canonical lanes + 'uninitialized'); changing it requires a "
+        f"deliberate edit here AND in contracts/lane-vocabulary.md terms."
+    )
+    # The non-display sentinels stay excluded from board summaries.
+    from spec_kitty_events.diary import NON_DISPLAY_LANES
+
+    assert {lane.value for lane in NON_DISPLAY_LANES} == {"genesis", "uninitialized"}
+
+
 def test_lane_vocabulary_is_single_source_of_truth() -> None:
     """No duplicate canonical-lane definition lives elsewhere in the package.
 
@@ -89,6 +119,11 @@ def test_lane_vocabulary_is_single_source_of_truth() -> None:
     # Files allowed to contain canonical lane string literals.
     allowed_files: Set[Path] = {
         (package_root / "status.py").resolve(),
+        # diary.py legitimately hosts the CLI's second, separately pinned FSM
+        # vocabulary (canonical lanes + 'uninitialized'); see
+        # test_diary_lane_vocabulary_is_pinned above, which holds it to that
+        # exact set so the allow-list entry cannot hide drift.
+        (package_root / "diary.py").resolve(),
     }
 
     # Lane values whose strings could plausibly be common English words

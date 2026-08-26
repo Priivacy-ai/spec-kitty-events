@@ -1,6 +1,6 @@
 [project]
 name = "spec-kitty-events"
-version = "8.0.0"
+version = "8.1.0"
 description = "Event log library with Lamport clocks and systematic error tracking"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -90,6 +90,8 @@ spec_kitty_events = [
     "conformance/fixtures/harness_observation/replay/*.json",
     "conformance/fixtures/zeitgeist_attrs/valid/*.json",
     "conformance/fixtures/zeitgeist_attrs/invalid/*.json",
+    "conformance/fixtures/status_diary/replay/*.jsonl",
+    "conformance/fixtures/status_diary/replay/*.json",
 ]
 
 [tool.pytest.ini_options]

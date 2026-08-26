@@ -23,6 +23,7 @@ _VALID_CATEGORIES = frozenset({
     "profile_invocation", "retrospective",  # 3.1.0
     "harness_observation",  # F1-T1 (7.0.0)
     "zeitgeist_attrs",  # E2: volatile mission/WP moment codecs
+    "status_diary",  # 8.1.0: status.events.jsonl diary reducer (issue #41)
 })
 
 # Replay stream fixture type sentinel
@@ -175,3 +176,52 @@ def load_replay_stream(fixture_id: str) -> List[Dict[str, Any]]:
             events.append(event_dict)
 
     return events
+
+
+def load_reducer_output(fixture_id: str) -> dict[str, Any]:
+    """Load a golden reducer-output fixture for a replay stream.
+
+    Reducer-output fixtures are the pinned :class:`dict` a reducer must
+    produce for the like-named ``replay_stream`` fixture (convention:
+    same path stem plus an ``_output`` suffix).
+
+    Args:
+        fixture_id: The manifest ``id`` of the ``reducer_output`` entry
+            (e.g. ``"status-diary-replay-fresh-mission-output"``).
+
+    Returns:
+        The parsed golden output document.
+
+    Raises:
+        ValueError: If *fixture_id* is not found or is not a reducer_output entry.
+        FileNotFoundError: If the JSON file does not exist on disk.
+    """
+    with open(_MANIFEST_PATH, "r", encoding="utf-8") as fh:
+        manifest: dict[str, Any] = json.load(fh)
+
+    entry: dict[str, Any] | None = None
+    for candidate in manifest["fixtures"]:
+        if candidate["id"] == fixture_id:
+            entry = candidate
+            break
+
+    if entry is None:
+        raise ValueError(
+            f"Reducer-output fixture not found in manifest: {fixture_id!r}"
+        )
+
+    if entry.get("fixture_type") != "reducer_output":
+        raise ValueError(
+            f"Fixture {fixture_id!r} is not a reducer_output "
+            f"(fixture_type={entry.get('fixture_type')!r}). "
+            f"Use load_replay_stream() for replay streams."
+        )
+
+    full_path = _FIXTURES_DIR / entry["path"]
+    if not full_path.exists():
+        raise FileNotFoundError(
+            f"Reducer-output fixture referenced in manifest does not exist: {full_path}"
+        )
+
+    payload: dict[str, Any] = json.loads(full_path.read_text(encoding="utf-8"))
+    return payload

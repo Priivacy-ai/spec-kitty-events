@@ -2173,6 +2173,78 @@
       "event_type": "FeatureCreated",
       "notes": "Forbidden legacy event name FeatureCreated moved from the removed cutover gate to strict-profile membership: validate_strict_envelope reports exactly UNKNOWN_EVENT_TYPE.",
       "min_version": "8.0.0"
+    },
+    {
+      "id": "status-diary-replay-fresh-mission",
+      "path": "status_diary/replay/status_diary_fresh_mission.jsonl",
+      "fixture_type": "replay_stream",
+      "event_type": "mixed",
+      "expected_result": "valid",
+      "notes": "Fresh mission: genesis seed -> planned -> claimed (policy_metadata claim triple) -> in_progress; runtime slots carried forward",
+      "min_version": "8.1.0"
+    },
+    {
+      "id": "status-diary-replay-fresh-mission-output",
+      "path": "status_diary/replay/status_diary_fresh_mission_output.json",
+      "fixture_type": "reducer_output",
+      "event_type": "State",
+      "expected_result": "valid",
+      "notes": "Golden reduce() output for status_diary_fresh-mission.jsonl (issue #41)",
+      "min_version": "8.1.0"
+    },
+    {
+      "id": "status-diary-replay-every-lane",
+      "path": "status_diary/replay/status_diary_every_lane.jsonl",
+      "fixture_type": "replay_stream",
+      "event_type": "mixed",
+      "expected_result": "valid",
+      "notes": "WP01 traverses every display lane planned..done (review_result + done evidence), WP02 detours through blocked, WP03 canceled mid-flight",
+      "min_version": "8.1.0"
+    },
+    {
+      "id": "status-diary-replay-every-lane-output",
+      "path": "status_diary/replay/status_diary_every_lane_output.json",
+      "fixture_type": "reducer_output",
+      "event_type": "State",
+      "expected_result": "valid",
+      "notes": "Golden reduce() output for status_diary_every-lane.jsonl (issue #41)",
+      "min_version": "8.1.0"
+    },
+    {
+      "id": "status-diary-replay-out-of-order-duplicates",
+      "path": "status_diary/replay/status_diary_out_of_order_duplicates.jsonl",
+      "fixture_type": "replay_stream",
+      "event_type": "mixed",
+      "expected_result": "valid",
+      "notes": "Same stream shuffled relative to (at, event_id) order with exact duplicate rows appended; dedup + sort make the fold deterministic",
+      "min_version": "8.1.0"
+    },
+    {
+      "id": "status-diary-replay-out-of-order-duplicates-output",
+      "path": "status_diary/replay/status_diary_out_of_order_duplicates_output.json",
+      "fixture_type": "reducer_output",
+      "event_type": "State",
+      "expected_result": "valid",
+      "notes": "Golden reduce() output for status_diary_out-of-order-duplicates.jsonl (issue #41)",
+      "min_version": "8.1.0"
+    },
+    {
+      "id": "status-diary-replay-unknown-kinds",
+      "path": "status_diary/replay/status_diary_unknown_kinds.jsonl",
+      "fixture_type": "replay_stream",
+      "event_type": "mixed",
+      "expected_result": "valid",
+      "notes": "Unknown event_type writers (DecisionPointOpened, future protocol events) and retrospective.* rows are ignored in place; annotation row still folds",
+      "min_version": "8.1.0"
+    },
+    {
+      "id": "status-diary-replay-unknown-kinds-output",
+      "path": "status_diary/replay/status_diary_unknown_kinds_output.json",
+      "fixture_type": "reducer_output",
+      "event_type": "State",
+      "expected_result": "valid",
+      "notes": "Golden reduce() output for status_diary_unknown-kinds.jsonl (issue #41)",
+      "min_version": "8.1.0"
     }
   ],
   "classes": {
