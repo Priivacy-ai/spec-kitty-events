@@ -9,13 +9,17 @@ This release publishes:
   interview-origin fields, terminal outcome rules, and shared V1 models
 - TeamSpace readiness: canonical ``in_review`` lane handling and reconciled
   mission payloads.
+- The status-diary reducer (``spec_kitty_events.diary``, re-exported as
+  ``spec_kitty_events.status.reduce``): the shared
+  ``status.events.jsonl`` -> kanban-state fold for the CLI and the Team Kitty
+  repo dossier.
 
 The offline sync/cutover surfaces (``spec_kitty_events.sync``, ``legacy``,
 ``cutover``) were removed in ``8.0.0``; envelope-level fail-closed gating now
 lives in ``spec_kitty_events.strict.validate_strict_envelope``.
 """
 
-__version__ = "8.0.0"
+__version__ = "8.1.0"
 
 # Core data models
 from spec_kitty_events.models import (

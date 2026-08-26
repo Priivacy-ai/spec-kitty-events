@@ -150,9 +150,18 @@ from typing import Any, Dict, FrozenSet, List, Literal, Mapping, Optional, Seque
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
+# Diary-format contracts (issue #41): the CLI's ``status.events.jsonl`` ->
+# kanban-state reducer moved to :mod:`spec_kitty_events.diary`; re-exported
+# here so every consumer finds the shared entry point at
+# ``spec_kitty_events.status.reduce``.
+from spec_kitty_events.diary import DiaryError, State, parse_diary, reduce
 from spec_kitty_events.models import Event, SpecKittyEventsError, ValidationError
 
 logger = logging.getLogger(__name__)
+
+#: Names re-exported from :mod:`spec_kitty_events.diary` (see the import
+#: above): the shared ``status.events.jsonl`` -> kanban-state contract.
+diary_reexports = (DiaryError, State, parse_diary, reduce)
 
 
 class Lane(str, Enum):

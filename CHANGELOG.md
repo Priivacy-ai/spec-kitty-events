@@ -7,6 +7,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [8.1.0] - 2026-08-26
+
+Reducer unification, step 1 of 3
+(EXPERIMENTAL-spec-kitty-events#41; milestone "Dossier hardening", Repo
+Dossier decision D): the CLI's status reducer moved into this package so the
+CLI and Team Kitty's repo dossier reduce `status.events.jsonl` with one
+implementation.
+
+### Added
+
+- **`spec_kitty_events.diary`** — the Spec Kitty status diary
+  (`status.events.jsonl`) contracts and the deterministic
+  diary → kanban-state reducer, moved verbatim from the CLI's
+  `specify_cli/status/{models,reducer}.py` (plus the pure halves of its
+  store/paths/mission-metadata helpers). Public entry points:
+  `reduce(events: Iterable[dict]) -> State` (raw wire rows in, reduced
+  state out), `parse_diary(rows) -> EventStream` (row partition), and
+  `reduce_parsed(transitions, annotations)` (the typed fold). Also reachable
+  as `spec_kitty_events.status.reduce` / `.State`.
+- Conformance fixtures `status_diary/replay/*.jsonl` with pinned golden
+  outputs (`*_output.json`): fresh mission, a WP through every display lane,
+  out-of-order + duplicate rows, and unknown non-lane event kinds ignored.
+  Loader helper: `load_reducer_output(fixture_id)`.
+- Row-partition contract, unchanged from the CLI store: `kind == "annotation"`
+  folds as an off-axis runtime-state annotation; an unknown `kind` fails loud
+  (`DiaryError`); rows carrying an `event_type` key or a `retrospective.*`
+  `event_name` are ignored in place — never fatal.
+
+### Changed
+
+- `Lane` in the diary module is declared `(str, Enum)` with an explicit
+  `__str__` instead of `enum.StrEnum`, because this package still supports
+  Python 3.10; the reducer's string snapshot slots are unchanged.
+- `State` serializes to exactly the shape the CLI writes as `status.json`,
+  minus the CLI-side `retrospective` attachment (computed by the CLI after
+  reduction).
+
 ## [8.0.0] - 2026-08-25
 
 E2 (EXPERIMENTAL-spec-kitty-planning#3): the offline sync/replay story is
