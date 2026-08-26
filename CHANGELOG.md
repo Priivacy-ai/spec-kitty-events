@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Keep E2 mission-run support-matrix `min_consumer_package` aligned with
+  `strict_since` and the conformance fixture `min_version` floor.
+
 ## [8.1.0] - 2026-08-26
 
 Reducer unification, step 1 of 3

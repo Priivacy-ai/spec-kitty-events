@@ -132,6 +132,7 @@ _REQUIRED_SCHEMA_VERSION = "3.0.0"
 # release, not by 2.3.0 where their models appeared. Move this value with
 # the release number if it changes.
 _E2_STRICT_SINCE = "8.0.0"
+_STRICT_PROFILE_MIN_CONSUMER_PACKAGE = "7.0.0"
 
 
 # ── Support matrix (draft §3.4) ──────────────────────────────────────────────
@@ -196,7 +197,7 @@ def _journal_row(
         introduced_in=introduced_in,
         strict_since=strict_since or introduced_in,
         status="supported",
-        min_consumer_package="7.0.0",
+        min_consumer_package=_STRICT_PROFILE_MIN_CONSUMER_PACKAGE,
     )
 
 
@@ -215,6 +216,7 @@ def _volatile_row(
     bounded attrs (``spec_kitty_events.zeitgeist_attrs``) and observed for
     the retention window only; they never form durable server-side state.
     """
+    row_strict_since = strict_since or introduced_in
     return SupportRow(
         event_type=event_type,
         kind=None,
@@ -225,9 +227,9 @@ def _volatile_row(
         schema=schema,
         strict=True,
         introduced_in=introduced_in,
-        strict_since=strict_since or introduced_in,
+        strict_since=row_strict_since,
         status="supported",
-        min_consumer_package="7.0.0",
+        min_consumer_package=strict_since or _STRICT_PROFILE_MIN_CONSUMER_PACKAGE,
     )
 
 
@@ -244,7 +246,7 @@ def _observation_row(kind: ObservationKind) -> SupportRow:
         introduced_in="7.0.0",
         strict_since="7.0.0",
         status="supported",
-        min_consumer_package="7.0.0",
+        min_consumer_package=_STRICT_PROFILE_MIN_CONSUMER_PACKAGE,
     )
 
 
