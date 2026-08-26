@@ -315,6 +315,14 @@ def _encode_fields(
     return entries
 
 
+def _utf8_size(subject: str, value: str) -> int:
+    """Return UTF-8 byte size, preserving the typed attrs error contract."""
+    try:
+        return len(value.encode("utf-8"))
+    except UnicodeEncodeError as exc:
+        raise ZeitgeistAttrsError(f"{subject} is not UTF-8 encodable") from exc
+
+
 def to_zeitgeist_attrs(payload: BaseModel, envelope: Event) -> dict[str, str]:
     """Project one volatile payload and its envelope onto bounded attrs.
 
@@ -375,8 +383,8 @@ def to_zeitgeist_attrs(payload: BaseModel, envelope: Event) -> dict[str, str]:
     oversized = sorted(
         key
         for key, value in attrs.items()
-        if len(key.encode("utf-8")) > ZEITGEIST_ATTRS_MAX_BYTES
-        or len(value.encode("utf-8")) > ZEITGEIST_ATTRS_MAX_BYTES
+        if _utf8_size(f"attr key {key!r}", key) > ZEITGEIST_ATTRS_MAX_BYTES
+        or _utf8_size(f"attr {key!r} value", value) > ZEITGEIST_ATTRS_MAX_BYTES
     )
     if oversized:
         raise ZeitgeistAttrsOverflowError(
@@ -515,8 +523,8 @@ def from_zeitgeist_attrs(
     oversized = sorted(
         key
         for key, value in attrs.items()
-        if len(key.encode("utf-8")) > ZEITGEIST_ATTRS_MAX_BYTES
-        or len(value.encode("utf-8")) > ZEITGEIST_ATTRS_MAX_BYTES
+        if _utf8_size(f"attr key {key!r}", key) > ZEITGEIST_ATTRS_MAX_BYTES
+        or _utf8_size(f"attr {key!r} value", value) > ZEITGEIST_ATTRS_MAX_BYTES
     )
     if oversized:
         raise ZeitgeistAttrsOverflowError(
