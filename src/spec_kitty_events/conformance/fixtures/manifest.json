@@ -619,6 +619,22 @@
       "min_version": "2.4.0"
     },
     {
+      "id": "dossier-artifact-missing-empty-step",
+      "path": "dossier/invalid/dossier_artifact_missing_empty_step.json",
+      "event_type": "MissionDossierArtifactMissing",
+      "expected_result": "invalid",
+      "notes": "manifest_step is an empty string — violates min_length=1",
+      "min_version": "2.4.0"
+    },
+    {
+      "id": "dossier-snapshot-computed-negative-count",
+      "path": "dossier/invalid/dossier_snapshot_computed_negative_count.json",
+      "event_type": "MissionDossierSnapshotComputed",
+      "expected_result": "invalid",
+      "notes": "artifact_count is negative (-1) — violates ge=0",
+      "min_version": "2.4.0"
+    },
+    {
       "id": "dossier-replay-happy-path",
       "path": "dossier/replay/dossier_happy_path.jsonl",
       "fixture_type": "replay_stream",
