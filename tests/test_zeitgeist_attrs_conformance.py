@@ -20,6 +20,7 @@ from uuid import UUID
 
 import pytest
 
+from spec_kitty_events.conformance import validate_event
 from spec_kitty_events.conformance.loader import FixtureCase, load_fixtures
 from spec_kitty_events.models import Event
 from spec_kitty_events.zeitgeist_attrs import (
@@ -78,9 +79,7 @@ def test_fixtures_loaded(zeitgeist_attrs_fixtures) -> None:
 def test_every_valid_fixture_covers_one_volatile_event_type(
     zeitgeist_attrs_fixtures,
 ) -> None:
-    valid_types = {
-        f.event_type for f in zeitgeist_attrs_fixtures if f.expected_valid
-    }
+    valid_types = {f.event_type for f in zeitgeist_attrs_fixtures if f.expected_valid}
     assert valid_types == set(PAYLOAD_MODEL_BY_EVENT_TYPE)
 
 
@@ -120,6 +119,26 @@ def test_codec_fixtures_stay_out_of_the_packaged_event_gate() -> None:
         "envelopes turns pytest --pyargs spec_kitty_events.conformance red "
         f"for every consumer: {leaked}"
     )
+
+
+def test_packaged_event_gate_fixture_entries_match_manifest_expectations() -> None:
+    """Mirror the packaged event gate inside the default in-repo test suite."""
+    from spec_kitty_events.conformance.test_pyargs_entrypoint import (
+        _event_fixture_params,
+    )
+
+    failures: list[str] = []
+    for case in _event_fixture_params():
+        result = validate_event(case["payload"], case["event_type"])
+        if case["expected_result"] == "valid" and result.model_violations:
+            violations = "; ".join(
+                f"{v.field}: {v.message}" for v in result.model_violations
+            )
+            failures.append(f"{case['id']} unexpectedly failed: {violations}")
+        elif case["expected_result"] == "invalid" and result.valid:
+            failures.append(f"{case['id']} unexpectedly passed")
+
+    assert not failures
 
 
 @pytest.mark.parametrize(
