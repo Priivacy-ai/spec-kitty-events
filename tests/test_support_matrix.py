@@ -39,6 +39,14 @@ _SCHEMA_DIR = Path(__file__).resolve().parent.parent / "src" / "spec_kitty_event
 _SUPPORT_MATRIX_PATH = (
     Path(__file__).resolve().parent.parent / "src" / "spec_kitty_events" / "support_matrix.json"
 )
+_FIXTURE_MANIFEST_PATH = (
+    Path(__file__).resolve().parent.parent
+    / "src"
+    / "spec_kitty_events"
+    / "conformance"
+    / "fixtures"
+    / "manifest.json"
+)
 
 # The 30 (event_type, kind) row keys, committed in-test (draft §3.4 as
 # amended by E2), mirroring
@@ -89,6 +97,17 @@ EXPECTED_PAYLOAD_IDS: frozenset[str] = frozenset(
     }
 )
 
+E2_MISSION_RUN_EVENT_TYPES: frozenset[str] = frozenset(
+    {
+        "MissionRunStarted",
+        "NextStepIssued",
+        "NextStepAutoCompleted",
+        "DecisionInputRequested",
+        "DecisionInputAnswered",
+        "MissionRunCompleted",
+    }
+)
+
 
 def test_support_matrix_has_exactly_30_rows() -> None:
     assert len(SUPPORT_MATRIX) == 30
@@ -118,6 +137,15 @@ def test_mission_run_rows_use_the_mission_next_models() -> None:
     for row in rows:
         assert row.model.startswith("spec_kitty_events.mission_next.")
         assert row.payload_id is None and row.kind is None
+
+
+def test_mission_run_rows_pin_min_consumer_to_strict_since() -> None:
+    """E2 rows must not admit strict envelopes before consumers can read them."""
+    rows = [row for row in SUPPORT_MATRIX if row.family == "mission_run"]
+    assert {row.event_type for row in rows} == E2_MISSION_RUN_EVENT_TYPES
+    for row in rows:
+        assert row.strict_since == "8.0.0", row.event_type
+        assert row.min_consumer_package == row.strict_since, row.event_type
 
 
 def test_support_matrix_row_keys_match_expected() -> None:
@@ -246,6 +274,35 @@ def test_support_matrix_json_uses_schema_key_not_schema_underscore() -> None:
     for row in data:
         assert "schema" in row
         assert "schema_" not in row
+
+
+def test_e2_fixture_min_versions_match_mission_run_support_rows() -> None:
+    """The E2 attrs manifest and support matrix publish one package floor."""
+    manifest = json.loads(_FIXTURE_MANIFEST_PATH.read_text(encoding="utf-8"))
+    strict_since_by_event_type = {
+        row.event_type: row.strict_since
+        for row in SUPPORT_MATRIX
+        if row.event_type in E2_MISSION_RUN_EVENT_TYPES
+    }
+    min_consumer_by_event_type = {
+        row.event_type: row.min_consumer_package
+        for row in SUPPORT_MATRIX
+        if row.event_type in E2_MISSION_RUN_EVENT_TYPES
+    }
+    checked: set[str] = set()
+
+    for entry in manifest["fixtures"]:
+        event_type = entry["event_type"]
+        if event_type not in E2_MISSION_RUN_EVENT_TYPES:
+            continue
+        if not entry["path"].startswith("zeitgeist_attrs/"):
+            continue
+
+        checked.add(event_type)
+        assert entry["min_version"] == strict_since_by_event_type[event_type]
+        assert entry["min_version"] == min_consumer_by_event_type[event_type]
+
+    assert checked == E2_MISSION_RUN_EVENT_TYPES
 
 
 # ---------------------------------------------------------------------------
