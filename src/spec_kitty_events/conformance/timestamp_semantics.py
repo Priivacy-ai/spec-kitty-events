@@ -79,7 +79,7 @@ class TimestampSubstitutionError(Exception):
 _ISO8601_SHAPE_RE = re.compile(
     r"^(?P<date>\d{4}-\d{2}-\d{2}|\d{8})"
     r"[T ]"
-    r"(?P<time>\d{2}:\d{2}:\d{2}|\d{6})"
+    r"(?P<time>\d{2}:\d{2}:\d{2}|\d{2}:\d{2}|\d{6}|\d{4}|\d{2})"
     r"(?P<frac>[.,]\d+)?"
     r"(?P<offset>Z|[+-]\d{2}:?\d{2})?$"
 )
@@ -101,12 +101,18 @@ def _normalize_iso8601_shape(value: str) -> str:
     conformance test purely on interpreter version.
 
     This truncates/pads any fractional part to 6 digits — the precision
-    ``datetime`` itself stores — and inserts the extended-format separators
-    when given basic format, then normalizes a trailing ``Z`` to
-    ``+00:00`` so the result parses the same way everywhere. A value that
-    does not match the expected timestamp shape at all (already malformed,
-    or a format this repo does not need to handle) is returned unchanged,
-    so it still fails ``fromisoformat`` with its ordinary ``ValueError``.
+    ``datetime`` itself stores — inserts the extended-format separators
+    when given basic format, pads a reduced-precision time (bare hour, or
+    hour:minute with no seconds, in either format) out to hour:minute:second
+    — 3.10's ``fromisoformat`` accepts those shapes only with the ``-``/``:``
+    separators already present and a trailing offset it recognizes, not a
+    literal ``Z``, so a reduced-precision time must reach it fully padded and
+    with ``Z`` already rewritten, the same as full-precision — then
+    normalizes a trailing ``Z`` to ``+00:00`` so the result parses the same
+    way everywhere. A value that does not match the expected timestamp shape
+    at all (already malformed, or a format this repo does not need to
+    handle) is returned unchanged, so it still fails ``fromisoformat`` with
+    its ordinary ``ValueError``.
     """
     match = _ISO8601_SHAPE_RE.match(value)
     if match is None:
@@ -114,7 +120,14 @@ def _normalize_iso8601_shape(value: str) -> str:
     date, time, frac, offset = match.group("date", "time", "frac", "offset")
     if len(date) == 8:
         date = f"{date[0:4]}-{date[4:6]}-{date[6:8]}"
-    if len(time) == 6:
+    if ":" in time:
+        if time.count(":") == 1:
+            time = f"{time}:00"
+    elif len(time) == 2:
+        time = f"{time}:00:00"
+    elif len(time) == 4:
+        time = f"{time[0:2]}:{time[2:4]}:00"
+    else:
         time = f"{time[0:2]}:{time[2:4]}:{time[4:6]}"
     fraction = f".{frac[1:][:6].ljust(6, '0')}" if frac else ""
     if offset is None:

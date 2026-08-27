@@ -156,6 +156,16 @@ def test_helper_handles_z_suffix_iso_string() -> None:
             "2026-01-01T02:00:00+02:00",
             id="basic-format-numeric-offset",
         ),
+        pytest.param(
+            "2026-01-01T00:00Z",
+            "2026-01-01T00:00:00+00:00",
+            id="extended-minute-precision-z-suffix",
+        ),
+        pytest.param(
+            "2026-01-01T00Z",
+            "2026-01-01T00:00:00+00:00",
+            id="extended-hour-precision-z-suffix",
+        ),
     ],
 )
 def test_helper_accepts_timestamp_shapes_that_split_by_python_version(
@@ -172,13 +182,69 @@ def test_helper_accepts_timestamp_shapes_that_split_by_python_version(
     finding, 2026-08-27): asserting only that the round-trip preserves
     the producer's occurrence time passes identically with the reshape
     deleted, on any interpreter that already tolerates the shape
-    natively — this repo's own test runner included."""
+    natively — this repo's own test runner included.
+
+    The two reduced-precision cases (squad pass 2 MAJOR, 2026-08-27) guard
+    against the seconds component having been mandatory in
+    ``_ISO8601_SHAPE_RE``. The basic-format half of that same regression is
+    covered directly against ``_normalize_iso8601_shape`` below rather than
+    through this test's ``_parse_iso`` — that local helper only replaces a
+    trailing ``Z`` and never reshapes basic format, so it cannot itself
+    parse a basic reduced-precision value on any interpreter, independent
+    of the fix under test."""
     from spec_kitty_events.conformance.timestamp_semantics import _normalize_iso8601_shape
 
     assert _normalize_iso8601_shape(timestamp) == reshaped
     envelope = {"timestamp": timestamp}
     persisted = _parse_iso(timestamp)
     assert_producer_occurrence_preserved(envelope, persisted)
+
+
+@pytest.mark.parametrize(
+    "timestamp,reshaped",
+    [
+        pytest.param(
+            "20260101T0000Z",
+            "2026-01-01T00:00:00+00:00",
+            id="basic-format-minute-precision-z-suffix",
+        ),
+        pytest.param(
+            "20260101T00Z",
+            "2026-01-01T00:00:00+00:00",
+            id="basic-format-hour-precision-z-suffix",
+        ),
+    ],
+)
+def test_helper_normalizes_basic_format_reduced_precision_shapes(
+    timestamp: str, reshaped: str
+) -> None:
+    """Basic-format half of the reduced-precision regression (squad pass 2
+    MAJOR, 2026-08-27), asserted directly against ``_normalize_iso8601_shape``
+    rather than through the full envelope round-trip: this test file's own
+    ``_parse_iso`` helper only replaces a trailing ``Z`` and never reshapes
+    basic format, so it cannot compute an independent expected value for a
+    basic-format reduced-precision timestamp on any interpreter — that is a
+    limitation of the test helper, not of the fix under test, which the
+    unit-level assertion below is unaffected by."""
+    from spec_kitty_events.conformance.timestamp_semantics import _normalize_iso8601_shape
+
+    assert _normalize_iso8601_shape(timestamp) == reshaped
+    parsed = datetime.fromisoformat(_normalize_iso8601_shape(timestamp))
+    assert parsed == datetime(2026, 1, 1, tzinfo=timezone.utc)
+
+
+def test_helper_still_rejects_doubled_z_at_reduced_precision() -> None:
+    """Guards the incidental gain the squad flagged as worth keeping (pass 2,
+    2026-08-27): closing the reduced-precision gap above must not resurrect
+    acceptance of a doubled trailing ``Z`` at any precision."""
+    from spec_kitty_events.conformance.timestamp_semantics import _normalize_iso8601_shape
+
+    for value in (
+        "2026-01-01T00:00:00ZZ",
+        "2026-01-01T00:00ZZ",
+        "2026-01-01T00ZZ",
+    ):
+        assert _normalize_iso8601_shape(value) == value
 
 
 def test_helper_raises_on_one_second_drift() -> None:

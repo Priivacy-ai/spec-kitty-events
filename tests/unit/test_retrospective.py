@@ -160,6 +160,26 @@ class TestRetrospectiveCompletedPayload:
                 "2026-04-13T10:00:00+02:00",
                 id="basic-format-numeric-offset",
             ),
+            pytest.param(
+                "2026-04-13T10:00Z",
+                "2026-04-13T10:00:00+00:00",
+                id="extended-minute-precision-z-suffix",
+            ),
+            pytest.param(
+                "2026-04-13T10Z",
+                "2026-04-13T10:00:00+00:00",
+                id="extended-hour-precision-z-suffix",
+            ),
+            pytest.param(
+                "20260413T1000Z",
+                "2026-04-13T10:00:00+00:00",
+                id="basic-format-minute-precision-z-suffix",
+            ),
+            pytest.param(
+                "20260413T10Z",
+                "2026-04-13T10:00:00+00:00",
+                id="basic-format-hour-precision-z-suffix",
+            ),
         ],
     )
     def test_completed_timestamp_shapes_that_split_by_python_version_accepted(
@@ -175,12 +195,39 @@ class TestRetrospectiveCompletedPayload:
         finding, 2026-08-27): asserting only that the payload round-trips
         passes identically with the reshape deleted, on any interpreter
         that already tolerates the shape natively — this repo's own test
-        runner included."""
+        runner included.
+
+        The four reduced-precision cases (squad pass 2 MAJOR, 2026-08-27)
+        guard against the seconds component having been mandatory in
+        ``_ISO8601_SHAPE_RE``, which made the trailing-``Z`` rewrite
+        conditional on a full match and reintroduced a 3.10-only rejection
+        for reduced-precision completion timestamps — reachable here
+        because ``test_completed_plain_date_no_time_raises`` above already
+        establishes that a bare date is in-contract for ``completed_at``,
+        so nothing mandates second precision either."""
         from spec_kitty_events.retrospective import _normalize_iso8601_shape
 
         assert _normalize_iso8601_shape(completed_at) == reshaped
         payload = _make_completed(completed_at=completed_at)
         assert payload.completed_at == completed_at
+
+    def test_completed_timestamp_still_rejects_doubled_z_at_reduced_precision(
+        self,
+    ) -> None:
+        """Guards the incidental gain the squad flagged as worth keeping
+        (pass 2, 2026-08-27): closing the reduced-precision gap above must
+        not resurrect acceptance of a doubled trailing ``Z`` at any
+        precision."""
+        from spec_kitty_events.retrospective import _normalize_iso8601_shape
+
+        for value in (
+            "2026-04-13T10:00:00ZZ",
+            "2026-04-13T10:00ZZ",
+            "2026-04-13T10ZZ",
+        ):
+            assert _normalize_iso8601_shape(value) == value
+            with pytest.raises(ValidationError):
+                _make_completed(completed_at=value)
 
 
 # ── RetrospectiveSkippedPayload tests ─────────────────────────────────────────

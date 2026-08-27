@@ -467,6 +467,26 @@ def test_t5b_timestamp_nanosecond_fraction_that_splits_by_python_version_accepte
             "2026-01-01T02:00:00+02:00",
             id="basic-format-numeric-offset",
         ),
+        pytest.param(
+            "2026-01-01T00:00Z",
+            "2026-01-01T00:00:00+00:00",
+            id="extended-minute-precision-z-suffix",
+        ),
+        pytest.param(
+            "2026-01-01T00Z",
+            "2026-01-01T00:00:00+00:00",
+            id="extended-hour-precision-z-suffix",
+        ),
+        pytest.param(
+            "20260101T0000Z",
+            "2026-01-01T00:00:00+00:00",
+            id="basic-format-minute-precision-z-suffix",
+        ),
+        pytest.param(
+            "20260101T00Z",
+            "2026-01-01T00:00:00+00:00",
+            id="basic-format-hour-precision-z-suffix",
+        ),
     ],
 )
 def test_parse_iso8601_accepts_shapes_that_split_by_python_version(
@@ -480,7 +500,15 @@ def test_parse_iso8601_accepts_shapes_that_split_by_python_version(
     ``_parse_iso8601`` accepted the value (squad finding, 2026-08-27):
     the acceptance-only assertion passes identically with the reshape
     code deleted entirely on any interpreter that natively tolerates
-    these shapes, so it never actually exercised the fix."""
+    these shapes, so it never actually exercised the fix.
+
+    The four reduced-precision cases (squad pass 2 MAJOR, 2026-08-27) guard
+    against the seconds component being mandatory in ``_ISO8601_SHAPE_RE``:
+    that made the trailing-``Z`` rewrite conditional on a full match, so a
+    minute- or hour-precision ``Z``-suffixed value that did not match fell
+    through to ``fromisoformat`` with a literal ``Z`` still attached — which
+    only 3.11+ accepts, reintroducing on 3.10 exactly the interpreter split
+    this PR exists to remove."""
     from spec_kitty_events.strict import _normalize_iso8601_shape, _parse_iso8601
 
     assert _normalize_iso8601_shape(value) == reshaped
@@ -491,6 +519,24 @@ def test_parse_iso8601_rejects_malformed_value() -> None:
     from spec_kitty_events.strict import _parse_iso8601
 
     assert _parse_iso8601("not a timestamp") is None
+
+
+def test_parse_iso8601_still_rejects_doubled_z_at_reduced_precision() -> None:
+    """Guards the incidental gain the squad flagged as worth keeping
+    (pass 2, 2026-08-27): closing the reduced-precision gap above must not
+    resurrect acceptance of a doubled trailing ``Z`` — the shape regex stays
+    fully anchored, so an unmatched value (extra trailing ``Z``) still
+    reaches ``fromisoformat`` unchanged and still raises, at every
+    precision, not only at second precision."""
+    from spec_kitty_events.strict import _normalize_iso8601_shape, _parse_iso8601
+
+    for value in (
+        "2026-01-01T00:00:00ZZ",
+        "2026-01-01T00:00ZZ",
+        "2026-01-01T00ZZ",
+    ):
+        assert _normalize_iso8601_shape(value) == value
+        assert _parse_iso8601(value) is None
 
 
 def test_t6_observation_payload_carries_ts_field_rejected() -> None:
