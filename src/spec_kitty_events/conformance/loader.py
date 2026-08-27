@@ -14,28 +14,39 @@ from typing import Any, Dict, List
 _FIXTURES_DIR = Path(__file__).parent / "fixtures"
 _MANIFEST_PATH = _FIXTURES_DIR / "manifest.json"
 
-_VALID_CATEGORIES = frozenset({
-    "events", "lane_mapping", "edge_cases",
-    "collaboration", "glossary", "mission_next",
-    "analytics",
-    "dossier", "mission_audit", "decisionpoint",
-    "connector",
-    "profile_invocation", "retrospective",  # 3.1.0
-    "harness_observation",  # F1-T1 (7.0.0)
-    "zeitgeist_attrs",  # E2: volatile mission/WP moment codecs
-    "status_diary",  # 8.1.0: status.events.jsonl diary reducer (issue #41)
-})
+_VALID_CATEGORIES = frozenset(
+    {
+        "events",
+        "lane_mapping",
+        "edge_cases",
+        "collaboration",
+        "glossary",
+        "mission_next",
+        "analytics",
+        "dossier",
+        "mission_audit",
+        "decisionpoint",
+        "connector",
+        "profile_invocation",
+        "retrospective",  # 3.1.0
+        "harness_observation",  # F1-T1 (7.0.0)
+        "zeitgeist_attrs",  # E2: volatile mission/WP moment codecs
+        "status_diary",  # 8.1.0: status.events.jsonl diary reducer (issue #41)
+    }
+)
 
 # Replay stream fixture type sentinel
 _REPLAY_STREAM_TYPE = "replay_stream"
 
 # Known special fixture types that load_fixtures() skips.
 # Typos in manifest fixture_type values will raise ValueError.
-_SPECIAL_FIXTURE_TYPES: frozenset[str] = frozenset({
-    "replay_stream",
-    "reducer_output",
-    "timestamp_semantics",
-})
+_SPECIAL_FIXTURE_TYPES: frozenset[str] = frozenset(
+    {
+        "replay_stream",
+        "reducer_output",
+        "timestamp_semantics",
+    }
+)
 
 
 @dataclass(frozen=True)
@@ -68,8 +79,7 @@ def load_fixtures(category: str) -> List[FixtureCase]:
     """
     if category not in _VALID_CATEGORIES:
         raise ValueError(
-            f"Unknown fixture category: {category!r}. "
-            f"Valid categories: {sorted(_VALID_CATEGORIES)}"
+            f"Unknown fixture category: {category!r}. Valid categories: {sorted(_VALID_CATEGORIES)}"
         )
 
     with open(_MANIFEST_PATH, "r", encoding="utf-8") as fh:
@@ -149,9 +159,7 @@ def load_replay_stream(fixture_id: str) -> List[Dict[str, Any]]:
             break
 
     if entry is None:
-        raise ValueError(
-            f"Replay stream fixture not found in manifest: {fixture_id!r}"
-        )
+        raise ValueError(f"Replay stream fixture not found in manifest: {fixture_id!r}")
 
     if entry.get("fixture_type") != _REPLAY_STREAM_TYPE:
         raise ValueError(
@@ -206,9 +214,7 @@ def load_reducer_output(fixture_id: str) -> dict[str, Any]:
             break
 
     if entry is None:
-        raise ValueError(
-            f"Reducer-output fixture not found in manifest: {fixture_id!r}"
-        )
+        raise ValueError(f"Reducer-output fixture not found in manifest: {fixture_id!r}")
 
     if entry.get("fixture_type") != "reducer_output":
         raise ValueError(

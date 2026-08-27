@@ -100,9 +100,9 @@ wp_code: WP02
 
          mission_id: str = Field(..., min_length=1, description="Mission context")
          scope_id: str = Field(..., min_length=1, description="Unique scope identifier")
-         scope_type: Literal[
-             "spec_kitty_core", "team_domain", "audience_domain", "mission_local"
-         ] = Field(..., description="Scope category")
+         scope_type: Literal["spec_kitty_core", "team_domain", "audience_domain", "mission_local"] = (
+             Field(..., description="Scope category")
+         )
          glossary_version_id: str = Field(
              ..., min_length=1, description="Version of the glossary being activated"
          )
@@ -125,12 +125,8 @@ wp_code: WP02
          mission_id: str = Field(..., min_length=1, description="Mission context")
          scope_id: str = Field(..., min_length=1, description="Scope the term was observed in")
          step_id: str = Field(..., min_length=1, description="Mission step that produced the term")
-         term_surface: str = Field(
-             ..., min_length=1, description="Raw text form of the observed term"
-         )
-         confidence: float = Field(
-             ..., ge=0.0, le=1.0, description="Confidence score (0.0–1.0)"
-         )
+         term_surface: str = Field(..., min_length=1, description="Raw text form of the observed term")
+         confidence: float = Field(..., ge=0.0, le=1.0, description="Confidence score (0.0–1.0)")
          actor: str = Field(..., min_length=1, description="Identity of the observing actor")
          step_metadata: Dict[str, str] = Field(
              default_factory=dict,

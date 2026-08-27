@@ -64,6 +64,7 @@ Introduce a structured `ValidationError` Pydantic model with a closed `Validatio
    ```python
    from enum import Enum
 
+
    class ValidationErrorCode(str, Enum):
        FORBIDDEN_KEY = "FORBIDDEN_KEY"
        UNKNOWN_LANE = "UNKNOWN_LANE"
@@ -77,6 +78,7 @@ Introduce a structured `ValidationError` Pydantic model with a closed `Validatio
    ```python
    from typing import Any
    from pydantic import BaseModel, ConfigDict
+
 
    class ValidationError(BaseModel):
        model_config = ConfigDict(extra="forbid", frozen=True)
@@ -94,6 +96,7 @@ Introduce a structured `ValidationError` Pydantic model with a closed `Validatio
 
    ```python
    from spec_kitty_events.validation_errors import ValidationError, ValidationErrorCode
+
    __all__ = [..., "ValidationError", "ValidationErrorCode"]
    ```
 
@@ -168,12 +171,14 @@ Introduce a structured `ValidationError` Pydantic model with a closed `Validatio
        lifecycle_error_to_validation_error,
    )
 
+
    def test_validation_error_minimum_fields():
        err = ValidationError(code=ValidationErrorCode.UNKNOWN_LANE, message="x")
        assert err.code == ValidationErrorCode.UNKNOWN_LANE
        assert err.message == "x"
        assert err.path == []
        assert err.details == {}
+
 
    def test_validation_error_full_fields():
        err = ValidationError(
@@ -184,18 +189,22 @@ Introduce a structured `ValidationError` Pydantic model with a closed `Validatio
        )
        assert err.path == ["payload", "tags", 2, "feature_slug"]
 
+
    def test_validation_error_rejects_extra_fields():
        with pytest.raises(Exception):
            ValidationError(code=ValidationErrorCode.UNKNOWN_LANE, message="x", extra=1)
+
 
    def test_validation_error_rejects_unknown_code():
        with pytest.raises(Exception):
            ValidationError(code="NOT_A_CODE", message="x")
 
+
    def test_validation_error_is_frozen():
        err = ValidationError(code=ValidationErrorCode.UNKNOWN_LANE, message="x")
        with pytest.raises(Exception):
            err.message = "y"
+
 
    def test_validation_error_codes_are_closed_set():
        expected = {
@@ -208,9 +217,14 @@ Introduce a structured `ValidationError` Pydantic model with a closed `Validatio
        actual = {member.value for member in ValidationErrorCode}
        assert actual == expected
 
+
    def test_determinism():
-       a = ValidationError(code=ValidationErrorCode.UNKNOWN_LANE, message="x", details={"a": 1, "b": 2})
-       b = ValidationError(code=ValidationErrorCode.UNKNOWN_LANE, message="x", details={"a": 1, "b": 2})
+       a = ValidationError(
+           code=ValidationErrorCode.UNKNOWN_LANE, message="x", details={"a": 1, "b": 2}
+       )
+       b = ValidationError(
+           code=ValidationErrorCode.UNKNOWN_LANE, message="x", details={"a": 1, "b": 2}
+       )
        assert a == b
        assert a.model_dump_json() == b.model_dump_json()
    ```

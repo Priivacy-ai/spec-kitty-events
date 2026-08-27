@@ -62,6 +62,7 @@ Per research (R1), Pydantic v2 generates JSON Schema Draft 2020-12. Each model p
 
 ```python
 """JSON Schema artifacts for spec-kitty-events models."""
+
 from __future__ import annotations
 
 import json
@@ -86,10 +87,7 @@ def load_schema(name: str) -> dict[str, Any]:
 
 def list_schemas() -> list[str]:
     """List all available schema names."""
-    return sorted(
-        p.stem.replace(".schema", "")
-        for p in _SCHEMA_DIR.glob("*.schema.json")
-    )
+    return sorted(p.stem.replace(".schema", "") for p in _SCHEMA_DIR.glob("*.schema.json"))
 ```
 
 3. Ensure all functions have proper type annotations for `mypy --strict`.
@@ -111,12 +109,16 @@ def list_schemas() -> list[str]:
    from pydantic import TypeAdapter
    from spec_kitty_events.models import Event
    from spec_kitty_events.status import (
-       Lane, SyncLaneV1, StatusTransitionPayload,
+       Lane,
+       SyncLaneV1,
+       StatusTransitionPayload,
    )
    from spec_kitty_events.gates import GatePassedPayload, GateFailedPayload
    from spec_kitty_events.lifecycle import (
-       MissionStartedPayload, MissionCompletedPayload,
-       MissionCancelledPayload, PhaseEnteredPayload,
+       MissionStartedPayload,
+       MissionCompletedPayload,
+       MissionCancelledPayload,
+       PhaseEnteredPayload,
        ReviewRollbackPayload,
    )
 

@@ -89,12 +89,14 @@ The validator is **key-only**: a string *value* that happens to equal a forbidde
 2. Define the constant:
 
    ```python
-   FORBIDDEN_LEGACY_KEYS: frozenset[str] = frozenset({
-       "feature_slug",
-       "feature_number",
-       "mission_key",
-       # ... add audit-derived keys here, with a # comment citing the source
-   })
+   FORBIDDEN_LEGACY_KEYS: frozenset[str] = frozenset(
+       {
+           "feature_slug",
+           "feature_number",
+           "mission_key",
+           # ... add audit-derived keys here, with a # comment citing the source
+       }
+   )
 
    FORBIDDEN_LEGACY_KEYS_VERSION: str = "v1"  # bump on membership change
    ```
@@ -104,6 +106,7 @@ The validator is **key-only**: a string *value* that happens to equal a forbidde
    ```python
    from typing import Any, Iterator
    from spec_kitty_events.validation_errors import ValidationError, ValidationErrorCode
+
 
    def find_forbidden_keys(
        data: Any,
@@ -133,10 +136,9 @@ The validator is **key-only**: a string *value* that happens to equal a forbidde
                yield from find_forbidden_keys(value, forbidden=forbidden, _path=key_path)
        elif isinstance(data, list):
            for index, element in enumerate(data):
-               yield from find_forbidden_keys(
-                   element, forbidden=forbidden, _path=path + [index]
-               )
+               yield from find_forbidden_keys(element, forbidden=forbidden, _path=path + [index])
        # primitives: no-op
+
 
    def validate_no_forbidden_keys(
        data: Any,
@@ -181,6 +183,7 @@ The validator is **key-only**: a string *value* that happens to equal a forbidde
    )
    from spec_kitty_events.validation_errors import ValidationErrorCode
 
+
    def test_top_level_forbidden_key():
        err = validate_no_forbidden_keys({"feature_slug": "x"})
        assert err is not None
@@ -188,16 +191,19 @@ The validator is **key-only**: a string *value* that happens to equal a forbidde
        assert err.path == ["feature_slug"]
        assert err.details == {"key": "feature_slug"}
 
+
    def test_depth_1_nested_forbidden_key():
        err = validate_no_forbidden_keys({"payload": {"feature_slug": "x"}})
        assert err is not None
        assert err.path == ["payload", "feature_slug"]
+
 
    def test_depth_3_nested_forbidden_key():
        data = {"a": {"b": {"c": {"mission_key": 1}}}}
        err = validate_no_forbidden_keys(data)
        assert err is not None
        assert err.path == ["a", "b", "c", "mission_key"]
+
 
    def test_depth_10_nested_forbidden_key():
        # Build a 10-deep nesting with the forbidden key at the bottom.
@@ -210,11 +216,13 @@ The validator is **key-only**: a string *value* that happens to equal a forbidde
        assert err.path[-1] == "feature_number"
        assert len(err.path) == 11  # 10 wrappers + the leaf key
 
+
    def test_array_element_forbidden_key():
        data = {"items": [{"ok": 1}, {"feature_slug": 2}]}
        err = validate_no_forbidden_keys(data)
        assert err is not None
        assert err.path == ["items", 1, "feature_slug"]
+
 
    def test_must_accept_when_forbidden_name_is_a_value():
        # The validator inspects KEYS only; a string VALUE that looks like
@@ -222,9 +230,11 @@ The validator is **key-only**: a string *value* that happens to equal a forbidde
        data = {"description": "see field feature_slug for legacy"}
        assert validate_no_forbidden_keys(data) is None
 
+
    def test_must_accept_clean_envelope():
        data = {"event_type": "MissionCreated", "payload": {"name": "x"}}
        assert validate_no_forbidden_keys(data) is None
+
 
    def test_seeded_keys_are_in_set():
        assert "feature_slug" in FORBIDDEN_LEGACY_KEYS
@@ -269,6 +279,7 @@ The validator is **key-only**: a string *value* that happens to equal a forbidde
        max_leaves=20,
    )
 
+
    def _contains_forbidden_key(data, forbidden=FORBIDDEN_LEGACY_KEYS):
        if isinstance(data, dict):
            if any(k in forbidden for k in data.keys()):
@@ -277,6 +288,7 @@ The validator is **key-only**: a string *value* that happens to equal a forbidde
        if isinstance(data, list):
            return any(_contains_forbidden_key(e, forbidden) for e in data)
        return False
+
 
    @given(json_like)
    def test_property_validator_agrees_with_oracle(data):
@@ -288,6 +300,7 @@ The validator is **key-only**: a string *value* that happens to equal a forbidde
        else:
            assert err is None
 
+
    @given(json_like)
    def test_property_determinism(data):
        a = validate_no_forbidden_keys(data)
@@ -298,11 +311,14 @@ The validator is **key-only**: a string *value* that happens to equal a forbidde
            assert b is not None
            assert a.model_dump_json() == b.model_dump_json()
 
-   @given(st.dictionaries(
-       st.sampled_from(sorted(FORBIDDEN_LEGACY_KEYS)),
-       st.text(),
-       min_size=1,
-   ))
+
+   @given(
+       st.dictionaries(
+           st.sampled_from(sorted(FORBIDDEN_LEGACY_KEYS)),
+           st.text(),
+           min_size=1,
+       )
+   )
    def test_property_any_forbidden_key_at_top_level_is_rejected(data):
        err = validate_no_forbidden_keys(data)
        assert err is not None
@@ -314,6 +330,7 @@ The validator is **key-only**: a string *value* that happens to equal a forbidde
 
    ```python
    from hypothesis import settings
+
    settings.register_profile("ci", max_examples=200, deadline=2000)
    settings.load_profile("ci")
    ```

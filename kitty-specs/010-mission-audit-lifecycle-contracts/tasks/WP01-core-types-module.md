@@ -80,13 +80,15 @@ Create the file `src/spec_kitty_events/mission_audit.py` with:
    MISSION_AUDIT_COMPLETED: str = "MissionAuditCompleted"
    MISSION_AUDIT_FAILED: str = "MissionAuditFailed"
 
-   MISSION_AUDIT_EVENT_TYPES: FrozenSet[str] = frozenset({
-       MISSION_AUDIT_REQUESTED,
-       MISSION_AUDIT_STARTED,
-       MISSION_AUDIT_DECISION_REQUESTED,
-       MISSION_AUDIT_COMPLETED,
-       MISSION_AUDIT_FAILED,
-   })
+   MISSION_AUDIT_EVENT_TYPES: FrozenSet[str] = frozenset(
+       {
+           MISSION_AUDIT_REQUESTED,
+           MISSION_AUDIT_STARTED,
+           MISSION_AUDIT_DECISION_REQUESTED,
+           MISSION_AUDIT_COMPLETED,
+           MISSION_AUDIT_FAILED,
+       }
+   )
    ```
 
 5. Enums (FR-008, FR-009, FR-010):
@@ -97,11 +99,13 @@ Create the file `src/spec_kitty_events/mission_audit.py` with:
        FAIL = "fail"
        BLOCKED_DECISION_REQUIRED = "blocked_decision_required"
 
+
    class AuditSeverity(str, Enum):
        INFO = "info"
        WARNING = "warning"
        ERROR = "error"
        CRITICAL = "critical"
+
 
    class AuditStatus(str, Enum):
        PENDING = "pending"
@@ -110,10 +114,13 @@ Create the file `src/spec_kitty_events/mission_audit.py` with:
        COMPLETED = "completed"
        FAILED = "failed"
 
-   TERMINAL_AUDIT_STATUSES: FrozenSet[AuditStatus] = frozenset({
-       AuditStatus.COMPLETED,
-       AuditStatus.FAILED,
-   })
+
+   TERMINAL_AUDIT_STATUSES: FrozenSet[AuditStatus] = frozenset(
+       {
+           AuditStatus.COMPLETED,
+           AuditStatus.FAILED,
+       }
+   )
    ```
 
 ### T002 — Add frozen value objects to `mission_audit.py`
@@ -124,6 +131,7 @@ Add the following frozen Pydantic models after the enums:
    ```python
    class AuditArtifactRef(BaseModel):
        """Links an audit report to its content hash and provenance."""
+
        model_config = ConfigDict(frozen=True)
 
        report_path: str = Field(..., min_length=1)
@@ -136,6 +144,7 @@ Add the following frozen Pydantic models after the enums:
    ```python
    class PendingDecision(BaseModel):
        """Tracks an unresolved decision checkpoint within the reducer."""
+
        model_config = ConfigDict(frozen=True)
 
        decision_id: str = Field(..., min_length=1)
@@ -214,7 +223,7 @@ Add each with `model_config = ConfigDict(frozen=True)`:
        verdict: AuditVerdict
        severity: AuditSeverity
        findings_count: int = Field(..., ge=0)
-       artifact_ref: AuditArtifactRef      # required — not Optional (FR-006)
+       artifact_ref: AuditArtifactRef  # required — not Optional (FR-006)
        summary: str
    ```
 

@@ -1,4 +1,5 @@
 """Unit tests for state-machine merge logic."""
+
 import uuid
 import pytest
 from datetime import datetime
@@ -55,7 +56,9 @@ class TestStateMachineMerge:
 
         resolution = state_machine_merge([e1, e2, e3], priority_map)
 
-        assert resolution.merged_event.event_id == "01HRN7QMQJT8XVKP9YZ2ABCDEG"  # e2 has highest priority
+        assert (
+            resolution.merged_event.event_id == "01HRN7QMQJT8XVKP9YZ2ABCDEG"
+        )  # e2 has highest priority
         assert resolution.merged_event.payload["state"] == "done"
         assert len(resolution.conflicting_events) == 3
 
@@ -315,6 +318,8 @@ class TestStateMachineMerge:
         # Using default state_key (no explicit parameter), should fallback to "status"
         resolution = state_machine_merge([e1, e2], priority_map)
 
-        assert resolution.merged_event.event_id == "01HRN7QMQJT8XVKP9YZ2ABCDEG"  # e2 has higher priority
+        assert (
+            resolution.merged_event.event_id == "01HRN7QMQJT8XVKP9YZ2ABCDEG"
+        )  # e2 has higher priority
         assert resolution.merged_event.payload["status"] == "done"
         assert len(resolution.conflicting_events) == 2

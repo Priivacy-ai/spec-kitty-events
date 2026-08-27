@@ -188,10 +188,20 @@ class TestConstants:
 class TestNormalizeLane:
     """Test normalize_lane function."""
 
-    @pytest.mark.parametrize("value", [
-        "planned", "claimed", "in_progress", "for_review", "in_review",
-        "approved", "done", "blocked", "canceled",
-    ])
+    @pytest.mark.parametrize(
+        "value",
+        [
+            "planned",
+            "claimed",
+            "in_progress",
+            "for_review",
+            "in_review",
+            "approved",
+            "done",
+            "blocked",
+            "canceled",
+        ],
+    )
     def test_canonical_values(self, value: str) -> None:
         result = normalize_lane(value)
         assert result.value == value
@@ -634,30 +644,22 @@ class TestGenesisLane:
 
     def test_genesis_to_planned_is_valid(self) -> None:
         """The finalize-tasks seed is a first-class allowed transition."""
-        result = validate_transition(
-            _make_payload(from_lane=Lane.GENESIS, to_lane=Lane.PLANNED)
-        )
+        result = validate_transition(_make_payload(from_lane=Lane.GENESIS, to_lane=Lane.PLANNED))
         assert result.valid is True, result.violations
         assert (Lane.GENESIS, Lane.PLANNED) in _ALLOWED_TRANSITIONS
 
     def test_genesis_to_canceled_is_valid(self) -> None:
-        result = validate_transition(
-            _make_payload(from_lane=Lane.GENESIS, to_lane=Lane.CANCELED)
-        )
+        result = validate_transition(_make_payload(from_lane=Lane.GENESIS, to_lane=Lane.CANCELED))
         assert result.valid is True, result.violations
 
     def test_genesis_to_claimed_is_rejected(self) -> None:
         """Genesis may only be seeded to planned, never claimed directly."""
-        result = validate_transition(
-            _make_payload(from_lane=Lane.GENESIS, to_lane=Lane.CLAIMED)
-        )
+        result = validate_transition(_make_payload(from_lane=Lane.GENESIS, to_lane=Lane.CLAIMED))
         assert result.valid is False
 
     def test_transition_into_genesis_is_rejected(self) -> None:
         """No lane transitions *into* genesis; it is an origin-only state."""
-        result = validate_transition(
-            _make_payload(from_lane=Lane.PLANNED, to_lane=Lane.GENESIS)
-        )
+        result = validate_transition(_make_payload(from_lane=Lane.PLANNED, to_lane=Lane.GENESIS))
         assert result.valid is False
 
     def test_genesis_maps_to_planned_in_sync_v1_and_v2(self) -> None:
@@ -1044,13 +1046,17 @@ class TestStatusEventSortKey:
         t1 = datetime(2026, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
         t2 = datetime(2026, 1, 1, 0, 0, 1, tzinfo=timezone.utc)
         e1 = _make_event("01HV0000000000000000000002", "WP01", None, Lane.PLANNED, 1, timestamp=t1)
-        e2 = _make_event("01HV0000000000000000000001", "WP01", Lane.PLANNED, Lane.CLAIMED, 1, timestamp=t2)
+        e2 = _make_event(
+            "01HV0000000000000000000001", "WP01", Lane.PLANNED, Lane.CLAIMED, 1, timestamp=t2
+        )
         assert status_event_sort_key(e1) < status_event_sort_key(e2)
 
     def test_tiebreak_by_event_id(self) -> None:
         t = datetime(2026, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
         e1 = _make_event("01HV0000000000000000000001", "WP01", None, Lane.PLANNED, 1, timestamp=t)
-        e2 = _make_event("01HV0000000000000000000002", "WP01", Lane.PLANNED, Lane.CLAIMED, 1, timestamp=t)
+        e2 = _make_event(
+            "01HV0000000000000000000002", "WP01", Lane.PLANNED, Lane.CLAIMED, 1, timestamp=t
+        )
         assert status_event_sort_key(e1) < status_event_sort_key(e2)
 
 
@@ -1101,17 +1107,48 @@ class TestReduceStatusEvents:
             review=ReviewVerdict(reviewer="alice", verdict="approved"),
         )
         events = [
-            _make_event("01HV0000000000000000000001", "WP01", None, Lane.PLANNED, 1, timestamp=base_t),
-            _make_event("01HV0000000000000000000002", "WP01", Lane.PLANNED, Lane.CLAIMED, 2, timestamp=base_t + timedelta(seconds=1)),
-            _make_event("01HV0000000000000000000003", "WP01", Lane.CLAIMED, Lane.IN_PROGRESS, 3, timestamp=base_t + timedelta(seconds=2)),
-            _make_event("01HV0000000000000000000004", "WP01", Lane.IN_PROGRESS, Lane.FOR_REVIEW, 4, timestamp=base_t + timedelta(seconds=3)),
             _make_event(
-                "01HV0000000000000000000005", "WP01", Lane.FOR_REVIEW, Lane.APPROVED, 5,
+                "01HV0000000000000000000001", "WP01", None, Lane.PLANNED, 1, timestamp=base_t
+            ),
+            _make_event(
+                "01HV0000000000000000000002",
+                "WP01",
+                Lane.PLANNED,
+                Lane.CLAIMED,
+                2,
+                timestamp=base_t + timedelta(seconds=1),
+            ),
+            _make_event(
+                "01HV0000000000000000000003",
+                "WP01",
+                Lane.CLAIMED,
+                Lane.IN_PROGRESS,
+                3,
+                timestamp=base_t + timedelta(seconds=2),
+            ),
+            _make_event(
+                "01HV0000000000000000000004",
+                "WP01",
+                Lane.IN_PROGRESS,
+                Lane.FOR_REVIEW,
+                4,
+                timestamp=base_t + timedelta(seconds=3),
+            ),
+            _make_event(
+                "01HV0000000000000000000005",
+                "WP01",
+                Lane.FOR_REVIEW,
+                Lane.APPROVED,
+                5,
                 timestamp=base_t + timedelta(seconds=4),
                 evidence=evidence,
             ),
             _make_event(
-                "01HV0000000000000000000006", "WP01", Lane.APPROVED, Lane.DONE, 6,
+                "01HV0000000000000000000006",
+                "WP01",
+                Lane.APPROVED,
+                Lane.DONE,
+                6,
                 timestamp=base_t + timedelta(seconds=5),
                 evidence=evidence,
             ),
@@ -1129,10 +1166,34 @@ class TestReduceStatusEvents:
         base_t = datetime(2026, 1, 1, tzinfo=timezone.utc)
         evidence = _make_evidence()
         events = [
-            _make_event("01HV0000000000000000000101", "WP01", None, Lane.PLANNED, 1, timestamp=base_t),
-            _make_event("01HV0000000000000000000102", "WP01", Lane.PLANNED, Lane.CLAIMED, 2, timestamp=base_t + timedelta(seconds=1)),
-            _make_event("01HV0000000000000000000103", "WP01", Lane.CLAIMED, Lane.IN_PROGRESS, 3, timestamp=base_t + timedelta(seconds=2)),
-            _make_event("01HV0000000000000000000104", "WP01", Lane.IN_PROGRESS, Lane.APPROVED, 4, timestamp=base_t + timedelta(seconds=3), evidence=evidence),
+            _make_event(
+                "01HV0000000000000000000101", "WP01", None, Lane.PLANNED, 1, timestamp=base_t
+            ),
+            _make_event(
+                "01HV0000000000000000000102",
+                "WP01",
+                Lane.PLANNED,
+                Lane.CLAIMED,
+                2,
+                timestamp=base_t + timedelta(seconds=1),
+            ),
+            _make_event(
+                "01HV0000000000000000000103",
+                "WP01",
+                Lane.CLAIMED,
+                Lane.IN_PROGRESS,
+                3,
+                timestamp=base_t + timedelta(seconds=2),
+            ),
+            _make_event(
+                "01HV0000000000000000000104",
+                "WP01",
+                Lane.IN_PROGRESS,
+                Lane.APPROVED,
+                4,
+                timestamp=base_t + timedelta(seconds=3),
+                evidence=evidence,
+            ),
         ]
         result = reduce_status_events(events)
         assert result.wp_states["WP01"].current_lane == Lane.APPROVED
@@ -1141,10 +1202,33 @@ class TestReduceStatusEvents:
         """Interleaved events for WP01 and WP02."""
         base_t = datetime(2026, 1, 1, tzinfo=timezone.utc)
         events = [
-            _make_event("01HV0000000000000000000001", "WP01", None, Lane.PLANNED, 1, timestamp=base_t),
-            _make_event("01HV0000000000000000000002", "WP02", None, Lane.PLANNED, 2, timestamp=base_t + timedelta(seconds=1)),
-            _make_event("01HV0000000000000000000003", "WP01", Lane.PLANNED, Lane.CLAIMED, 3, timestamp=base_t + timedelta(seconds=2)),
-            _make_event("01HV0000000000000000000004", "WP02", Lane.PLANNED, Lane.CLAIMED, 4, timestamp=base_t + timedelta(seconds=3)),
+            _make_event(
+                "01HV0000000000000000000001", "WP01", None, Lane.PLANNED, 1, timestamp=base_t
+            ),
+            _make_event(
+                "01HV0000000000000000000002",
+                "WP02",
+                None,
+                Lane.PLANNED,
+                2,
+                timestamp=base_t + timedelta(seconds=1),
+            ),
+            _make_event(
+                "01HV0000000000000000000003",
+                "WP01",
+                Lane.PLANNED,
+                Lane.CLAIMED,
+                3,
+                timestamp=base_t + timedelta(seconds=2),
+            ),
+            _make_event(
+                "01HV0000000000000000000004",
+                "WP02",
+                Lane.PLANNED,
+                Lane.CLAIMED,
+                4,
+                timestamp=base_t + timedelta(seconds=3),
+            ),
         ]
         result = reduce_status_events(events)
         assert len(result.wp_states) == 2
@@ -1180,9 +1264,18 @@ class TestReduceStatusEvents:
         """Jump planned -> done without force/evidence -> anomaly."""
         base_t = datetime(2026, 1, 1, tzinfo=timezone.utc)
         # First set up WP01 at PLANNED
-        e1 = _make_event("01HV0000000000000000000001", "WP01", None, Lane.PLANNED, 1, timestamp=base_t)
+        e1 = _make_event(
+            "01HV0000000000000000000001", "WP01", None, Lane.PLANNED, 1, timestamp=base_t
+        )
         # Try illegal jump: planned -> for_review (skipping claimed/in_progress)
-        e2 = _make_event("01HV0000000000000000000002", "WP01", Lane.PLANNED, Lane.FOR_REVIEW, 2, timestamp=base_t + timedelta(seconds=1))
+        e2 = _make_event(
+            "01HV0000000000000000000002",
+            "WP01",
+            Lane.PLANNED,
+            Lane.FOR_REVIEW,
+            2,
+            timestamp=base_t + timedelta(seconds=1),
+        )
         result = reduce_status_events([e1, e2])
         assert len(result.anomalies) == 1
         assert result.anomalies[0].wp_id == "WP01"
@@ -1217,9 +1310,18 @@ class TestReduceStatusEvents:
     def test_from_lane_mismatch_flagged(self) -> None:
         """Event claims from_lane=claimed when WP is in planned -> anomaly."""
         base_t = datetime(2026, 1, 1, tzinfo=timezone.utc)
-        e1 = _make_event("01HV0000000000000000000001", "WP01", None, Lane.PLANNED, 1, timestamp=base_t)
+        e1 = _make_event(
+            "01HV0000000000000000000001", "WP01", None, Lane.PLANNED, 1, timestamp=base_t
+        )
         # Claims from_lane=claimed but WP is actually in planned
-        e2 = _make_event("01HV0000000000000000000002", "WP01", Lane.CLAIMED, Lane.IN_PROGRESS, 2, timestamp=base_t + timedelta(seconds=1))
+        e2 = _make_event(
+            "01HV0000000000000000000002",
+            "WP01",
+            Lane.CLAIMED,
+            Lane.IN_PROGRESS,
+            2,
+            timestamp=base_t + timedelta(seconds=1),
+        )
         result = reduce_status_events([e1, e2])
         assert len(result.anomalies) == 1
         assert "mismatch" in result.anomalies[0].reason
@@ -1240,19 +1342,50 @@ class TestReduceStatusEvents:
         )
         # Build up to FOR_REVIEW
         events = [
-            _make_event("01HV0000000000000000000001", "WP01", None, Lane.PLANNED, 1, timestamp=base_t),
-            _make_event("01HV0000000000000000000002", "WP01", Lane.PLANNED, Lane.CLAIMED, 2, timestamp=base_t + timedelta(seconds=1)),
-            _make_event("01HV0000000000000000000003", "WP01", Lane.CLAIMED, Lane.IN_PROGRESS, 3, timestamp=base_t + timedelta(seconds=2)),
-            _make_event("01HV0000000000000000000004", "WP01", Lane.IN_PROGRESS, Lane.FOR_REVIEW, 4, timestamp=base_t + timedelta(seconds=3)),
+            _make_event(
+                "01HV0000000000000000000001", "WP01", None, Lane.PLANNED, 1, timestamp=base_t
+            ),
+            _make_event(
+                "01HV0000000000000000000002",
+                "WP01",
+                Lane.PLANNED,
+                Lane.CLAIMED,
+                2,
+                timestamp=base_t + timedelta(seconds=1),
+            ),
+            _make_event(
+                "01HV0000000000000000000003",
+                "WP01",
+                Lane.CLAIMED,
+                Lane.IN_PROGRESS,
+                3,
+                timestamp=base_t + timedelta(seconds=2),
+            ),
+            _make_event(
+                "01HV0000000000000000000004",
+                "WP01",
+                Lane.IN_PROGRESS,
+                Lane.FOR_REVIEW,
+                4,
+                timestamp=base_t + timedelta(seconds=3),
+            ),
         ]
         # Two concurrent events at same lamport_clock=5
         e_done = _make_event(
-            "01HV0000000000000000000005", "WP01", Lane.FOR_REVIEW, Lane.DONE, 5,
+            "01HV0000000000000000000005",
+            "WP01",
+            Lane.FOR_REVIEW,
+            Lane.DONE,
+            5,
             timestamp=base_t + timedelta(seconds=4),
             evidence=evidence,
         )
         e_rollback = _make_event(
-            "01HV0000000000000000000006", "WP01", Lane.FOR_REVIEW, Lane.IN_PROGRESS, 5,
+            "01HV0000000000000000000006",
+            "WP01",
+            Lane.FOR_REVIEW,
+            Lane.IN_PROGRESS,
+            5,
             timestamp=base_t + timedelta(seconds=4),
             review_ref="PR#42",
         )
@@ -1269,21 +1402,56 @@ class TestReduceStatusEvents:
             review=ReviewVerdict(reviewer="alice", verdict="approved"),
         )
         events = [
-            _make_event("01HV0000000000000000000010", "WP01", None, Lane.PLANNED, 1, timestamp=base_t),
-            _make_event("01HV0000000000000000000011", "WP01", Lane.PLANNED, Lane.CLAIMED, 2, timestamp=base_t + timedelta(seconds=1)),
-            _make_event("01HV0000000000000000000012", "WP01", Lane.CLAIMED, Lane.IN_PROGRESS, 3, timestamp=base_t + timedelta(seconds=2)),
-            _make_event("01HV0000000000000000000013", "WP01", Lane.IN_PROGRESS, Lane.FOR_REVIEW, 4, timestamp=base_t + timedelta(seconds=3)),
             _make_event(
-                "01HV0000000000000000000014", "WP01", Lane.FOR_REVIEW, Lane.DONE, 5,
+                "01HV0000000000000000000010", "WP01", None, Lane.PLANNED, 1, timestamp=base_t
+            ),
+            _make_event(
+                "01HV0000000000000000000011",
+                "WP01",
+                Lane.PLANNED,
+                Lane.CLAIMED,
+                2,
+                timestamp=base_t + timedelta(seconds=1),
+            ),
+            _make_event(
+                "01HV0000000000000000000012",
+                "WP01",
+                Lane.CLAIMED,
+                Lane.IN_PROGRESS,
+                3,
+                timestamp=base_t + timedelta(seconds=2),
+            ),
+            _make_event(
+                "01HV0000000000000000000013",
+                "WP01",
+                Lane.IN_PROGRESS,
+                Lane.FOR_REVIEW,
+                4,
+                timestamp=base_t + timedelta(seconds=3),
+            ),
+            _make_event(
+                "01HV0000000000000000000014",
+                "WP01",
+                Lane.FOR_REVIEW,
+                Lane.DONE,
+                5,
                 timestamp=base_t + timedelta(seconds=4),
                 evidence=evidence,
             ),
             _make_event(
-                "01HV0000000000000000000015", "WP02", None, Lane.PLANNED, 5,
+                "01HV0000000000000000000015",
+                "WP02",
+                None,
+                Lane.PLANNED,
+                5,
                 timestamp=base_t + timedelta(seconds=5),
             ),
             _make_event(
-                "01HV0000000000000000000016", "WP01", Lane.FOR_REVIEW, Lane.IN_PROGRESS, 5,
+                "01HV0000000000000000000016",
+                "WP01",
+                Lane.FOR_REVIEW,
+                Lane.IN_PROGRESS,
+                5,
                 timestamp=base_t + timedelta(seconds=6),
                 review_ref="PR#42",
             ),
@@ -1295,10 +1463,21 @@ class TestReduceStatusEvents:
         """Verify count matches unique status events."""
         base_t = datetime(2026, 1, 1, tzinfo=timezone.utc)
         events = [
-            _make_event("01HV0000000000000000000001", "WP01", None, Lane.PLANNED, 1, timestamp=base_t),
-            _make_event("01HV0000000000000000000002", "WP01", Lane.PLANNED, Lane.CLAIMED, 2, timestamp=base_t + timedelta(seconds=1)),
+            _make_event(
+                "01HV0000000000000000000001", "WP01", None, Lane.PLANNED, 1, timestamp=base_t
+            ),
+            _make_event(
+                "01HV0000000000000000000002",
+                "WP01",
+                Lane.PLANNED,
+                Lane.CLAIMED,
+                2,
+                timestamp=base_t + timedelta(seconds=1),
+            ),
             # Duplicate of first event
-            _make_event("01HV0000000000000000000001", "WP01", None, Lane.PLANNED, 1, timestamp=base_t),
+            _make_event(
+                "01HV0000000000000000000001", "WP01", None, Lane.PLANNED, 1, timestamp=base_t
+            ),
         ]
         result = reduce_status_events(events)
         assert result.event_count == 2  # deduped
@@ -1307,8 +1486,17 @@ class TestReduceStatusEvents:
         """Verify it's the last event in sorted order."""
         base_t = datetime(2026, 1, 1, tzinfo=timezone.utc)
         events = [
-            _make_event("01HV0000000000000000000001", "WP01", None, Lane.PLANNED, 1, timestamp=base_t),
-            _make_event("01HV0000000000000000000002", "WP01", Lane.PLANNED, Lane.CLAIMED, 2, timestamp=base_t + timedelta(seconds=1)),
+            _make_event(
+                "01HV0000000000000000000001", "WP01", None, Lane.PLANNED, 1, timestamp=base_t
+            ),
+            _make_event(
+                "01HV0000000000000000000002",
+                "WP01",
+                Lane.PLANNED,
+                Lane.CLAIMED,
+                2,
+                timestamp=base_t + timedelta(seconds=1),
+            ),
         ]
         result = reduce_status_events(events)
         assert result.last_processed_event_id == "01HV0000000000000000000002"
@@ -1480,10 +1668,34 @@ class TestBootstrapPlannedInitializeOnly:
             review=ReviewVerdict(reviewer="alice", verdict="approved"),
         )
         return [
-            _make_event("01HV0000000000000000B00001", wp_id, None, Lane.PLANNED, 1, timestamp=base_t),
-            _make_event("01HV0000000000000000B00002", wp_id, Lane.PLANNED, Lane.CLAIMED, 2, timestamp=base_t + timedelta(seconds=1)),
-            _make_event("01HV0000000000000000B00003", wp_id, Lane.CLAIMED, Lane.IN_PROGRESS, 3, timestamp=base_t + timedelta(seconds=2)),
-            _make_event("01HV0000000000000000B00004", wp_id, Lane.IN_PROGRESS, Lane.APPROVED, 4, timestamp=base_t + timedelta(seconds=3), evidence=evidence),
+            _make_event(
+                "01HV0000000000000000B00001", wp_id, None, Lane.PLANNED, 1, timestamp=base_t
+            ),
+            _make_event(
+                "01HV0000000000000000B00002",
+                wp_id,
+                Lane.PLANNED,
+                Lane.CLAIMED,
+                2,
+                timestamp=base_t + timedelta(seconds=1),
+            ),
+            _make_event(
+                "01HV0000000000000000B00003",
+                wp_id,
+                Lane.CLAIMED,
+                Lane.IN_PROGRESS,
+                3,
+                timestamp=base_t + timedelta(seconds=2),
+            ),
+            _make_event(
+                "01HV0000000000000000B00004",
+                wp_id,
+                Lane.IN_PROGRESS,
+                Lane.APPROVED,
+                4,
+                timestamp=base_t + timedelta(seconds=3),
+                evidence=evidence,
+            ),
         ]
 
     def test_late_bootstrap_planned_planned_does_not_regress_approved(self) -> None:
@@ -1505,8 +1717,7 @@ class TestBootstrapPlannedInitializeOnly:
         assert result.wp_states["WP01"].last_event_id == "01HV0000000000000000B00004"
         # The ignored bootstrap is surfaced as an anomaly for observability.
         assert any(
-            a.event_id == "01HV0000000000000000B00099"
-            and "bootstrap planned ignored" in a.reason
+            a.event_id == "01HV0000000000000000B00099" and "bootstrap planned ignored" in a.reason
             for a in result.anomalies
         )
 
@@ -1535,11 +1746,42 @@ class TestBootstrapPlannedInitializeOnly:
             review=ReviewVerdict(reviewer="alice", verdict="approved"),
         )
         prior = [
-            _make_event("01HV0000000000000000C00001", "WP01", None, Lane.PLANNED, 1, timestamp=base_t),
-            _make_event("01HV0000000000000000C00002", "WP01", Lane.PLANNED, Lane.CLAIMED, 2, timestamp=base_t + timedelta(seconds=1)),
-            _make_event("01HV0000000000000000C00003", "WP01", Lane.CLAIMED, Lane.IN_PROGRESS, 3, timestamp=base_t + timedelta(seconds=2)),
-            _make_event("01HV0000000000000000C00004", "WP01", Lane.IN_PROGRESS, Lane.FOR_REVIEW, 4, timestamp=base_t + timedelta(seconds=3)),
-            _make_event("01HV0000000000000000C00005", "WP01", Lane.FOR_REVIEW, Lane.DONE, 5, timestamp=base_t + timedelta(seconds=4), evidence=evidence),
+            _make_event(
+                "01HV0000000000000000C00001", "WP01", None, Lane.PLANNED, 1, timestamp=base_t
+            ),
+            _make_event(
+                "01HV0000000000000000C00002",
+                "WP01",
+                Lane.PLANNED,
+                Lane.CLAIMED,
+                2,
+                timestamp=base_t + timedelta(seconds=1),
+            ),
+            _make_event(
+                "01HV0000000000000000C00003",
+                "WP01",
+                Lane.CLAIMED,
+                Lane.IN_PROGRESS,
+                3,
+                timestamp=base_t + timedelta(seconds=2),
+            ),
+            _make_event(
+                "01HV0000000000000000C00004",
+                "WP01",
+                Lane.IN_PROGRESS,
+                Lane.FOR_REVIEW,
+                4,
+                timestamp=base_t + timedelta(seconds=3),
+            ),
+            _make_event(
+                "01HV0000000000000000C00005",
+                "WP01",
+                Lane.FOR_REVIEW,
+                Lane.DONE,
+                5,
+                timestamp=base_t + timedelta(seconds=4),
+                evidence=evidence,
+            ),
         ]
         late_bootstrap = _make_event(
             "01HV0000000000000000C00099",
@@ -1691,8 +1933,7 @@ class TestReviewRejectionFamily:
         )
         result = validate_transition(payload)
         assert result.valid is True, (
-            f"Expected forced {from_lane} -> planned to be valid; "
-            f"violations: {result.violations}"
+            f"Expected forced {from_lane} -> planned to be valid; violations: {result.violations}"
         )
         assert result.violations == ()
 
@@ -1711,8 +1952,7 @@ class TestReviewRejectionFamily:
         assert result.valid is False
         assert len(result.violations) >= 1
         assert any("force" in v or from_lane in v for v in result.violations), (
-            f"Expected violation to mention 'force' or '{from_lane}'; "
-            f"got: {result.violations}"
+            f"Expected violation to mention 'force' or '{from_lane}'; got: {result.violations}"
         )
 
     def test_forced_backward_without_reason_rejected(self, from_lane: str) -> None:
@@ -1767,17 +2007,13 @@ class TestReviewRejectionFamily:
             f"Expected unforced {from_lane} -> planned to be invalid; "
             f"violations: {result.violations}"
         )
-        assert any(
-            "force=True" in v and "review-rejection" in v
-            for v in result.violations
-        ), (
+        assert any("force=True" in v and "review-rejection" in v for v in result.violations), (
             f"Expected a violation containing both 'force=True' and "
             f"'review-rejection'; got: {result.violations}"
         )
 
     def test_forced_rollback_with_reason_is_accepted(self, from_lane: str) -> None:
-        """force=True + reason + review_ref is valid for every family member.
-        """
+        """force=True + reason + review_ref is valid for every family member."""
         payload = StatusTransitionPayload(
             **{
                 **VALID_TRANSITION_DATA,
@@ -1793,8 +2029,7 @@ class TestReviewRejectionFamily:
         )
         result = validate_transition(payload)
         assert result.valid is True, (
-            f"Expected forced {from_lane} -> planned to be valid; "
-            f"violations: {result.violations}"
+            f"Expected forced {from_lane} -> planned to be valid; violations: {result.violations}"
         )
 
 
@@ -1812,9 +2047,7 @@ def test_bootstrap_planned_is_not_review_rejection() -> None:
         }
     )
     result = validate_transition(payload)
-    assert result.valid is True, (
-        f"Bootstrap-planned must validate; violations: {result.violations}"
-    )
+    assert result.valid is True, f"Bootstrap-planned must validate; violations: {result.violations}"
     assert not any("force=True" in v for v in result.violations), (
         f"Bootstrap-planned must not surface a force=True family violation; "
         f"got: {result.violations}"
@@ -1841,9 +2074,11 @@ def test_review_rejection_family_has_exactly_four_pairs() -> None:
         f"FR-004 says exactly 4 pairs; got {len(_REVIEW_REJECTION_FAMILY)}: "
         f"{sorted(_REVIEW_REJECTION_FAMILY)}"
     )
-    assert _REVIEW_REJECTION_FAMILY == frozenset({
-        (Lane.IN_PROGRESS, Lane.PLANNED),
-        (Lane.FOR_REVIEW, Lane.PLANNED),
-        (Lane.IN_REVIEW, Lane.PLANNED),
-        (Lane.APPROVED, Lane.PLANNED),
-    })
+    assert _REVIEW_REJECTION_FAMILY == frozenset(
+        {
+            (Lane.IN_PROGRESS, Lane.PLANNED),
+            (Lane.FOR_REVIEW, Lane.PLANNED),
+            (Lane.IN_REVIEW, Lane.PLANNED),
+            (Lane.APPROVED, Lane.PLANNED),
+        }
+    )

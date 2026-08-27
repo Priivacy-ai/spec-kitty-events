@@ -116,13 +116,9 @@ class ThreadRef(BaseModel):
 
     model_config = ConfigDict(frozen=True, extra="forbid")
 
-    slack_team_id: Optional[str] = Field(
-        None, description="Slack workspace team identifier"
-    )
+    slack_team_id: Optional[str] = Field(None, description="Slack workspace team identifier")
     channel_id: str = Field(..., min_length=1, description="Slack channel identifier")
-    thread_ts: str = Field(
-        ..., min_length=1, description="Thread timestamp (Slack ts format)"
-    )
+    thread_ts: str = Field(..., min_length=1, description="Thread timestamp (Slack ts format)")
     url: Optional[str] = Field(None, description="Permalink URL to the thread")
 
 
@@ -132,12 +128,8 @@ class ClosureMessageRef(BaseModel):
     model_config = ConfigDict(frozen=True, extra="forbid")
 
     channel_id: str = Field(..., min_length=1, description="Slack channel identifier")
-    thread_ts: str = Field(
-        ..., min_length=1, description="Thread timestamp (Slack ts format)"
-    )
-    message_ts: str = Field(
-        ..., min_length=1, description="Message timestamp (Slack ts format)"
-    )
+    thread_ts: str = Field(..., min_length=1, description="Thread timestamp (Slack ts format)")
+    message_ts: str = Field(..., min_length=1, description="Message timestamp (Slack ts format)")
     url: Optional[str] = Field(None, description="Permalink URL to the message")
 
 
@@ -151,18 +143,12 @@ class WideningProjection(BaseModel):
 
     model_config = ConfigDict(frozen=True, extra="forbid")
 
-    channel: WideningChannel = Field(
-        ..., description="Channel used for widening"
-    )
-    teamspace_ref: TeamspaceRef = Field(
-        ..., description="Teamspace the widening was sent to"
-    )
+    channel: WideningChannel = Field(..., description="Channel used for widening")
+    teamspace_ref: TeamspaceRef = Field(..., description="Teamspace the widening was sent to")
     default_channel_ref: DefaultChannelRef = Field(
         ..., description="Default channel in the teamspace"
     )
-    thread_ref: ThreadRef = Field(
-        ..., description="Slack thread created for widening"
-    )
+    thread_ref: ThreadRef = Field(..., description="Slack thread created for widening")
     invited_participants: Tuple["ParticipantIdentity", ...] = Field(
         ..., description="Participants invited during widening"
     )

@@ -236,9 +236,7 @@ def _build_collaboration_sequence(
                         "participant_id": ack_pid,
                         "mission_id": _MISSION_ID,
                         "warning_id": warn_id,
-                        "acknowledgement": rng.choice(
-                            ["continue", "hold", "reassign", "defer"]
-                        ),
+                        "acknowledgement": rng.choice(["continue", "hold", "reassign", "defer"]),
                     },
                     timestamp=base_time + timedelta(seconds=clock),
                     build_id="test-build",
@@ -277,15 +275,11 @@ def _build_collaboration_sequence(
     return events, roster
 
 
-def _shuffle_preserving_causal_order(
-    events: List[Event], rng: random.Random
-) -> List[Event]:
+def _shuffle_preserving_causal_order(events: List[Event], rng: random.Random) -> List[Event]:
     """Shuffle events while preserving causal order (Lamport clock)."""
     sorted_events = sorted(events, key=lambda e: e.lamport_clock)
     groups: List[List[Event]] = []
-    for _clock, group_iter in groupby(
-        sorted_events, key=lambda e: e.lamport_clock
-    ):
+    for _clock, group_iter in groupby(sorted_events, key=lambda e: e.lamport_clock):
         group = list(group_iter)
         rng.shuffle(group)
         groups.append(group)
@@ -306,12 +300,8 @@ def test_reducer_determinism_strict_mode(seed: int) -> None:
 
     shuffled = _shuffle_preserving_causal_order(list(events), random.Random(seed + 1))
 
-    result_original = reduce_collaboration_events(
-        events, mode="strict", roster=roster
-    )
-    result_shuffled = reduce_collaboration_events(
-        shuffled, mode="strict", roster=roster
-    )
+    result_original = reduce_collaboration_events(events, mode="strict", roster=roster)
+    result_shuffled = reduce_collaboration_events(shuffled, mode="strict", roster=roster)
 
     assert result_original == result_shuffled
 
@@ -327,12 +317,8 @@ def test_reducer_determinism_permissive_mode(seed: int) -> None:
 
     shuffled = _shuffle_preserving_causal_order(list(events), random.Random(seed + 1))
 
-    result_original = reduce_collaboration_events(
-        events, mode="permissive", roster=roster
-    )
-    result_shuffled = reduce_collaboration_events(
-        shuffled, mode="permissive", roster=roster
-    )
+    result_original = reduce_collaboration_events(events, mode="permissive", roster=roster)
+    result_shuffled = reduce_collaboration_events(shuffled, mode="permissive", roster=roster)
 
     assert result_original == result_shuffled
 
@@ -352,12 +338,8 @@ def test_idempotent_dedup_property(seed: int) -> None:
         if rng.random() < 0.5:
             duplicated.append(event)
 
-    result_original = reduce_collaboration_events(
-        events, mode="strict", roster=roster
-    )
-    result_duplicated = reduce_collaboration_events(
-        duplicated, mode="strict", roster=roster
-    )
+    result_original = reduce_collaboration_events(events, mode="strict", roster=roster)
+    result_duplicated = reduce_collaboration_events(duplicated, mode="strict", roster=roster)
 
     assert result_original.event_count == result_duplicated.event_count
     assert result_original.participants == result_duplicated.participants

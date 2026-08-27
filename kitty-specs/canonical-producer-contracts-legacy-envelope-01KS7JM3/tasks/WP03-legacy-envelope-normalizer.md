@@ -144,18 +144,18 @@ from pydantic import BaseModel, ConfigDict, Field
 
 LEGACY_ENVELOPE_CONTRACT_NAME: str = "legacy_envelope_v1"
 
-RECOGNIZED_LEGACY_SHAPES: FrozenSet[str] = frozenset({
-    "pre_3_0_envelope",
-    "feature_keys_envelope",
-    "awaiting_review_synonym",
-})
+RECOGNIZED_LEGACY_SHAPES: FrozenSet[str] = frozenset(
+    {
+        "pre_3_0_envelope",
+        "feature_keys_envelope",
+        "awaiting_review_synonym",
+    }
+)
 
 # UUID namespace used when minting deterministic project_uuid values for
 # pre-3.0 envelopes that lack one. Constant so the mapping is reproducible
 # across processes.
-_LEGACY_NAMESPACE: uuid.UUID = uuid.uuid5(
-    uuid.NAMESPACE_URL, "spec-kitty-events/legacy"
-)
+_LEGACY_NAMESPACE: uuid.UUID = uuid.uuid5(uuid.NAMESPACE_URL, "spec-kitty-events/legacy")
 ```
 
 ### T014 — Implement result types
@@ -171,11 +171,10 @@ class NormalizedEnvelope(BaseModel):
     canonical: Dict[str, Any] = Field(
         ..., description="Canonical-shape event ready for validate_event(strict=True)."
     )
-    raw: Dict[str, Any] = Field(
-        ..., description="Original raw input retained verbatim for audit."
-    )
+    raw: Dict[str, Any] = Field(..., description="Original raw input retained verbatim for audit.")
     legacy_shape: str = Field(
-        ..., min_length=1,
+        ...,
+        min_length=1,
         description="Which named shape detector matched. Member of RECOGNIZED_LEGACY_SHAPES.",
     )
 
@@ -186,7 +185,8 @@ class UnnormalizableLegacyDiagnostic(BaseModel):
     model_config = ConfigDict(frozen=True, extra="forbid")
 
     reason: str = Field(
-        ..., min_length=1,
+        ...,
+        min_length=1,
         description="Machine-readable reason code (e.g. 'pre_3_0_envelope_missing_identity').",
     )
     shape_hints: List[str] = Field(
@@ -194,7 +194,8 @@ class UnnormalizableLegacyDiagnostic(BaseModel):
         description="Free-form hints describing why normalization failed.",
     )
     raw: Dict[str, Any] = Field(
-        ..., description="Original raw input retained verbatim for audit.",
+        ...,
+        description="Original raw input retained verbatim for audit.",
     )
 
 
@@ -226,8 +227,9 @@ class LegacyEnvelopeNormalizer:
         ):
             node_id = raw.get("node_id")
             build_id = raw.get("build_id")
-            if not (isinstance(node_id, str) and isinstance(build_id, str)
-                    and node_id and build_id):
+            if not (
+                isinstance(node_id, str) and isinstance(build_id, str) and node_id and build_id
+            ):
                 hints: List[str] = []
                 if not (isinstance(node_id, str) and node_id):
                     hints.append("missing node_id")
@@ -239,9 +241,7 @@ class LegacyEnvelopeNormalizer:
                     raw=raw_event,
                 )
             canonical = dict(raw)
-            canonical["project_uuid"] = str(uuid.uuid5(
-                _LEGACY_NAMESPACE, f"{node_id}/{build_id}"
-            ))
+            canonical["project_uuid"] = str(uuid.uuid5(_LEGACY_NAMESPACE, f"{node_id}/{build_id}"))
             canonical.setdefault("schema_version", "3.0.0")
             if "correlation_id" not in canonical and isinstance(canonical.get("event_id"), str):
                 canonical["correlation_id"] = canonical["event_id"]
@@ -387,6 +387,7 @@ Note: the pyargs entrypoint already excludes fixtures whose `event_type == "Lane
 
 Covers FR-006..FR-009, NFR-003 (determinism), and the idempotency guarantee.
 """
+
 from __future__ import annotations
 
 import json
@@ -402,7 +403,9 @@ from spec_kitty_events.legacy import (
     UnnormalizableLegacyDiagnostic,
 )
 
-_FIXTURES = Path(__file__).resolve().parents[2] / "src/spec_kitty_events/conformance/fixtures/legacy"
+_FIXTURES = (
+    Path(__file__).resolve().parents[2] / "src/spec_kitty_events/conformance/fixtures/legacy"
+)
 
 
 def _read_fixture(name: str) -> dict:
@@ -415,9 +418,13 @@ def test_contract_name_is_legacy_envelope_v1() -> None:
 
 def test_recognized_shapes_is_frozenset() -> None:
     assert isinstance(RECOGNIZED_LEGACY_SHAPES, frozenset)
-    assert RECOGNIZED_LEGACY_SHAPES == frozenset({
-        "pre_3_0_envelope", "feature_keys_envelope", "awaiting_review_synonym",
-    })
+    assert RECOGNIZED_LEGACY_SHAPES == frozenset(
+        {
+            "pre_3_0_envelope",
+            "feature_keys_envelope",
+            "awaiting_review_synonym",
+        }
+    )
 
 
 def test_normalize_pre_3_0_envelope_synthesizes_canonical() -> None:

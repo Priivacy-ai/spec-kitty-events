@@ -1,4 +1,5 @@
 """Error logging system for tracking failed actions (Manus pattern)."""
+
 from typing import List
 from spec_kitty_events.storage import ErrorStorage
 from spec_kitty_events.models import ErrorEntry

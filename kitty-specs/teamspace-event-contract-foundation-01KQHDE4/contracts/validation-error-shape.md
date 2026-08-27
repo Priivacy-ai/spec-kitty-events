@@ -11,10 +11,10 @@ Every rejection produced by the contract package returns a `ValidationError` wit
 
 ```python
 class ValidationError(BaseModel):
-    code: ValidationErrorCode      # closed enum (str-backed)
-    message: str                   # one-line human-readable summary
-    path: list[str | int]          # JSON-pointer-like; [] denotes root
-    details: dict[str, Any] = {}   # class-specific structured detail
+    code: ValidationErrorCode  # closed enum (str-backed)
+    message: str  # one-line human-readable summary
+    path: list[str | int]  # JSON-pointer-like; [] denotes root
+    details: dict[str, Any] = {}  # class-specific structured detail
     model_config = ConfigDict(extra="forbid")
 ```
 

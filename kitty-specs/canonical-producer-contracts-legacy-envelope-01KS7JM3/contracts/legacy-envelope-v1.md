@@ -16,8 +16,8 @@ from spec_kitty_events.legacy import (
     NormalizedEnvelope,
     UnnormalizableLegacyDiagnostic,
     NormalizationResult,
-    LEGACY_ENVELOPE_CONTRACT_NAME,        # "legacy_envelope_v1"
-    RECOGNIZED_LEGACY_SHAPES,             # frozenset of named shapes
+    LEGACY_ENVELOPE_CONTRACT_NAME,  # "legacy_envelope_v1"
+    RECOGNIZED_LEGACY_SHAPES,  # frozenset of named shapes
 )
 ```
 

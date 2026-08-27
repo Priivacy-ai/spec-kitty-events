@@ -13,14 +13,14 @@ class GatePayloadBase(BaseModel):
 
     model_config = ConfigDict(frozen=True)
 
-    gate_name: str                    # e.g., "ci/build", "ci/lint"
-    gate_type: Literal["ci"]          # constrained
-    conclusion: str                   # raw conclusion from provider
+    gate_name: str  # e.g., "ci/build", "ci/lint"
+    gate_type: Literal["ci"]  # constrained
+    conclusion: str  # raw conclusion from provider
     external_provider: Literal["github"]  # constrained
-    check_run_id: int                 # GitHub check run ID (> 0)
-    check_run_url: AnyHttpUrl         # GitHub check run URL
-    delivery_id: str                  # webhook delivery ID (idempotency key)
-    pr_number: Optional[int]          # PR number if applicable (> 0 or None)
+    check_run_id: int  # GitHub check run ID (> 0)
+    check_run_url: AnyHttpUrl  # GitHub check run URL
+    delivery_id: str  # webhook delivery ID (idempotency key)
+    pr_number: Optional[int]  # PR number if applicable (> 0 or None)
 ```
 
 #### `GatePassedPayload(GatePayloadBase)`
@@ -28,6 +28,7 @@ class GatePayloadBase(BaseModel):
 ```python
 class GatePassedPayload(GatePayloadBase):
     """Payload for a CI gate that concluded successfully."""
+
     pass
 ```
 
@@ -36,6 +37,7 @@ class GatePassedPayload(GatePayloadBase):
 ```python
 class GateFailedPayload(GatePayloadBase):
     """Payload for a CI gate that concluded with a failure condition."""
+
     pass
 ```
 

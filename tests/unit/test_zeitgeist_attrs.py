@@ -103,13 +103,24 @@ def _identity() -> RuntimeActorIdentity:
 
 def test_volatile_vocabulary_is_the_ephemeral_design_set() -> None:
     assert VOLATILE_EVENT_TYPES == {
-        "WPStatusChanged", "MissionCreated", "MissionClosed", "PhaseEntered",
-        "MissionRunStarted", "NextStepIssued", "NextStepAutoCompleted",
-        "DecisionInputRequested", "DecisionInputAnswered", "MissionRunCompleted",
-        "DecisionPointOpened", "DecisionPointResolved",
-        "SpecifyStarted", "SpecifyCompleted",
-        "PlanStarted", "PlanCompleted",
-        "TasksStarted", "TasksCompleted",
+        "WPStatusChanged",
+        "MissionCreated",
+        "MissionClosed",
+        "PhaseEntered",
+        "MissionRunStarted",
+        "NextStepIssued",
+        "NextStepAutoCompleted",
+        "DecisionInputRequested",
+        "DecisionInputAnswered",
+        "MissionRunCompleted",
+        "DecisionPointOpened",
+        "DecisionPointResolved",
+        "SpecifyStarted",
+        "SpecifyCompleted",
+        "PlanStarted",
+        "PlanCompleted",
+        "TasksStarted",
+        "TasksCompleted",
     }
 
 
@@ -171,9 +182,7 @@ def test_oversize_display_name_never_drops_the_moment() -> None:
         actor_type="service",
         display_name="Dr. " + "X" * 250,
     )
-    payload = MissionRunStartedPayload(
-        run_id="run-01", mission_type="software-dev", actor=identity
-    )
+    payload = MissionRunStartedPayload(run_id="run-01", mission_type="software-dev", actor=identity)
     attrs = to_zeitgeist_attrs(payload, _envelope("MissionRunStarted"))
     assert attrs["actor"] == "svc-1"
     assert "Dr." not in " ".join(attrs.values())
@@ -306,8 +315,7 @@ def test_envelope_identity_leads_the_projection() -> None:
 
 def test_occurred_at_comes_from_the_envelope_not_receipt_time() -> None:
     envelope = _envelope("MissionClosed")
-    payload = MissionClosedPayload(mission_slug="s", mission_number=1,
-                                   mission_type="software-dev")
+    payload = MissionClosedPayload(mission_slug="s", mission_number=1, mission_type="software-dev")
     attrs = to_zeitgeist_attrs(payload, envelope)
     assert attrs["occurred_at"] == envelope.timestamp.isoformat()
 
@@ -342,8 +350,13 @@ def test_absent_optionals_emit_no_key() -> None:
 def test_structured_actor_projects_to_actor_label() -> None:
     structured = _transition(actor={"role": "implementer", "profile": "ox"})
     plain = _transition(actor=structured.actor_label)
-    assert to_zeitgeist_attrs(structured, _envelope("WPStatusChanged"))["actor"] == structured.actor_label
-    assert to_zeitgeist_attrs(plain, _envelope("WPStatusChanged"))["actor"] == structured.actor_label
+    assert (
+        to_zeitgeist_attrs(structured, _envelope("WPStatusChanged"))["actor"]
+        == structured.actor_label
+    )
+    assert (
+        to_zeitgeist_attrs(plain, _envelope("WPStatusChanged"))["actor"] == structured.actor_label
+    )
 
 
 def test_mission_run_actor_rides_as_one_label_never_as_identity_breakdown() -> None:
@@ -380,8 +393,10 @@ def test_mission_level_actor_rides_as_an_opaque_identifier() -> None:
     assert moment.attrs["actor"] == "rob@robshouse.net"
 
     closed = MissionClosedPayload(
-        mission_slug="demo-mission", mission_number=12,
-        mission_type="software-dev", actor="merge-agent",
+        mission_slug="demo-mission",
+        mission_number=12,
+        mission_type="software-dev",
+        actor="merge-agent",
     )
     closed_attrs = to_zeitgeist_attrs(closed, _envelope("MissionClosed"))
     assert closed_attrs["actor"] == "merge-agent"
@@ -403,9 +418,7 @@ def test_mission_run_identity_keys_admitted_both_directions() -> None:
     moment = from_zeitgeist_attrs("MissionRunStarted", attrs)
     assert moment.attrs["mission_slug"] == "demo-mission"
 
-    bare = MissionRunStartedPayload(
-        run_id="run-01", mission_type="software-dev", actor=_identity()
-    )
+    bare = MissionRunStartedPayload(run_id="run-01", mission_type="software-dev", actor=_identity())
     bare_attrs = to_zeitgeist_attrs(bare, _envelope("MissionRunStarted"))
     assert "mission_id" not in bare_attrs and "mission_slug" not in bare_attrs
 
@@ -415,11 +428,12 @@ def test_no_volatile_projection_emits_dotted_keys() -> None:
     asserted identity sneaks past a flat-key check."""
     payloads = [
         (_transition(actor={"role": "implementer", "profile": "ox"}), "WPStatusChanged"),
-        (MissionRunStartedPayload(run_id="r", mission_type="t", actor=_identity()), "MissionRunStarted"),
         (
-            NextStepIssuedPayload(
-                run_id="r", step_id="s", agent_id="a", actor=_identity()
-            ),
+            MissionRunStartedPayload(run_id="r", mission_type="t", actor=_identity()),
+            "MissionRunStarted",
+        ),
+        (
+            NextStepIssuedPayload(run_id="r", step_id="s", agent_id="a", actor=_identity()),
             "NextStepIssued",
         ),
         (
@@ -430,14 +444,23 @@ def test_no_volatile_projection_emits_dotted_keys() -> None:
         ),
         (
             DecisionInputRequestedPayload(
-                run_id="r", decision_id="d", step_id="s", question="Ship?",
-                options=("yes",), actor=_identity(),
+                run_id="r",
+                decision_id="d",
+                step_id="s",
+                question="Ship?",
+                options=("yes",),
+                actor=_identity(),
             ),
             "DecisionInputRequested",
         ),
         (
-            __import__("spec_kitty_events.mission_next", fromlist=["DecisionInputAnsweredPayload"]).DecisionInputAnsweredPayload(
-                run_id="r", decision_id="d", answer="yes", actor=_identity(),
+            __import__(
+                "spec_kitty_events.mission_next", fromlist=["DecisionInputAnsweredPayload"]
+            ).DecisionInputAnsweredPayload(
+                run_id="r",
+                decision_id="d",
+                answer="yes",
+                actor=_identity(),
             ),
             "DecisionInputAnswered",
         ),
@@ -485,15 +508,20 @@ def test_prose_never_reaches_the_broadcast() -> None:
 
 def test_decision_question_and_answer_stay_local() -> None:
     requested = DecisionInputRequestedPayload(
-        run_id="run-01", decision_id="dec-01", step_id="step-07",
-        question="Ship WP01 to done now?", options=("yes", "no"),
+        run_id="run-01",
+        decision_id="dec-01",
+        step_id="step-07",
+        question="Ship WP01 to done now?",
+        options=("yes", "no"),
         actor=_identity(),
     )
     attrs = to_zeitgeist_attrs(requested, _envelope("DecisionInputRequested"))
     assert "question" not in attrs and "options" not in attrs
 
     answered = DecisionInputAnsweredPayload(
-        run_id="run-01", decision_id="dec-01", answer="yes, but keep it quiet",
+        run_id="run-01",
+        decision_id="dec-01",
+        answer="yes, but keep it quiet",
         actor=_identity(),
     )
     attrs = to_zeitgeist_attrs(answered, _envelope("DecisionInputAnswered"))
@@ -504,8 +532,7 @@ def test_decision_question_and_answer_stay_local() -> None:
 def test_unknown_payload_type_fails_closed() -> None:
     with pytest.raises(UnknownVolatileEventTypeError):
         to_zeitgeist_attrs(
-            MissionStartedPayload(mission_id="m1", mission_type="t",
-                                  initial_phase="p", actor="a"),
+            MissionStartedPayload(mission_id="m1", mission_type="t", initial_phase="p", actor="a"),
             _envelope("MissionStarted"),
         )
     with pytest.raises(UnknownVolatileEventTypeError):
@@ -513,8 +540,9 @@ def test_unknown_payload_type_fails_closed() -> None:
 
 
 def test_oversize_value_raises_rather_than_truncating() -> None:
-    payload = MissionClosedPayload(mission_slug="s" * 241, mission_number=1,
-                                   mission_type="software-dev")
+    payload = MissionClosedPayload(
+        mission_slug="s" * 241, mission_number=1, mission_type="software-dev"
+    )
     with pytest.raises(ZeitgeistAttrsOverflowError):
         to_zeitgeist_attrs(payload, _envelope("MissionClosed"))
 
@@ -563,7 +591,8 @@ def test_unbroadcast_evidence_never_appears_in_attrs() -> None:
         from_lane="for_review",
         evidence=DoneEvidence(
             repos=[RepoEvidence(repo="r", branch="b", commit="c")],
-            verification=[], review=ReviewVerdict(reviewer="robert", verdict="ok"),
+            verification=[],
+            review=ReviewVerdict(reviewer="robert", verdict="ok"),
         ),
     )
     attrs = to_zeitgeist_attrs(payload, _envelope("WPStatusChanged"))
@@ -574,8 +603,7 @@ def test_value_types_without_an_encoding_fail_closed() -> None:
     """The encoder handles str/int/bool/str-Enum/nested models only. If a
     future field introduces any other scalar (float, datetime, ...), emit
     refuses rather than guessing an encoding."""
-    payload = MissionClosedPayload(mission_slug="s", mission_number=1,
-                                   mission_type="software-dev")
+    payload = MissionClosedPayload(mission_slug="s", mission_number=1, mission_type="software-dev")
     object.__setattr__(payload, "mission_number", 1.5)  # bypass frozen: force an exotic type
     with pytest.raises(UnencodableFieldValueError):
         to_zeitgeist_attrs(payload, _envelope("MissionClosed"))
@@ -621,7 +649,9 @@ def test_phase_entered_ref_derives_from_mission_id_when_slug_is_absent() -> None
     identity (PhaseEnteredPayload's own field description). A valid payload
     without the compat field must still yield a ref."""
     payload = PhaseEnteredPayload(
-        mission_id="mission-demo", phase_name="build", actor="robert",
+        mission_id="mission-demo",
+        phase_name="build",
+        actor="robert",
         mission_slug=None,
     )
     assert zeitgeist_ref_for("PhaseEntered", payload) == "mission-demo"
@@ -631,7 +661,9 @@ def test_phase_entered_ref_ignores_mission_slug_when_present() -> None:
     """mission_id is the identity regardless of the compat field's value —
     ref derivation does not silently prefer the display slug."""
     payload = PhaseEnteredPayload(
-        mission_id="mission-demo", phase_name="build", actor="robert",
+        mission_id="mission-demo",
+        phase_name="build",
+        actor="robert",
         mission_slug="a-totally-different-slug",
     )
     assert zeitgeist_ref_for("PhaseEntered", payload) == "mission-demo"
@@ -678,9 +710,7 @@ def test_encode_rejects_a_key_over_the_64_char_bound(
     """Regression pin for spec-kitty-events#16: a >64-char key must not
     reach the wire, even though it is well under the 240-byte value bound
     the old combined scan checked it against."""
-    monkeypatch.setattr(
-        zeitgeist_attrs, "_encode_fields", lambda *a, **k: {"a" * 65: "v"}
-    )
+    monkeypatch.setattr(zeitgeist_attrs, "_encode_fields", lambda *a, **k: {"a" * 65: "v"})
     with pytest.raises(ZeitgeistAttrsOverflowError):
         to_zeitgeist_attrs(_transition(), _envelope("WPStatusChanged"))
 
@@ -717,8 +747,7 @@ def test_decode_returns_the_validated_moment() -> None:
     payload = _transition(from_lane="planned")
     attrs = to_zeitgeist_attrs(payload, _envelope("WPStatusChanged"))
     moment = from_zeitgeist_attrs("WPStatusChanged", attrs)
-    assert moment == VolatileMoment(kind="WPStatusChanged", ref="demo-mission",
-                                    attrs=dict(attrs))
+    assert moment == VolatileMoment(kind="WPStatusChanged", ref="demo-mission", attrs=dict(attrs))
 
 
 def test_decode_admits_envelope_identity_attrs() -> None:
@@ -742,9 +771,7 @@ def test_decode_rejects_empty_event_id() -> None:
         from_zeitgeist_attrs("WPStatusChanged", attrs)
 
 
-@pytest.mark.parametrize(
-    "bad_event_id", ["x", "not-a-ulid", "../../etc/passwd", "I" * 26]
-)
+@pytest.mark.parametrize("bad_event_id", ["x", "not-a-ulid", "../../etc/passwd", "I" * 26])
 def test_decode_rejects_an_event_id_that_is_not_a_ulid_or_uuid(
     bad_event_id: str,
 ) -> None:
@@ -985,7 +1012,8 @@ def test_decode_rejects_a_key_over_the_64_char_bound(
 ) -> None:
     long_key = "a" * 65
     monkeypatch.setattr(
-        zeitgeist_attrs, "_ALLOWED_KEYS_BY_EVENT_TYPE",
+        zeitgeist_attrs,
+        "_ALLOWED_KEYS_BY_EVENT_TYPE",
         dict(zeitgeist_attrs._ALLOWED_KEYS_BY_EVENT_TYPE),
     )
     monkeypatch.setitem(
@@ -1030,8 +1058,11 @@ def test_decode_forbidden_guard_catches_a_nested_dotted_key(
 def test_decode_key_count_overflow_is_rejected(monkeypatch: pytest.MonkeyPatch) -> None:
     """Decode-side bound: more entries than the frame allows never decode,
     regardless of how small each one is."""
-    monkeypatch.setattr(zeitgeist_attrs, "_ALLOWED_KEYS_BY_EVENT_TYPE",
-                        dict(zeitgeist_attrs._ALLOWED_KEYS_BY_EVENT_TYPE))
+    monkeypatch.setattr(
+        zeitgeist_attrs,
+        "_ALLOWED_KEYS_BY_EVENT_TYPE",
+        dict(zeitgeist_attrs._ALLOWED_KEYS_BY_EVENT_TYPE),
+    )
     monkeypatch.setitem(
         zeitgeist_attrs._ALLOWED_KEYS_BY_EVENT_TYPE,
         "WPStatusChanged",
@@ -1072,9 +1103,7 @@ def test_decode_tolerates_the_optional_compat_field_absent_and_still_derives_ref
     not ``None``."""
     from spec_kitty_events.lifecycle import PhaseEnteredPayload
 
-    payload = PhaseEnteredPayload(
-        mission_id="mission-demo", phase_name="build", actor="robert"
-    )
+    payload = PhaseEnteredPayload(mission_id="mission-demo", phase_name="build", actor="robert")
     attrs = to_zeitgeist_attrs(payload, _envelope("PhaseEntered"))
     assert "mission_slug" not in attrs
     moment = from_zeitgeist_attrs("PhaseEntered", attrs)

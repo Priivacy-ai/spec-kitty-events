@@ -192,18 +192,30 @@ wp_code: WP10
   4. Verify exports: In a Python session or test:
      ```python
      from spec_kitty_events import (
-         GLOSSARY_SCOPE_ACTIVATED, TERM_CANDIDATE_OBSERVED,
-         SEMANTIC_CHECK_EVALUATED, GLOSSARY_CLARIFICATION_REQUESTED,
-         GLOSSARY_CLARIFICATION_RESOLVED, GLOSSARY_SENSE_UPDATED,
-         GENERATION_BLOCKED_BY_SEMANTIC_CONFLICT, GLOSSARY_STRICTNESS_SET,
-         GLOSSARY_EVENT_TYPES, SemanticConflictEntry,
-         GlossaryScopeActivatedPayload, TermCandidateObservedPayload,
-         SemanticCheckEvaluatedPayload, GlossaryClarificationRequestedPayload,
-         GlossaryClarificationResolvedPayload, GlossarySenseUpdatedPayload,
-         GenerationBlockedBySemanticConflictPayload, GlossaryStrictnessSetPayload,
-         GlossaryAnomaly, ClarificationRecord, ReducedGlossaryState,
+         GLOSSARY_SCOPE_ACTIVATED,
+         TERM_CANDIDATE_OBSERVED,
+         SEMANTIC_CHECK_EVALUATED,
+         GLOSSARY_CLARIFICATION_REQUESTED,
+         GLOSSARY_CLARIFICATION_RESOLVED,
+         GLOSSARY_SENSE_UPDATED,
+         GENERATION_BLOCKED_BY_SEMANTIC_CONFLICT,
+         GLOSSARY_STRICTNESS_SET,
+         GLOSSARY_EVENT_TYPES,
+         SemanticConflictEntry,
+         GlossaryScopeActivatedPayload,
+         TermCandidateObservedPayload,
+         SemanticCheckEvaluatedPayload,
+         GlossaryClarificationRequestedPayload,
+         GlossaryClarificationResolvedPayload,
+         GlossarySenseUpdatedPayload,
+         GenerationBlockedBySemanticConflictPayload,
+         GlossaryStrictnessSetPayload,
+         GlossaryAnomaly,
+         ClarificationRecord,
+         ReducedGlossaryState,
          reduce_glossary_events,
      )
+
      assert len(GLOSSARY_EVENT_TYPES) == 8
      ```
   5. If any check fails, fix and re-run.

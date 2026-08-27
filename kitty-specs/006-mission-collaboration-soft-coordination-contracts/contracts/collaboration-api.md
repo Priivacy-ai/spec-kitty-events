@@ -33,24 +33,29 @@ COLLABORATION_EVENT_TYPES: frozenset[str]  # All 14 values
 ```python
 class ParticipantIdentity(BaseModel):
     """SaaS-minted, mission-scoped participant identity."""
+
     model_config = ConfigDict(frozen=True)
-    participant_id: str      # min_length=1
-    participant_type: str    # Literal["human", "llm_context"]
+    participant_id: str  # min_length=1
+    participant_type: str  # Literal["human", "llm_context"]
     display_name: str | None = None
     session_id: str | None = None
 
+
 class AuthPrincipalBinding(BaseModel):
     """Roster-level auth principal → participant binding."""
+
     model_config = ConfigDict(frozen=True)
-    auth_principal_id: str   # min_length=1
-    participant_id: str      # min_length=1
+    auth_principal_id: str  # min_length=1
+    participant_id: str  # min_length=1
     bound_at: datetime
+
 
 class FocusTarget(BaseModel):
     """Structured focus reference. Hashable for use as dict key."""
+
     model_config = ConfigDict(frozen=True)
-    target_type: str         # Literal["wp", "step", "file"]
-    target_id: str           # min_length=1
+    target_type: str  # Literal["wp", "step", "file"]
+    target_id: str  # min_length=1
 ```
 
 ### Reducer
@@ -97,6 +102,7 @@ def reduce_collaboration_events(
 ```python
 class UnknownParticipantError(SpecKittyEventsError):
     """Raised in strict mode for events from non-rostered participants."""
+
     participant_id: str
     event_id: str
     event_type: str
@@ -147,30 +153,80 @@ All symbols exported from `spec_kitty_events.__init__`:
 
 ```python
 # Collaboration constants (15)
-"PARTICIPANT_INVITED", "PARTICIPANT_JOINED", "PARTICIPANT_LEFT",
-"PRESENCE_HEARTBEAT", "DRIVE_INTENT_SET", "FOCUS_CHANGED",
-"PROMPT_STEP_EXECUTION_STARTED", "PROMPT_STEP_EXECUTION_COMPLETED",
-"CONCURRENT_DRIVER_WARNING", "POTENTIAL_STEP_COLLISION_DETECTED",
-"WARNING_ACKNOWLEDGED", "COMMENT_POSTED", "DECISION_CAPTURED",
-"SESSION_LINKED", "COLLABORATION_EVENT_TYPES",
+(
+    "PARTICIPANT_INVITED",
+    "PARTICIPANT_JOINED",
+    "PARTICIPANT_LEFT",
+)
+(
+    "PRESENCE_HEARTBEAT",
+    "DRIVE_INTENT_SET",
+    "FOCUS_CHANGED",
+)
+(
+    "PROMPT_STEP_EXECUTION_STARTED",
+    "PROMPT_STEP_EXECUTION_COMPLETED",
+)
+(
+    "CONCURRENT_DRIVER_WARNING",
+    "POTENTIAL_STEP_COLLISION_DETECTED",
+)
+(
+    "WARNING_ACKNOWLEDGED",
+    "COMMENT_POSTED",
+    "DECISION_CAPTURED",
+)
+(
+    "SESSION_LINKED",
+    "COLLABORATION_EVENT_TYPES",
+)
 
 # Collaboration identity models (3)
-"ParticipantIdentity", "AuthPrincipalBinding", "FocusTarget",
+(
+    "ParticipantIdentity",
+    "AuthPrincipalBinding",
+    "FocusTarget",
+)
 
 # Collaboration payload models (14)
-"ParticipantInvitedPayload", "ParticipantJoinedPayload",
-"ParticipantLeftPayload", "PresenceHeartbeatPayload",
-"DriveIntentSetPayload", "FocusChangedPayload",
-"PromptStepExecutionStartedPayload", "PromptStepExecutionCompletedPayload",
-"ConcurrentDriverWarningPayload", "PotentialStepCollisionDetectedPayload",
-"WarningAcknowledgedPayload", "CommentPostedPayload",
-"DecisionCapturedPayload", "SessionLinkedPayload",
+(
+    "ParticipantInvitedPayload",
+    "ParticipantJoinedPayload",
+)
+(
+    "ParticipantLeftPayload",
+    "PresenceHeartbeatPayload",
+)
+(
+    "DriveIntentSetPayload",
+    "FocusChangedPayload",
+)
+(
+    "PromptStepExecutionStartedPayload",
+    "PromptStepExecutionCompletedPayload",
+)
+(
+    "ConcurrentDriverWarningPayload",
+    "PotentialStepCollisionDetectedPayload",
+)
+(
+    "WarningAcknowledgedPayload",
+    "CommentPostedPayload",
+)
+(
+    "DecisionCapturedPayload",
+    "SessionLinkedPayload",
+)
 
 # Collaboration reducer output (3)
-"ReducedCollaborationState", "CollaborationAnomaly", "UnknownParticipantError",
+(
+    "ReducedCollaborationState",
+    "CollaborationAnomaly",
+    "UnknownParticipantError",
+)
 
 # Collaboration reducer function (1)
-"reduce_collaboration_events",
+("reduce_collaboration_events",)
 ```
 
 **Total new exports**: 36 symbols

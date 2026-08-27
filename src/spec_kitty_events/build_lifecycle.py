@@ -21,10 +21,12 @@ from pydantic import BaseModel, ConfigDict, Field
 BUILD_REGISTERED: str = "BuildRegistered"
 BUILD_HEARTBEAT: str = "BuildHeartbeat"
 
-BUILD_LIFECYCLE_EVENT_TYPES: FrozenSet[str] = frozenset({
-    BUILD_REGISTERED,
-    BUILD_HEARTBEAT,
-})
+BUILD_LIFECYCLE_EVENT_TYPES: FrozenSet[str] = frozenset(
+    {
+        BUILD_REGISTERED,
+        BUILD_HEARTBEAT,
+    }
+)
 
 
 class BuildRegisteredPayload(BaseModel):
@@ -57,9 +59,7 @@ class BuildHeartbeatPayload(BaseModel):
 
     model_config = ConfigDict(frozen=True, extra="forbid")
 
-    repo_slug: Optional[str] = Field(
-        None, min_length=1, description="Git repository slug."
-    )
+    repo_slug: Optional[str] = Field(None, min_length=1, description="Git repository slug.")
     git_branch: Optional[str] = Field(
         None, min_length=1, description="Active git branch at heartbeat time."
     )
@@ -72,9 +72,7 @@ class BuildHeartbeatPayload(BaseModel):
     ahead_of_remote: Optional[int] = Field(
         None, ge=0, description="Local commits ahead of the remote."
     )
-    behind_remote: Optional[int] = Field(
-        None, ge=0, description="Local commits behind the remote."
-    )
+    behind_remote: Optional[int] = Field(None, ge=0, description="Local commits behind the remote.")
     recent_commits: Optional[List[str]] = Field(
         None, description="Recent local commit SHAs (most-recent-first)."
     )

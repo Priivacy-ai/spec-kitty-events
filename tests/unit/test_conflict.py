@@ -1,4 +1,5 @@
 """Unit tests for conflict detection."""
+
 import uuid
 import pytest
 from datetime import datetime

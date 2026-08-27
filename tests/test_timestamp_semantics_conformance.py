@@ -42,9 +42,7 @@ def _parse_iso(value: str) -> datetime:
 
 def test_old_producer_recent_receipt_helper_passes() -> None:
     """The "old producer, recent receipt" scenario must pass when the consumer preserves producer time."""
-    fixture = load_timestamp_semantics_fixture(
-        "old_producer_recent_receipt", expectation="valid"
-    )
+    fixture = load_timestamp_semantics_fixture("old_producer_recent_receipt", expectation="valid")
     envelope = fixture["envelope"]
     persisted = _parse_iso(fixture["consumer_simulation"]["persisted_occurrence_time"])
     # Sanity: receipt time and producer time differ by ~134 days.
@@ -76,9 +74,7 @@ def test_consumer_substituted_receipt_time_helper_raises() -> None:
     expected_producer = _parse_iso(envelope["timestamp"])
 
     with pytest.raises(TimestampSubstitutionError) as exc_info:
-        assert_producer_occurrence_preserved(
-            envelope, persisted, field_name="last_event_at"
-        )
+        assert_producer_occurrence_preserved(envelope, persisted, field_name="last_event_at")
 
     err = exc_info.value
     assert err.field_name == "last_event_at"
@@ -118,9 +114,7 @@ def test_helper_accepts_event_instance() -> None:
         project_slug=None,
         correlation_id="01J6XW9KQT7M0YB3N4R5CQZ2EX",
     )
-    assert_producer_occurrence_preserved(
-        event, datetime(2026, 1, 1, tzinfo=timezone.utc)
-    )
+    assert_producer_occurrence_preserved(event, datetime(2026, 1, 1, tzinfo=timezone.utc))
 
 
 def test_helper_envelope_with_datetime_value() -> None:
@@ -133,9 +127,7 @@ def test_helper_envelope_with_datetime_value() -> None:
 def test_helper_handles_z_suffix_iso_string() -> None:
     """ISO-8601 with a trailing 'Z' is normalised correctly (Python 3.10 compat)."""
     envelope = {"timestamp": "2026-01-01T00:00:00Z"}
-    assert_producer_occurrence_preserved(
-        envelope, datetime(2026, 1, 1, tzinfo=timezone.utc)
-    )
+    assert_producer_occurrence_preserved(envelope, datetime(2026, 1, 1, tzinfo=timezone.utc))
 
 
 def test_helper_raises_on_one_second_drift() -> None:

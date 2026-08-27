@@ -1,4 +1,5 @@
 """Shared pytest fixtures for all tests."""
+
 import pytest
 from datetime import datetime, timezone
 from typing import Any

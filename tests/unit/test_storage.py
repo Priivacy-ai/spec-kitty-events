@@ -1,4 +1,5 @@
 """Unit tests for storage adapters."""
+
 import uuid
 import inspect
 import pytest
@@ -164,9 +165,7 @@ class TestErrorStorage:
         """Test in-memory error storage appends and loads entries."""
         storage = InMemoryErrorStorage()
         entry = ErrorEntry(
-            timestamp=datetime.now(),
-            action_attempted="Run pytest",
-            error_message="AssertionError"
+            timestamp=datetime.now(), action_attempted="Run pytest", error_message="AssertionError"
         )
         storage.append(entry)
         loaded = storage.load_recent(limit=10)
@@ -179,17 +178,17 @@ class TestErrorStorage:
         e1 = ErrorEntry(
             timestamp=datetime(2026, 1, 26, 10, 0, 0),
             action_attempted="Action 1",
-            error_message="Error 1"
+            error_message="Error 1",
         )
         e2 = ErrorEntry(
             timestamp=datetime(2026, 1, 26, 11, 0, 0),
             action_attempted="Action 2",
-            error_message="Error 2"
+            error_message="Error 2",
         )
         e3 = ErrorEntry(
             timestamp=datetime(2026, 1, 26, 12, 0, 0),
             action_attempted="Action 3",
-            error_message="Error 3"
+            error_message="Error 3",
         )
         storage.append(e1)
         storage.append(e2)
@@ -205,9 +204,7 @@ class TestErrorStorage:
         storage = InMemoryErrorStorage(max_entries=3)
         for i in range(5):
             entry = ErrorEntry(
-                timestamp=datetime.now(),
-                action_attempted=f"Action {i}",
-                error_message=f"Error {i}"
+                timestamp=datetime.now(), action_attempted=f"Action {i}", error_message=f"Error {i}"
             )
             storage.append(entry)
         loaded = storage.load_recent(limit=10)
@@ -220,11 +217,11 @@ class TestErrorStorage:
         """Test load_recent respects limit parameter."""
         storage = InMemoryErrorStorage()
         for i in range(10):
-            storage.append(ErrorEntry(
-                timestamp=datetime.now(),
-                action_attempted=f"Action {i}",
-                error_message="Error"
-            ))
+            storage.append(
+                ErrorEntry(
+                    timestamp=datetime.now(), action_attempted=f"Action {i}", error_message="Error"
+                )
+            )
         loaded = storage.load_recent(limit=3)
         assert len(loaded) == 3
         assert loaded[0].action_attempted == "Action 9"  # Newest

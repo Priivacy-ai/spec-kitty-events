@@ -7,6 +7,7 @@ Consumers can import these to write their own conformance assertions:
         assert_lane_mapping,
     )
 """
+
 from __future__ import annotations
 
 from typing import Any, Dict
@@ -33,8 +34,7 @@ def assert_payload_conforms(
         for sv in result.schema_violations:
             violations.append(f"  Schema: {sv.json_path} \u2014 {sv.message}")
         raise AssertionError(
-            f"Payload for {event_type!r} failed conformance:\n"
-            + "\n".join(violations)
+            f"Payload for {event_type!r} failed conformance:\n" + "\n".join(violations)
         )
     return result
 
@@ -62,6 +62,5 @@ def assert_lane_mapping(
     lane = Lane(canonical_value)
     sync = canonical_to_sync_v1(lane)
     assert sync == SyncLaneV1(expected_sync_value), (
-        f"Expected {canonical_value!r} \u2192 {expected_sync_value!r}, "
-        f"got {sync.value!r}"
+        f"Expected {canonical_value!r} \u2192 {expected_sync_value!r}, got {sync.value!r}"
     )

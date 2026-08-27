@@ -82,9 +82,7 @@ wp_code: WP03
          severity: Literal["low", "medium", "high"] = Field(
              ..., description="Overall check severity (max of conflicts)"
          )
-         confidence: float = Field(
-             ..., ge=0.0, le=1.0, description="Overall confidence score"
-         )
+         confidence: float = Field(..., ge=0.0, le=1.0, description="Overall confidence score")
          recommended_action: Literal["block", "warn", "pass"] = Field(
              ..., description="Action recommendation based on severity and strictness"
          )
@@ -122,9 +120,7 @@ wp_code: WP03
          term: str = Field(..., min_length=1, description="The ambiguous term")
          question: str = Field(..., description="Clarification question text")
          options: Tuple[str, ...] = Field(..., description="Available answer options")
-         urgency: Literal["low", "medium", "high"] = Field(
-             ..., description="Urgency level"
-         )
+         urgency: Literal["low", "medium", "high"] = Field(..., description="Urgency level")
          actor: str = Field(..., min_length=1, description="Actor who triggered the request")
      ```
 - **Files**: `src/spec_kitty_events/glossary.py` (Section 3).
@@ -148,9 +144,7 @@ wp_code: WP03
              min_length=1,
              description="Event ID of the originating clarification request",
          )
-         selected_meaning: str = Field(
-             ..., min_length=1, description="The chosen or entered meaning"
-         )
+         selected_meaning: str = Field(..., min_length=1, description="The chosen or entered meaning")
          actor: str = Field(..., min_length=1, description="Identity of the resolving actor")
      ```
 - **Files**: `src/spec_kitty_events/glossary.py` (Section 3).

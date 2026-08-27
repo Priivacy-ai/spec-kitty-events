@@ -57,11 +57,11 @@ events: list[Event] = [mission_started, phase_entered, wp_changed, gate_passed, 
 # Reduce to projected state
 state = reduce_lifecycle_events(events)
 
-print(state.mission_status)   # MissionStatus.COMPLETED
-print(state.current_phase)    # "review"
-print(state.wp_states)        # {"WP01": WPState(current_lane=Lane.DONE, ...)}
-print(state.anomalies)        # [] (no anomalies)
-print(state.event_count)      # 5
+print(state.mission_status)  # MissionStatus.COMPLETED
+print(state.current_phase)  # "review"
+print(state.wp_states)  # {"WP01": WPState(current_lane=Lane.DONE, ...)}
+print(state.anomalies)  # [] (no anomalies)
+print(state.event_count)  # 5
 ```
 
 ## Precedence: Cancel Beats Re-Open

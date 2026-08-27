@@ -72,6 +72,7 @@ Land the final mission-close gate: a per-envelope validation performance benchma
    from spec_kitty_events.conformance import load_manifest_entries, load_fixture
    from spec_kitty_events import validate_envelope  # adjust to actual public API
 
+
    def measure_one(envelope, iterations=100):
        times = []
        for _ in range(iterations):
@@ -81,10 +82,12 @@ Land the final mission-close gate: a per-envelope validation performance benchma
            times.append(t1 - t0)
        return times
 
+
    def percentile(values, p):
        values_sorted = sorted(values)
        k = int(round((p / 100.0) * (len(values_sorted) - 1)))
        return values_sorted[k]
+
 
    def test_validation_p95_under_5ms():
        all_times_ns = []

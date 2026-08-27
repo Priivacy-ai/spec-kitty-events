@@ -199,6 +199,7 @@ Each fixture category has `valid/` and `invalid/` subdirectories. The `manifest.
    from dataclasses import dataclass
    from typing import Any
 
+
    @dataclass(frozen=True)
    class FixtureCase:
        id: str
@@ -207,6 +208,7 @@ Each fixture category has `valid/` and `invalid/` subdirectories. The `manifest.
        event_type: str
        notes: str
        min_version: str
+
 
    def load_fixtures(category: str) -> list[FixtureCase]:
        """Load canonical fixture cases for a category."""

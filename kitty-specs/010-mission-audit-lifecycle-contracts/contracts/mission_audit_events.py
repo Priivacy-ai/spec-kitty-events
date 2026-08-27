@@ -28,13 +28,16 @@ MISSION_AUDIT_DECISION_REQUESTED: str = "MissionAuditDecisionRequested"
 MISSION_AUDIT_COMPLETED: str = "MissionAuditCompleted"
 MISSION_AUDIT_FAILED: str = "MissionAuditFailed"
 
-MISSION_AUDIT_EVENT_TYPES: FrozenSet[str] = frozenset({
-    MISSION_AUDIT_REQUESTED,
-    MISSION_AUDIT_STARTED,
-    MISSION_AUDIT_DECISION_REQUESTED,
-    MISSION_AUDIT_COMPLETED,
-    MISSION_AUDIT_FAILED,
-})
+MISSION_AUDIT_EVENT_TYPES: FrozenSet[str] = frozenset(
+    {
+        MISSION_AUDIT_REQUESTED,
+        MISSION_AUDIT_STARTED,
+        MISSION_AUDIT_DECISION_REQUESTED,
+        MISSION_AUDIT_COMPLETED,
+        MISSION_AUDIT_FAILED,
+    }
+)
+
 
 # ---------------------------------------------------------------------------
 # Enums (FR-008, FR-009, FR-010)
@@ -61,16 +64,20 @@ class AuditStatus(str, Enum):
     FAILED = "failed"
 
 
-TERMINAL_AUDIT_STATUSES: FrozenSet[AuditStatus] = frozenset({
-    AuditStatus.COMPLETED,
-    AuditStatus.FAILED,
-})
+TERMINAL_AUDIT_STATUSES: FrozenSet[AuditStatus] = frozenset(
+    {
+        AuditStatus.COMPLETED,
+        AuditStatus.FAILED,
+    }
+)
+
 
 # ---------------------------------------------------------------------------
 # Value objects (FR-011)
 # ---------------------------------------------------------------------------
 class AuditArtifactRef(BaseModel):
     """Links an audit report to its content hash and provenance."""
+
     model_config = ConfigDict(frozen=True)
 
     report_path: str = Field(..., min_length=1)
@@ -80,6 +87,7 @@ class AuditArtifactRef(BaseModel):
 
 class PendingDecision(BaseModel):
     """Tracks an unresolved decision checkpoint within the reducer."""
+
     model_config = ConfigDict(frozen=True)
 
     decision_id: str = Field(..., min_length=1)

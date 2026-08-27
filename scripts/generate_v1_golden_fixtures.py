@@ -3,12 +3,14 @@
 Run from the worktree root with:
     python -c "import sys; sys.path.insert(0, 'src'); exec(open('scripts/generate_v1_golden_fixtures.py').read())"
 """
+
 import json
 import shutil
 from pathlib import Path
 
 # ── Imports ──────────────────────────────────────────────────────────────────
 import sys
+
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 from spec_kitty_events.models import Event

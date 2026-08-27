@@ -53,6 +53,7 @@ For `Lane` and `SyncLaneV1` (which are `str, Enum` and cannot call `model_json_s
 ```python
 # Use TypeAdapter for enum schema generation:
 from pydantic import TypeAdapter
+
 schema = TypeAdapter(Lane).json_schema(mode="serialization")
 ```
 
@@ -60,6 +61,7 @@ schema = TypeAdapter(Lane).json_schema(mode="serialization")
 
 ```python
 # In src/spec_kitty_events/schemas/__init__.py:
+
 
 def load_schema(name: str) -> dict[str, Any]:
     """Load a committed JSON Schema by model name.
@@ -74,6 +76,7 @@ def load_schema(name: str) -> dict[str, Any]:
         FileNotFoundError: If no schema exists for the given name.
     """
 
+
 def schema_path(name: str) -> Path:
     """Return the filesystem path to a committed schema file.
 
@@ -83,6 +86,7 @@ def schema_path(name: str) -> Path:
     Returns:
         Path to the .schema.json file.
     """
+
 
 def list_schemas() -> list[str]:
     """List all available schema names."""

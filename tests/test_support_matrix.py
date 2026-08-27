@@ -119,9 +119,16 @@ def test_support_matrix_has_exactly_30_rows() -> None:
 def test_ephemeral_vocabulary_is_volatile() -> None:
     """E2: the mission/WP moment vocabulary broadcasts, it does not sync."""
     expected_volatile = {
-        "WPStatusChanged", "MissionCreated", "MissionClosed", "PhaseEntered",
-        "MissionRunStarted", "NextStepIssued", "NextStepAutoCompleted",
-        "DecisionInputRequested", "DecisionInputAnswered", "MissionRunCompleted",
+        "WPStatusChanged",
+        "MissionCreated",
+        "MissionClosed",
+        "PhaseEntered",
+        "MissionRunStarted",
+        "NextStepIssued",
+        "NextStepAutoCompleted",
+        "DecisionInputRequested",
+        "DecisionInputAnswered",
+        "MissionRunCompleted",
     }
     durability = {row.event_type: row.durability for row in SUPPORT_MATRIX}
     for event_type in expected_volatile:

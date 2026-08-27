@@ -37,8 +37,8 @@ Signature shape:
 
 ```python
 def assert_producer_occurrence_preserved(
-    envelope: dict,                          # the canonical event envelope (dict or Event)
-    persisted_occurrence_time: datetime,     # the consumer's persisted occurrence-time value
+    envelope: dict,  # the canonical event envelope (dict or Event)
+    persisted_occurrence_time: datetime,  # the consumer's persisted occurrence-time value
 ) -> None:
     """Raise TimestampSubstitutionError if persisted_occurrence_time != envelope['timestamp']."""
 ```

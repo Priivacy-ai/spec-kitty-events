@@ -546,8 +546,7 @@ def validate_event(
     """
     if event_type not in _EVENT_TYPE_TO_MODEL:
         raise ValueError(
-            f"Unknown event type: {event_type!r}. "
-            f"Known types: {sorted(_EVENT_TYPE_TO_MODEL)}"
+            f"Unknown event type: {event_type!r}. Known types: {sorted(_EVENT_TYPE_TO_MODEL)}"
         )
 
     model_class = _EVENT_TYPE_TO_MODEL[event_type]
@@ -587,9 +586,7 @@ def validate_event(
         schema_skipped = True
 
     # Determine overall validity
-    valid = len(model_violations) == 0 and (
-        len(schema_violations) == 0 or schema_skipped
-    )
+    valid = len(model_violations) == 0 and (len(schema_violations) == 0 or schema_skipped)
 
     return ConformanceResult(
         valid=valid,

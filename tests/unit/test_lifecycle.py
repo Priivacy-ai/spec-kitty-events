@@ -1228,9 +1228,7 @@ class TestPostMissionReducerSemantics:
         )
 
     def test_reopen_after_completion_is_not_anomaly(self) -> None:
-        result = reduce_lifecycle_events(
-            [self._started(), self._completed(), self._reopened()]
-        )
+        result = reduce_lifecycle_events([self._started(), self._completed(), self._reopened()])
         assert result.anomalies == ()
         # Re-open transitions the mission OUT of terminal.
         assert result.mission_status == MissionStatus.REOPENED
@@ -1240,9 +1238,7 @@ class TestPostMissionReducerSemantics:
     def test_follow_up_after_completion_is_not_anomaly_and_status_unchanged(
         self,
     ) -> None:
-        result = reduce_lifecycle_events(
-            [self._started(), self._completed(), self._follow_up()]
-        )
+        result = reduce_lifecycle_events([self._started(), self._completed(), self._follow_up()])
         assert result.anomalies == ()
         # FollowUpRecorded is a recorded fact: status stays terminal.
         assert result.mission_status == MissionStatus.COMPLETED
@@ -1256,9 +1252,7 @@ class TestPostMissionReducerSemantics:
         assert "before completion" in result.anomalies[0].reason
 
     def test_follow_up_before_completion_is_anomaly(self) -> None:
-        result = reduce_lifecycle_events(
-            [self._started(), self._follow_up(lamport=2)]
-        )
+        result = reduce_lifecycle_events([self._started(), self._follow_up(lamport=2)])
         assert result.mission_status == MissionStatus.ACTIVE
         assert len(result.anomalies) == 1
         assert result.anomalies[0].event_type == FOLLOW_UP_RECORDED
@@ -1392,9 +1386,7 @@ class TestMissionReopenedPayload:
             setattr(p, "reason", "changed")
 
     def test_round_trip(self) -> None:
-        p = MissionReopenedPayload(
-            **self._valid(cleared_merge={"merged_commit": "abc123"})
-        )
+        p = MissionReopenedPayload(**self._valid(cleared_merge={"merged_commit": "abc123"}))
         restored = MissionReopenedPayload(**p.model_dump(mode="json"))
         assert restored == p
 

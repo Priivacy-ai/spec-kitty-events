@@ -4,6 +4,7 @@ Covers: user_connections field, UserConnected/UserDisconnected roster updates,
 anomaly for disconnected-without-connected, pre-migration (no user_id) backward
 compatibility, and deterministic roster ordering.
 """
+
 from __future__ import annotations
 
 import uuid
@@ -84,9 +85,7 @@ def _user_connected_event(user_id: str, lamport: int = 10) -> Event:
     return _event(USER_CONNECTED, d, lamport=lamport)
 
 
-def _user_disconnected_event(
-    user_id: str, lamport: int = 20, reason: str = ""
-) -> Event:
+def _user_disconnected_event(user_id: str, lamport: int = 20, reason: str = "") -> Event:
     d = _base_payload(lamport)
     d["user_id"] = user_id
     d["reason"] = reason
@@ -252,9 +251,7 @@ def test_pre_migration_stream_identical_binding_state() -> None:
 
 
 def test_user_connection_status_frozen() -> None:
-    uc = UserConnectionStatus(
-        user_id="u1", state=ConnectorState.PROVISIONED, last_event_at=_NOW
-    )
+    uc = UserConnectionStatus(user_id="u1", state=ConnectorState.PROVISIONED, last_event_at=_NOW)
     import pytest
 
     with pytest.raises(Exception):

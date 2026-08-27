@@ -31,22 +31,24 @@ COMMENT_POSTED: str = "CommentPosted"
 DECISION_CAPTURED: str = "DecisionCaptured"
 SESSION_LINKED: str = "SessionLinked"
 
-COLLABORATION_EVENT_TYPES: FrozenSet[str] = frozenset({
-    PARTICIPANT_INVITED,
-    PARTICIPANT_JOINED,
-    PARTICIPANT_LEFT,
-    PRESENCE_HEARTBEAT,
-    DRIVE_INTENT_SET,
-    FOCUS_CHANGED,
-    PROMPT_STEP_EXECUTION_STARTED,
-    PROMPT_STEP_EXECUTION_COMPLETED,
-    CONCURRENT_DRIVER_WARNING,
-    POTENTIAL_STEP_COLLISION_DETECTED,
-    WARNING_ACKNOWLEDGED,
-    COMMENT_POSTED,
-    DECISION_CAPTURED,
-    SESSION_LINKED,
-})
+COLLABORATION_EVENT_TYPES: FrozenSet[str] = frozenset(
+    {
+        PARTICIPANT_INVITED,
+        PARTICIPANT_JOINED,
+        PARTICIPANT_LEFT,
+        PRESENCE_HEARTBEAT,
+        DRIVE_INTENT_SET,
+        FOCUS_CHANGED,
+        PROMPT_STEP_EXECUTION_STARTED,
+        PROMPT_STEP_EXECUTION_COMPLETED,
+        CONCURRENT_DRIVER_WARNING,
+        POTENTIAL_STEP_COLLISION_DETECTED,
+        WARNING_ACKNOWLEDGED,
+        COMMENT_POSTED,
+        DECISION_CAPTURED,
+        SESSION_LINKED,
+    }
+)
 
 # ── Section 2: Identity and Target Models ────────────────────────────────────
 
@@ -81,12 +83,8 @@ class ParticipantIdentity(BaseModel):
     participant_type: Literal["human", "llm_context"] = Field(
         ..., description="Participant category"
     )
-    display_name: Optional[str] = Field(
-        None, description="Human-readable name for display"
-    )
-    session_id: Optional[str] = Field(
-        None, description="SaaS-issued session identifier"
-    )
+    display_name: Optional[str] = Field(None, description="Human-readable name for display")
+    session_id: Optional[str] = Field(None, description="SaaS-issued session identifier")
     external_refs: Optional[ParticipantExternalRefs] = Field(
         None, description="Optional cross-channel identity references (V1)"
     )
@@ -103,9 +101,7 @@ class AuthPrincipalBinding(BaseModel):
     participant_id: str = Field(
         ..., min_length=1, description="Mission-scoped participant identifier"
     )
-    bound_at: datetime = Field(
-        ..., description="Timestamp when binding was created"
-    )
+    bound_at: datetime = Field(..., description="Timestamp when binding was created")
 
 
 class FocusTarget(BaseModel):
@@ -113,20 +109,14 @@ class FocusTarget(BaseModel):
 
     model_config = ConfigDict(frozen=True)
 
-    target_type: Literal["wp", "step", "file"] = Field(
-        ..., description="Category of focus target"
-    )
-    target_id: str = Field(
-        ..., min_length=1, description="Identifier within the target type"
-    )
+    target_type: Literal["wp", "step", "file"] = Field(..., description="Category of focus target")
+    target_id: str = Field(..., min_length=1, description="Identifier within the target type")
 
 
 class UnknownParticipantError(SpecKittyEventsError):
     """Raised in strict mode for events from non-rostered participants."""
 
-    def __init__(
-        self, participant_id: str, event_id: str, event_type: str
-    ) -> None:
+    def __init__(self, participant_id: str, event_id: str, event_type: str) -> None:
         self.participant_id = participant_id
         self.event_id = event_id
         self.event_type = event_type
@@ -144,18 +134,10 @@ class ParticipantInvitedPayload(BaseModel):
 
     model_config = ConfigDict(frozen=True)
 
-    participant_id: str = Field(
-        ..., min_length=1, description="Invited participant"
-    )
-    participant_identity: ParticipantIdentity = Field(
-        ..., description="Full structured identity"
-    )
-    invited_by: str = Field(
-        ..., min_length=1, description="participant_id of inviter"
-    )
-    mission_id: str = Field(
-        ..., min_length=1, description="Target mission"
-    )
+    participant_id: str = Field(..., min_length=1, description="Invited participant")
+    participant_identity: ParticipantIdentity = Field(..., description="Full structured identity")
+    invited_by: str = Field(..., min_length=1, description="participant_id of inviter")
+    mission_id: str = Field(..., min_length=1, description="Target mission")
 
 
 class ParticipantJoinedPayload(BaseModel):
@@ -163,15 +145,9 @@ class ParticipantJoinedPayload(BaseModel):
 
     model_config = ConfigDict(frozen=True)
 
-    participant_id: str = Field(
-        ..., min_length=1, description="Joining participant"
-    )
-    participant_identity: ParticipantIdentity = Field(
-        ..., description="Full structured identity"
-    )
-    mission_id: str = Field(
-        ..., min_length=1, description="Target mission"
-    )
+    participant_id: str = Field(..., min_length=1, description="Joining participant")
+    participant_identity: ParticipantIdentity = Field(..., description="Full structured identity")
+    mission_id: str = Field(..., min_length=1, description="Target mission")
     auth_principal_id: Optional[str] = Field(
         None, description="Auth principal bound at join time (present in live traffic)"
     )
@@ -182,12 +158,8 @@ class ParticipantLeftPayload(BaseModel):
 
     model_config = ConfigDict(frozen=True)
 
-    participant_id: str = Field(
-        ..., min_length=1, description="Departing participant"
-    )
-    mission_id: str = Field(
-        ..., min_length=1, description="Mission being left"
-    )
+    participant_id: str = Field(..., min_length=1, description="Departing participant")
+    mission_id: str = Field(..., min_length=1, description="Mission being left")
     reason: Optional[str] = Field(
         None, description="Departure reason (e.g., 'disconnect', 'explicit')"
     )
@@ -198,15 +170,9 @@ class PresenceHeartbeatPayload(BaseModel):
 
     model_config = ConfigDict(frozen=True)
 
-    participant_id: str = Field(
-        ..., min_length=1, description="Heartbeat source"
-    )
-    mission_id: str = Field(
-        ..., min_length=1, description="Mission context"
-    )
-    session_id: Optional[str] = Field(
-        None, description="Specific session sending heartbeat"
-    )
+    participant_id: str = Field(..., min_length=1, description="Heartbeat source")
+    mission_id: str = Field(..., min_length=1, description="Mission context")
+    session_id: Optional[str] = Field(None, description="Specific session sending heartbeat")
 
 
 class DriveIntentSetPayload(BaseModel):
@@ -214,15 +180,9 @@ class DriveIntentSetPayload(BaseModel):
 
     model_config = ConfigDict(frozen=True)
 
-    participant_id: str = Field(
-        ..., min_length=1, description="Participant declaring intent"
-    )
-    mission_id: str = Field(
-        ..., min_length=1, description="Mission context"
-    )
-    intent: Literal["active", "inactive"] = Field(
-        ..., description="Drive intent state"
-    )
+    participant_id: str = Field(..., min_length=1, description="Participant declaring intent")
+    mission_id: str = Field(..., min_length=1, description="Mission context")
+    intent: Literal["active", "inactive"] = Field(..., description="Drive intent state")
 
 
 class FocusChangedPayload(BaseModel):
@@ -230,15 +190,9 @@ class FocusChangedPayload(BaseModel):
 
     model_config = ConfigDict(frozen=True)
 
-    participant_id: str = Field(
-        ..., min_length=1, description="Participant changing focus"
-    )
-    mission_id: str = Field(
-        ..., min_length=1, description="Mission context"
-    )
-    focus_target: FocusTarget = Field(
-        ..., description="New focus target"
-    )
+    participant_id: str = Field(..., min_length=1, description="Participant changing focus")
+    mission_id: str = Field(..., min_length=1, description="Mission context")
+    focus_target: FocusTarget = Field(..., description="New focus target")
     previous_focus_target: Optional[FocusTarget] = Field(
         None, description="Previous focus (if any)"
     )
@@ -249,21 +203,11 @@ class PromptStepExecutionStartedPayload(BaseModel):
 
     model_config = ConfigDict(frozen=True)
 
-    participant_id: str = Field(
-        ..., min_length=1, description="Executing participant"
-    )
-    mission_id: str = Field(
-        ..., min_length=1, description="Mission context"
-    )
-    step_id: str = Field(
-        ..., min_length=1, description="Step identifier"
-    )
-    wp_id: Optional[str] = Field(
-        None, description="Work package being targeted"
-    )
-    step_description: Optional[str] = Field(
-        None, description="Human-readable step description"
-    )
+    participant_id: str = Field(..., min_length=1, description="Executing participant")
+    mission_id: str = Field(..., min_length=1, description="Mission context")
+    step_id: str = Field(..., min_length=1, description="Step identifier")
+    wp_id: Optional[str] = Field(None, description="Work package being targeted")
+    step_description: Optional[str] = Field(None, description="Human-readable step description")
 
 
 class PromptStepExecutionCompletedPayload(BaseModel):
@@ -271,21 +215,11 @@ class PromptStepExecutionCompletedPayload(BaseModel):
 
     model_config = ConfigDict(frozen=True)
 
-    participant_id: str = Field(
-        ..., min_length=1, description="Completing participant"
-    )
-    mission_id: str = Field(
-        ..., min_length=1, description="Mission context"
-    )
-    step_id: str = Field(
-        ..., min_length=1, description="Step identifier"
-    )
-    wp_id: Optional[str] = Field(
-        None, description="Work package targeted"
-    )
-    outcome: Literal["success", "failure", "skipped"] = Field(
-        ..., description="Step outcome"
-    )
+    participant_id: str = Field(..., min_length=1, description="Completing participant")
+    mission_id: str = Field(..., min_length=1, description="Mission context")
+    step_id: str = Field(..., min_length=1, description="Step identifier")
+    wp_id: Optional[str] = Field(None, description="Work package targeted")
+    outcome: Literal["success", "failure", "skipped"] = Field(..., description="Step outcome")
 
 
 class ConcurrentDriverWarningPayload(BaseModel):
@@ -293,21 +227,13 @@ class ConcurrentDriverWarningPayload(BaseModel):
 
     model_config = ConfigDict(frozen=True)
 
-    warning_id: str = Field(
-        ..., min_length=1, description="Unique warning identifier"
-    )
-    mission_id: str = Field(
-        ..., min_length=1, description="Mission context"
-    )
+    warning_id: str = Field(..., min_length=1, description="Unique warning identifier")
+    mission_id: str = Field(..., min_length=1, description="Mission context")
     participant_ids: List[str] = Field(
         ..., min_length=2, description="All concurrent active drivers on overlapping target"
     )
-    focus_target: FocusTarget = Field(
-        ..., description="Shared focus target triggering warning"
-    )
-    severity: Literal["info", "warning"] = Field(
-        ..., description="Warning severity level"
-    )
+    focus_target: FocusTarget = Field(..., description="Shared focus target triggering warning")
+    severity: Literal["info", "warning"] = Field(..., description="Warning severity level")
 
 
 class PotentialStepCollisionDetectedPayload(BaseModel):
@@ -315,24 +241,12 @@ class PotentialStepCollisionDetectedPayload(BaseModel):
 
     model_config = ConfigDict(frozen=True)
 
-    warning_id: str = Field(
-        ..., min_length=1, description="Unique warning identifier"
-    )
-    mission_id: str = Field(
-        ..., min_length=1, description="Mission context"
-    )
-    participant_ids: List[str] = Field(
-        ..., min_length=2, description="Colliding participants"
-    )
-    step_id: str = Field(
-        ..., min_length=1, description="Colliding step"
-    )
-    wp_id: Optional[str] = Field(
-        None, description="Work package context"
-    )
-    severity: Literal["info", "warning"] = Field(
-        ..., description="Warning severity level"
-    )
+    warning_id: str = Field(..., min_length=1, description="Unique warning identifier")
+    mission_id: str = Field(..., min_length=1, description="Mission context")
+    participant_ids: List[str] = Field(..., min_length=2, description="Colliding participants")
+    step_id: str = Field(..., min_length=1, description="Colliding step")
+    wp_id: Optional[str] = Field(None, description="Work package context")
+    severity: Literal["info", "warning"] = Field(..., description="Warning severity level")
 
 
 class WarningAcknowledgedPayload(BaseModel):
@@ -340,15 +254,9 @@ class WarningAcknowledgedPayload(BaseModel):
 
     model_config = ConfigDict(frozen=True)
 
-    participant_id: str = Field(
-        ..., min_length=1, description="Acknowledging participant"
-    )
-    mission_id: str = Field(
-        ..., min_length=1, description="Mission context"
-    )
-    warning_id: str = Field(
-        ..., min_length=1, description="Warning being acknowledged"
-    )
+    participant_id: str = Field(..., min_length=1, description="Acknowledging participant")
+    mission_id: str = Field(..., min_length=1, description="Mission context")
+    warning_id: str = Field(..., min_length=1, description="Warning being acknowledged")
     acknowledgement: Literal["continue", "hold", "reassign", "defer"] = Field(
         ..., description="Response action"
     )
@@ -359,21 +267,11 @@ class CommentPostedPayload(BaseModel):
 
     model_config = ConfigDict(frozen=True)
 
-    participant_id: str = Field(
-        ..., min_length=1, description="Comment author"
-    )
-    mission_id: str = Field(
-        ..., min_length=1, description="Mission context"
-    )
-    comment_id: str = Field(
-        ..., min_length=1, description="Unique comment identifier"
-    )
-    content: str = Field(
-        ..., min_length=1, description="Comment text"
-    )
-    reply_to: Optional[str] = Field(
-        None, description="Parent comment_id for threading"
-    )
+    participant_id: str = Field(..., min_length=1, description="Comment author")
+    mission_id: str = Field(..., min_length=1, description="Mission context")
+    comment_id: str = Field(..., min_length=1, description="Unique comment identifier")
+    content: str = Field(..., min_length=1, description="Comment text")
+    reply_to: Optional[str] = Field(None, description="Parent comment_id for threading")
 
 
 class DecisionCapturedPayload(BaseModel):
@@ -381,24 +279,12 @@ class DecisionCapturedPayload(BaseModel):
 
     model_config = ConfigDict(frozen=True)
 
-    participant_id: str = Field(
-        ..., min_length=1, description="Decision author"
-    )
-    mission_id: str = Field(
-        ..., min_length=1, description="Mission context"
-    )
-    decision_id: str = Field(
-        ..., min_length=1, description="Unique decision identifier"
-    )
-    topic: str = Field(
-        ..., min_length=1, description="Decision topic/question"
-    )
-    chosen_option: str = Field(
-        ..., min_length=1, description="Selected option"
-    )
-    rationale: Optional[str] = Field(
-        None, description="Reasoning for the decision"
-    )
+    participant_id: str = Field(..., min_length=1, description="Decision author")
+    mission_id: str = Field(..., min_length=1, description="Mission context")
+    decision_id: str = Field(..., min_length=1, description="Unique decision identifier")
+    topic: str = Field(..., min_length=1, description="Decision topic/question")
+    chosen_option: str = Field(..., min_length=1, description="Selected option")
+    rationale: Optional[str] = Field(None, description="Reasoning for the decision")
     referenced_warning_id: Optional[str] = Field(
         None, description="Warning that prompted this decision"
     )
@@ -409,21 +295,11 @@ class SessionLinkedPayload(BaseModel):
 
     model_config = ConfigDict(frozen=True)
 
-    participant_id: str = Field(
-        ..., min_length=1, description="Participant linking sessions"
-    )
-    mission_id: str = Field(
-        ..., min_length=1, description="Mission context"
-    )
-    primary_session_id: str = Field(
-        ..., min_length=1, description="Primary session"
-    )
-    linked_session_id: str = Field(
-        ..., min_length=1, description="Session being linked"
-    )
-    link_type: Literal["cli_to_saas", "saas_to_cli"] = Field(
-        ..., description="Direction of link"
-    )
+    participant_id: str = Field(..., min_length=1, description="Participant linking sessions")
+    mission_id: str = Field(..., min_length=1, description="Mission context")
+    primary_session_id: str = Field(..., min_length=1, description="Primary session")
+    linked_session_id: str = Field(..., min_length=1, description="Session being linked")
+    link_type: Literal["cli_to_saas", "saas_to_cli"] = Field(..., description="Direction of link")
 
 
 # ── Section 4: Reducer Output Models ──────────────────────────────────────
@@ -450,9 +326,7 @@ class WarningEntry(BaseModel):
         ...,
         description="'ConcurrentDriverWarning' or 'PotentialStepCollisionDetected'",
     )
-    participant_ids: Tuple[str, ...] = Field(
-        ..., description="Affected participants"
-    )
+    participant_ids: Tuple[str, ...] = Field(..., description="Affected participants")
     acknowledgements: Dict[str, str] = Field(
         default_factory=dict,
         description="participant_id -> acknowledgement action",
@@ -469,9 +343,7 @@ class DecisionEntry(BaseModel):
     participant_id: str = Field(..., description="Decision author")
     topic: str = Field(..., description="Decision topic")
     chosen_option: str = Field(..., description="Selected option")
-    referenced_warning_id: Optional[str] = Field(
-        None, description="Related warning"
-    )
+    referenced_warning_id: Optional[str] = Field(None, description="Related warning")
 
 
 class CommentEntry(BaseModel):
@@ -491,9 +363,7 @@ class ReducedCollaborationState(BaseModel):
 
     model_config = ConfigDict(frozen=True)
 
-    mission_id: str = Field(
-        ..., description="Mission this state represents"
-    )
+    mission_id: str = Field(..., description="Mission this state represents")
     participants: Dict[str, ParticipantIdentity] = Field(
         default_factory=dict,
         description="Active participant roster (participant_id -> identity)",
@@ -542,9 +412,7 @@ class ReducedCollaborationState(BaseModel):
         default_factory=tuple,
         description="Non-fatal issues encountered",
     )
-    event_count: int = Field(
-        default=0, description="Total events processed"
-    )
+    event_count: int = Field(default=0, description="Total events processed")
     last_processed_event_id: Optional[str] = Field(
         None, description="Last event_id in processed sequence"
     )
@@ -641,9 +509,7 @@ def reduce_collaboration_events(
 
     # -- Helper functions --
 
-    def _check_active_participant(
-        participant_id: str, event_id: str, event_type: str
-    ) -> bool:
+    def _check_active_participant(participant_id: str, event_id: str, event_type: str) -> bool:
         """Check participant is in active roster. Returns True if valid."""
         if participant_id in participants:
             return True
@@ -915,9 +781,7 @@ def reduce_collaboration_events(
                 continue
             _check_active_participants(pids, event.event_id, et)
             existing = warning_map.get(warning_id)
-            existing_acks = (
-                dict(existing.acknowledgements) if existing is not None else {}
-            )
+            existing_acks = dict(existing.acknowledgements) if existing is not None else {}
             warning_map[warning_id] = _MutableWarningEntry(
                 warning_id=warning_id,
                 event_id=event.event_id,
@@ -935,9 +799,7 @@ def reduce_collaboration_events(
                 continue
             _check_active_participants(pids, event.event_id, et)
             existing = warning_map.get(warning_id)
-            existing_acks = (
-                dict(existing.acknowledgements) if existing is not None else {}
-            )
+            existing_acks = dict(existing.acknowledgements) if existing is not None else {}
             warning_map[warning_id] = _MutableWarningEntry(
                 warning_id=warning_id,
                 event_id=event.event_id,

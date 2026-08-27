@@ -88,10 +88,13 @@ Add the remaining 6 payload models to `collaboration.py` Section 3:
      ```python
      class ConcurrentDriverWarningPayload(BaseModel):
          """Typed payload for ConcurrentDriverWarning events."""
+
          model_config = ConfigDict(frozen=True)
          warning_id: str = Field(..., min_length=1, description="Unique warning identifier")
          mission_id: str = Field(..., min_length=1, description="Mission context")
-         participant_ids: List[str] = Field(..., min_length=2, description="All concurrent active drivers on overlapping target")
+         participant_ids: List[str] = Field(
+             ..., min_length=2, description="All concurrent active drivers on overlapping target"
+         )
          focus_target: FocusTarget = Field(..., description="Shared focus target triggering warning")
          severity: Literal["info", "warning"] = Field(..., description="Warning severity level")
      ```
@@ -109,6 +112,7 @@ Add the remaining 6 payload models to `collaboration.py` Section 3:
      ```python
      class PotentialStepCollisionDetectedPayload(BaseModel):
          """Typed payload for PotentialStepCollisionDetected events."""
+
          model_config = ConfigDict(frozen=True)
          warning_id: str = Field(..., min_length=1, description="Unique warning identifier")
          mission_id: str = Field(..., min_length=1, description="Mission context")
@@ -128,11 +132,14 @@ Add the remaining 6 payload models to `collaboration.py` Section 3:
      ```python
      class WarningAcknowledgedPayload(BaseModel):
          """Typed payload for WarningAcknowledged events."""
+
          model_config = ConfigDict(frozen=True)
          participant_id: str = Field(..., min_length=1, description="Acknowledging participant")
          mission_id: str = Field(..., min_length=1, description="Mission context")
          warning_id: str = Field(..., min_length=1, description="Warning being acknowledged")
-         acknowledgement: Literal["continue", "hold", "reassign", "defer"] = Field(..., description="Response action")
+         acknowledgement: Literal["continue", "hold", "reassign", "defer"] = Field(
+             ..., description="Response action"
+         )
      ```
   2. Verify all 4 acknowledgement values accepted
   3. Verify invalid value (e.g., `"noted"`) rejected
@@ -148,6 +155,7 @@ Add the remaining 6 payload models to `collaboration.py` Section 3:
      ```python
      class CommentPostedPayload(BaseModel):
          """Typed payload for CommentPosted events."""
+
          model_config = ConfigDict(frozen=True)
          participant_id: str = Field(..., min_length=1, description="Comment author")
          mission_id: str = Field(..., min_length=1, description="Mission context")
@@ -166,6 +174,7 @@ Add the remaining 6 payload models to `collaboration.py` Section 3:
      ```python
      class DecisionCapturedPayload(BaseModel):
          """Typed payload for DecisionCaptured events."""
+
          model_config = ConfigDict(frozen=True)
          participant_id: str = Field(..., min_length=1, description="Decision author")
          mission_id: str = Field(..., min_length=1, description="Mission context")
@@ -173,7 +182,9 @@ Add the remaining 6 payload models to `collaboration.py` Section 3:
          topic: str = Field(..., min_length=1, description="Decision topic/question")
          chosen_option: str = Field(..., min_length=1, description="Selected option")
          rationale: Optional[str] = Field(None, description="Reasoning for the decision")
-         referenced_warning_id: Optional[str] = Field(None, description="Warning that prompted this decision")
+         referenced_warning_id: Optional[str] = Field(
+             None, description="Warning that prompted this decision"
+         )
      ```
 - **Files**: `src/spec_kitty_events/collaboration.py`
 - **Parallel?**: Yes (with T018-T021, T023)
@@ -186,6 +197,7 @@ Add the remaining 6 payload models to `collaboration.py` Section 3:
      ```python
      class SessionLinkedPayload(BaseModel):
          """Typed payload for SessionLinked events."""
+
          model_config = ConfigDict(frozen=True)
          participant_id: str = Field(..., min_length=1, description="Participant linking sessions")
          mission_id: str = Field(..., min_length=1, description="Mission context")

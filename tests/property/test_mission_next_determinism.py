@@ -34,8 +34,11 @@ _PROJECT_UUID = uuid.UUID("12345678-1234-5678-1234-567812345678")
 
 def _actor() -> RuntimeActorIdentity:
     return RuntimeActorIdentity(
-        actor_id="agent-claude", actor_type="llm",
-        display_name="Claude", provider="anthropic", model="claude-opus-4-6",
+        actor_id="agent-claude",
+        actor_type="llm",
+        display_name="Claude",
+        provider="anthropic",
+        model="claude-opus-4-6",
     )
 
 
@@ -46,105 +49,168 @@ def _build_test_run_sequence() -> List[Event]:
     actor = _actor()
     events: List[Event] = []
 
-    events.append(Event(
-        event_id=str(ULID()), event_type=MISSION_RUN_STARTED,
-        aggregate_id="run/run-1",
-        payload=MissionRunStartedPayload(
-            run_id="run-1", mission_type="software-dev", actor=actor,
-        ).model_dump(),
-        timestamp=base_time + timedelta(seconds=1),
-        build_id="build-test",
-        node_id="node-1", lamport_clock=1,
-        project_uuid=_PROJECT_UUID, correlation_id=corr_id,
-    ))
+    events.append(
+        Event(
+            event_id=str(ULID()),
+            event_type=MISSION_RUN_STARTED,
+            aggregate_id="run/run-1",
+            payload=MissionRunStartedPayload(
+                run_id="run-1",
+                mission_type="software-dev",
+                actor=actor,
+            ).model_dump(),
+            timestamp=base_time + timedelta(seconds=1),
+            build_id="build-test",
+            node_id="node-1",
+            lamport_clock=1,
+            project_uuid=_PROJECT_UUID,
+            correlation_id=corr_id,
+        )
+    )
 
-    events.append(Event(
-        event_id=str(ULID()), event_type=NEXT_STEP_ISSUED,
-        aggregate_id="run/run-1",
-        payload=NextStepIssuedPayload(
-            run_id="run-1", step_id="S1", agent_id="a1", actor=actor,
-        ).model_dump(),
-        timestamp=base_time + timedelta(seconds=2),
-        build_id="build-test",
-        node_id="node-1", lamport_clock=2,
-        project_uuid=_PROJECT_UUID, correlation_id=corr_id,
-    ))
+    events.append(
+        Event(
+            event_id=str(ULID()),
+            event_type=NEXT_STEP_ISSUED,
+            aggregate_id="run/run-1",
+            payload=NextStepIssuedPayload(
+                run_id="run-1",
+                step_id="S1",
+                agent_id="a1",
+                actor=actor,
+            ).model_dump(),
+            timestamp=base_time + timedelta(seconds=2),
+            build_id="build-test",
+            node_id="node-1",
+            lamport_clock=2,
+            project_uuid=_PROJECT_UUID,
+            correlation_id=corr_id,
+        )
+    )
 
-    events.append(Event(
-        event_id=str(ULID()), event_type=NEXT_STEP_AUTO_COMPLETED,
-        aggregate_id="run/run-1",
-        payload=NextStepAutoCompletedPayload(
-            run_id="run-1", step_id="S1", agent_id="a1",
-            result="success", actor=actor,
-        ).model_dump(),
-        timestamp=base_time + timedelta(seconds=3),
-        build_id="build-test",
-        node_id="node-1", lamport_clock=3,
-        project_uuid=_PROJECT_UUID, correlation_id=corr_id,
-    ))
+    events.append(
+        Event(
+            event_id=str(ULID()),
+            event_type=NEXT_STEP_AUTO_COMPLETED,
+            aggregate_id="run/run-1",
+            payload=NextStepAutoCompletedPayload(
+                run_id="run-1",
+                step_id="S1",
+                agent_id="a1",
+                result="success",
+                actor=actor,
+            ).model_dump(),
+            timestamp=base_time + timedelta(seconds=3),
+            build_id="build-test",
+            node_id="node-1",
+            lamport_clock=3,
+            project_uuid=_PROJECT_UUID,
+            correlation_id=corr_id,
+        )
+    )
 
-    events.append(Event(
-        event_id=str(ULID()), event_type=NEXT_STEP_ISSUED,
-        aggregate_id="run/run-1",
-        payload=NextStepIssuedPayload(
-            run_id="run-1", step_id="S2", agent_id="a1", actor=actor,
-        ).model_dump(),
-        timestamp=base_time + timedelta(seconds=4),
-        build_id="build-test",
-        node_id="node-1", lamport_clock=4,
-        project_uuid=_PROJECT_UUID, correlation_id=corr_id,
-    ))
+    events.append(
+        Event(
+            event_id=str(ULID()),
+            event_type=NEXT_STEP_ISSUED,
+            aggregate_id="run/run-1",
+            payload=NextStepIssuedPayload(
+                run_id="run-1",
+                step_id="S2",
+                agent_id="a1",
+                actor=actor,
+            ).model_dump(),
+            timestamp=base_time + timedelta(seconds=4),
+            build_id="build-test",
+            node_id="node-1",
+            lamport_clock=4,
+            project_uuid=_PROJECT_UUID,
+            correlation_id=corr_id,
+        )
+    )
 
-    events.append(Event(
-        event_id=str(ULID()), event_type=DECISION_INPUT_REQUESTED,
-        aggregate_id="run/run-1",
-        payload=DecisionInputRequestedPayload(
-            run_id="run-1", decision_id="d1", step_id="S2",
-            question="Which DB?", options=("pg",), actor=actor,
-        ).model_dump(),
-        timestamp=base_time + timedelta(seconds=5),
-        build_id="build-test",
-        node_id="node-1", lamport_clock=5,
-        project_uuid=_PROJECT_UUID, correlation_id=corr_id,
-    ))
+    events.append(
+        Event(
+            event_id=str(ULID()),
+            event_type=DECISION_INPUT_REQUESTED,
+            aggregate_id="run/run-1",
+            payload=DecisionInputRequestedPayload(
+                run_id="run-1",
+                decision_id="d1",
+                step_id="S2",
+                question="Which DB?",
+                options=("pg",),
+                actor=actor,
+            ).model_dump(),
+            timestamp=base_time + timedelta(seconds=5),
+            build_id="build-test",
+            node_id="node-1",
+            lamport_clock=5,
+            project_uuid=_PROJECT_UUID,
+            correlation_id=corr_id,
+        )
+    )
 
     human = RuntimeActorIdentity(actor_id="user-1", actor_type="human")
-    events.append(Event(
-        event_id=str(ULID()), event_type=DECISION_INPUT_ANSWERED,
-        aggregate_id="run/run-1",
-        payload=DecisionInputAnsweredPayload(
-            run_id="run-1", decision_id="d1", answer="pg", actor=human,
-        ).model_dump(),
-        timestamp=base_time + timedelta(seconds=6),
-        build_id="build-test",
-        node_id="node-1", lamport_clock=6,
-        project_uuid=_PROJECT_UUID, correlation_id=corr_id,
-    ))
+    events.append(
+        Event(
+            event_id=str(ULID()),
+            event_type=DECISION_INPUT_ANSWERED,
+            aggregate_id="run/run-1",
+            payload=DecisionInputAnsweredPayload(
+                run_id="run-1",
+                decision_id="d1",
+                answer="pg",
+                actor=human,
+            ).model_dump(),
+            timestamp=base_time + timedelta(seconds=6),
+            build_id="build-test",
+            node_id="node-1",
+            lamport_clock=6,
+            project_uuid=_PROJECT_UUID,
+            correlation_id=corr_id,
+        )
+    )
 
-    events.append(Event(
-        event_id=str(ULID()), event_type=NEXT_STEP_AUTO_COMPLETED,
-        aggregate_id="run/run-1",
-        payload=NextStepAutoCompletedPayload(
-            run_id="run-1", step_id="S2", agent_id="a1",
-            result="success", actor=actor,
-        ).model_dump(),
-        timestamp=base_time + timedelta(seconds=7),
-        build_id="build-test",
-        node_id="node-1", lamport_clock=7,
-        project_uuid=_PROJECT_UUID, correlation_id=corr_id,
-    ))
+    events.append(
+        Event(
+            event_id=str(ULID()),
+            event_type=NEXT_STEP_AUTO_COMPLETED,
+            aggregate_id="run/run-1",
+            payload=NextStepAutoCompletedPayload(
+                run_id="run-1",
+                step_id="S2",
+                agent_id="a1",
+                result="success",
+                actor=actor,
+            ).model_dump(),
+            timestamp=base_time + timedelta(seconds=7),
+            build_id="build-test",
+            node_id="node-1",
+            lamport_clock=7,
+            project_uuid=_PROJECT_UUID,
+            correlation_id=corr_id,
+        )
+    )
 
-    events.append(Event(
-        event_id=str(ULID()), event_type=MISSION_RUN_COMPLETED,
-        aggregate_id="run/run-1",
-        payload=MissionRunCompletedPayload(
-            run_id="run-1", mission_type="software-dev", actor=actor,
-        ).model_dump(),
-        timestamp=base_time + timedelta(seconds=8),
-        build_id="build-test",
-        node_id="node-1", lamport_clock=8,
-        project_uuid=_PROJECT_UUID, correlation_id=corr_id,
-    ))
+    events.append(
+        Event(
+            event_id=str(ULID()),
+            event_type=MISSION_RUN_COMPLETED,
+            aggregate_id="run/run-1",
+            payload=MissionRunCompletedPayload(
+                run_id="run-1",
+                mission_type="software-dev",
+                actor=actor,
+            ).model_dump(),
+            timestamp=base_time + timedelta(seconds=8),
+            build_id="build-test",
+            node_id="node-1",
+            lamport_clock=8,
+            project_uuid=_PROJECT_UUID,
+            correlation_id=corr_id,
+        )
+    )
 
     return events
 
@@ -155,7 +221,8 @@ class TestMissionNextDeterminism:
     @given(st.randoms())
     @settings(max_examples=200)
     def test_deterministic_across_physical_orderings(
-        self, rng: random.Random,
+        self,
+        rng: random.Random,
     ) -> None:
         """Reducer output is identical regardless of physical event ordering."""
         events = _build_test_run_sequence()

@@ -75,13 +75,23 @@ spec-kitty agent action implement WP03 --agent <name>
 1. Edit `src/spec_kitty_events/conformance/loader.py`
 2. Add `"profile_invocation"` and `"retrospective"` to `_VALID_CATEGORIES`:
    ```python
-   _VALID_CATEGORIES = frozenset({
-       "events", "lane_mapping", "edge_cases",
-       "collaboration", "glossary", "mission_next",
-       "dossier", "mission_audit", "decisionpoint",
-       "connector", "sync",
-       "profile_invocation", "retrospective",  # 3.1.0
-   })
+   _VALID_CATEGORIES = frozenset(
+       {
+           "events",
+           "lane_mapping",
+           "edge_cases",
+           "collaboration",
+           "glossary",
+           "mission_next",
+           "dossier",
+           "mission_audit",
+           "decisionpoint",
+           "connector",
+           "sync",
+           "profile_invocation",
+           "retrospective",  # 3.1.0
+       }
+   )
    ```
 3. Update the `load_fixtures()` docstring to list the new categories
 
@@ -341,21 +351,24 @@ spec-kitty agent action implement WP03 --agent <name>
 1. Create the test file following the pattern of `tests/test_dossier_conformance.py`:
    ```python
    """Conformance tests for profile invocation event contracts."""
+
    import pytest
    from spec_kitty_events.conformance.loader import load_fixtures
    from spec_kitty_events.profile_invocation import ProfileInvocationStartedPayload
    from pydantic import ValidationError
 
+
    @pytest.fixture
    def profile_invocation_fixtures():
        return load_fixtures("profile_invocation")
+
 
    def test_fixtures_loaded(profile_invocation_fixtures):
        """At least 4 fixtures should be loaded (2 valid, 2 invalid)."""
        assert len(profile_invocation_fixtures) >= 4
 
-   @pytest.mark.parametrize("fixture", load_fixtures("profile_invocation"),
-                            ids=lambda f: f.id)
+
+   @pytest.mark.parametrize("fixture", load_fixtures("profile_invocation"), ids=lambda f: f.id)
    def test_profile_invocation_conformance(fixture):
        """Validate each fixture against ProfileInvocationStartedPayload."""
        if fixture.expected_valid:
@@ -381,6 +394,7 @@ spec-kitty agent action implement WP03 --agent <name>
 1. Create the test file:
    ```python
    """Conformance tests for retrospective event contracts."""
+
    import pytest
    from spec_kitty_events.conformance.loader import load_fixtures
    from spec_kitty_events.retrospective import (
@@ -394,16 +408,18 @@ spec-kitty agent action implement WP03 --agent <name>
        "RetrospectiveSkipped": RetrospectiveSkippedPayload,
    }
 
+
    @pytest.fixture
    def retrospective_fixtures():
        return load_fixtures("retrospective")
+
 
    def test_fixtures_loaded(retrospective_fixtures):
        """At least 5 fixtures should be loaded (3 valid, 2 invalid)."""
        assert len(retrospective_fixtures) >= 5
 
-   @pytest.mark.parametrize("fixture", load_fixtures("retrospective"),
-                            ids=lambda f: f.id)
+
+   @pytest.mark.parametrize("fixture", load_fixtures("retrospective"), ids=lambda f: f.id)
    def test_retrospective_conformance(fixture):
        """Validate each fixture against the appropriate payload model."""
        model_class = _EVENT_TYPE_TO_MODEL[fixture.event_type]

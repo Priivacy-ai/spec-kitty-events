@@ -2,6 +2,7 @@
 
 Run: pytest --pyargs spec_kitty_events.conformance
 """
+
 from spec_kitty_events.conformance.loader import (
     FixtureCase,
     load_fixtures,

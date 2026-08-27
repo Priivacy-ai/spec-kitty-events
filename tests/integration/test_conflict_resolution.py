@@ -1,4 +1,5 @@
 """Integration test for conflict resolution workflow."""
+
 import uuid
 from datetime import datetime
 from ulid import ULID

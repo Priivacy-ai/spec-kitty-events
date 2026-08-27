@@ -1,4 +1,5 @@
 """Tests for mixed ULID/UUID event ID formats across dedup, sort, reducers, and storage."""
+
 import uuid
 from datetime import datetime
 from typing import List

@@ -4,6 +4,7 @@ Provides constants, exception, provenance value objects, four event payload mode
 reducer output models, and the reduce_mission_dossier() reducer for the Mission
 Dossier contract.
 """
+
 from __future__ import annotations
 
 from typing import Any, Dict, FrozenSet, List, Literal, Optional, Sequence, Tuple
@@ -19,12 +20,14 @@ MISSION_DOSSIER_ARTIFACT_MISSING: str = "MissionDossierArtifactMissing"
 MISSION_DOSSIER_SNAPSHOT_COMPUTED: str = "MissionDossierSnapshotComputed"
 MISSION_DOSSIER_PARITY_DRIFT_DETECTED: str = "MissionDossierParityDriftDetected"
 
-DOSSIER_EVENT_TYPES: FrozenSet[str] = frozenset({
-    MISSION_DOSSIER_ARTIFACT_INDEXED,
-    MISSION_DOSSIER_ARTIFACT_MISSING,
-    MISSION_DOSSIER_SNAPSHOT_COMPUTED,
-    MISSION_DOSSIER_PARITY_DRIFT_DETECTED,
-})
+DOSSIER_EVENT_TYPES: FrozenSet[str] = frozenset(
+    {
+        MISSION_DOSSIER_ARTIFACT_INDEXED,
+        MISSION_DOSSIER_ARTIFACT_MISSING,
+        MISSION_DOSSIER_SNAPSHOT_COMPUTED,
+        MISSION_DOSSIER_PARITY_DRIFT_DETECTED,
+    }
+)
 
 # ── Section 2: Exception ──────────────────────────────────────────────────────
 
@@ -42,8 +45,12 @@ class NamespaceMixedStreamError(ValueError):
 
 ArtifactClassT = Literal["input", "workflow", "output", "evidence", "policy", "runtime"]
 DriftKindT = Literal[
-    "artifact_added", "artifact_removed", "artifact_mutated",
-    "anomaly_introduced", "anomaly_resolved", "manifest_version_changed",
+    "artifact_added",
+    "artifact_removed",
+    "artifact_mutated",
+    "anomaly_introduced",
+    "anomaly_resolved",
+    "manifest_version_changed",
 ]
 AlgorithmT = Literal["sha256", "sha512", "md5"]
 ParityStatusT = Literal["clean", "drifted", "unknown"]
@@ -356,9 +363,7 @@ def reduce_mission_dossier(events: Sequence[Event]) -> MissionDossierState:
 
         if etype == MISSION_DOSSIER_ARTIFACT_INDEXED:
             try:
-                payload_indexed = MissionDossierArtifactIndexedPayload(
-                    **event.payload
-                )
+                payload_indexed = MissionDossierArtifactIndexedPayload(**event.payload)
             except Exception:
                 continue
             # Mark superseded artifact if applicable
@@ -386,9 +391,7 @@ def reduce_mission_dossier(events: Sequence[Event]) -> MissionDossierState:
 
         elif etype == MISSION_DOSSIER_ARTIFACT_MISSING:
             try:
-                payload_missing = MissionDossierArtifactMissingPayload(
-                    **event.payload
-                )
+                payload_missing = MissionDossierArtifactMissingPayload(**event.payload)
             except Exception:
                 continue
             anomalies.append(
@@ -403,15 +406,11 @@ def reduce_mission_dossier(events: Sequence[Event]) -> MissionDossierState:
 
         elif etype == MISSION_DOSSIER_SNAPSHOT_COMPUTED:
             try:
-                payload_snapshot = MissionDossierSnapshotComputedPayload(
-                    **event.payload
-                )
+                payload_snapshot = MissionDossierSnapshotComputedPayload(**event.payload)
             except Exception:
                 continue
             algorithm_value: str = (
-                payload_snapshot.algorithm
-                if payload_snapshot.algorithm is not None
-                else "sha256"
+                payload_snapshot.algorithm if payload_snapshot.algorithm is not None else "sha256"
             )
             latest_snapshot = SnapshotSummary(
                 snapshot_hash=payload_snapshot.snapshot_hash,
@@ -423,9 +422,7 @@ def reduce_mission_dossier(events: Sequence[Event]) -> MissionDossierState:
 
         elif etype == MISSION_DOSSIER_PARITY_DRIFT_DETECTED:
             try:
-                payload_drift = MissionDossierParityDriftDetectedPayload(
-                    **event.payload
-                )
+                payload_drift = MissionDossierParityDriftDetectedPayload(**event.payload)
             except Exception:
                 continue
             drift_history.append(

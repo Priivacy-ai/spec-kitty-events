@@ -82,13 +82,9 @@ Use language identifiers in code blocks: ````python`, ````bash`
   3. Add two new fields to the `Event` class, after `causation_id`:
 
      ```python
-     project_uuid: uuid.UUID = Field(
-         ...,
-         description="UUID of the project this event belongs to"
-     )
+     project_uuid: uuid.UUID = Field(..., description="UUID of the project this event belongs to")
      project_slug: Optional[str] = Field(
-         None,
-         description="Human-readable project identifier (optional)"
+         None, description="Human-readable project identifier (optional)"
      )
      ```
 

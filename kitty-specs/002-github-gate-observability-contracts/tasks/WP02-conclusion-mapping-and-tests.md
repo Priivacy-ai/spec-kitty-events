@@ -139,9 +139,7 @@ Implement the `map_check_run_conclusion()` function in `gates.py` (replacing the
        event_type = _CONCLUSION_MAP[conclusion]
 
        if conclusion in _IGNORED_CONCLUSIONS:
-           logger.info(
-               "Ignored non-blocking check_run conclusion: %s", conclusion
-           )
+           logger.info("Ignored non-blocking check_run conclusion: %s", conclusion)
            if on_ignored is not None:
                on_ignored(conclusion, "non_blocking")
 
@@ -185,12 +183,20 @@ Implement the `map_check_run_conclusion()` function in `gates.py` (replacing the
 
 3. **Test each required field missing** — parametrize over field names:
    ```python
-   @pytest.mark.parametrize("omitted_field", [
-       "gate_name", "gate_type", "conclusion", "external_provider",
-       "check_run_id", "check_run_url", "delivery_id",
-   ])
+   @pytest.mark.parametrize(
+       "omitted_field",
+       [
+           "gate_name",
+           "gate_type",
+           "conclusion",
+           "external_provider",
+           "check_run_id",
+           "check_run_url",
+           "delivery_id",
+       ],
+   )
    def test_gate_payload_missing_required_field(omitted_field):
-       valid_data = { ... }  # all fields present
+       valid_data = {...}  # all fields present
        del valid_data[omitted_field]
        with pytest.raises(pydantic.ValidationError):
            GatePassedPayload(**valid_data)
@@ -231,6 +237,7 @@ Implement the `map_check_run_conclusion()` function in `gates.py` (replacing the
    **Important**: If `AnyHttpUrl` causes the round-trip to fail (serializes as `Url` object that can't be fed back), you need to add a serializer to the model. Fix this in `gates.py`:
    ```python
    from pydantic import field_serializer
+
 
    @field_serializer("check_run_url")
    @classmethod
@@ -278,16 +285,19 @@ Implement the `map_check_run_conclusion()` function in `gates.py` (replacing the
 
 1. **Test each known conclusion** — parametrize:
    ```python
-   @pytest.mark.parametrize("conclusion,expected", [
-       ("success", "GatePassed"),
-       ("failure", "GateFailed"),
-       ("timed_out", "GateFailed"),
-       ("cancelled", "GateFailed"),
-       ("action_required", "GateFailed"),
-       ("neutral", None),
-       ("skipped", None),
-       ("stale", None),
-   ])
+   @pytest.mark.parametrize(
+       "conclusion,expected",
+       [
+           ("success", "GatePassed"),
+           ("failure", "GateFailed"),
+           ("timed_out", "GateFailed"),
+           ("cancelled", "GateFailed"),
+           ("action_required", "GateFailed"),
+           ("neutral", None),
+           ("skipped", None),
+           ("stale", None),
+       ],
+   )
    def test_map_check_run_conclusion_known_values(conclusion, expected):
        result = map_check_run_conclusion(conclusion)
        assert result == expected
@@ -322,6 +332,7 @@ Implement the `map_check_run_conclusion()` function in `gates.py` (replacing the
    @pytest.mark.parametrize("conclusion", ["neutral", "skipped", "stale"])
    def test_map_check_run_conclusion_calls_on_ignored(conclusion):
        calls = []
+
        def callback(c: str, reason: str) -> None:
            calls.append((c, reason))
 
@@ -345,6 +356,7 @@ Implement the `map_check_run_conclusion()` function in `gates.py` (replacing the
    ```python
    def test_map_check_run_conclusion_logs_ignored(caplog):
        import logging
+
        with caplog.at_level(logging.INFO, logger="spec_kitty_events.gates"):
            map_check_run_conclusion("neutral")
        assert "neutral" in caplog.text
@@ -415,8 +427,14 @@ Implement the `map_check_run_conclusion()` function in `gates.py` (replacing the
    ```python
    def test_conclusion_map_covers_all_github_values():
        expected_conclusions = {
-           "success", "failure", "timed_out", "cancelled",
-           "action_required", "neutral", "skipped", "stale",
+           "success",
+           "failure",
+           "timed_out",
+           "cancelled",
+           "action_required",
+           "neutral",
+           "skipped",
+           "stale",
        }
        assert set(_CONCLUSION_MAP.keys()) == expected_conclusions
    ```

@@ -178,9 +178,7 @@ json_like = st.recursive(
     ),
     lambda children: st.one_of(
         st.lists(children, max_size=5),
-        st.dictionaries(
-            st.text(min_size=1, max_size=10), children, max_size=5
-        ),
+        st.dictionaries(st.text(min_size=1, max_size=10), children, max_size=5),
     ),
     max_leaves=20,
 )
@@ -200,13 +198,9 @@ def _oracle_contains_forbidden_key(
     if isinstance(data, dict):
         if any(isinstance(k, str) and k in forbidden for k in data.keys()):
             return True
-        return any(
-            _oracle_contains_forbidden_key(v, forbidden) for v in data.values()
-        )
+        return any(_oracle_contains_forbidden_key(v, forbidden) for v in data.values())
     if isinstance(data, list):
-        return any(
-            _oracle_contains_forbidden_key(e, forbidden) for e in data
-        )
+        return any(_oracle_contains_forbidden_key(e, forbidden) for e in data)
     return False
 
 
@@ -253,9 +247,7 @@ def test_property_any_forbidden_key_at_top_level_is_rejected(
 
 
 @given(json_like, st.text(min_size=1, max_size=20))
-def test_property_value_equal_to_forbidden_name_does_not_trip(
-    inner: Any, key_name: str
-) -> None:
+def test_property_value_equal_to_forbidden_name_does_not_trip(inner: Any, key_name: str) -> None:
     """A string VALUE equal to a forbidden key name MUST be accepted.
 
     We construct an envelope whose key is *not* forbidden but whose value

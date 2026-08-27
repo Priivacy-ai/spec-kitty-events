@@ -126,16 +126,18 @@ wp_code: WP01
      ```
   2. Define the frozenset:
      ```python
-     GLOSSARY_EVENT_TYPES: FrozenSet[str] = frozenset({
-         GLOSSARY_SCOPE_ACTIVATED,
-         TERM_CANDIDATE_OBSERVED,
-         SEMANTIC_CHECK_EVALUATED,
-         GLOSSARY_CLARIFICATION_REQUESTED,
-         GLOSSARY_CLARIFICATION_RESOLVED,
-         GLOSSARY_SENSE_UPDATED,
-         GENERATION_BLOCKED_BY_SEMANTIC_CONFLICT,
-         GLOSSARY_STRICTNESS_SET,
-     })
+     GLOSSARY_EVENT_TYPES: FrozenSet[str] = frozenset(
+         {
+             GLOSSARY_SCOPE_ACTIVATED,
+             TERM_CANDIDATE_OBSERVED,
+             SEMANTIC_CHECK_EVALUATED,
+             GLOSSARY_CLARIFICATION_REQUESTED,
+             GLOSSARY_CLARIFICATION_RESOLVED,
+             GLOSSARY_SENSE_UPDATED,
+             GENERATION_BLOCKED_BY_SEMANTIC_CONFLICT,
+             GLOSSARY_STRICTNESS_SET,
+         }
+     )
      ```
 - **Files**: `src/spec_kitty_events/glossary.py` (Section 1).
 - **Parallel?**: Yes — works alongside T004.

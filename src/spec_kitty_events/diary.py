@@ -353,9 +353,7 @@ class DoneEvidence:
         return cls(
             review=ReviewApproval.from_dict(data["review"]),
             repos=[RepoEvidence.from_dict(r) for r in data.get("repos", [])],
-            verification=[
-                VerificationResult.from_dict(v) for v in data.get("verification", [])
-            ],
+            verification=[VerificationResult.from_dict(v) for v in data.get("verification", [])],
         )
 
 
@@ -484,9 +482,7 @@ class StatusEvent:
             review_ref=data.get("review_ref"),
             evidence=DoneEvidence.from_dict(evidence_data) if evidence_data else None,
             review_result=(
-                ReviewResult.from_dict(review_result_data)
-                if review_result_data
-                else None
+                ReviewResult.from_dict(review_result_data) if review_result_data else None
             ),
             policy_metadata=data.get("policy_metadata"),
             mission_id=data.get("mission_id"),  # None for legacy events
@@ -668,9 +664,7 @@ class WPInnerStateDelta:
         if self.release_runtime_claim:
             return False
         return all(
-            getattr(self, f.name) is None
-            for f in fields(self)
-            if f.name != "release_runtime_claim"
+            getattr(self, f.name) is None for f in fields(self) if f.name != "release_runtime_claim"
         )
 
     def to_dict(self) -> dict[str, Any]:
@@ -709,9 +703,7 @@ class WPInnerStateDelta:
         if subtasks_raw is not None:
             subtasks = {str(sid): Status(value) for sid, value in subtasks_raw.items()}
         review_raw = data.get("review")
-        review = (
-            ReviewOverride.from_dict(review_raw) if review_raw is not None else None
-        )
+        review = ReviewOverride.from_dict(review_raw) if review_raw is not None else None
         shell_pid_raw = data.get("shell_pid")
         tracker_refs_raw = data.get("tracker_refs")
         tracker_refs_replace_raw = data.get("tracker_refs_replace")
@@ -720,13 +712,9 @@ class WPInnerStateDelta:
             shell_pid=int(shell_pid_raw) if shell_pid_raw is not None else None,
             subtasks=subtasks,
             note=data.get("note"),
-            tracker_refs=list(tracker_refs_raw)
-            if tracker_refs_raw is not None
-            else None,
+            tracker_refs=list(tracker_refs_raw) if tracker_refs_raw is not None else None,
             tracker_refs_replace=(
-                list(tracker_refs_replace_raw)
-                if tracker_refs_replace_raw is not None
-                else None
+                list(tracker_refs_replace_raw) if tracker_refs_replace_raw is not None else None
             ),
             review=review,
             release_runtime_claim=bool(data.get("release_runtime_claim", False)),
@@ -779,9 +767,7 @@ class InnerStateChanged:
         """
         event_id = data["event_id"]
         if not isinstance(event_id, str) or not ULID_PATTERN.match(event_id):
-            raise ValueError(
-                f"InnerStateChanged.event_id is not a valid ULID: {event_id!r}"
-            )
+            raise ValueError(f"InnerStateChanged.event_id is not a valid ULID: {event_id!r}")
         kind = data.get("kind")
         if kind != ANNOTATION_KIND:
             raise ValueError(
@@ -989,10 +975,7 @@ def with_tracked_mission_slug_aliases(payload: dict[str, Any]) -> dict[str, Any]
 
     enriched = dict(payload)
 
-    if (
-        enriched.get("mission_slug") is None
-        and enriched.get("feature_slug") is not None
-    ):
+    if enriched.get("mission_slug") is None and enriched.get("feature_slug") is not None:
         enriched["mission_slug"] = enriched["feature_slug"]
 
     return enriched
@@ -1260,9 +1243,7 @@ def _apply_annotation_delta(state: dict[str, Any], delta: WPInnerStateDelta) -> 
                 merged.append(ref)
         state["tracker_refs"] = merged
     if delta.review is not None:
-        state["review"] = (
-            None if delta.review.is_release_sentinel else delta.review.to_dict()
-        )
+        state["review"] = None if delta.review.is_release_sentinel else delta.review.to_dict()
 
 
 def _dedup_preserve_order(refs: list[str]) -> list[str]:
@@ -1413,11 +1394,13 @@ _RETROSPECTIVE_EVENT_NAME_PREFIX = "retrospective."
 # envelope shape MUST be added here, or this row will hit StatusEvent.from_dict
 # and raise as a malformed lane-transition row. Ported from the CLI's
 # `_RETROSPECTIVE_LIFECYCLE_EVENT_TYPES` (specify_cli/status/store.py).
-_RETROSPECTIVE_LIFECYCLE_EVENT_TYPES: frozenset[str] = frozenset({
-    "RetrospectiveCaptured",
-    "RetrospectiveCaptureFailed",
-    "RetrospectiveSkipped",
-})
+_RETROSPECTIVE_LIFECYCLE_EVENT_TYPES: frozenset[str] = frozenset(
+    {
+        "RetrospectiveCaptured",
+        "RetrospectiveCaptureFailed",
+        "RetrospectiveSkipped",
+    }
+)
 
 
 def _is_retrospective_lifecycle_event(obj: dict[str, Any]) -> bool:
@@ -1457,9 +1440,7 @@ def _is_non_lane_row(obj: dict[str, Any]) -> bool:
     to the reducer via the annotation read path (handled before this check).
     """
     event_name = obj.get("event_name")
-    if isinstance(event_name, str) and event_name.startswith(
-        _RETROSPECTIVE_EVENT_NAME_PREFIX
-    ):
+    if isinstance(event_name, str) and event_name.startswith(_RETROSPECTIVE_EVENT_NAME_PREFIX):
         return True
     if _is_retrospective_lifecycle_event(obj):
         return True
@@ -1478,9 +1459,7 @@ def parse_diary(rows: Iterable[dict[str, Any]]) -> EventStream:
     annotations: list[InnerStateChanged] = []
     for row in rows:
         if not isinstance(row, dict):
-            raise DiaryError(
-                f"Invalid diary row: expected JSON object, got {type(row).__name__}"
-            )
+            raise DiaryError(f"Invalid diary row: expected JSON object, got {type(row).__name__}")
 
         kind = row.get("kind")
         if kind is not None:
@@ -1568,9 +1547,7 @@ def reduce_parsed(
     # trusted feature_dir.name when the slug is empty (`slug or feature_dir.name`),
     # so this one chokepoint fail-closes all current and future path sinks.
     # An annotation-only stream has no transition to source the slug from.
-    mission_slug = (
-        safe_mission_slug(sorted_events[0].mission_slug, "") if sorted_events else ""
-    )
+    mission_slug = safe_mission_slug(sorted_events[0].mission_slug, "") if sorted_events else ""
 
     for event in sorted_events:
         current = wp_states.get(event.wp_id)
@@ -1598,9 +1575,7 @@ def reduce_parsed(
     # Lanes in NON_DISPLAY_LANES (GENESIS, UNINITIALIZED) are excluded --
     # neither is ever the current lane of a materialised WP (post-finalize
     # there are none).
-    summary: dict[str, int] = {
-        lane.value: 0 for lane in Lane if lane not in NON_DISPLAY_LANES
-    }
+    summary: dict[str, int] = {lane.value: 0 for lane in Lane if lane not in NON_DISPLAY_LANES}
     for wp_state in wp_states.values():
         lane_val = wp_state["lane"]
         if lane_val in summary:
