@@ -19,6 +19,7 @@ from pathlib import Path
 from typing import Any
 
 import pytest
+from packaging.version import Version
 
 from spec_kitty_events import __version__, forbidden_keys, strict
 
@@ -206,4 +207,142 @@ def test_documented_recipe_rejects_cutover_boundary_fixtures(
         f"cutover boundary. The recipe in COMPATIBILITY.md has drifted -- "
         f"update _admitted_by_documented_recipe (and the doc, if the doc is "
         f"wrong) to match."
+    )
+
+
+# ---------------------------------------------------------------------------
+# COMPATIBILITY.md's section-ordering contract (issue #181, MINOR from the
+# adversarial squad pass 2 on PR #152, head 3e25993).
+#
+# COMPATIBILITY.md:10-11 states: "Sections below are ordered newest-first by
+# the release that introduced them." An unreleased `## Known gap (not yet
+# closed)` section carries no version number and must precede every released
+# section regardless of when the gap it describes will close. Neither half
+# was enforced -- a future in-place rework of the open control-character gap
+# (added by #119, expected to close when #104 merges) into a normal, dated
+# entry while leaving it sitting above `## \`8.0.0\`` would silently violate
+# the contract this document states, with no test failing.
+#
+# Unversioned policy sections (`## Canonical On-Wire Policy`, `## Forbidden
+# Legacy Surfaces`, `## Versioning`, `## Quick Reference`, ...) are
+# interleaved after the released sections and are deliberately not part of
+# assertion 1 -- they carry no version and are not sorted. `##
+# \`8.0.0\`` uses backticks; `## Decision Moment V1 (4.0.0)` carries its
+# version in parentheses instead -- both spellings must be recognized or the
+# checker quietly skips the second one.
+# ---------------------------------------------------------------------------
+
+_SECTION_HEADING_RE = re.compile(r"^## (.+)$", re.M)
+_HEADING_VERSION_RE = re.compile(r"`(\d+(?:\.\d+){2})`|\((\d+(?:\.\d+){2})\)")
+_KNOWN_GAP_HEADING_RE = re.compile(r"^Known gap \(not yet closed\)")
+
+
+def _heading_version(heading: str) -> str | None:
+    """Extract a `X.Y.Z` version from a '## ' heading's text, if present.
+
+    Recognizes both spellings this document uses: backticked (`` `8.0.0` ``)
+    and parenthetical (``(4.0.0)``) -- the latter is how `## Decision Moment
+    V1 (4.0.0)` states its version, and would be silently skipped by a
+    backtick-only pattern.
+    """
+    match = _HEADING_VERSION_RE.search(heading)
+    if match is None:
+        return None
+    return match.group(1) or match.group(2)
+
+
+def _parse_section_headings(text: str) -> list[str]:
+    """Top-level ('## ') section headings, in document order.
+
+    ``^## `` (exactly two hashes then a space) deliberately excludes '### '
+    subsections -- e.g. the `6.1.0`/`6.0.0` entries nested under '##
+    Versioning' -- which are not top-level release sections and would
+    otherwise appear interleaved out of order with the real ones.
+    """
+    return _SECTION_HEADING_RE.findall(text)
+
+
+def _versioned_headings_are_newest_first(headings: list[str]) -> bool:
+    parsed = [Version(v) for v in (_heading_version(h) for h in headings) if v is not None]
+    return parsed == sorted(parsed, reverse=True)
+
+
+def _known_gap_precedes_every_versioned_heading(headings: list[str]) -> bool:
+    versioned_indices = [i for i, h in enumerate(headings) if _heading_version(h) is not None]
+    if not versioned_indices:
+        return True
+    first_versioned = min(versioned_indices)
+    gap_indices = (i for i, h in enumerate(headings) if _KNOWN_GAP_HEADING_RE.match(h))
+    return all(i < first_versioned for i in gap_indices)
+
+
+def test_heading_version_recognizes_both_spellings() -> None:
+    assert _heading_version("`8.0.0` -- Sync, legacy-envelope surfaces deleted") == "8.0.0"
+    assert _heading_version("Decision Moment V1 (4.0.0)") == "4.0.0"
+    assert _heading_version("Canonical On-Wire Policy") is None
+    assert _heading_version("Known gap (not yet closed) -- some gap") is None
+
+
+def test_parse_section_headings_ignores_level_three_subsections() -> None:
+    """`### ` subsections (e.g. the `6.1.0`/`6.0.0` entries under '##
+    Versioning') are not top-level release sections and must not be parsed
+    as one -- ``^## `` matches on exactly two hashes.
+    """
+    text = "## Versioning\n\n### Post-mission lifecycle events (6.1.0)\n\n## `8.0.0` -- x\n"
+    assert _parse_section_headings(text) == ["Versioning", "`8.0.0` -- x"]
+
+
+def test_versioned_headings_helper_detects_out_of_order_versions() -> None:
+    """Proves the ordering check actually rejects a bad ordering, not just
+    passes trivially on the current, already-compliant document.
+    """
+    assert not _versioned_headings_are_newest_first(["`7.0.0` -- first", "`8.0.0` -- second"])
+    assert _versioned_headings_are_newest_first(["`8.0.0` -- first", "`7.0.0` -- second"])
+
+
+def test_known_gap_helper_detects_known_gap_after_versioned_heading() -> None:
+    """Proves the precedence check actually rejects a known-gap heading that
+    sorts after a versioned one -- the exact drift scenario #181 describes.
+    """
+    assert not _known_gap_precedes_every_versioned_heading(
+        ["`8.0.0` -- first", "Known gap (not yet closed) -- late"]
+    )
+    assert _known_gap_precedes_every_versioned_heading(
+        ["Known gap (not yet closed) -- early", "`8.0.0` -- second"]
+    )
+    assert _known_gap_precedes_every_versioned_heading(["`8.0.0` -- no gap heading at all"])
+
+
+def test_compatibility_doc_versioned_sections_are_newest_first() -> None:
+    """Assertion 1 of the ordering contract (COMPATIBILITY.md:10-11)."""
+    headings = _parse_section_headings(_COMPATIBILITY_PATH.read_text(encoding="utf-8"))
+    versions = [_heading_version(h) for h in headings]
+    versions = [v for v in versions if v is not None]
+    assert versions, "No versioned '## ' headings found in COMPATIBILITY.md"
+    assert _versioned_headings_are_newest_first(headings), (
+        f"COMPATIBILITY.md's versioned '## ' headings are not newest-first in "
+        f"document order: {versions}. Per COMPATIBILITY.md:10-11, released "
+        f"sections must be ordered newest-first by the release that "
+        f"introduced them."
+    )
+
+
+def test_compatibility_doc_known_gap_precedes_every_versioned_section() -> None:
+    """Assertion 2 of the ordering contract (COMPATIBILITY.md:10-14).
+
+    Guards the concrete drift scenario #181 dated: the open
+    `to_zeitgeist_attrs` control-character gap (added by #119, expected to
+    close when #104 merges) getting reworded in place into a normal,
+    versioned entry while staying above '## `8.0.0`' would violate this
+    silently were it not for this test. Passes vacuously if the gap has
+    since closed and no '## Known gap' heading remains -- that is a valid
+    state, not a violation.
+    """
+    headings = _parse_section_headings(_COMPATIBILITY_PATH.read_text(encoding="utf-8"))
+    assert _known_gap_precedes_every_versioned_heading(headings), (
+        "A '## Known gap (not yet closed)' heading in COMPATIBILITY.md sorts "
+        "after a versioned release section. Per COMPATIBILITY.md:10-14, an "
+        "unreleased known-gap section carries no version number and must "
+        "precede every released section, regardless of when the gap it "
+        "describes will close."
     )
