@@ -482,7 +482,7 @@ def _validate_with_schema(
         ImportError: If strict=True and jsonschema is unavailable.
     """
     try:
-        from jsonschema import Draft202012Validator
+        from jsonschema import Draft202012Validator  # type: ignore[import-untyped]
     except ImportError:
         if strict:
             raise ImportError(
