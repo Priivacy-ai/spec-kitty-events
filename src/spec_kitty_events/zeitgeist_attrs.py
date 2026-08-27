@@ -1066,8 +1066,28 @@ def from_zeitgeist_attrs(
             ) from exc
     occurred_at = attrs.get("occurred_at")
     if occurred_at is not None:
+        # datetime.fromisoformat() only accepts the "Z" UTC designator from
+        # Python 3.11 on; this repo's declared floor is 3.10 (pyproject.toml),
+        # so a textbook Z-suffixed timestamp would otherwise be wrongly
+        # rejected on 3.10 while passing on 3.11+ for the exact same wire
+        # bytes (spec-kitty-events#55). Normalize before parsing so the
+        # accept/reject outcome doesn't depend on the interpreter's minor
+        # version.
+        # A well-formed value has at most one trailing "Z"; if another "Z"
+        # remains after stripping it, the input was already malformed and
+        # must not be laundered into something 3.10's laxer fromisoformat()
+        # would accept (e.g. a doubled "...00ZZ").
+        if occurred_at.endswith("Z"):
+            candidate = occurred_at[:-1]
+            if "Z" in candidate:
+                raise ZeitgeistAttrsError(
+                    f"attr 'occurred_at' is not ISO-8601: {occurred_at!r}"
+                )
+            candidate += "+00:00"
+        else:
+            candidate = occurred_at
         try:
-            parsed_occurred_at = datetime.fromisoformat(occurred_at)
+            parsed_occurred_at = datetime.fromisoformat(candidate)
         except ValueError as exc:
             raise ZeitgeistAttrsError(
                 f"attr 'occurred_at' is not ISO-8601: {occurred_at!r}"

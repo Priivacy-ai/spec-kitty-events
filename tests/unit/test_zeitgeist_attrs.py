@@ -656,6 +656,25 @@ def test_decode_accepts_a_timezone_aware_occurred_at_with_nonzero_offset() -> No
     assert moment.attrs["occurred_at"] == "2026-08-25T09:00:00-05:00"
 
 
+def test_decode_accepts_a_z_suffixed_occurred_at() -> None:
+    """``datetime.fromisoformat`` only accepts the "Z" UTC designator from
+    Python 3.11 on; decode must normalize it so the same wire bytes are
+    accepted on this repo's declared 3.10 floor too (spec-kitty-events#55)."""
+    attrs = to_zeitgeist_attrs(_transition(), _envelope("WPStatusChanged"))
+    attrs["occurred_at"] = "2026-08-25T09:00:00Z"
+    moment = from_zeitgeist_attrs("WPStatusChanged", attrs)
+    assert moment.attrs["occurred_at"] == "2026-08-25T09:00:00Z"
+
+
+def test_decode_rejects_malformed_occurred_at_that_merely_ends_in_z() -> None:
+    """The Z-suffix normalization must not turn a bogus string ending in
+    "Z" into something that spuriously parses."""
+    attrs = to_zeitgeist_attrs(_transition(), _envelope("WPStatusChanged"))
+    attrs["occurred_at"] = "not a timestampZ"
+    with pytest.raises(ZeitgeistAttrsError, match="occurred_at"):
+        from_zeitgeist_attrs("WPStatusChanged", attrs)
+
+
 def test_decode_rejects_unknown_keys() -> None:
     with pytest.raises(ZeitgeistAttrsError):
         from_zeitgeist_attrs("WPStatusChanged", {"not_in_schema": "x"})
