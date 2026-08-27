@@ -23,17 +23,20 @@ import json
 from pathlib import Path
 
 import pytest
+from packaging.version import Version
 
 from spec_kitty_events.harness_observation import (
     HARNESS_OBSERVATION_PAYLOAD_IDS,
     ObservationKind,
 )
 from spec_kitty_events.strict import (
+    _E2_STRICT_SINCE,
     STRICT_EVENT_TYPES,
     SUPPORT_MATRIX,
     SupportRow,
     support_matrix_digest,
 )
+from spec_kitty_events.zeitgeist_attrs import VOLATILE_EVENT_TYPES
 
 _SCHEMA_DIR = Path(__file__).resolve().parent.parent / "src" / "spec_kitty_events" / "schemas"
 _SUPPORT_MATRIX_PATH = (
@@ -131,6 +134,34 @@ def test_ephemeral_vocabulary_is_volatile() -> None:
     assert volatile_non_observation == expected_volatile
 
 
+def test_volatile_support_matrix_rows_are_all_zeitgeist_broadcast() -> None:
+    """Cross-check the two independent sources of truth directly (#23), not
+    just each against its own in-test literal: a ``durability="volatile"``
+    row has no durable server-side existence, so the strict profile must
+    never admit one that :mod:`zeitgeist_attrs` cannot actually broadcast —
+    that failure mode (a type added to ``SUPPORT_MATRIX`` as volatile but
+    never wired into ``VOLATILE_EVENT_TYPES``) stayed green under the old
+    per-file hardcoded-literal tests as long as each literal was kept in
+    sync with its own module, even though the two modules had drifted apart.
+
+    This is deliberately a subset, not the ``==`` the finding proposed:
+    ``VOLATILE_EVENT_TYPES`` (8.2.0, #77) also covers event types that are
+    durably journaled and additionally broadcast for the moment/feed
+    requirements (``SpecifyStarted`` et al., still ``durability="journal"``
+    here) and types not yet admitted to the strict profile at all
+    (``DecisionPointOpened``/``DecisionPointResolved``) — so it is a
+    superset of the volatile support-matrix rows, never a mismatch of it.
+    """
+    volatile_non_observation = {
+        row.event_type
+        for row in SUPPORT_MATRIX
+        if row.durability == "volatile" and row.event_type != "HarnessObservation"
+    }
+    assert volatile_non_observation <= VOLATILE_EVENT_TYPES, (
+        volatile_non_observation - VOLATILE_EVENT_TYPES
+    )
+
+
 def test_mission_run_rows_use_the_mission_next_models() -> None:
     rows = [row for row in SUPPORT_MATRIX if row.family == "mission_run"]
     assert len(rows) == 6
@@ -146,6 +177,24 @@ def test_mission_run_rows_pin_min_consumer_to_strict_since() -> None:
     for row in rows:
         assert row.strict_since == "8.0.0", row.event_type
         assert row.min_consumer_package == row.strict_since, row.event_type
+
+
+def test_mission_run_strict_since_is_pinned_to_the_e2_marker_and_postdates_introduction() -> None:
+    """Pin ``_E2_STRICT_SINCE`` (strict.py) itself as the row.strict_since
+    authority for the six mission_run rows (#23): each row must literally
+    equal the module marker, not a coincidentally-matching literal, and the
+    marker must postdate each row's ``introduced_in`` — the semantics
+    ``strict.py`` documents ("first strict-admitted later than their 2.3.0
+    introduction"). Before this test, changing the marker without updating
+    every row (or vice versa) kept ``test_mission_run_rows_pin_min_consumer_
+    to_strict_since`` above green as long as both happened to still equal
+    the hardcoded ``"8.0.0"`` literal.
+    """
+    rows = [row for row in SUPPORT_MATRIX if row.family == "mission_run"]
+    assert len(rows) == 6
+    for row in rows:
+        assert row.strict_since == _E2_STRICT_SINCE, row.event_type
+        assert Version(row.strict_since) > Version(row.introduced_in), row.event_type
 
 
 def test_support_matrix_row_keys_match_expected() -> None:
