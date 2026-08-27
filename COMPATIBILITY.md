@@ -1,6 +1,6 @@
 # Compatibility Guide
 
-**Current package version**: `9.0.1`
+**Current package version**: `9.0.2`
 
 The on-wire envelope schema version is `3.0.0` and has been unchanged since
 the cutover. The package version and the envelope schema version move
@@ -22,6 +22,15 @@ This document is the public compatibility policy for consumers of:
 - `spec-kitty-events`
 - `spec-kitty-saas`
 - `spec-kitty`
+
+## `9.0.2` — mixed-case doubled `Z` UTC designators are rejected
+
+`9.0.2` tightens timestamp validation at three normalization sites:
+`strict.validate_strict_envelope`, the retrospective payload validators, and
+the packaged conformance timestamp helper. A malformed value ending in `zZ`
+is now rejected instead of being normalized to a lowercase-`z` form that some
+supported Python interpreters accept. Producers already sending one valid UTC
+designator are unaffected.
 
 ## `9.0.1` — `zeitgeist_ref_for` rejects control characters in the derived ref
 

@@ -499,17 +499,23 @@ def _envelope_shape_error(**details: object) -> ValidationError:
 def _parse_iso8601(value: str) -> datetime | None:
     """Best-effort ISO-8601 parse. Returns None when unparsable.
 
-    A well-formed value has at most one trailing ``Z``; if another ``Z``
-    remains after stripping it, the input was already malformed and must not
-    be laundered into something Python 3.10's laxer ``fromisoformat`` would
-    accept (e.g. a doubled ``...00ZZ``) (spec-kitty-events#55/#107/#115).
+    ``datetime.fromisoformat`` only accepts the "Z" UTC designator from
+    Python 3.11 on; this repo's declared floor is 3.10, so a well-formed
+    Z-suffixed value is normalized to "+00:00" before parsing (spec-kitty-
+    events#115). A value has at most one trailing "Z"; if another "Z"
+    remains after stripping it, the input was already malformed and must
+    not be laundered into something 3.10's laxer ``fromisoformat`` would
+    accept (e.g. a doubled "...00ZZ"). The residual check is
+    case-insensitive: a mixed-case doubled designator (e.g. "...00zZ") is
+    just as malformed, and a case-sensitive guard would let it through on
+    some interpreters and not others (spec-kitty-events#124).
     """
     text = value
     if text.endswith("Z"):
-        text = text[:-1]
-        if "Z" in text:
+        candidate = text[:-1]
+        if "z" in candidate.lower():
             return None
-        text += "+00:00"
+        text = candidate + "+00:00"
     try:
         return datetime.fromisoformat(text)
     except ValueError:

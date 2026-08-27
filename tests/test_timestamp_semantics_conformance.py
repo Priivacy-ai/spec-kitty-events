@@ -153,6 +153,16 @@ def test_helper_raises_on_one_second_drift() -> None:
     assert exc_info.value.actual == drifted
 
 
+def test_helper_rejects_a_mixed_case_doubled_z_timestamp() -> None:
+    """A doubled UTC designator must be rejected regardless of case: a
+    case-sensitive residual check misses a lowercase "z" left behind by a
+    mixed-case doubled designator (e.g. "...00zZ"), which would otherwise
+    launder it into "...00z+00:00" (spec-kitty-events#124)."""
+    envelope = {"timestamp": "2026-01-01T00:00:00zZ"}
+    with pytest.raises(ValueError, match="timestamp"):
+        assert_producer_occurrence_preserved(envelope, datetime(2026, 1, 1, tzinfo=timezone.utc))
+
+
 def test_error_attributes_round_trip() -> None:
     """Constructing TimestampSubstitutionError directly preserves attributes and __str__."""
     expected = datetime(2026, 1, 1, tzinfo=timezone.utc)

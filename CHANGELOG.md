@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [9.0.2] - 2026-08-29
+
+### Fixed
+
+- `strict.validate_strict_envelope`, the retrospective payload validators,
+  and the conformance timestamp helper now reject a doubled trailing `Z`
+  case-insensitively. A malformed mixed-case value such as
+  `...00zZ` can no longer be normalized into a form that some supported
+  interpreters accept (EXPERIMENTAL-spec-kitty-events#124).
+
 ### Fixed
 
 - `COMPATIBILITY.md`'s `8.0.0` migration recipe for callers outside
