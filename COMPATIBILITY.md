@@ -20,17 +20,20 @@ This document is the public compatibility policy for consumers of:
 - `spec-kitty-saas`
 - `spec-kitty`
 
-## `8.2.0` — `to_zeitgeist_attrs` also rejects control characters, on encode
+## Known gap (not yet closed) — `to_zeitgeist_attrs` does not yet reject control characters on encode
 
-`to_zeitgeist_attrs` now runs the same `str.isprintable()` control-character
-check `from_zeitgeist_attrs` already enforces on decode
-(EXPERIMENTAL-spec-kitty-events#25, then widened by #63), closing the
-encode/decode gap (#64): before this, a producer could successfully encode
-and broadcast an attrs value carrying a control character that a consumer's
-decode would then reject, silently dropping the moment. Both directions now
-share one predicate and raise the same typed
-`ZeitgeistAttrsControlCharacterError` — a value either survives both
-directions or is rejected by both.
+`from_zeitgeist_attrs` rejects an attrs value carrying a non-printable
+character on decode (`str.isprintable()`, EXPERIMENTAL-spec-kitty-events#25,
+then widened by #63), but `to_zeitgeist_attrs` does not yet run the same
+check on encode (EXPERIMENTAL-spec-kitty-events#64): a producer can
+successfully encode and broadcast an attrs value carrying a control
+character that a consumer's decode will then reject, silently dropping the
+moment. The fix — both directions sharing one predicate and raising the
+same typed `ZeitgeistAttrsControlCharacterError` — is open as
+EXPERIMENTAL-spec-kitty-events#104 and not yet merged to `main`. This
+section is written ahead of that merge so the documentation gap doesn't
+reopen once it lands; it becomes a normal dated-version entry, and this
+"known gap" framing goes away, when #104 merges.
 
 ## `8.0.0` — Sync, legacy-envelope, and cutover surfaces deleted
 
