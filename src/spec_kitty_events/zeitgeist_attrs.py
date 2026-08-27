@@ -1115,8 +1115,32 @@ def from_zeitgeist_attrs(
             ) from exc
     occurred_at = attrs.get("occurred_at")
     if occurred_at is not None:
+        # datetime.fromisoformat() only accepts the "Z" UTC designator from
+        # Python 3.11 on; this repo's declared floor is 3.10 (pyproject.toml),
+        # so a textbook Z-suffixed timestamp would otherwise be wrongly
+        # rejected on 3.10 while passing on 3.11+ for the exact same wire
+        # bytes (spec-kitty-events#55). Normalize before parsing so the
+        # accept/reject outcome doesn't depend on the interpreter's minor
+        # version. A well-formed value has at most this one trailing "Z"; if
+        # another "Z" remains after stripping it, the input was already
+        # malformed and must not be laundered into something 3.10's laxer
+        # fromisoformat() would accept (e.g. a doubled "...00ZZ"). The
+        # residual check is case-insensitive: a mixed-case doubled
+        # designator (e.g. "...00zZ") is just as malformed, and Python
+        # 3.11+'s fromisoformat is itself case-insensitive on "Z", so a
+        # case-sensitive guard here would let it through on some
+        # interpreters and not others — the exact split this fix removes.
+        if occurred_at.endswith("Z"):
+            candidate = occurred_at[:-1]
+            if "z" in candidate.lower():
+                raise ZeitgeistAttrsError(
+                    f"attr 'occurred_at' is not ISO-8601: {occurred_at!r}"
+                )
+            candidate += "+00:00"
+        else:
+            candidate = occurred_at
         try:
-            parsed_occurred_at = datetime.fromisoformat(occurred_at)
+            parsed_occurred_at = datetime.fromisoformat(candidate)
         except ValueError as exc:
             raise ZeitgeistAttrsError(
                 f"attr 'occurred_at' is not ISO-8601: {occurred_at!r}"
