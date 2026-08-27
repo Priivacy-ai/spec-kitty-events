@@ -55,12 +55,17 @@ _CORRELATION_ID = "01JMC0RRC0RRC0RRC0RRC0RRC0"
 _PROJECT_UUID = UUID("550e8400-e29b-41d4-a716-446655440000")
 
 
-def _envelope(event_type: str, *, event_id: str = _EVENT_ID) -> Event:
+def _envelope(
+    event_type: str,
+    *,
+    event_id: str = _EVENT_ID,
+    timestamp: datetime = datetime(2026, 8, 25, 9, 0, 0, tzinfo=timezone.utc),
+) -> Event:
     return Event(
         event_id=event_id,
         event_type=event_type,
         aggregate_id="agg",
-        timestamp=datetime(2026, 8, 25, 9, 0, 0, tzinfo=timezone.utc),
+        timestamp=timestamp,
         build_id="build-unit",
         node_id="node-unit",
         lamport_clock=1,
@@ -209,6 +214,22 @@ def test_occurred_at_comes_from_the_envelope_not_receipt_time() -> None:
                                    mission_type="software-dev")
     attrs = to_zeitgeist_attrs(payload, envelope)
     assert attrs["occurred_at"] == envelope.timestamp.isoformat()
+
+
+def test_encode_canonicalises_a_naive_timestamp_to_utc() -> None:
+    """#100: a naive Event.timestamp is idiomatic in this repo (Event has no
+    tz-aware validator, and conformance/timestamp_semantics._to_utc treats
+    naive as UTC) but from_zeitgeist_attrs (#62) rejects a naive occurred_at
+    on decode. Encode must canonicalise rather than emit the naive value
+    as-is, so the codec's own output always round-trips."""
+    envelope = _envelope(
+        "WPStatusChanged", timestamp=datetime(2026, 8, 25, 9, 0, 0)
+    )
+    attrs = to_zeitgeist_attrs(_transition(), envelope)
+    assert attrs["occurred_at"] == "2026-08-25T09:00:00+00:00"
+
+    moment = from_zeitgeist_attrs("WPStatusChanged", attrs)
+    assert moment.attrs["occurred_at"] == "2026-08-25T09:00:00+00:00"
 
 
 def test_envelope_event_type_must_match_the_payload_family() -> None:

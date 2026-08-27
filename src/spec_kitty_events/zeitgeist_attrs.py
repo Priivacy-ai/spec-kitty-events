@@ -125,7 +125,7 @@ from __future__ import annotations
 
 import dataclasses
 from collections.abc import Mapping, Sequence
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 from types import UnionType
 from typing import Any, Union, get_args, get_origin
@@ -682,7 +682,13 @@ def to_zeitgeist_attrs(payload: BaseModel, envelope: Event) -> dict[str, str]:
         envelope: The journal envelope this payload was emitted under. Its
             ``event_id`` and ``timestamp`` become the ``event_id`` and
             ``occurred_at`` attrs (ISO-8601); its ``event_type`` must name
-            the same volatile family as *payload*.
+            the same volatile family as *payload*. A timezone-naive
+            ``timestamp`` is treated as UTC (``replace(tzinfo=timezone.utc)``),
+            matching :func:`spec_kitty_events.conformance.timestamp_semantics._to_utc`
+            and this package's documented naive-means-UTC contract, so the
+            emitted ``occurred_at`` is always timezone-aware — required
+            because :func:`from_zeitgeist_attrs` rejects a naive
+            ``occurred_at`` on decode (spec-kitty-events#100).
 
     Raises:
         UnknownVolatileEventTypeError: *payload* is not a volatile-family
@@ -710,10 +716,16 @@ def to_zeitgeist_attrs(payload: BaseModel, envelope: Event) -> dict[str, str]:
         )
 
     # Envelope identity first, so the projection order is stable across
-    # producers regardless of how each family's payload fields evolve.
+    # producers regardless of how each family's payload fields evolve. A
+    # naive timestamp is canonicalised to UTC rather than emitted as-is:
+    # from_zeitgeist_attrs rejects a naive occurred_at (#62), so encode must
+    # not emit one (#100).
+    occurred_at = envelope.timestamp
+    if occurred_at.tzinfo is None:
+        occurred_at = occurred_at.replace(tzinfo=timezone.utc)
     attrs = {
         "event_id": envelope.event_id,
-        "occurred_at": envelope.timestamp.isoformat(),
+        "occurred_at": occurred_at.isoformat(),
     }
     attrs.update(
         _encode_fields(
