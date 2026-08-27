@@ -43,6 +43,17 @@ re-homed from the deleted artifact per issue #10).
 Producers and ingress paths that relied on `validate_event` for the gate
 must switch to the strict profile.
 
+That switch is a single call only for the event types
+`spec_kitty_events.strict.STRICT_EVENT_TYPES` admits (the fixed
+lifecycle/WP/project/harness allowlist) — `validate_strict_envelope()`
+rejects every other event type with `UNKNOWN_EVENT_TYPE` regardless of
+whether the envelope is otherwise well-formed. Callers whose event type is
+outside that allowlist must reproduce the removed gate's two checks
+directly instead: `forbidden_keys.find_forbidden_keys(record,
+forbidden=FORBIDDEN_LEGACY_KEYS)` for the recursive legacy-key walk, plus
+an explicit `record.get("schema_version") == "3.0.0"` check for the
+envelope signal.
+
 Migration: pin `>=8.0.0`; delete or re-home any import of the three
 modules. There are no aliases. See `CHANGELOG.md` (`### Breaking`) for the
 full removed-name list.
