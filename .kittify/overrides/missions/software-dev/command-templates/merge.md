@@ -144,8 +144,8 @@ spec-kitty merge --keep-branch
 # Keep the worktree
 spec-kitty merge --keep-worktree
 
-# Merge into a different branch
-spec-kitty merge --target develop
+# Merge into a different branch (this programme has no branch ladder; main is the only target)
+spec-kitty merge --target release-1.2
 
 # See what would happen without doing it
 spec-kitty merge --dry-run
@@ -163,8 +163,8 @@ spec-kitty merge --strategy squash --push
 # Keep branch for reference
 spec-kitty merge --keep-branch
 
-# Merge into develop instead of main
-spec-kitty merge --target develop --push
+# Merge into a non-default branch instead of main
+spec-kitty merge --target release-1.2 --push
 ```
 
 ## Merge Strategies
