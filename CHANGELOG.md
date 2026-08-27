@@ -21,6 +21,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   aware `datetime`'s `isoformat()` and every downstream comparison (the
   72-hour feed window, the staleness guard) is against an aware "now".
 
+### Known issues
+
+- **Not yet closed**: `to_zeitgeist_attrs` does not reject a value
+  carrying a non-printable character (`not str.isprintable()`) on encode,
+  even though `from_zeitgeist_attrs` already rejects one on decode
+  (EXPERIMENTAL-spec-kitty-events#64). Until this closes, a producer whose
+  `actor`/`review_ref`/id field carries a stray control character can
+  broadcast successfully while a consumer's decode raises, silently
+  dropping the moment. This bullet moves to `### Fixed`, in past tense,
+  once #64's encode-side check lands.
+
 ## [8.2.0] - 2026-08-27
 
 ### Added
