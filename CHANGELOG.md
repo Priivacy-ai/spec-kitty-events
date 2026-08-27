@@ -20,6 +20,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   ISO-8601 *and* be timezone-aware, since the encoder only ever emits an
   aware `datetime`'s `isoformat()` and every downstream comparison (the
   72-hour feed window, the staleness guard) is against an aware "now".
+- `to_zeitgeist_attrs` now rejects a value carrying a non-printable
+  character (`not str.isprintable()`) on encode — the same check
+  `from_zeitgeist_attrs` already enforced on decode
+  (EXPERIMENTAL-spec-kitty-events#64). Previously only decode rejected
+  control characters, so a producer whose `actor`/`review_ref`/id field
+  carried a stray control character could broadcast successfully while a
+  consumer's decode raised, silently dropping the moment; encode now fails
+  closed with the same `ZeitgeistAttrsControlCharacterError` before that
+  attrs dict ever reaches the relay.
 
 ## [8.2.0] - 2026-08-27
 

@@ -20,6 +20,18 @@ This document is the public compatibility policy for consumers of:
 - `spec-kitty-saas`
 - `spec-kitty`
 
+## `8.2.0` — `to_zeitgeist_attrs` also rejects control characters, on encode
+
+`to_zeitgeist_attrs` now runs the same `str.isprintable()` control-character
+check `from_zeitgeist_attrs` already enforces on decode
+(EXPERIMENTAL-spec-kitty-events#25, then widened by #63), closing the
+encode/decode gap (#64): before this, a producer could successfully encode
+and broadcast an attrs value carrying a control character that a consumer's
+decode would then reject, silently dropping the moment. Both directions now
+share one predicate and raise the same typed
+`ZeitgeistAttrsControlCharacterError` — a value either survives both
+directions or is rejected by both.
+
 ## `8.0.0` — Sync, legacy-envelope, and cutover surfaces deleted
 
 `8.0.0` deletes three modules whose only consumer was the offline
