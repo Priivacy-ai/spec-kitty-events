@@ -8,7 +8,7 @@
     "mission_slug": "demo-mission",
     "wp_id": "WP01",
     "from_lane": null,
-    "to_lane": "in_progress",
+    "to_lane": "planned",
     "actor": "robert",
     "force": false,
     "reason": null,
@@ -21,11 +21,11 @@
     "occurred_at": "2026-08-25T09:00:00+00:00",
     "mission_slug": "demo-mission",
     "wp_id": "WP01",
-    "to_lane": "in_progress",
+    "to_lane": "planned",
     "actor": "robert",
     "force": "false",
     "execution_mode": "worktree"
   },
   "expected_ref": "demo-mission",
-  "notes": "The MVP moment: a WP moves to doing; from_lane absent (key omitted) because the transition had no recorded origin lane; the two envelope attrs lead every projection."
+  "notes": "The MVP moment: a WP is seeded to planned; from_lane absent (key omitted) because the transition had no recorded origin lane (the only domain-valid edge out of no-recorded-lane is None -> planned); the two envelope attrs lead every projection."
 }
