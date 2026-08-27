@@ -11,7 +11,11 @@ from pydantic import BaseModel
 
 from spec_kitty_events import zeitgeist_attrs
 from spec_kitty_events.forbidden_keys import FORBIDDEN_LEGACY_KEYS
-from spec_kitty_events.lifecycle import MissionClosedPayload, MissionStartedPayload
+from spec_kitty_events.lifecycle import (
+    MissionClosedPayload,
+    MissionStartedPayload,
+    PhaseEnteredPayload,
+)
 from spec_kitty_events.mission_next import (
     DecisionInputAnsweredPayload,
     DecisionInputRequestedPayload,
@@ -37,6 +41,7 @@ from spec_kitty_events.zeitgeist_attrs import (
     UnencodableFieldValueError,
     UnknownVolatileEventTypeError,
     VolatileMoment,
+    ZeitgeistAttrsControlCharacterError,
     ZeitgeistAttrsError,
     ZeitgeistAttrsForbiddenKeyError,
     ZeitgeistAttrsOverflowError,
@@ -429,6 +434,36 @@ def test_ref_derival_and_mismatch_fail_closed() -> None:
         zeitgeist_ref_for("MissionClosed", _transition())
 
 
+def test_phase_entered_ref_derives_from_mission_id_when_slug_is_absent() -> None:
+    """mission_slug is optional display/back-compat; mission_id is the
+    identity (PhaseEnteredPayload's own field description). A valid payload
+    without the compat field must still yield a ref."""
+    payload = PhaseEnteredPayload(
+        mission_id="mission-demo", phase_name="build", actor="robert",
+        mission_slug=None,
+    )
+    assert zeitgeist_ref_for("PhaseEntered", payload) == "mission-demo"
+
+
+def test_phase_entered_ref_ignores_mission_slug_when_present() -> None:
+    """mission_id is the identity regardless of the compat field's value —
+    ref derivation does not silently prefer the display slug."""
+    payload = PhaseEnteredPayload(
+        mission_id="mission-demo", phase_name="build", actor="robert",
+        mission_slug="a-totally-different-slug",
+    )
+    assert zeitgeist_ref_for("PhaseEntered", payload) == "mission-demo"
+
+
+def test_ref_over_bound_raises_rather_than_emitting_unbounded() -> None:
+    """The module documents the frame ref as carrying the same ≤240-byte
+    bound as an attrs entry independently of attrs; zeitgeist_ref_for must
+    enforce it, not just to_zeitgeist_attrs."""
+    payload = _transition(mission_slug="s" * 241)
+    with pytest.raises(ZeitgeistAttrsOverflowError):
+        zeitgeist_ref_for("WPStatusChanged", payload)
+
+
 def test_bounds_constants_match_the_zeitgeist_frame_contract() -> None:
     assert ZEITGEIST_ATTRS_MAX_KEYS == 16
     assert ZEITGEIST_ATTRS_MAX_BYTES == 240
@@ -538,6 +573,24 @@ def test_decode_rejects_lone_surrogates_with_typed_error() -> None:
         from_zeitgeist_attrs("WPStatusChanged", attrs)
 
 
+def test_decode_rejects_a_newline_in_a_value_with_typed_error() -> None:
+    """A bare LF/CR could forge extra frame lines for whatever renders the
+    moment next (issue #25, lens: security)."""
+    attrs = to_zeitgeist_attrs(_transition(), _envelope("WPStatusChanged"))
+    attrs["actor"] = "actor\nrumor: fake status line"
+    with pytest.raises(ZeitgeistAttrsControlCharacterError, match="attr 'actor' value"):
+        from_zeitgeist_attrs("WPStatusChanged", attrs)
+
+
+def test_decode_rejects_an_ansi_escape_in_a_value_with_typed_error() -> None:
+    """A bare ESC could smuggle ANSI into whatever terminal or log renders
+    the moment next (issue #25, lens: security)."""
+    attrs = to_zeitgeist_attrs(_transition(), _envelope("WPStatusChanged"))
+    attrs["actor"] = "\x1b[31mactor\x1b[0m"
+    with pytest.raises(ZeitgeistAttrsControlCharacterError, match="attr 'actor' value"):
+        from_zeitgeist_attrs("WPStatusChanged", attrs)
+
+
 def test_decode_admits_a_multibyte_value_within_the_byte_bound() -> None:
     """A multi-byte value that fits the relay's 240-UTF-8-byte bound (and
     therefore also its 240-character bound, since bytes >= chars) decodes."""
@@ -636,10 +689,11 @@ def test_decode_requires_the_ref_key_when_the_family_guarantees_one() -> None:
         from_zeitgeist_attrs("WPStatusChanged", attrs)
 
 
-def test_decode_permits_an_absent_ref_when_the_family_leaves_it_optional() -> None:
+def test_decode_tolerates_the_optional_compat_field_absent_and_still_derives_ref() -> None:
     """PhaseEntered's ``mission_slug`` is a genuinely optional back-compat
-    field (unlike every other family's required ref), so decode must still
-    accept its absence and report ``ref=None`` rather than requiring it."""
+    field, unlike ``mission_id`` (the required ref field), so decode must
+    not require its presence -- but ref still resolves via ``mission_id``,
+    not ``None``."""
     from spec_kitty_events.lifecycle import PhaseEnteredPayload
 
     payload = PhaseEnteredPayload(
@@ -648,7 +702,7 @@ def test_decode_permits_an_absent_ref_when_the_family_leaves_it_optional() -> No
     attrs = to_zeitgeist_attrs(payload, _envelope("PhaseEntered"))
     assert "mission_slug" not in attrs
     moment = from_zeitgeist_attrs("PhaseEntered", attrs)
-    assert moment.ref is None
+    assert moment.ref == "mission-demo"
 
 
 def test_required_keys_exclude_optional_typed_fields_pydantic_still_requires() -> None:

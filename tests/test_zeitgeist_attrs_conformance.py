@@ -70,9 +70,9 @@ def zeitgeist_attrs_fixtures():
 
 
 def test_fixtures_loaded(zeitgeist_attrs_fixtures) -> None:
-    """13 valid + 4 invalid fixtures are on disk and manifest-registered."""
-    assert len(zeitgeist_attrs_fixtures) == 17
-    assert len([f for f in zeitgeist_attrs_fixtures if f.expected_valid]) == 13
+    """14 valid + 4 invalid fixtures are on disk and manifest-registered."""
+    assert len(zeitgeist_attrs_fixtures) == 18
+    assert len([f for f in zeitgeist_attrs_fixtures if f.expected_valid]) == 14
     assert len([f for f in zeitgeist_attrs_fixtures if not f.expected_valid]) == 4
 
 

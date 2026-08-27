@@ -151,6 +151,7 @@ __all__ = [
     "UnencodableFieldValueError",
     "UnknownVolatileEventTypeError",
     "VolatileMoment",
+    "ZeitgeistAttrsControlCharacterError",
     "ZeitgeistAttrsError",
     "ZeitgeistAttrsForbiddenKeyError",
     "ZeitgeistAttrsOverflowError",
@@ -230,6 +231,10 @@ class ZeitgeistAttrsOverflowError(ZeitgeistAttrsError):
 
 class ZeitgeistAttrsForbiddenKeyError(ZeitgeistAttrsError):
     """Encoding would emit a key in :data:`FORBIDDEN_ATTR_KEYS`."""
+
+
+class ZeitgeistAttrsControlCharacterError(ZeitgeistAttrsError):
+    """A value carries a C0 control character (or DEL)."""
 
 
 #: The event families the Ephemeral Team Status design moves to ``volatile``
@@ -355,6 +360,30 @@ def _encode_fields(
     return entries
 
 
+def _reject_control_characters(subject: str, value: str) -> None:
+    """Refuse a value carrying a C0 control character (``U+0000``-``U+001F``)
+    or DEL (``U+007F``).
+
+    This is the decode-seam hardening `EXPERIMENTAL-spec-kitty-events#25`_
+    asks for: an inbound attrs mapping is opaque wire data from a relay a
+    hostile teammate or hostile relay frame can shape, and free-text keys
+    (the actor label, ``review_ref``, ...) carry it verbatim into
+    :class:`VolatileMoment`. A bare newline could forge extra frame lines
+    for whatever renders the moment next; a bare ESC could smuggle ANSI
+    into a terminal or log. Zeitgeist's own ingest doctrine strips these
+    (``editor.clean_field``); this module rejects instead of stripping,
+    matching the rest of this file's fail-closed contract (over-bound
+    values raise rather than truncate).
+
+    .. _EXPERIMENTAL-spec-kitty-events#25: https://github.com/spec-kitty/EXPERIMENTAL-spec-kitty-events/issues/25
+    """
+    bad = sorted({f"U+{ord(ch):04X}" for ch in value if ord(ch) < 0x20 or ord(ch) == 0x7F})
+    if bad:
+        raise ZeitgeistAttrsControlCharacterError(
+            f"{subject} contains control characters: {bad}"
+        )
+
+
 def _utf8_size(subject: str, value: str) -> int:
     """Return UTF-8 byte size, preserving the typed attrs error contract."""
     try:
@@ -450,11 +479,16 @@ def to_zeitgeist_attrs(payload: BaseModel, envelope: Event) -> dict[str, str]:
 # ── frame ref ────────────────────────────────────────────────────────────────
 
 #: The payload field each family uses as the frame's aggregate identity.
+#: ``PhaseEnteredPayload`` uses ``mission_id`` (required) rather than
+#: ``mission_slug`` (optional display/back-compat; see the field's own
+#: description) — that field alone can be absent on an otherwise-valid
+#: payload, which would otherwise make identity loss the normal producer
+#: outcome rather than an edge case.
 REF_FIELD_BY_EVENT_TYPE: Mapping[str, str] = {
     WP_STATUS_CHANGED: "mission_slug",
     MISSION_CREATED: "mission_slug",
     MISSION_CLOSED: "mission_slug",
-    PHASE_ENTERED: "mission_slug",
+    PHASE_ENTERED: "mission_id",
     MISSION_RUN_STARTED: "run_id",
     NEXT_STEP_ISSUED: "run_id",
     NEXT_STEP_AUTO_COMPLETED: "run_id",
@@ -470,6 +504,9 @@ def zeitgeist_ref_for(event_type: str, payload: BaseModel) -> str | None:
     Raises:
         UnknownVolatileEventTypeError: *event_type* is unknown or *payload*
             is not that event type's payload model.
+        ZeitgeistAttrsOverflowError: the ref exceeds
+            :data:`ZEITGEIST_ATTRS_MAX_BYTES` (the frame's ``ref`` carries
+            the same bound as an attrs entry; see the module docstring).
     """
     model = PAYLOAD_MODEL_BY_EVENT_TYPE.get(event_type)
     if model is None or type(payload) is not model:
@@ -478,7 +515,14 @@ def zeitgeist_ref_for(event_type: str, payload: BaseModel) -> str | None:
             f"type {event_type!r}; known: {sorted(PAYLOAD_MODEL_BY_EVENT_TYPE)}"
         )
     value = getattr(payload, REF_FIELD_BY_EVENT_TYPE[event_type], None)
-    return None if value is None else str(value)
+    if value is None:
+        return None
+    ref = str(value)
+    if _utf8_size(f"{event_type} ref", ref) > ZEITGEIST_ATTRS_MAX_BYTES:
+        raise ZeitgeistAttrsOverflowError(
+            f"{event_type} ref exceeds the {ZEITGEIST_ATTRS_MAX_BYTES}-byte bound"
+        )
+    return ref
 
 
 # ── decode ───────────────────────────────────────────────────────────────────
@@ -604,6 +648,8 @@ def from_zeitgeist_attrs(
             kind's closed key set, a key the kind's payload always carries
             on encode is missing, or an ``event_id``/``occurred_at`` attr is
             present but malformed (empty, or not ISO-8601, respectively).
+        ZeitgeistAttrsControlCharacterError: a value carries a C0 control
+            character or DEL.
         ZeitgeistAttrsForbiddenKeyError: a forbidden key is present.
         ZeitgeistAttrsOverflowError: the bound is exceeded.
     """
@@ -616,6 +662,7 @@ def from_zeitgeist_attrs(
     for key, value in attrs.items():
         if not isinstance(value, str):
             raise ZeitgeistAttrsError(f"attr {key!r}: expected str, got {type(value).__name__}")
+        _reject_control_characters(f"attr {key!r} value", value)
 
     allowed = _ALLOWED_KEYS_BY_EVENT_TYPE[event_type]
     unknown = sorted(attrs.keys() - allowed)
