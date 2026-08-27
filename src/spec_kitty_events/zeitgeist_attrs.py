@@ -163,7 +163,7 @@ from spec_kitty_events.mission_next import (
     NextStepAutoCompletedPayload,
     NextStepIssuedPayload,
 )
-from spec_kitty_events.models import Event
+from spec_kitty_events.models import Event, normalize_event_id
 from spec_kitty_events.project_lifecycle import (
     PLAN_COMPLETED,
     PLAN_STARTED,
@@ -973,7 +973,11 @@ def from_zeitgeist_attrs(
         ZeitgeistAttrsError: a value is not ``str``, a key is outside the
             kind's closed key set, a key the kind's payload always carries
             on encode is missing, or an ``event_id``/``occurred_at`` attr is
-            present but malformed (empty, or not ISO-8601, respectively).
+            present but malformed — ``event_id`` does not match one of the
+            three shapes :func:`~spec_kitty_events.models.normalize_event_id`
+            accepts (26-char Crockford-base32 ULID, 36-char hyphenated UUID,
+            32-char bare hex UUID), or ``occurred_at`` does not parse as
+            ISO-8601 or parses but is timezone-naive.
         ZeitgeistAttrsControlCharacterError: a value carries a non-printable
             character (``not str.isprintable()``).
         ZeitgeistAttrsForbiddenKeyError: a forbidden key is present.
@@ -1038,16 +1042,31 @@ def from_zeitgeist_attrs(
             f"on encode: {missing}"
         )
 
+    decoded_attrs = dict(attrs)
+
     event_id = attrs.get("event_id")
-    if event_id is not None and not event_id:
-        raise ZeitgeistAttrsError("attr 'event_id' must not be empty")
+    if event_id is not None:
+        try:
+            decoded_attrs["event_id"] = normalize_event_id(event_id)
+        except ValueError as exc:
+            raise ZeitgeistAttrsError(
+                f"attr 'event_id' is malformed: {exc}"
+            ) from exc
     occurred_at = attrs.get("occurred_at")
     if occurred_at is not None:
         try:
-            datetime.fromisoformat(occurred_at)
+            parsed_occurred_at = datetime.fromisoformat(occurred_at)
         except ValueError as exc:
             raise ZeitgeistAttrsError(
                 f"attr 'occurred_at' is not ISO-8601: {occurred_at!r}"
             ) from exc
+        if parsed_occurred_at.tzinfo is None:
+            raise ZeitgeistAttrsError(
+                f"attr 'occurred_at' must be timezone-aware: {occurred_at!r}"
+            )
 
-    return VolatileMoment(kind=event_type, ref=attrs.get(REF_FIELD_BY_EVENT_TYPE[event_type]), attrs=dict(attrs))
+    return VolatileMoment(
+        kind=event_type,
+        ref=attrs.get(REF_FIELD_BY_EVENT_TYPE[event_type]),
+        attrs=decoded_attrs,
+    )

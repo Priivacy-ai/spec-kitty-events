@@ -580,13 +580,59 @@ def test_decode_rejects_empty_event_id() -> None:
         from_zeitgeist_attrs("WPStatusChanged", attrs)
 
 
-def test_decode_accepts_a_bare_date_occurred_at() -> None:
-    """``datetime.fromisoformat`` accepts date-only strings; decode does too —
-    the check is "parses as ISO-8601", not "carries a time component"."""
+@pytest.mark.parametrize(
+    "bad_event_id", ["x", "not-a-ulid", "../../etc/passwd", "I" * 26]
+)
+def test_decode_rejects_an_event_id_that_is_not_a_ulid_or_uuid(
+    bad_event_id: str,
+) -> None:
+    """spec-kitty-events#62: the envelope's own contract
+    (``normalize_event_id``) requires a 26-char Crockford-base32 ULID, a
+    36-char hyphenated UUID, or a 32-char bare hex UUID; decode must reject
+    anything else rather than admit an undedupable moment."""
+    attrs = to_zeitgeist_attrs(_transition(), _envelope("WPStatusChanged"))
+    attrs["event_id"] = bad_event_id
+    with pytest.raises(ZeitgeistAttrsError, match="event_id"):
+        from_zeitgeist_attrs("WPStatusChanged", attrs)
+
+
+def test_decode_canonicalizes_event_id_case() -> None:
+    """Two spellings of the same ULID must decode to the same canonical
+    ``event_id`` so ``(team, event_id)`` dedup actually dedupes
+    (spec-kitty-events#62)."""
+    attrs = to_zeitgeist_attrs(_transition(), _envelope("WPStatusChanged"))
+    attrs["event_id"] = _EVENT_ID.lower()
+    moment = from_zeitgeist_attrs("WPStatusChanged", attrs)
+    assert moment.attrs["event_id"] == _EVENT_ID
+
+
+def test_decode_rejects_a_timezone_naive_occurred_at() -> None:
+    """spec-kitty-events#62: the encoder only ever emits an aware
+    ``datetime``'s ``isoformat()``; a naive value would make every
+    comparison against an aware "now" (the 72-hour feed window, the
+    staleness guard) raise ``TypeError`` at render time instead of being
+    rejected here at the codec seam."""
+    attrs = to_zeitgeist_attrs(_transition(), _envelope("WPStatusChanged"))
+    attrs["occurred_at"] = "2026-08-25T09:00:00"
+    with pytest.raises(ZeitgeistAttrsError, match="occurred_at"):
+        from_zeitgeist_attrs("WPStatusChanged", attrs)
+
+
+def test_decode_rejects_a_bare_date_occurred_at() -> None:
+    """A date-only string parses via ``datetime.fromisoformat`` but is
+    timezone-naive, so it is rejected same as any other naive value
+    (spec-kitty-events#62 — this supersedes the prior deliberate accept)."""
     attrs = to_zeitgeist_attrs(_transition(), _envelope("WPStatusChanged"))
     attrs["occurred_at"] = "2026-08-25"
+    with pytest.raises(ZeitgeistAttrsError, match="occurred_at"):
+        from_zeitgeist_attrs("WPStatusChanged", attrs)
+
+
+def test_decode_accepts_a_timezone_aware_occurred_at_with_nonzero_offset() -> None:
+    attrs = to_zeitgeist_attrs(_transition(), _envelope("WPStatusChanged"))
+    attrs["occurred_at"] = "2026-08-25T09:00:00-05:00"
     moment = from_zeitgeist_attrs("WPStatusChanged", attrs)
-    assert moment.attrs["occurred_at"] == "2026-08-25"
+    assert moment.attrs["occurred_at"] == "2026-08-25T09:00:00-05:00"
 
 
 def test_decode_rejects_unknown_keys() -> None:
