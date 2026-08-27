@@ -869,6 +869,21 @@ def test_required_keys_exclude_optional_typed_fields_pydantic_still_requires() -
     assert "mission_slug" in zeitgeist_attrs._REQUIRED_KEYS_BY_EVENT_TYPE["MissionCreated"]
 
 
+def test_every_current_family_guarantees_its_ref_field() -> None:
+    """Pins the invariant VolatileMoment's docstring and zeitgeist_ref_for's
+    ``None`` branch rely on: every current family's ref field
+    (REF_FIELD_BY_EVENT_TYPE) is also one of decode's required keys
+    (_REQUIRED_KEYS_BY_EVENT_TYPE), so ref can never be None on decode for
+    any type in today's vocabulary (spec-kitty-events#71). If a future
+    family adds an Optional ref field, this test must be updated alongside
+    the docstrings that currently claim the branch is unreachable."""
+    for event_type, ref_field in REF_FIELD_BY_EVENT_TYPE.items():
+        assert ref_field in zeitgeist_attrs._REQUIRED_KEYS_BY_EVENT_TYPE[event_type], (
+            f"{event_type}'s ref field {ref_field!r} is not required; "
+            "zeitgeist_ref_for/from_zeitgeist_attrs could now decode ref=None"
+        )
+
+
 def test_moment_is_frozen() -> None:
     moment = from_zeitgeist_attrs(
         "WPStatusChanged",
