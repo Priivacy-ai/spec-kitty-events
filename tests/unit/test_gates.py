@@ -106,30 +106,36 @@ class TestConclusionDiscrimination:
 class TestRequiredFieldEnforcement:
     """Verify missing required fields raise ValidationError."""
 
-    @pytest.mark.parametrize("omitted_field", [
-        "gate_name",
-        "gate_type",
-        "conclusion",
-        "external_provider",
-        "check_run_id",
-        "check_run_url",
-        "delivery_id",
-    ])
+    @pytest.mark.parametrize(
+        "omitted_field",
+        [
+            "gate_name",
+            "gate_type",
+            "conclusion",
+            "external_provider",
+            "check_run_id",
+            "check_run_url",
+            "delivery_id",
+        ],
+    )
     def test_missing_required_field_raises(self, omitted_field: str) -> None:
         data = {**VALID_PAYLOAD_DATA}
         del data[omitted_field]
         with pytest.raises(pydantic.ValidationError):
             GatePassedPayload(**data)
 
-    @pytest.mark.parametrize("omitted_field", [
-        "gate_name",
-        "gate_type",
-        "conclusion",
-        "external_provider",
-        "check_run_id",
-        "check_run_url",
-        "delivery_id",
-    ])
+    @pytest.mark.parametrize(
+        "omitted_field",
+        [
+            "gate_name",
+            "gate_type",
+            "conclusion",
+            "external_provider",
+            "check_run_id",
+            "check_run_url",
+            "delivery_id",
+        ],
+    )
     def test_missing_required_field_raises_failed_payload(self, omitted_field: str) -> None:
         data = {**VALID_PAYLOAD_DATA}
         del data[omitted_field]
@@ -307,16 +313,19 @@ class TestEventIntegration:
 class TestMapCheckRunConclusion:
     """Test map_check_run_conclusion for all known values and edge cases."""
 
-    @pytest.mark.parametrize("conclusion,expected", [
-        ("success", "GatePassed"),
-        ("failure", "GateFailed"),
-        ("timed_out", "GateFailed"),
-        ("cancelled", "GateFailed"),
-        ("action_required", "GateFailed"),
-        ("neutral", None),
-        ("skipped", None),
-        ("stale", None),
-    ])
+    @pytest.mark.parametrize(
+        "conclusion,expected",
+        [
+            ("success", "GatePassed"),
+            ("failure", "GateFailed"),
+            ("timed_out", "GateFailed"),
+            ("cancelled", "GateFailed"),
+            ("action_required", "GateFailed"),
+            ("neutral", None),
+            ("skipped", None),
+            ("stale", None),
+        ],
+    )
     def test_known_conclusions(self, conclusion: str, expected: str | None) -> None:
         result = map_check_run_conclusion(conclusion)
         assert result == expected
@@ -351,9 +360,7 @@ class TestMapCheckRunConclusion:
     @pytest.mark.parametrize("conclusion", ["success", "failure", "timed_out"])
     def test_no_callback_for_blocking_conclusions(self, conclusion: str) -> None:
         calls: list[tuple[str, str]] = []
-        result = map_check_run_conclusion(
-            conclusion, on_ignored=lambda c, r: calls.append((c, r))
-        )
+        result = map_check_run_conclusion(conclusion, on_ignored=lambda c, r: calls.append((c, r)))
         assert result is not None
         assert len(calls) == 0
 

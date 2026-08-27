@@ -15,10 +15,12 @@ from spec_kitty_events.mission_next import RuntimeActorIdentity
 TOKEN_USAGE_RECORDED: str = "TokenUsageRecorded"
 DIFF_SUMMARY_RECORDED: str = "DiffSummaryRecorded"
 
-ANALYTICS_EVENT_TYPES: FrozenSet[str] = frozenset({
-    TOKEN_USAGE_RECORDED,
-    DIFF_SUMMARY_RECORDED,
-})
+ANALYTICS_EVENT_TYPES: FrozenSet[str] = frozenset(
+    {
+        TOKEN_USAGE_RECORDED,
+        DIFF_SUMMARY_RECORDED,
+    }
+)
 
 
 class TokenUsageRecordedPayload(BaseModel):
@@ -27,10 +29,18 @@ class TokenUsageRecordedPayload(BaseModel):
     model_config = ConfigDict(frozen=True, extra="forbid")
 
     mission_id: str = Field(..., min_length=1, description="Canonical mission identifier")
-    run_id: Optional[str] = Field(None, min_length=1, description="Mission run identifier when available")
-    step_id: Optional[str] = Field(None, min_length=1, description="Mission step identifier when available")
-    wp_id: Optional[str] = Field(None, min_length=1, description="Work-package identifier when available")
-    phase_name: Optional[str] = Field(None, min_length=1, description="Mission phase name when known")
+    run_id: Optional[str] = Field(
+        None, min_length=1, description="Mission run identifier when available"
+    )
+    step_id: Optional[str] = Field(
+        None, min_length=1, description="Mission step identifier when available"
+    )
+    wp_id: Optional[str] = Field(
+        None, min_length=1, description="Work-package identifier when available"
+    )
+    phase_name: Optional[str] = Field(
+        None, min_length=1, description="Mission phase name when known"
+    )
     actor: Optional[RuntimeActorIdentity] = Field(
         None,
         description="Runtime actor identity when available",
@@ -51,9 +61,7 @@ class TokenUsageRecordedPayload(BaseModel):
     def _validate_totals(self) -> "TokenUsageRecordedPayload":
         expected_total = self.input_tokens + self.output_tokens
         if self.total_tokens != expected_total:
-            raise ValueError(
-                "total_tokens must equal input_tokens + output_tokens"
-            )
+            raise ValueError("total_tokens must equal input_tokens + output_tokens")
         return self
 
 
@@ -63,10 +71,18 @@ class DiffSummaryRecordedPayload(BaseModel):
     model_config = ConfigDict(frozen=True, extra="forbid")
 
     mission_id: str = Field(..., min_length=1, description="Canonical mission identifier")
-    run_id: Optional[str] = Field(None, min_length=1, description="Mission run identifier when available")
-    step_id: Optional[str] = Field(None, min_length=1, description="Mission step identifier when available")
-    wp_id: Optional[str] = Field(None, min_length=1, description="Work-package identifier when available")
-    phase_name: Optional[str] = Field(None, min_length=1, description="Mission phase name when known")
+    run_id: Optional[str] = Field(
+        None, min_length=1, description="Mission run identifier when available"
+    )
+    step_id: Optional[str] = Field(
+        None, min_length=1, description="Mission step identifier when available"
+    )
+    wp_id: Optional[str] = Field(
+        None, min_length=1, description="Work-package identifier when available"
+    )
+    phase_name: Optional[str] = Field(
+        None, min_length=1, description="Mission phase name when known"
+    )
     base_ref: str = Field(..., min_length=1, description="Diff base git ref or commit")
     head_ref: str = Field(..., min_length=1, description="Diff head git ref or commit")
     files_changed: int = Field(..., ge=0, description="Count of files changed in the diff")

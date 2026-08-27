@@ -4,6 +4,7 @@ Covers: empty stream, happy-path transitions, revocation path,
 invalid transition recording (anomaly, no crash), duplicate event dedup,
 deterministic ordering, and per-user roster functionality.
 """
+
 from __future__ import annotations
 
 import uuid
@@ -308,9 +309,7 @@ def test_reducer_output_is_frozen() -> None:
 # ── Roster event helpers (T013) ──────────────────────────────────────────────
 
 
-def _user_connected_event(
-    user_id: str, lamport: int = 10
-) -> Event:
+def _user_connected_event(user_id: str, lamport: int = 10) -> Event:
     d = _base_payload(lamport)
     d["user_id"] = user_id
     return _event(USER_CONNECTED, d, lamport=lamport)
@@ -325,9 +324,7 @@ def _user_disconnected_event(
     return _event(USER_DISCONNECTED, d, lamport=lamport)
 
 
-def _provisioned_event_with_user(
-    user_id: str, lamport: int = 1
-) -> Event:
+def _provisioned_event_with_user(user_id: str, lamport: int = 1) -> Event:
     d = _base_payload(lamport)
     d["credentials_ref"] = "vault://secrets/gh-token"
     d["config_hash"] = "sha256:abc123"
@@ -335,9 +332,7 @@ def _provisioned_event_with_user(
     return _event(CONNECTOR_PROVISIONED, d, lamport=lamport)
 
 
-def _health_checked_event_with_user(
-    user_id: str, lamport: int = 2
-) -> Event:
+def _health_checked_event_with_user(user_id: str, lamport: int = 2) -> Event:
     d = _base_payload(lamport)
     d["health_status"] = "healthy"
     d["latency_ms"] = 42.5

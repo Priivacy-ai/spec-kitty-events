@@ -24,16 +24,18 @@ GLOSSARY_SENSE_UPDATED: str = "GlossarySenseUpdated"
 GENERATION_BLOCKED_BY_SEMANTIC_CONFLICT: str = "GenerationBlockedBySemanticConflict"
 GLOSSARY_STRICTNESS_SET: str = "GlossaryStrictnessSet"
 
-GLOSSARY_EVENT_TYPES: FrozenSet[str] = frozenset({
-    GLOSSARY_SCOPE_ACTIVATED,
-    TERM_CANDIDATE_OBSERVED,
-    SEMANTIC_CHECK_EVALUATED,
-    GLOSSARY_CLARIFICATION_REQUESTED,
-    GLOSSARY_CLARIFICATION_RESOLVED,
-    GLOSSARY_SENSE_UPDATED,
-    GENERATION_BLOCKED_BY_SEMANTIC_CONFLICT,
-    GLOSSARY_STRICTNESS_SET,
-})
+GLOSSARY_EVENT_TYPES: FrozenSet[str] = frozenset(
+    {
+        GLOSSARY_SCOPE_ACTIVATED,
+        TERM_CANDIDATE_OBSERVED,
+        SEMANTIC_CHECK_EVALUATED,
+        GLOSSARY_CLARIFICATION_REQUESTED,
+        GLOSSARY_CLARIFICATION_RESOLVED,
+        GLOSSARY_SENSE_UPDATED,
+        GENERATION_BLOCKED_BY_SEMANTIC_CONFLICT,
+        GLOSSARY_STRICTNESS_SET,
+    }
+)
 
 # ── Section 2: Value Objects ─────────────────────────────────────────────────
 
@@ -63,9 +65,9 @@ class GlossaryScopeActivatedPayload(BaseModel):
 
     mission_id: str = Field(..., min_length=1, description="Mission context")
     scope_id: str = Field(..., min_length=1, description="Unique scope identifier")
-    scope_type: Literal[
-        "spec_kitty_core", "team_domain", "audience_domain", "mission_local"
-    ] = Field(..., description="Scope category")
+    scope_type: Literal["spec_kitty_core", "team_domain", "audience_domain", "mission_local"] = (
+        Field(..., description="Scope category")
+    )
     glossary_version_id: str = Field(
         ..., min_length=1, description="Version of the glossary being activated"
     )
@@ -79,12 +81,8 @@ class TermCandidateObservedPayload(BaseModel):
     mission_id: str = Field(..., min_length=1, description="Mission context")
     scope_id: str = Field(..., min_length=1, description="Scope the term was observed in")
     step_id: str = Field(..., min_length=1, description="Mission step that produced the term")
-    term_surface: str = Field(
-        ..., min_length=1, description="Raw text form of the observed term"
-    )
-    confidence: float = Field(
-        ..., ge=0.0, le=1.0, description="Confidence score (0.0–1.0)"
-    )
+    term_surface: str = Field(..., min_length=1, description="Raw text form of the observed term")
+    confidence: float = Field(..., ge=0.0, le=1.0, description="Confidence score (0.0–1.0)")
     actor: str = Field(..., min_length=1, description="Identity of the observing actor")
     step_metadata: Dict[str, str] = Field(
         default_factory=dict,
@@ -137,9 +135,7 @@ class SemanticCheckEvaluatedPayload(BaseModel):
     severity: Literal["low", "medium", "high"] = Field(
         ..., description="Overall check severity (max of conflicts)"
     )
-    confidence: float = Field(
-        ..., ge=0.0, le=1.0, description="Overall confidence score"
-    )
+    confidence: float = Field(..., ge=0.0, le=1.0, description="Overall confidence score")
     recommended_action: Literal["block", "warn", "pass"] = Field(
         ..., description="Action recommendation based on severity and strictness"
     )
@@ -168,9 +164,7 @@ class GlossaryClarificationRequestedPayload(BaseModel):
     term: str = Field(..., min_length=1, description="The ambiguous term")
     question: str = Field(..., description="Clarification question text")
     options: Tuple[str, ...] = Field(..., description="Available answer options")
-    urgency: Literal["low", "medium", "high"] = Field(
-        ..., description="Urgency level"
-    )
+    urgency: Literal["low", "medium", "high"] = Field(..., description="Urgency level")
     actor: str = Field(..., min_length=1, description="Actor who triggered the request")
 
 
@@ -185,9 +179,7 @@ class GlossaryClarificationResolvedPayload(BaseModel):
         min_length=1,
         description="Event ID of the originating clarification request",
     )
-    selected_meaning: str = Field(
-        ..., min_length=1, description="The chosen or entered meaning"
-    )
+    selected_meaning: str = Field(..., min_length=1, description="The chosen or entered meaning")
     actor: str = Field(..., min_length=1, description="Identity of the resolving actor")
 
 
@@ -211,6 +203,7 @@ class GenerationBlockedBySemanticConflictPayload(BaseModel):
         description="Mission primitive metadata",
     )
 
+
 # ── Section 4: Reducer Output Models ─────────────────────────────────────────
 
 
@@ -229,12 +222,8 @@ class ClarificationRecord(BaseModel):
 
     model_config = ConfigDict(frozen=True)
 
-    request_event_id: str = Field(
-        ..., description="Event ID of the clarification request"
-    )
-    semantic_check_event_id: str = Field(
-        ..., description="Burst-window grouping key"
-    )
+    request_event_id: str = Field(..., description="Event ID of the clarification request")
+    semantic_check_event_id: str = Field(..., description="Burst-window grouping key")
     term: str = Field(..., description="The ambiguous term")
     resolved: bool = Field(default=False, description="Whether resolution received")
     resolution_event_id: Optional[str] = Field(
@@ -325,11 +314,13 @@ def _check_scope_activated(
             raise SpecKittyEventsError(
                 f"Event {event.event_id} references unactivated scope '{scope_id}'"
             )
-        anomalies.append(GlossaryAnomaly(
-            event_id=event.event_id,
-            event_type=event.event_type,
-            reason=f"References unactivated scope '{scope_id}'",
-        ))
+        anomalies.append(
+            GlossaryAnomaly(
+                event_id=event.event_id,
+                event_type=event.event_type,
+                reason=f"References unactivated scope '{scope_id}'",
+            )
+        )
 
 
 def reduce_glossary_events(
@@ -410,11 +401,13 @@ def reduce_glossary_events(
                         f"GlossarySenseUpdated for unobserved term '{p_sense.term_surface}' "
                         f"in event {event.event_id}"
                     )
-                anomalies.append(GlossaryAnomaly(
-                    event_id=event.event_id,
-                    event_type=event.event_type,
-                    reason=f"Sense update for unobserved term '{p_sense.term_surface}'",
-                ))
+                anomalies.append(
+                    GlossaryAnomaly(
+                        event_id=event.event_id,
+                        event_type=event.event_type,
+                        reason=f"Sense update for unobserved term '{p_sense.term_surface}'",
+                    )
+                )
             term_senses[sense_key] = p_sense
 
         elif etype == SEMANTIC_CHECK_EVALUATED:
@@ -434,20 +427,21 @@ def reduce_glossary_events(
                         f"semantic check '{p_clar.semantic_check_event_id}' "
                         f"in event {event.event_id}"
                     )
-                anomalies.append(GlossaryAnomaly(
-                    event_id=event.event_id,
-                    event_type=event.event_type,
-                    reason=(
-                        f"References unknown semantic check "
-                        f"'{p_clar.semantic_check_event_id}'"
-                    ),
-                ))
+                anomalies.append(
+                    GlossaryAnomaly(
+                        event_id=event.event_id,
+                        event_type=event.event_type,
+                        reason=(
+                            f"References unknown semantic check '{p_clar.semantic_check_event_id}'"
+                        ),
+                    )
+                )
                 continue
 
             active_for_check = sum(
-                1 for c in clarifications
-                if c.semantic_check_event_id == p_clar.semantic_check_event_id
-                and not c.resolved
+                1
+                for c in clarifications
+                if c.semantic_check_event_id == p_clar.semantic_check_event_id and not c.resolved
             )
 
             if active_for_check >= 3:
@@ -456,20 +450,24 @@ def reduce_glossary_events(
                         f"Clarification burst cap exceeded for semantic check "
                         f"'{p_clar.semantic_check_event_id}' in event {event.event_id}"
                     )
-                anomalies.append(GlossaryAnomaly(
-                    event_id=event.event_id,
-                    event_type=event.event_type,
-                    reason=(
-                        f"Burst cap exceeded: >3 active clarifications for "
-                        f"semantic check '{p_clar.semantic_check_event_id}'"
-                    ),
-                ))
+                anomalies.append(
+                    GlossaryAnomaly(
+                        event_id=event.event_id,
+                        event_type=event.event_type,
+                        reason=(
+                            f"Burst cap exceeded: >3 active clarifications for "
+                            f"semantic check '{p_clar.semantic_check_event_id}'"
+                        ),
+                    )
+                )
             else:
-                clarifications.append(ClarificationRecord(
-                    request_event_id=event.event_id,
-                    semantic_check_event_id=p_clar.semantic_check_event_id,
-                    term=p_clar.term,
-                ))
+                clarifications.append(
+                    ClarificationRecord(
+                        request_event_id=event.event_id,
+                        semantic_check_event_id=p_clar.semantic_check_event_id,
+                        term=p_clar.term,
+                    )
+                )
 
         elif etype == GLOSSARY_CLARIFICATION_RESOLVED:
             p_res = GlossaryClarificationResolvedPayload(**payload_data)
@@ -494,14 +492,15 @@ def reduce_glossary_events(
                         f"clarification '{p_res.clarification_event_id}' "
                         f"in event {event.event_id}"
                     )
-                anomalies.append(GlossaryAnomaly(
-                    event_id=event.event_id,
-                    event_type=event.event_type,
-                    reason=(
-                        f"Resolution for unknown clarification "
-                        f"'{p_res.clarification_event_id}'"
-                    ),
-                ))
+                anomalies.append(
+                    GlossaryAnomaly(
+                        event_id=event.event_id,
+                        event_type=event.event_type,
+                        reason=(
+                            f"Resolution for unknown clarification '{p_res.clarification_event_id}'"
+                        ),
+                    )
+                )
 
         elif etype == GENERATION_BLOCKED_BY_SEMANTIC_CONFLICT:
             p_block = GenerationBlockedBySemanticConflictPayload(**payload_data)
@@ -515,9 +514,7 @@ def reduce_glossary_events(
         active_scopes=active_scopes,
         current_strictness=current_strictness,  # type: ignore[arg-type]
         strictness_history=tuple(strictness_history),
-        term_candidates={
-            k: tuple(v) for k, v in term_candidates.items()
-        },
+        term_candidates={k: tuple(v) for k, v in term_candidates.items()},
         term_senses=term_senses,
         clarifications=tuple(clarifications),
         semantic_checks=tuple(semantic_checks),

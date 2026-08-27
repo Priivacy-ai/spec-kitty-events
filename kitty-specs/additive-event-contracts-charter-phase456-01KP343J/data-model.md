@@ -120,14 +120,16 @@ This tranche introduces 3 new Pydantic payload models across 2 domain modules an
 PROFILE_INVOCATION_SCHEMA_VERSION: str = "3.1.0"
 
 PROFILE_INVOCATION_STARTED: str = "ProfileInvocationStarted"
-PROFILE_INVOCATION_COMPLETED: str = "ProfileInvocationCompleted"   # Reserved
-PROFILE_INVOCATION_FAILED: str = "ProfileInvocationFailed"         # Reserved
+PROFILE_INVOCATION_COMPLETED: str = "ProfileInvocationCompleted"  # Reserved
+PROFILE_INVOCATION_FAILED: str = "ProfileInvocationFailed"  # Reserved
 
-PROFILE_INVOCATION_EVENT_TYPES: FrozenSet[str] = frozenset({
-    PROFILE_INVOCATION_STARTED,
-    PROFILE_INVOCATION_COMPLETED,  # Reserved — payload deferred
-    PROFILE_INVOCATION_FAILED,     # Reserved — payload deferred
-})
+PROFILE_INVOCATION_EVENT_TYPES: FrozenSet[str] = frozenset(
+    {
+        PROFILE_INVOCATION_STARTED,
+        PROFILE_INVOCATION_COMPLETED,  # Reserved — payload deferred
+        PROFILE_INVOCATION_FAILED,  # Reserved — payload deferred
+    }
+)
 ```
 
 ### Retrospective Domain
@@ -138,10 +140,12 @@ RETROSPECTIVE_SCHEMA_VERSION: str = "3.1.0"
 RETROSPECTIVE_COMPLETED: str = "RetrospectiveCompleted"
 RETROSPECTIVE_SKIPPED: str = "RetrospectiveSkipped"
 
-RETROSPECTIVE_EVENT_TYPES: FrozenSet[str] = frozenset({
-    RETROSPECTIVE_COMPLETED,
-    RETROSPECTIVE_SKIPPED,
-})
+RETROSPECTIVE_EVENT_TYPES: FrozenSet[str] = frozenset(
+    {
+        RETROSPECTIVE_COMPLETED,
+        RETROSPECTIVE_SKIPPED,
+    }
+)
 ```
 
 ## Conformance Dispatch Additions (WP04)
@@ -170,8 +174,8 @@ New symbols added to `__init__.py` imports and `__all__`:
 # Profile invocation contracts (3.1.0)
 PROFILE_INVOCATION_SCHEMA_VERSION
 PROFILE_INVOCATION_STARTED
-PROFILE_INVOCATION_COMPLETED    # Reserved
-PROFILE_INVOCATION_FAILED       # Reserved
+PROFILE_INVOCATION_COMPLETED  # Reserved
+PROFILE_INVOCATION_FAILED  # Reserved
 PROFILE_INVOCATION_EVENT_TYPES
 ProfileInvocationStartedPayload
 

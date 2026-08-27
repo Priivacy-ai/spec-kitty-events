@@ -13,8 +13,12 @@ pip install -e ".[dev]"
 
 ```python
 from spec_kitty_events import (
-    Lane, ExecutionMode, StatusTransitionPayload,
-    Event, LamportClock, InMemoryClockStorage,
+    Lane,
+    ExecutionMode,
+    StatusTransitionPayload,
+    Event,
+    LamportClock,
+    InMemoryClockStorage,
 )
 import uuid
 from datetime import datetime, timezone
@@ -56,6 +60,7 @@ assert lane == Lane.IN_PROGRESS
 
 # Unknown values raise ValidationError
 from spec_kitty_events import ValidationError
+
 try:
     normalize_lane("unknown_lane")
 except ValidationError:
@@ -98,7 +103,10 @@ assert result.valid  # Force overrides terminal constraint
 
 ```python
 from spec_kitty_events import (
-    DoneEvidence, RepoEvidence, VerificationEntry, ReviewVerdict,
+    DoneEvidence,
+    RepoEvidence,
+    VerificationEntry,
+    ReviewVerdict,
 )
 
 evidence = DoneEvidence(

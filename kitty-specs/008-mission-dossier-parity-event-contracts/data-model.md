@@ -223,12 +223,14 @@ MISSION_DOSSIER_ARTIFACT_MISSING: str = "MissionDossierArtifactMissing"
 MISSION_DOSSIER_SNAPSHOT_COMPUTED: str = "MissionDossierSnapshotComputed"
 MISSION_DOSSIER_PARITY_DRIFT_DETECTED: str = "MissionDossierParityDriftDetected"
 
-DOSSIER_EVENT_TYPES: FrozenSet[str] = frozenset({
-    MISSION_DOSSIER_ARTIFACT_INDEXED,
-    MISSION_DOSSIER_ARTIFACT_MISSING,
-    MISSION_DOSSIER_SNAPSHOT_COMPUTED,
-    MISSION_DOSSIER_PARITY_DRIFT_DETECTED,
-})
+DOSSIER_EVENT_TYPES: FrozenSet[str] = frozenset(
+    {
+        MISSION_DOSSIER_ARTIFACT_INDEXED,
+        MISSION_DOSSIER_ARTIFACT_MISSING,
+        MISSION_DOSSIER_SNAPSHOT_COMPUTED,
+        MISSION_DOSSIER_PARITY_DRIFT_DETECTED,
+    }
+)
 ```
 
 ---
@@ -238,11 +240,17 @@ DOSSIER_EVENT_TYPES: FrozenSet[str] = frozenset({
 ### loader.py
 
 ```python
-_VALID_CATEGORIES = frozenset({
-    "events", "lane_mapping", "edge_cases",
-    "collaboration", "glossary", "mission_next",
-    "dossier",  # ← ADD
-})
+_VALID_CATEGORIES = frozenset(
+    {
+        "events",
+        "lane_mapping",
+        "edge_cases",
+        "collaboration",
+        "glossary",
+        "mission_next",
+        "dossier",  # ← ADD
+    }
+)
 ```
 
 ### validators.py additions

@@ -83,6 +83,7 @@ Add the 4 participant lifecycle payload models to `collaboration.py` Section 3:
      ```python
      class ParticipantInvitedPayload(BaseModel):
          """Typed payload for ParticipantInvited events."""
+
          model_config = ConfigDict(frozen=True)
          participant_id: str = Field(..., min_length=1, description="Invited participant")
          participant_identity: ParticipantIdentity = Field(..., description="Full structured identity")
@@ -100,11 +101,14 @@ Add the 4 participant lifecycle payload models to `collaboration.py` Section 3:
      ```python
      class ParticipantJoinedPayload(BaseModel):
          """Typed payload for ParticipantJoined events."""
+
          model_config = ConfigDict(frozen=True)
          participant_id: str = Field(..., min_length=1, description="Joining participant")
          participant_identity: ParticipantIdentity = Field(..., description="Full structured identity")
          mission_id: str = Field(..., min_length=1, description="Target mission")
-         auth_principal_id: Optional[str] = Field(None, description="Auth principal bound at join time (present in live traffic)")
+         auth_principal_id: Optional[str] = Field(
+             None, description="Auth principal bound at join time (present in live traffic)"
+         )
      ```
 - **Files**: `src/spec_kitty_events/collaboration.py`
 - **Parallel?**: Yes (with T008, T010, T011)
@@ -118,10 +122,13 @@ Add the 4 participant lifecycle payload models to `collaboration.py` Section 3:
      ```python
      class ParticipantLeftPayload(BaseModel):
          """Typed payload for ParticipantLeft events."""
+
          model_config = ConfigDict(frozen=True)
          participant_id: str = Field(..., min_length=1, description="Departing participant")
          mission_id: str = Field(..., min_length=1, description="Mission being left")
-         reason: Optional[str] = Field(None, description="Departure reason (e.g., 'disconnect', 'explicit')")
+         reason: Optional[str] = Field(
+             None, description="Departure reason (e.g., 'disconnect', 'explicit')"
+         )
      ```
 - **Files**: `src/spec_kitty_events/collaboration.py`
 - **Parallel?**: Yes (with T008, T009, T011)
@@ -134,6 +141,7 @@ Add the 4 participant lifecycle payload models to `collaboration.py` Section 3:
      ```python
      class PresenceHeartbeatPayload(BaseModel):
          """Typed payload for PresenceHeartbeat events."""
+
          model_config = ConfigDict(frozen=True)
          participant_id: str = Field(..., min_length=1, description="Heartbeat source")
          mission_id: str = Field(..., min_length=1, description="Mission context")

@@ -113,15 +113,17 @@ wp_code: WP01
      ```
   2. Update the `CONNECTOR_EVENT_TYPES` frozenset to include both new constants:
      ```python
-     CONNECTOR_EVENT_TYPES: FrozenSet[str] = frozenset({
-         CONNECTOR_PROVISIONED,
-         CONNECTOR_HEALTH_CHECKED,
-         CONNECTOR_DEGRADED,
-         CONNECTOR_REVOKED,
-         CONNECTOR_RECONNECTED,
-         USER_CONNECTED,
-         USER_DISCONNECTED,
-     })
+     CONNECTOR_EVENT_TYPES: FrozenSet[str] = frozenset(
+         {
+             CONNECTOR_PROVISIONED,
+             CONNECTOR_HEALTH_CHECKED,
+             CONNECTOR_DEGRADED,
+             CONNECTOR_REVOKED,
+             CONNECTOR_RECONNECTED,
+             USER_CONNECTED,
+             USER_DISCONNECTED,
+         }
+     )
      ```
 - **Files**: `src/spec_kitty_events/connector.py`
 - **Notes**: The frozenset grows from 5 to 7 members.

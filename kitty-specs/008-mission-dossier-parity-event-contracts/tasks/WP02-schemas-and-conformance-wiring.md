@@ -97,14 +97,14 @@ spec-kitty implement WP02 --base WP01
   3. Add 8 entries to `PYDANTIC_MODELS` list (after the `# Mission-next runtime models` block):
      ```python
      # Dossier event contract models
-     ("artifact_identity", ArtifactIdentity),
-     ("content_hash_ref", ContentHashRef),
-     ("provenance_ref", ProvenanceRef),
-     ("local_namespace_tuple", LocalNamespaceTuple),
-     ("mission_dossier_artifact_indexed_payload", MissionDossierArtifactIndexedPayload),
-     ("mission_dossier_artifact_missing_payload", MissionDossierArtifactMissingPayload),
-     ("mission_dossier_snapshot_computed_payload", MissionDossierSnapshotComputedPayload),
-     ("mission_dossier_parity_drift_detected_payload", MissionDossierParityDriftDetectedPayload),
+     (("artifact_identity", ArtifactIdentity),)
+     (("content_hash_ref", ContentHashRef),)
+     (("provenance_ref", ProvenanceRef),)
+     (("local_namespace_tuple", LocalNamespaceTuple),)
+     (("mission_dossier_artifact_indexed_payload", MissionDossierArtifactIndexedPayload),)
+     (("mission_dossier_artifact_missing_payload", MissionDossierArtifactMissingPayload),)
+     (("mission_dossier_snapshot_computed_payload", MissionDossierSnapshotComputedPayload),)
+     (("mission_dossier_parity_drift_detected_payload", MissionDossierParityDriftDetectedPayload),)
      ```
   4. Run the generator:
      ```bash
@@ -140,15 +140,23 @@ spec-kitty implement WP02 --base WP01
   1. Open `src/spec_kitty_events/conformance/loader.py`, line 17.
   2. Current:
      ```python
-     _VALID_CATEGORIES = frozenset({"events", "lane_mapping", "edge_cases", "collaboration", "glossary", "mission_next"})
+     _VALID_CATEGORIES = frozenset(
+         {"events", "lane_mapping", "edge_cases", "collaboration", "glossary", "mission_next"}
+     )
      ```
   3. Updated:
      ```python
-     _VALID_CATEGORIES = frozenset({
-         "events", "lane_mapping", "edge_cases",
-         "collaboration", "glossary", "mission_next",
-         "dossier",
-     })
+     _VALID_CATEGORIES = frozenset(
+         {
+             "events",
+             "lane_mapping",
+             "edge_cases",
+             "collaboration",
+             "glossary",
+             "mission_next",
+             "dossier",
+         }
+     )
      ```
   4. Update the docstring of `load_fixtures()` to include `"dossier"` in the valid values list.
 - **Files**: `src/spec_kitty_events/conformance/loader.py`

@@ -1,4 +1,5 @@
 """Integration test demonstrating custom adapter implementation."""
+
 import uuid
 from typing import List, Dict
 from ulid import ULID

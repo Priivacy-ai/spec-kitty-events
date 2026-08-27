@@ -9,16 +9,13 @@
 ```python
 from spec_kitty_events import (
     # New event type constants
-    USER_CONNECTED,           # "UserConnected"
-    USER_DISCONNECTED,        # "UserDisconnected"
-
+    USER_CONNECTED,  # "UserConnected"
+    USER_DISCONNECTED,  # "UserDisconnected"
     # New payload models
     UserConnectedPayload,
     UserDisconnectedPayload,
-
     # New roster model
     UserConnectionStatus,
-
     # Existing (updated with user_connections field)
     ReducedConnectorState,
     reduce_connector_events,
@@ -65,13 +62,13 @@ degraded_payload = {
     "provider": "jira",
     "mission_id": "mission-001",
     "project_uuid": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
-    "actor_id": "system",          # system triggered the check
+    "actor_id": "system",  # system triggered the check
     "actor_type": "system",
     "endpoint_url": "https://mycompany.atlassian.net",
     "recorded_at": "2026-03-05T11:00:00Z",
     "degradation_reason": "OAuth token expired",
     "last_healthy_at": "2026-03-04T10:00:00Z",
-    "user_id": "user-123",         # whose token expired (Optional, new)
+    "user_id": "user-123",  # whose token expired (Optional, new)
 }
 ```
 
@@ -81,8 +78,8 @@ degraded_payload = {
 state = reduce_connector_events(events)
 
 # Binding-level state (unchanged)
-print(state.current_state)     # e.g., ConnectorState.HEALTHY
-print(state.transition_log)    # binding-level transitions
+print(state.current_state)  # e.g., ConnectorState.HEALTHY
+print(state.transition_log)  # binding-level transitions
 
 # Per-user roster (new)
 for uc in state.user_connections:

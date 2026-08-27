@@ -108,29 +108,35 @@ def reduce_mission_audit_events(events: Sequence[Event]) -> ReducedMissionAuditS
 
         # Anomaly: unrecognized event type (within family — defensive)
         if event_type not in MISSION_AUDIT_EVENT_TYPES:
-            state["anomalies"].append(MissionAuditAnomaly(
-                kind="unrecognized_event_type",
-                event_id=event_id,
-                message=f"Unrecognized event type in audit family: {event_type!r}",
-            ))
+            state["anomalies"].append(
+                MissionAuditAnomaly(
+                    kind="unrecognized_event_type",
+                    event_id=event_id,
+                    message=f"Unrecognized event type in audit family: {event_type!r}",
+                )
+            )
             continue
 
         # Anomaly: event after terminal
         if terminal_seen:
-            state["anomalies"].append(MissionAuditAnomaly(
-                kind="event_after_terminal",
-                event_id=event_id,
-                message=f"Event {event_type!r} arrived after terminal state",
-            ))
+            state["anomalies"].append(
+                MissionAuditAnomaly(
+                    kind="event_after_terminal",
+                    event_id=event_id,
+                    message=f"Event {event_type!r} arrived after terminal state",
+                )
+            )
             continue
 
         # Anomaly: event before Requested (except Requested itself)
         if not requested_seen and event_type != MISSION_AUDIT_REQUESTED:
-            state["anomalies"].append(MissionAuditAnomaly(
-                kind="event_before_requested",
-                event_id=event_id,
-                message=f"Event {event_type!r} arrived before MissionAuditRequested",
-            ))
+            state["anomalies"].append(
+                MissionAuditAnomaly(
+                    kind="event_before_requested",
+                    event_id=event_id,
+                    message=f"Event {event_type!r} arrived before MissionAuditRequested",
+                )
+            )
             # Still process state transitions for robustness — do not skip
 
         if event_type == MISSION_AUDIT_REQUESTED:
@@ -158,18 +164,22 @@ def reduce_mission_audit_events(events: Sequence[Event]) -> ReducedMissionAuditS
             # Anomaly: duplicate decision_id
             existing_ids = [d.decision_id for d in state["pending_decisions"]]
             if payload.decision_id in existing_ids:
-                state["anomalies"].append(MissionAuditAnomaly(
-                    kind="duplicate_decision_id",
-                    event_id=event_id,
-                    message=f"Duplicate decision_id: {payload.decision_id!r}",
-                ))
+                state["anomalies"].append(
+                    MissionAuditAnomaly(
+                        kind="duplicate_decision_id",
+                        event_id=event_id,
+                        message=f"Duplicate decision_id: {payload.decision_id!r}",
+                    )
+                )
             else:
-                state["pending_decisions"].append(PendingDecision(
-                    decision_id=payload.decision_id,
-                    question=payload.question,
-                    context_summary=payload.context_summary,
-                    severity=payload.severity,
-                ))
+                state["pending_decisions"].append(
+                    PendingDecision(
+                        decision_id=payload.decision_id,
+                        question=payload.question,
+                        context_summary=payload.context_summary,
+                        severity=payload.severity,
+                    )
+                )
             state["audit_status"] = AuditStatus.AWAITING_DECISION
 
         elif event_type == MISSION_AUDIT_COMPLETED:
@@ -268,6 +278,7 @@ Covers T009: payload validation (round-trip, required fields, Literal constraint
 Field constraints, enum validation, AuditArtifactRef composition, frozen immutability,
 PendingDecision construction).
 """
+
 from __future__ import annotations
 
 import pytest
@@ -332,6 +343,7 @@ Covers: happy-path pass, happy-path fail, decision checkpoint, empty stream,
 deduplication, 4 anomaly scenarios, terminal clears pending, partial artifact,
 3 golden-file replay scenarios.
 """
+
 from __future__ import annotations
 
 import json
@@ -406,6 +418,7 @@ Generate and commit the golden output files as part of this WP so future CI can 
 Tests: order independence (≥200 examples), idempotent dedup (≥200 examples),
 monotonic event_count (≥200 examples).
 """
+
 from __future__ import annotations
 
 from hypothesis import given, settings

@@ -110,33 +110,24 @@ Wire all new types into the package's public API via `__init__.py`.
        model_config = ConfigDict(frozen=True)
 
        gate_name: str = Field(
-           ..., min_length=1,
-           description="Name of the CI gate (e.g., 'ci/build', 'ci/lint')"
+           ..., min_length=1, description="Name of the CI gate (e.g., 'ci/build', 'ci/lint')"
        )
        gate_type: Literal["ci"] = Field(
            ..., description="Type of gate. Currently only 'ci' is supported."
        )
        conclusion: str = Field(
-           ..., min_length=1,
-           description="Raw conclusion string from the external provider"
+           ..., min_length=1, description="Raw conclusion string from the external provider"
        )
        external_provider: Literal["github"] = Field(
            ..., description="External CI provider. Currently only 'github' is supported."
        )
-       check_run_id: int = Field(
-           ..., gt=0,
-           description="GitHub check run ID"
-       )
-       check_run_url: AnyHttpUrl = Field(
-           ..., description="URL of the GitHub check run"
-       )
+       check_run_id: int = Field(..., gt=0, description="GitHub check run ID")
+       check_run_url: AnyHttpUrl = Field(..., description="URL of the GitHub check run")
        delivery_id: str = Field(
-           ..., min_length=1,
-           description="Webhook delivery ID used as idempotency key"
+           ..., min_length=1, description="Webhook delivery ID used as idempotency key"
        )
        pr_number: Optional[int] = Field(
-           None, gt=0,
-           description="Pull request number, if the gate is associated with a PR"
+           None, gt=0, description="Pull request number, if the gate is associated with a PR"
        )
    ```
 
@@ -169,6 +160,7 @@ Wire all new types into the package's public API via `__init__.py`.
 
        Attached to a generic Event with event_type='GatePassed'.
        """
+
        pass
 
 
@@ -178,6 +170,7 @@ Wire all new types into the package's public API via `__init__.py`.
        Covers conclusions: failure, timed_out, cancelled, action_required.
        Attached to a generic Event with event_type='GateFailed'.
        """
+
        pass
    ```
 
@@ -250,11 +243,11 @@ Wire all new types into the package's public API via `__init__.py`.
 3. Add all 5 new names to `__all__`:
    ```python
    # Gate observability
-   "GatePayloadBase",
-   "GatePassedPayload",
-   "GateFailedPayload",
-   "UnknownConclusionError",
-   "map_check_run_conclusion",
+   ("GatePayloadBase",)
+   ("GatePassedPayload",)
+   ("GateFailedPayload",)
+   ("UnknownConclusionError",)
+   ("map_check_run_conclusion",)
    ```
 
 **Files**: `src/spec_kitty_events/__init__.py`

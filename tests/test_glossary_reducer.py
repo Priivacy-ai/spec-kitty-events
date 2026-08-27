@@ -85,33 +85,80 @@ class TestReducerHappyPath:
 
     def test_full_lifecycle(self) -> None:
         events = [
-            make_glossary_event("GlossaryScopeActivated", {
-                "mission_id": "m1", "scope_id": "s1",
-                "scope_type": "team_domain", "glossary_version_id": "v1",
-            }, lamport_clock=1),
-            make_glossary_event("GlossaryStrictnessSet", {
-                "mission_id": "m1", "new_strictness": "max", "actor": "admin",
-            }, lamport_clock=2),
-            make_glossary_event("TermCandidateObserved", {
-                "mission_id": "m1", "scope_id": "s1", "step_id": "st1",
-                "term_surface": "dashboard", "confidence": 0.85, "actor": "a1",
-            }, lamport_clock=3),
-            make_glossary_event("GlossarySenseUpdated", {
-                "mission_id": "m1", "scope_id": "s1",
-                "term_surface": "dashboard", "after_sense": "UI panel",
-                "reason": "initial", "actor": "a1",
-            }, lamport_clock=4),
-            make_glossary_event("SemanticCheckEvaluated", {
-                "mission_id": "m1", "scope_id": "s1", "step_id": "st2",
-                "conflicts": [{"term": "dashboard", "nature": "overloaded",
-                               "severity": "high", "description": "ambig"}],
-                "severity": "high", "confidence": 0.9,
-                "recommended_action": "block", "effective_strictness": "max",
-            }, lamport_clock=5),
-            make_glossary_event("GenerationBlockedBySemanticConflict", {
-                "mission_id": "m1", "step_id": "st2",
-                "conflict_event_ids": ["e5"], "blocking_strictness": "max",
-            }, lamport_clock=6),
+            make_glossary_event(
+                "GlossaryScopeActivated",
+                {
+                    "mission_id": "m1",
+                    "scope_id": "s1",
+                    "scope_type": "team_domain",
+                    "glossary_version_id": "v1",
+                },
+                lamport_clock=1,
+            ),
+            make_glossary_event(
+                "GlossaryStrictnessSet",
+                {
+                    "mission_id": "m1",
+                    "new_strictness": "max",
+                    "actor": "admin",
+                },
+                lamport_clock=2,
+            ),
+            make_glossary_event(
+                "TermCandidateObserved",
+                {
+                    "mission_id": "m1",
+                    "scope_id": "s1",
+                    "step_id": "st1",
+                    "term_surface": "dashboard",
+                    "confidence": 0.85,
+                    "actor": "a1",
+                },
+                lamport_clock=3,
+            ),
+            make_glossary_event(
+                "GlossarySenseUpdated",
+                {
+                    "mission_id": "m1",
+                    "scope_id": "s1",
+                    "term_surface": "dashboard",
+                    "after_sense": "UI panel",
+                    "reason": "initial",
+                    "actor": "a1",
+                },
+                lamport_clock=4,
+            ),
+            make_glossary_event(
+                "SemanticCheckEvaluated",
+                {
+                    "mission_id": "m1",
+                    "scope_id": "s1",
+                    "step_id": "st2",
+                    "conflicts": [
+                        {
+                            "term": "dashboard",
+                            "nature": "overloaded",
+                            "severity": "high",
+                            "description": "ambig",
+                        }
+                    ],
+                    "severity": "high",
+                    "confidence": 0.9,
+                    "recommended_action": "block",
+                    "effective_strictness": "max",
+                },
+                lamport_clock=5,
+            ),
+            make_glossary_event(
+                "GenerationBlockedBySemanticConflict",
+                {
+                    "mission_id": "m1",
+                    "step_id": "st2",
+                    "conflict_event_ids": ["e5"],
+                    "blocking_strictness": "max",
+                },
+                lamport_clock=6,
+            ),
         ]
 
         state = reduce_glossary_events(events)
@@ -138,10 +185,16 @@ class TestReducerStrictnessTracking:
 
     def test_default_strictness(self) -> None:
         events = [
-            make_glossary_event("GlossaryScopeActivated", {
-                "mission_id": "m1", "scope_id": "s1",
-                "scope_type": "team_domain", "glossary_version_id": "v1",
-            }, lamport_clock=1),
+            make_glossary_event(
+                "GlossaryScopeActivated",
+                {
+                    "mission_id": "m1",
+                    "scope_id": "s1",
+                    "scope_type": "team_domain",
+                    "glossary_version_id": "v1",
+                },
+                lamport_clock=1,
+            ),
         ]
         state = reduce_glossary_events(events)
         assert state.current_strictness == "medium"
@@ -149,14 +202,26 @@ class TestReducerStrictnessTracking:
 
     def test_single_change(self) -> None:
         events = [
-            make_glossary_event("GlossaryScopeActivated", {
-                "mission_id": "m1", "scope_id": "s1",
-                "scope_type": "team_domain", "glossary_version_id": "v1",
-            }, lamport_clock=1),
-            make_glossary_event("GlossaryStrictnessSet", {
-                "mission_id": "m1", "new_strictness": "max",
-                "previous_strictness": "medium", "actor": "admin",
-            }, lamport_clock=2),
+            make_glossary_event(
+                "GlossaryScopeActivated",
+                {
+                    "mission_id": "m1",
+                    "scope_id": "s1",
+                    "scope_type": "team_domain",
+                    "glossary_version_id": "v1",
+                },
+                lamport_clock=1,
+            ),
+            make_glossary_event(
+                "GlossaryStrictnessSet",
+                {
+                    "mission_id": "m1",
+                    "new_strictness": "max",
+                    "previous_strictness": "medium",
+                    "actor": "admin",
+                },
+                lamport_clock=2,
+            ),
         ]
         state = reduce_glossary_events(events)
         assert state.current_strictness == "max"
@@ -164,22 +229,46 @@ class TestReducerStrictnessTracking:
 
     def test_multiple_changes(self) -> None:
         events = [
-            make_glossary_event("GlossaryScopeActivated", {
-                "mission_id": "m1", "scope_id": "s1",
-                "scope_type": "team_domain", "glossary_version_id": "v1",
-            }, lamport_clock=1),
-            make_glossary_event("GlossaryStrictnessSet", {
-                "mission_id": "m1", "new_strictness": "max",
-                "previous_strictness": "medium", "actor": "admin",
-            }, lamport_clock=2),
-            make_glossary_event("GlossaryStrictnessSet", {
-                "mission_id": "m1", "new_strictness": "off",
-                "previous_strictness": "max", "actor": "admin",
-            }, lamport_clock=3),
-            make_glossary_event("GlossaryStrictnessSet", {
-                "mission_id": "m1", "new_strictness": "medium",
-                "previous_strictness": "off", "actor": "admin",
-            }, lamport_clock=4),
+            make_glossary_event(
+                "GlossaryScopeActivated",
+                {
+                    "mission_id": "m1",
+                    "scope_id": "s1",
+                    "scope_type": "team_domain",
+                    "glossary_version_id": "v1",
+                },
+                lamport_clock=1,
+            ),
+            make_glossary_event(
+                "GlossaryStrictnessSet",
+                {
+                    "mission_id": "m1",
+                    "new_strictness": "max",
+                    "previous_strictness": "medium",
+                    "actor": "admin",
+                },
+                lamport_clock=2,
+            ),
+            make_glossary_event(
+                "GlossaryStrictnessSet",
+                {
+                    "mission_id": "m1",
+                    "new_strictness": "off",
+                    "previous_strictness": "max",
+                    "actor": "admin",
+                },
+                lamport_clock=3,
+            ),
+            make_glossary_event(
+                "GlossaryStrictnessSet",
+                {
+                    "mission_id": "m1",
+                    "new_strictness": "medium",
+                    "previous_strictness": "off",
+                    "actor": "admin",
+                },
+                lamport_clock=4,
+            ),
         ]
         state = reduce_glossary_events(events)
         assert state.current_strictness == "medium"
@@ -197,14 +286,28 @@ class TestReducerDedup:
 
     def test_duplicate_events_ignored(self) -> None:
         eid = "01HX0000000000000000000001"
-        event = make_glossary_event("GlossaryScopeActivated", {
-            "mission_id": "m1", "scope_id": "s1",
-            "scope_type": "team_domain", "glossary_version_id": "v1",
-        }, event_id=eid, lamport_clock=1)
-        dup = make_glossary_event("GlossaryScopeActivated", {
-            "mission_id": "m1", "scope_id": "s1",
-            "scope_type": "team_domain", "glossary_version_id": "v1",
-        }, event_id=eid, lamport_clock=2)
+        event = make_glossary_event(
+            "GlossaryScopeActivated",
+            {
+                "mission_id": "m1",
+                "scope_id": "s1",
+                "scope_type": "team_domain",
+                "glossary_version_id": "v1",
+            },
+            event_id=eid,
+            lamport_clock=1,
+        )
+        dup = make_glossary_event(
+            "GlossaryScopeActivated",
+            {
+                "mission_id": "m1",
+                "scope_id": "s1",
+                "scope_type": "team_domain",
+                "glossary_version_id": "v1",
+            },
+            event_id=eid,
+            lamport_clock=2,
+        )
 
         state_with_dup = reduce_glossary_events([event, dup])
         state_without_dup = reduce_glossary_events([event])
@@ -218,53 +321,137 @@ class TestReducerDedup:
 def _make_determinism_events() -> list[Event]:
     """Fixed set of glossary events for determinism testing."""
     return [
-        make_glossary_event("GlossaryScopeActivated", {
-            "mission_id": "m1", "scope_id": "s1",
-            "scope_type": "team_domain", "glossary_version_id": "v1",
-        }, event_id="01HX0000000000000000000101", lamport_clock=101),
-        make_glossary_event("GlossaryStrictnessSet", {
-            "mission_id": "m1", "new_strictness": "max", "actor": "admin",
-        }, event_id="01HX0000000000000000000102", lamport_clock=102),
-        make_glossary_event("TermCandidateObserved", {
-            "mission_id": "m1", "scope_id": "s1", "step_id": "st1",
-            "term_surface": "api", "confidence": 0.8, "actor": "a1",
-        }, event_id="01HX0000000000000000000103", lamport_clock=103),
-        make_glossary_event("TermCandidateObserved", {
-            "mission_id": "m1", "scope_id": "s1", "step_id": "st2",
-            "term_surface": "endpoint", "confidence": 0.7, "actor": "a1",
-        }, event_id="01HX0000000000000000000104", lamport_clock=104),
-        make_glossary_event("GlossarySenseUpdated", {
-            "mission_id": "m1", "scope_id": "s1",
-            "term_surface": "api", "after_sense": "REST interface",
-            "reason": "initial", "actor": "a1",
-        }, event_id="01HX0000000000000000000105", lamport_clock=105),
-        make_glossary_event("SemanticCheckEvaluated", {
-            "mission_id": "m1", "scope_id": "s1", "step_id": "st3",
-            "conflicts": [{"term": "api", "nature": "overloaded",
-                           "severity": "high", "description": "ambig"}],
-            "severity": "high", "confidence": 0.9,
-            "recommended_action": "warn", "effective_strictness": "max",
-        }, event_id="01HX0000000000000000000106", lamport_clock=106),
-        make_glossary_event("GlossaryClarificationRequested", {
-            "mission_id": "m1", "scope_id": "s1", "step_id": "st3",
-            "semantic_check_event_id": "01HX0000000000000000000106",
-            "term": "api", "question": "Which meaning?",
-            "options": ["REST", "Generic"], "urgency": "high", "actor": "a1",
-        }, event_id="01HX0000000000000000000107", lamport_clock=107),
-        make_glossary_event("GlossaryClarificationResolved", {
-            "mission_id": "m1",
-            "clarification_event_id": "01HX0000000000000000000107",
-            "selected_meaning": "REST interface", "actor": "a2",
-        }, event_id="01HX0000000000000000000108", lamport_clock=108),
-        make_glossary_event("GenerationBlockedBySemanticConflict", {
-            "mission_id": "m1", "step_id": "st4",
-            "conflict_event_ids": ["01HX0000000000000000000106"],
-            "blocking_strictness": "max",
-        }, event_id="01HX0000000000000000000109", lamport_clock=109),
-        make_glossary_event("GlossaryStrictnessSet", {
-            "mission_id": "m1", "new_strictness": "medium",
-            "previous_strictness": "max", "actor": "admin",
-        }, event_id="01HX0000000000000000000110", lamport_clock=110),
+        make_glossary_event(
+            "GlossaryScopeActivated",
+            {
+                "mission_id": "m1",
+                "scope_id": "s1",
+                "scope_type": "team_domain",
+                "glossary_version_id": "v1",
+            },
+            event_id="01HX0000000000000000000101",
+            lamport_clock=101,
+        ),
+        make_glossary_event(
+            "GlossaryStrictnessSet",
+            {
+                "mission_id": "m1",
+                "new_strictness": "max",
+                "actor": "admin",
+            },
+            event_id="01HX0000000000000000000102",
+            lamport_clock=102,
+        ),
+        make_glossary_event(
+            "TermCandidateObserved",
+            {
+                "mission_id": "m1",
+                "scope_id": "s1",
+                "step_id": "st1",
+                "term_surface": "api",
+                "confidence": 0.8,
+                "actor": "a1",
+            },
+            event_id="01HX0000000000000000000103",
+            lamport_clock=103,
+        ),
+        make_glossary_event(
+            "TermCandidateObserved",
+            {
+                "mission_id": "m1",
+                "scope_id": "s1",
+                "step_id": "st2",
+                "term_surface": "endpoint",
+                "confidence": 0.7,
+                "actor": "a1",
+            },
+            event_id="01HX0000000000000000000104",
+            lamport_clock=104,
+        ),
+        make_glossary_event(
+            "GlossarySenseUpdated",
+            {
+                "mission_id": "m1",
+                "scope_id": "s1",
+                "term_surface": "api",
+                "after_sense": "REST interface",
+                "reason": "initial",
+                "actor": "a1",
+            },
+            event_id="01HX0000000000000000000105",
+            lamport_clock=105,
+        ),
+        make_glossary_event(
+            "SemanticCheckEvaluated",
+            {
+                "mission_id": "m1",
+                "scope_id": "s1",
+                "step_id": "st3",
+                "conflicts": [
+                    {
+                        "term": "api",
+                        "nature": "overloaded",
+                        "severity": "high",
+                        "description": "ambig",
+                    }
+                ],
+                "severity": "high",
+                "confidence": 0.9,
+                "recommended_action": "warn",
+                "effective_strictness": "max",
+            },
+            event_id="01HX0000000000000000000106",
+            lamport_clock=106,
+        ),
+        make_glossary_event(
+            "GlossaryClarificationRequested",
+            {
+                "mission_id": "m1",
+                "scope_id": "s1",
+                "step_id": "st3",
+                "semantic_check_event_id": "01HX0000000000000000000106",
+                "term": "api",
+                "question": "Which meaning?",
+                "options": ["REST", "Generic"],
+                "urgency": "high",
+                "actor": "a1",
+            },
+            event_id="01HX0000000000000000000107",
+            lamport_clock=107,
+        ),
+        make_glossary_event(
+            "GlossaryClarificationResolved",
+            {
+                "mission_id": "m1",
+                "clarification_event_id": "01HX0000000000000000000107",
+                "selected_meaning": "REST interface",
+                "actor": "a2",
+            },
+            event_id="01HX0000000000000000000108",
+            lamport_clock=108,
+        ),
+        make_glossary_event(
+            "GenerationBlockedBySemanticConflict",
+            {
+                "mission_id": "m1",
+                "step_id": "st4",
+                "conflict_event_ids": ["01HX0000000000000000000106"],
+                "blocking_strictness": "max",
+            },
+            event_id="01HX0000000000000000000109",
+            lamport_clock=109,
+        ),
+        make_glossary_event(
+            "GlossaryStrictnessSet",
+            {
+                "mission_id": "m1",
+                "new_strictness": "medium",
+                "previous_strictness": "max",
+                "actor": "admin",
+            },
+            event_id="01HX0000000000000000000110",
+            lamport_clock=110,
+        ),
     ]
 
 
@@ -286,32 +473,65 @@ class TestReducerClarificationLifecycle:
     """Tests for clarification request/resolve and burst cap."""
 
     def _scope_event(self, clock: int = 1) -> Event:
-        return make_glossary_event("GlossaryScopeActivated", {
-            "mission_id": "m1", "scope_id": "s1",
-            "scope_type": "team_domain", "glossary_version_id": "v1",
-        }, event_id=f"01HX{clock:022d}", lamport_clock=clock)
+        return make_glossary_event(
+            "GlossaryScopeActivated",
+            {
+                "mission_id": "m1",
+                "scope_id": "s1",
+                "scope_type": "team_domain",
+                "glossary_version_id": "v1",
+            },
+            event_id=f"01HX{clock:022d}",
+            lamport_clock=clock,
+        )
 
     def _check_event(self, clock: int = 2) -> Event:
-        return make_glossary_event("SemanticCheckEvaluated", {
-            "mission_id": "m1", "scope_id": "s1", "step_id": "st1",
-            "conflicts": [], "severity": "low", "confidence": 0.5,
-            "recommended_action": "pass", "effective_strictness": "medium",
-        }, event_id=f"01HX{clock:022d}", lamport_clock=clock)
+        return make_glossary_event(
+            "SemanticCheckEvaluated",
+            {
+                "mission_id": "m1",
+                "scope_id": "s1",
+                "step_id": "st1",
+                "conflicts": [],
+                "severity": "low",
+                "confidence": 0.5,
+                "recommended_action": "pass",
+                "effective_strictness": "medium",
+            },
+            event_id=f"01HX{clock:022d}",
+            lamport_clock=clock,
+        )
 
     def _clar_request(self, check_eid: str, term: str, clock: int) -> Event:
-        return make_glossary_event("GlossaryClarificationRequested", {
-            "mission_id": "m1", "scope_id": "s1", "step_id": "st1",
-            "semantic_check_event_id": check_eid,
-            "term": term, "question": "Which?",
-            "options": ["A", "B"], "urgency": "low", "actor": "a1",
-        }, event_id=f"01HX{clock:022d}", lamport_clock=clock)
+        return make_glossary_event(
+            "GlossaryClarificationRequested",
+            {
+                "mission_id": "m1",
+                "scope_id": "s1",
+                "step_id": "st1",
+                "semantic_check_event_id": check_eid,
+                "term": term,
+                "question": "Which?",
+                "options": ["A", "B"],
+                "urgency": "low",
+                "actor": "a1",
+            },
+            event_id=f"01HX{clock:022d}",
+            lamport_clock=clock,
+        )
 
     def _clar_resolve(self, clar_eid: str, clock: int) -> Event:
-        return make_glossary_event("GlossaryClarificationResolved", {
-            "mission_id": "m1",
-            "clarification_event_id": clar_eid,
-            "selected_meaning": "meaning-A", "actor": "a2",
-        }, event_id=f"01HX{clock:022d}", lamport_clock=clock)
+        return make_glossary_event(
+            "GlossaryClarificationResolved",
+            {
+                "mission_id": "m1",
+                "clarification_event_id": clar_eid,
+                "selected_meaning": "meaning-A",
+                "actor": "a2",
+            },
+            event_id=f"01HX{clock:022d}",
+            lamport_clock=clock,
+        )
 
     def test_request_and_resolution(self) -> None:
         check_eid = f"01HX{2:022d}"
@@ -377,11 +597,21 @@ class TestReducerClarificationLifecycle:
         events = [
             self._scope_event(1),
             self._check_event(2),
-            make_glossary_event("SemanticCheckEvaluated", {
-                "mission_id": "m1", "scope_id": "s1", "step_id": "st2",
-                "conflicts": [], "severity": "low", "confidence": 0.5,
-                "recommended_action": "pass", "effective_strictness": "medium",
-            }, event_id=f"01HX{3:022d}", lamport_clock=3),
+            make_glossary_event(
+                "SemanticCheckEvaluated",
+                {
+                    "mission_id": "m1",
+                    "scope_id": "s1",
+                    "step_id": "st2",
+                    "conflicts": [],
+                    "severity": "low",
+                    "confidence": 0.5,
+                    "recommended_action": "pass",
+                    "effective_strictness": "medium",
+                },
+                event_id=f"01HX{3:022d}",
+                lamport_clock=3,
+            ),
             self._clar_request(check_a, "t1", 4),
             self._clar_request(check_a, "t2", 5),
             self._clar_request(check_a, "t3", 6),
@@ -401,10 +631,18 @@ class TestStrictModeUnactivatedScope:
     """Test strict mode raises on unactivated scope reference."""
 
     def test_term_in_unactivated_scope_raises(self) -> None:
-        event = make_glossary_event("TermCandidateObserved", {
-            "mission_id": "m1", "scope_id": "nonexistent", "step_id": "st1",
-            "term_surface": "api", "confidence": 0.5, "actor": "a1",
-        }, lamport_clock=1)
+        event = make_glossary_event(
+            "TermCandidateObserved",
+            {
+                "mission_id": "m1",
+                "scope_id": "nonexistent",
+                "step_id": "st1",
+                "term_surface": "api",
+                "confidence": 0.5,
+                "actor": "a1",
+            },
+            lamport_clock=1,
+        )
         with pytest.raises(SpecKittyEventsError, match="unactivated scope"):
             reduce_glossary_events([event], mode="strict")
 
@@ -417,15 +655,28 @@ class TestStrictModeUnobservedTerm:
 
     def test_sense_update_unobserved_term_raises(self) -> None:
         events = [
-            make_glossary_event("GlossaryScopeActivated", {
-                "mission_id": "m1", "scope_id": "s1",
-                "scope_type": "team_domain", "glossary_version_id": "v1",
-            }, lamport_clock=1),
-            make_glossary_event("GlossarySenseUpdated", {
-                "mission_id": "m1", "scope_id": "s1",
-                "term_surface": "unknown_term", "after_sense": "meaning",
-                "reason": "initial", "actor": "a1",
-            }, lamport_clock=2),
+            make_glossary_event(
+                "GlossaryScopeActivated",
+                {
+                    "mission_id": "m1",
+                    "scope_id": "s1",
+                    "scope_type": "team_domain",
+                    "glossary_version_id": "v1",
+                },
+                lamport_clock=1,
+            ),
+            make_glossary_event(
+                "GlossarySenseUpdated",
+                {
+                    "mission_id": "m1",
+                    "scope_id": "s1",
+                    "term_surface": "unknown_term",
+                    "after_sense": "meaning",
+                    "reason": "initial",
+                    "actor": "a1",
+                },
+                lamport_clock=2,
+            ),
         ]
         with pytest.raises(SpecKittyEventsError, match="unobserved term"):
             reduce_glossary_events(events, mode="strict")
@@ -439,18 +690,40 @@ class TestPermissiveModeScope:
 
     def test_unactivated_scope_records_anomaly_and_continues(self) -> None:
         events = [
-            make_glossary_event("TermCandidateObserved", {
-                "mission_id": "m1", "scope_id": "bad_scope", "step_id": "st1",
-                "term_surface": "early_term", "confidence": 0.5, "actor": "a1",
-            }, lamport_clock=1),
-            make_glossary_event("GlossaryScopeActivated", {
-                "mission_id": "m1", "scope_id": "s1",
-                "scope_type": "team_domain", "glossary_version_id": "v1",
-            }, lamport_clock=2),
-            make_glossary_event("TermCandidateObserved", {
-                "mission_id": "m1", "scope_id": "s1", "step_id": "st2",
-                "term_surface": "valid_term", "confidence": 0.8, "actor": "a1",
-            }, lamport_clock=3),
+            make_glossary_event(
+                "TermCandidateObserved",
+                {
+                    "mission_id": "m1",
+                    "scope_id": "bad_scope",
+                    "step_id": "st1",
+                    "term_surface": "early_term",
+                    "confidence": 0.5,
+                    "actor": "a1",
+                },
+                lamport_clock=1,
+            ),
+            make_glossary_event(
+                "GlossaryScopeActivated",
+                {
+                    "mission_id": "m1",
+                    "scope_id": "s1",
+                    "scope_type": "team_domain",
+                    "glossary_version_id": "v1",
+                },
+                lamport_clock=2,
+            ),
+            make_glossary_event(
+                "TermCandidateObserved",
+                {
+                    "mission_id": "m1",
+                    "scope_id": "s1",
+                    "step_id": "st2",
+                    "term_surface": "valid_term",
+                    "confidence": 0.8,
+                    "actor": "a1",
+                },
+                lamport_clock=3,
+            ),
         ]
         state = reduce_glossary_events(events, mode="permissive")
         assert len(state.anomalies) == 1
@@ -467,19 +740,40 @@ class TestPermissiveModeUnobservedTerm:
 
     def test_sense_update_unobserved_term_records_anomaly(self) -> None:
         events = [
-            make_glossary_event("GlossaryScopeActivated", {
-                "mission_id": "m1", "scope_id": "s1",
-                "scope_type": "team_domain", "glossary_version_id": "v1",
-            }, lamport_clock=1),
-            make_glossary_event("GlossarySenseUpdated", {
-                "mission_id": "m1", "scope_id": "s1",
-                "term_surface": "unknown_term", "after_sense": "meaning",
-                "reason": "initial", "actor": "a1",
-            }, lamport_clock=2),
-            make_glossary_event("TermCandidateObserved", {
-                "mission_id": "m1", "scope_id": "s1", "step_id": "st1",
-                "term_surface": "known_term", "confidence": 0.7, "actor": "a1",
-            }, lamport_clock=3),
+            make_glossary_event(
+                "GlossaryScopeActivated",
+                {
+                    "mission_id": "m1",
+                    "scope_id": "s1",
+                    "scope_type": "team_domain",
+                    "glossary_version_id": "v1",
+                },
+                lamport_clock=1,
+            ),
+            make_glossary_event(
+                "GlossarySenseUpdated",
+                {
+                    "mission_id": "m1",
+                    "scope_id": "s1",
+                    "term_surface": "unknown_term",
+                    "after_sense": "meaning",
+                    "reason": "initial",
+                    "actor": "a1",
+                },
+                lamport_clock=2,
+            ),
+            make_glossary_event(
+                "TermCandidateObserved",
+                {
+                    "mission_id": "m1",
+                    "scope_id": "s1",
+                    "step_id": "st1",
+                    "term_surface": "known_term",
+                    "confidence": 0.7,
+                    "actor": "a1",
+                },
+                lamport_clock=3,
+            ),
         ]
         state = reduce_glossary_events(events, mode="permissive")
         assert len(state.anomalies) == 1
@@ -498,29 +792,70 @@ class TestConcurrentClarificationResolution:
         req_eid = "01HX0000000000000000000203"
         check_eid = "01HX0000000000000000000202"
         events = [
-            make_glossary_event("GlossaryScopeActivated", {
-                "mission_id": "m1", "scope_id": "s1",
-                "scope_type": "team_domain", "glossary_version_id": "v1",
-            }, event_id="01HX0000000000000000000201", lamport_clock=201),
-            make_glossary_event("SemanticCheckEvaluated", {
-                "mission_id": "m1", "scope_id": "s1", "step_id": "st1",
-                "conflicts": [], "severity": "low", "confidence": 0.5,
-                "recommended_action": "pass", "effective_strictness": "medium",
-            }, event_id=check_eid, lamport_clock=202),
-            make_glossary_event("GlossaryClarificationRequested", {
-                "mission_id": "m1", "scope_id": "s1", "step_id": "st1",
-                "semantic_check_event_id": check_eid,
-                "term": "api", "question": "Which?",
-                "options": ["A", "B"], "urgency": "low", "actor": "a1",
-            }, event_id=req_eid, lamport_clock=203),
-            make_glossary_event("GlossaryClarificationResolved", {
-                "mission_id": "m1", "clarification_event_id": req_eid,
-                "selected_meaning": "A", "actor": "actor-A",
-            }, event_id="01HX0000000000000000000204", lamport_clock=204),
-            make_glossary_event("GlossaryClarificationResolved", {
-                "mission_id": "m1", "clarification_event_id": req_eid,
-                "selected_meaning": "B", "actor": "actor-B",
-            }, event_id="01HX0000000000000000000205", lamport_clock=205),
+            make_glossary_event(
+                "GlossaryScopeActivated",
+                {
+                    "mission_id": "m1",
+                    "scope_id": "s1",
+                    "scope_type": "team_domain",
+                    "glossary_version_id": "v1",
+                },
+                event_id="01HX0000000000000000000201",
+                lamport_clock=201,
+            ),
+            make_glossary_event(
+                "SemanticCheckEvaluated",
+                {
+                    "mission_id": "m1",
+                    "scope_id": "s1",
+                    "step_id": "st1",
+                    "conflicts": [],
+                    "severity": "low",
+                    "confidence": 0.5,
+                    "recommended_action": "pass",
+                    "effective_strictness": "medium",
+                },
+                event_id=check_eid,
+                lamport_clock=202,
+            ),
+            make_glossary_event(
+                "GlossaryClarificationRequested",
+                {
+                    "mission_id": "m1",
+                    "scope_id": "s1",
+                    "step_id": "st1",
+                    "semantic_check_event_id": check_eid,
+                    "term": "api",
+                    "question": "Which?",
+                    "options": ["A", "B"],
+                    "urgency": "low",
+                    "actor": "a1",
+                },
+                event_id=req_eid,
+                lamport_clock=203,
+            ),
+            make_glossary_event(
+                "GlossaryClarificationResolved",
+                {
+                    "mission_id": "m1",
+                    "clarification_event_id": req_eid,
+                    "selected_meaning": "A",
+                    "actor": "actor-A",
+                },
+                event_id="01HX0000000000000000000204",
+                lamport_clock=204,
+            ),
+            make_glossary_event(
+                "GlossaryClarificationResolved",
+                {
+                    "mission_id": "m1",
+                    "clarification_event_id": req_eid,
+                    "selected_meaning": "B",
+                    "actor": "actor-B",
+                },
+                event_id="01HX0000000000000000000205",
+                lamport_clock=205,
+            ),
         ]
         state = reduce_glossary_events(events)
         assert len(state.clarifications) == 1
@@ -537,28 +872,66 @@ class TestMidMissionStrictnessChange:
 
     def test_blocks_preserved_after_strictness_off(self) -> None:
         events = [
-            make_glossary_event("GlossaryScopeActivated", {
-                "mission_id": "m1", "scope_id": "s1",
-                "scope_type": "team_domain", "glossary_version_id": "v1",
-            }, lamport_clock=1),
-            make_glossary_event("GlossaryStrictnessSet", {
-                "mission_id": "m1", "new_strictness": "max", "actor": "admin",
-            }, lamport_clock=2),
-            make_glossary_event("SemanticCheckEvaluated", {
-                "mission_id": "m1", "scope_id": "s1", "step_id": "st1",
-                "conflicts": [{"term": "api", "nature": "overloaded",
-                               "severity": "high", "description": "ambig"}],
-                "severity": "high", "confidence": 0.9,
-                "recommended_action": "block", "effective_strictness": "max",
-            }, lamport_clock=3),
-            make_glossary_event("GenerationBlockedBySemanticConflict", {
-                "mission_id": "m1", "step_id": "st1",
-                "conflict_event_ids": ["e3"], "blocking_strictness": "max",
-            }, lamport_clock=4),
-            make_glossary_event("GlossaryStrictnessSet", {
-                "mission_id": "m1", "new_strictness": "off",
-                "previous_strictness": "max", "actor": "admin",
-            }, lamport_clock=5),
+            make_glossary_event(
+                "GlossaryScopeActivated",
+                {
+                    "mission_id": "m1",
+                    "scope_id": "s1",
+                    "scope_type": "team_domain",
+                    "glossary_version_id": "v1",
+                },
+                lamport_clock=1,
+            ),
+            make_glossary_event(
+                "GlossaryStrictnessSet",
+                {
+                    "mission_id": "m1",
+                    "new_strictness": "max",
+                    "actor": "admin",
+                },
+                lamport_clock=2,
+            ),
+            make_glossary_event(
+                "SemanticCheckEvaluated",
+                {
+                    "mission_id": "m1",
+                    "scope_id": "s1",
+                    "step_id": "st1",
+                    "conflicts": [
+                        {
+                            "term": "api",
+                            "nature": "overloaded",
+                            "severity": "high",
+                            "description": "ambig",
+                        }
+                    ],
+                    "severity": "high",
+                    "confidence": 0.9,
+                    "recommended_action": "block",
+                    "effective_strictness": "max",
+                },
+                lamport_clock=3,
+            ),
+            make_glossary_event(
+                "GenerationBlockedBySemanticConflict",
+                {
+                    "mission_id": "m1",
+                    "step_id": "st1",
+                    "conflict_event_ids": ["e3"],
+                    "blocking_strictness": "max",
+                },
+                lamport_clock=4,
+            ),
+            make_glossary_event(
+                "GlossaryStrictnessSet",
+                {
+                    "mission_id": "m1",
+                    "new_strictness": "off",
+                    "previous_strictness": "max",
+                    "actor": "admin",
+                },
+                lamport_clock=5,
+            ),
         ]
         state = reduce_glossary_events(events)
         assert state.current_strictness == "off"
@@ -575,32 +948,74 @@ class TestCrossScopeSameTerm:
 
     def test_same_term_different_scopes(self) -> None:
         events = [
-            make_glossary_event("GlossaryScopeActivated", {
-                "mission_id": "m1", "scope_id": "scope-a",
-                "scope_type": "team_domain", "glossary_version_id": "v1",
-            }, lamport_clock=1),
-            make_glossary_event("GlossaryScopeActivated", {
-                "mission_id": "m1", "scope_id": "scope-b",
-                "scope_type": "audience_domain", "glossary_version_id": "v1",
-            }, lamport_clock=2),
-            make_glossary_event("TermCandidateObserved", {
-                "mission_id": "m1", "scope_id": "scope-a", "step_id": "st1",
-                "term_surface": "node", "confidence": 0.9, "actor": "a1",
-            }, lamport_clock=3),
-            make_glossary_event("TermCandidateObserved", {
-                "mission_id": "m1", "scope_id": "scope-b", "step_id": "st2",
-                "term_surface": "node", "confidence": 0.8, "actor": "a1",
-            }, lamport_clock=4),
-            make_glossary_event("GlossarySenseUpdated", {
-                "mission_id": "m1", "scope_id": "scope-a",
-                "term_surface": "node", "after_sense": "server instance",
-                "reason": "infra context", "actor": "a1",
-            }, lamport_clock=5),
-            make_glossary_event("GlossarySenseUpdated", {
-                "mission_id": "m1", "scope_id": "scope-b",
-                "term_surface": "node", "after_sense": "graph vertex",
-                "reason": "data context", "actor": "a1",
-            }, lamport_clock=6),
+            make_glossary_event(
+                "GlossaryScopeActivated",
+                {
+                    "mission_id": "m1",
+                    "scope_id": "scope-a",
+                    "scope_type": "team_domain",
+                    "glossary_version_id": "v1",
+                },
+                lamport_clock=1,
+            ),
+            make_glossary_event(
+                "GlossaryScopeActivated",
+                {
+                    "mission_id": "m1",
+                    "scope_id": "scope-b",
+                    "scope_type": "audience_domain",
+                    "glossary_version_id": "v1",
+                },
+                lamport_clock=2,
+            ),
+            make_glossary_event(
+                "TermCandidateObserved",
+                {
+                    "mission_id": "m1",
+                    "scope_id": "scope-a",
+                    "step_id": "st1",
+                    "term_surface": "node",
+                    "confidence": 0.9,
+                    "actor": "a1",
+                },
+                lamport_clock=3,
+            ),
+            make_glossary_event(
+                "TermCandidateObserved",
+                {
+                    "mission_id": "m1",
+                    "scope_id": "scope-b",
+                    "step_id": "st2",
+                    "term_surface": "node",
+                    "confidence": 0.8,
+                    "actor": "a1",
+                },
+                lamport_clock=4,
+            ),
+            make_glossary_event(
+                "GlossarySenseUpdated",
+                {
+                    "mission_id": "m1",
+                    "scope_id": "scope-a",
+                    "term_surface": "node",
+                    "after_sense": "server instance",
+                    "reason": "infra context",
+                    "actor": "a1",
+                },
+                lamport_clock=5,
+            ),
+            make_glossary_event(
+                "GlossarySenseUpdated",
+                {
+                    "mission_id": "m1",
+                    "scope_id": "scope-b",
+                    "term_surface": "node",
+                    "after_sense": "graph vertex",
+                    "reason": "data context",
+                    "actor": "a1",
+                },
+                lamport_clock=6,
+            ),
         ]
         state = reduce_glossary_events(events)
 
@@ -627,21 +1042,46 @@ class TestClarificationScopeCheck:
     def test_strict_raises_on_unactivated_scope(self) -> None:
         check_eid = "01HX0000000000000000000502"
         events = [
-            make_glossary_event("GlossaryScopeActivated", {
-                "mission_id": "m1", "scope_id": "s1",
-                "scope_type": "team_domain", "glossary_version_id": "v1",
-            }, lamport_clock=501),
-            make_glossary_event("SemanticCheckEvaluated", {
-                "mission_id": "m1", "scope_id": "s1", "step_id": "st1",
-                "conflicts": [], "severity": "low", "confidence": 0.5,
-                "recommended_action": "pass", "effective_strictness": "medium",
-            }, event_id=check_eid, lamport_clock=502),
-            make_glossary_event("GlossaryClarificationRequested", {
-                "mission_id": "m1", "scope_id": "nonexistent", "step_id": "st1",
-                "semantic_check_event_id": check_eid,
-                "term": "api", "question": "Which?",
-                "options": ["A", "B"], "urgency": "low", "actor": "a1",
-            }, lamport_clock=503),
+            make_glossary_event(
+                "GlossaryScopeActivated",
+                {
+                    "mission_id": "m1",
+                    "scope_id": "s1",
+                    "scope_type": "team_domain",
+                    "glossary_version_id": "v1",
+                },
+                lamport_clock=501,
+            ),
+            make_glossary_event(
+                "SemanticCheckEvaluated",
+                {
+                    "mission_id": "m1",
+                    "scope_id": "s1",
+                    "step_id": "st1",
+                    "conflicts": [],
+                    "severity": "low",
+                    "confidence": 0.5,
+                    "recommended_action": "pass",
+                    "effective_strictness": "medium",
+                },
+                event_id=check_eid,
+                lamport_clock=502,
+            ),
+            make_glossary_event(
+                "GlossaryClarificationRequested",
+                {
+                    "mission_id": "m1",
+                    "scope_id": "nonexistent",
+                    "step_id": "st1",
+                    "semantic_check_event_id": check_eid,
+                    "term": "api",
+                    "question": "Which?",
+                    "options": ["A", "B"],
+                    "urgency": "low",
+                    "actor": "a1",
+                },
+                lamport_clock=503,
+            ),
         ]
         with pytest.raises(SpecKittyEventsError, match="unactivated scope"):
             reduce_glossary_events(events, mode="strict")
@@ -649,21 +1089,46 @@ class TestClarificationScopeCheck:
     def test_permissive_records_anomaly(self) -> None:
         check_eid = "01HX0000000000000000000602"
         events = [
-            make_glossary_event("GlossaryScopeActivated", {
-                "mission_id": "m1", "scope_id": "s1",
-                "scope_type": "team_domain", "glossary_version_id": "v1",
-            }, lamport_clock=601),
-            make_glossary_event("SemanticCheckEvaluated", {
-                "mission_id": "m1", "scope_id": "s1", "step_id": "st1",
-                "conflicts": [], "severity": "low", "confidence": 0.5,
-                "recommended_action": "pass", "effective_strictness": "medium",
-            }, event_id=check_eid, lamport_clock=602),
-            make_glossary_event("GlossaryClarificationRequested", {
-                "mission_id": "m1", "scope_id": "bad_scope", "step_id": "st1",
-                "semantic_check_event_id": check_eid,
-                "term": "api", "question": "Which?",
-                "options": ["A", "B"], "urgency": "low", "actor": "a1",
-            }, lamport_clock=603),
+            make_glossary_event(
+                "GlossaryScopeActivated",
+                {
+                    "mission_id": "m1",
+                    "scope_id": "s1",
+                    "scope_type": "team_domain",
+                    "glossary_version_id": "v1",
+                },
+                lamport_clock=601,
+            ),
+            make_glossary_event(
+                "SemanticCheckEvaluated",
+                {
+                    "mission_id": "m1",
+                    "scope_id": "s1",
+                    "step_id": "st1",
+                    "conflicts": [],
+                    "severity": "low",
+                    "confidence": 0.5,
+                    "recommended_action": "pass",
+                    "effective_strictness": "medium",
+                },
+                event_id=check_eid,
+                lamport_clock=602,
+            ),
+            make_glossary_event(
+                "GlossaryClarificationRequested",
+                {
+                    "mission_id": "m1",
+                    "scope_id": "bad_scope",
+                    "step_id": "st1",
+                    "semantic_check_event_id": check_eid,
+                    "term": "api",
+                    "question": "Which?",
+                    "options": ["A", "B"],
+                    "urgency": "low",
+                    "actor": "a1",
+                },
+                lamport_clock=603,
+            ),
         ]
         state = reduce_glossary_events(events, mode="permissive")
         scope_anomalies = [a for a in state.anomalies if "unactivated scope" in a.reason]
@@ -678,32 +1143,62 @@ class TestClarificationUnknownCheckRef:
 
     def test_strict_raises_on_unknown_check_ref(self) -> None:
         events = [
-            make_glossary_event("GlossaryScopeActivated", {
-                "mission_id": "m1", "scope_id": "s1",
-                "scope_type": "team_domain", "glossary_version_id": "v1",
-            }, lamport_clock=701),
-            make_glossary_event("GlossaryClarificationRequested", {
-                "mission_id": "m1", "scope_id": "s1", "step_id": "st1",
-                "semantic_check_event_id": "fabricated-check-id-00000001",
-                "term": "api", "question": "Which?",
-                "options": ["A", "B"], "urgency": "low", "actor": "a1",
-            }, lamport_clock=702),
+            make_glossary_event(
+                "GlossaryScopeActivated",
+                {
+                    "mission_id": "m1",
+                    "scope_id": "s1",
+                    "scope_type": "team_domain",
+                    "glossary_version_id": "v1",
+                },
+                lamport_clock=701,
+            ),
+            make_glossary_event(
+                "GlossaryClarificationRequested",
+                {
+                    "mission_id": "m1",
+                    "scope_id": "s1",
+                    "step_id": "st1",
+                    "semantic_check_event_id": "fabricated-check-id-00000001",
+                    "term": "api",
+                    "question": "Which?",
+                    "options": ["A", "B"],
+                    "urgency": "low",
+                    "actor": "a1",
+                },
+                lamport_clock=702,
+            ),
         ]
         with pytest.raises(SpecKittyEventsError, match="unknown semantic check"):
             reduce_glossary_events(events, mode="strict")
 
     def test_permissive_records_anomaly(self) -> None:
         events = [
-            make_glossary_event("GlossaryScopeActivated", {
-                "mission_id": "m1", "scope_id": "s1",
-                "scope_type": "team_domain", "glossary_version_id": "v1",
-            }, lamport_clock=801),
-            make_glossary_event("GlossaryClarificationRequested", {
-                "mission_id": "m1", "scope_id": "s1", "step_id": "st1",
-                "semantic_check_event_id": "fabricated-check-id-00000002",
-                "term": "api", "question": "Which?",
-                "options": ["A", "B"], "urgency": "low", "actor": "a1",
-            }, lamport_clock=802),
+            make_glossary_event(
+                "GlossaryScopeActivated",
+                {
+                    "mission_id": "m1",
+                    "scope_id": "s1",
+                    "scope_type": "team_domain",
+                    "glossary_version_id": "v1",
+                },
+                lamport_clock=801,
+            ),
+            make_glossary_event(
+                "GlossaryClarificationRequested",
+                {
+                    "mission_id": "m1",
+                    "scope_id": "s1",
+                    "step_id": "st1",
+                    "semantic_check_event_id": "fabricated-check-id-00000002",
+                    "term": "api",
+                    "question": "Which?",
+                    "options": ["A", "B"],
+                    "urgency": "low",
+                    "actor": "a1",
+                },
+                lamport_clock=802,
+            ),
         ]
         state = reduce_glossary_events(events, mode="permissive")
         ref_anomalies = [a for a in state.anomalies if "unknown semantic check" in a.reason]
@@ -720,32 +1215,74 @@ class TestGlossaryJsonSerialization:
 
     def test_tuple_key_collision_is_prevented_in_json_output(self) -> None:
         events = [
-            make_glossary_event("GlossaryScopeActivated", {
-                "mission_id": "m1", "scope_id": "a,b",
-                "scope_type": "team_domain", "glossary_version_id": "v1",
-            }, lamport_clock=901),
-            make_glossary_event("GlossaryScopeActivated", {
-                "mission_id": "m1", "scope_id": "a",
-                "scope_type": "team_domain", "glossary_version_id": "v1",
-            }, lamport_clock=902),
-            make_glossary_event("TermCandidateObserved", {
-                "mission_id": "m1", "scope_id": "a,b", "step_id": "st1",
-                "term_surface": "c", "confidence": 0.9, "actor": "a1",
-            }, lamport_clock=903),
-            make_glossary_event("TermCandidateObserved", {
-                "mission_id": "m1", "scope_id": "a", "step_id": "st2",
-                "term_surface": "b,c", "confidence": 0.8, "actor": "a1",
-            }, lamport_clock=904),
-            make_glossary_event("GlossarySenseUpdated", {
-                "mission_id": "m1", "scope_id": "a,b",
-                "term_surface": "c", "after_sense": "sense-1",
-                "reason": "collision test", "actor": "a1",
-            }, lamport_clock=905),
-            make_glossary_event("GlossarySenseUpdated", {
-                "mission_id": "m1", "scope_id": "a",
-                "term_surface": "b,c", "after_sense": "sense-2",
-                "reason": "collision test", "actor": "a1",
-            }, lamport_clock=906),
+            make_glossary_event(
+                "GlossaryScopeActivated",
+                {
+                    "mission_id": "m1",
+                    "scope_id": "a,b",
+                    "scope_type": "team_domain",
+                    "glossary_version_id": "v1",
+                },
+                lamport_clock=901,
+            ),
+            make_glossary_event(
+                "GlossaryScopeActivated",
+                {
+                    "mission_id": "m1",
+                    "scope_id": "a",
+                    "scope_type": "team_domain",
+                    "glossary_version_id": "v1",
+                },
+                lamport_clock=902,
+            ),
+            make_glossary_event(
+                "TermCandidateObserved",
+                {
+                    "mission_id": "m1",
+                    "scope_id": "a,b",
+                    "step_id": "st1",
+                    "term_surface": "c",
+                    "confidence": 0.9,
+                    "actor": "a1",
+                },
+                lamport_clock=903,
+            ),
+            make_glossary_event(
+                "TermCandidateObserved",
+                {
+                    "mission_id": "m1",
+                    "scope_id": "a",
+                    "step_id": "st2",
+                    "term_surface": "b,c",
+                    "confidence": 0.8,
+                    "actor": "a1",
+                },
+                lamport_clock=904,
+            ),
+            make_glossary_event(
+                "GlossarySenseUpdated",
+                {
+                    "mission_id": "m1",
+                    "scope_id": "a,b",
+                    "term_surface": "c",
+                    "after_sense": "sense-1",
+                    "reason": "collision test",
+                    "actor": "a1",
+                },
+                lamport_clock=905,
+            ),
+            make_glossary_event(
+                "GlossarySenseUpdated",
+                {
+                    "mission_id": "m1",
+                    "scope_id": "a",
+                    "term_surface": "b,c",
+                    "after_sense": "sense-2",
+                    "reason": "collision test",
+                    "actor": "a1",
+                },
+                lamport_clock=906,
+            ),
         ]
         state = reduce_glossary_events(events)
 

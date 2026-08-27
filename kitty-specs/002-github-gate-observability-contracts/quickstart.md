@@ -20,9 +20,9 @@ No new dependencies required — uses existing Pydantic v2.
 ```python
 from spec_kitty_events import map_check_run_conclusion
 
-event_type = map_check_run_conclusion("success")    # → "GatePassed"
-event_type = map_check_run_conclusion("failure")    # → "GateFailed"
-event_type = map_check_run_conclusion("neutral")    # → None (ignored, logged)
+event_type = map_check_run_conclusion("success")  # → "GatePassed"
+event_type = map_check_run_conclusion("failure")  # → "GateFailed"
+event_type = map_check_run_conclusion("neutral")  # → None (ignored, logged)
 ```
 
 ### 2. Construct a validated payload
@@ -64,6 +64,7 @@ event = Event(
 ```python
 def count_ignored(conclusion: str, reason: str) -> None:
     metrics.increment(f"gate.ignored.{conclusion}")
+
 
 event_type = map_check_run_conclusion("skipped", on_ignored=count_ignored)
 # Logs via stdlib + calls your callback

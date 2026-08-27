@@ -122,19 +122,16 @@ spec-kitty agent action implement WP02 --agent <name>
 
        Emitted when a retrospective step runs and produces a durable outcome.
        """
+
        model_config = ConfigDict(frozen=True, extra="forbid")
 
        mission_id: str = Field(..., min_length=1, description="Mission identifier")
        actor: str = Field(..., min_length=1, description="Actor who triggered the retrospective")
-       trigger_source: TriggerSourceT = Field(
-           ..., description="What initiated the retrospective"
-       )
+       trigger_source: TriggerSourceT = Field(..., description="What initiated the retrospective")
        artifact_ref: Optional[ProvenanceRef] = Field(
            None, description="Reference to retro artifact if one was produced"
        )
-       completed_at: str = Field(
-           ..., min_length=1, description="ISO 8601 completion timestamp"
-       )
+       completed_at: str = Field(..., min_length=1, description="ISO 8601 completion timestamp")
    ```
 
 **Field validation rules**:
@@ -166,6 +163,7 @@ spec-kitty agent action implement WP02 --agent <name>
 
        Emitted when a retrospective step is explicitly skipped.
        """
+
        model_config = ConfigDict(frozen=True, extra="forbid")
 
        mission_id: str = Field(..., min_length=1, description="Mission identifier")
@@ -173,19 +171,17 @@ spec-kitty agent action implement WP02 --agent <name>
        trigger_source: TriggerSourceT = Field(
            ..., description="What would have initiated the retrospective"
        )
-       skip_reason: str = Field(
-           ..., min_length=1, description="Why the retrospective was skipped"
-       )
-       skipped_at: str = Field(
-           ..., min_length=1, description="ISO 8601 skip decision timestamp"
-       )
+       skip_reason: str = Field(..., min_length=1, description="Why the retrospective was skipped")
+       skipped_at: str = Field(..., min_length=1, description="ISO 8601 skip decision timestamp")
    ```
 3. Define the event types frozen set:
    ```python
-   RETROSPECTIVE_EVENT_TYPES: FrozenSet[str] = frozenset({
-       RETROSPECTIVE_COMPLETED,
-       RETROSPECTIVE_SKIPPED,
-   })
+   RETROSPECTIVE_EVENT_TYPES: FrozenSet[str] = frozenset(
+       {
+           RETROSPECTIVE_COMPLETED,
+           RETROSPECTIVE_SKIPPED,
+       }
+   )
    ```
 
 **Validation**:
@@ -237,6 +233,7 @@ def _make_completed(**overrides):
     }
     defaults.update(overrides)
     return RetrospectiveCompletedPayload(**defaults)
+
 
 def _make_skipped(**overrides):
     defaults = {

@@ -84,6 +84,7 @@ Add the reducer output models to `collaboration.py` Section 4:
      ```python
      class CollaborationAnomaly(BaseModel):
          """Non-fatal issue encountered during collaboration event reduction."""
+
          model_config = ConfigDict(frozen=True)
          event_id: str = Field(..., description="Event that caused the anomaly")
          event_type: str = Field(..., description="Type of the problematic event")
@@ -101,12 +102,17 @@ Add the reducer output models to `collaboration.py` Section 4:
      ```python
      class WarningEntry(BaseModel):
          """Warning timeline entry in reduced collaboration state."""
+
          model_config = ConfigDict(frozen=True)
          warning_id: str = Field(..., description="Warning identifier")
          event_id: str = Field(..., description="Event that created this warning")
-         warning_type: str = Field(..., description="'ConcurrentDriverWarning' or 'PotentialStepCollisionDetected'")
+         warning_type: str = Field(
+             ..., description="'ConcurrentDriverWarning' or 'PotentialStepCollisionDetected'"
+         )
          participant_ids: Tuple[str, ...] = Field(..., description="Affected participants")
-         acknowledgements: Dict[str, str] = Field(default_factory=dict, description="participant_id -> acknowledgement action")
+         acknowledgements: Dict[str, str] = Field(
+             default_factory=dict, description="participant_id -> acknowledgement action"
+         )
      ```
   2. Note: `acknowledgements` is mutable-looking but the frozen model prevents reassignment. The dict values are strings from `Literal["continue", "hold", "reassign", "defer"]`.
 - **Files**: `src/spec_kitty_events/collaboration.py`
@@ -121,6 +127,7 @@ Add the reducer output models to `collaboration.py` Section 4:
      ```python
      class DecisionEntry(BaseModel):
          """Decision history entry in reduced collaboration state."""
+
          model_config = ConfigDict(frozen=True)
          decision_id: str = Field(..., description="Decision identifier")
          event_id: str = Field(..., description="Event that captured this decision")
@@ -140,6 +147,7 @@ Add the reducer output models to `collaboration.py` Section 4:
      ```python
      class CommentEntry(BaseModel):
          """Comment history entry in reduced collaboration state."""
+
          model_config = ConfigDict(frozen=True)
          comment_id: str = Field(..., description="Comment identifier")
          event_id: str = Field(..., description="Event that posted this comment")
@@ -158,36 +166,51 @@ Add the reducer output models to `collaboration.py` Section 4:
      ```python
      class ReducedCollaborationState(BaseModel):
          """Materialized collaboration state from event reduction."""
+
          model_config = ConfigDict(frozen=True)
 
          mission_id: str = Field(..., description="Mission this state represents")
          participants: Dict[str, ParticipantIdentity] = Field(
-             default_factory=dict, description="Active participant roster (participant_id -> identity)")
+             default_factory=dict, description="Active participant roster (participant_id -> identity)"
+         )
          departed_participants: Dict[str, ParticipantIdentity] = Field(
-             default_factory=dict, description="Historical departed participants")
+             default_factory=dict, description="Historical departed participants"
+         )
          presence: Dict[str, datetime] = Field(
-             default_factory=dict, description="Last heartbeat timestamp per participant_id")
+             default_factory=dict, description="Last heartbeat timestamp per participant_id"
+         )
          active_drivers: FrozenSet[str] = Field(
-             default_factory=frozenset, description="participant_ids with active drive intent")
+             default_factory=frozenset, description="participant_ids with active drive intent"
+         )
          focus_by_participant: Dict[str, FocusTarget] = Field(
-             default_factory=dict, description="Current focus per participant")
+             default_factory=dict, description="Current focus per participant"
+         )
          participants_by_focus: Dict[str, FrozenSet[str]] = Field(
-             default_factory=dict, description="Reverse index: focus_key -> participant set (focus_key = '{target_type}:{target_id}')")
+             default_factory=dict,
+             description="Reverse index: focus_key -> participant set (focus_key = '{target_type}:{target_id}')",
+         )
          warnings: Tuple[WarningEntry, ...] = Field(
-             default_factory=tuple, description="Ordered warning timeline")
+             default_factory=tuple, description="Ordered warning timeline"
+         )
          decisions: Tuple[DecisionEntry, ...] = Field(
-             default_factory=tuple, description="Ordered decision history")
+             default_factory=tuple, description="Ordered decision history"
+         )
          comments: Tuple[CommentEntry, ...] = Field(
-             default_factory=tuple, description="Ordered comment history")
+             default_factory=tuple, description="Ordered comment history"
+         )
          active_executions: Dict[str, List[str]] = Field(
-             default_factory=dict, description="In-flight step_ids per participant_id")
+             default_factory=dict, description="In-flight step_ids per participant_id"
+         )
          linked_sessions: Dict[str, List[str]] = Field(
-             default_factory=dict, description="Linked session_ids per participant_id")
+             default_factory=dict, description="Linked session_ids per participant_id"
+         )
          anomalies: Tuple[CollaborationAnomaly, ...] = Field(
-             default_factory=tuple, description="Non-fatal issues encountered")
+             default_factory=tuple, description="Non-fatal issues encountered"
+         )
          event_count: int = Field(default=0, description="Total events processed")
          last_processed_event_id: Optional[str] = Field(
-             None, description="Last event_id in processed sequence")
+             None, description="Last event_id in processed sequence"
+         )
      ```
   2. **Critical**: `participants_by_focus` uses normalized string keys to guarantee JSON/Pydantic serialization safety
   3. Note: `active_drivers` uses `FrozenSet[str]`, `warnings`/`decisions`/`comments`/`anomalies` use `Tuple[X, ...]` for immutability

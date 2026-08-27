@@ -143,7 +143,10 @@ def _check_legacy_format(feature: str, repo_root: Path) -> bool:
             print("\n" + "=" * 60, file=sys.stderr)
             print("Legacy directory-based lanes detected.", file=sys.stderr)
             print("", file=sys.stderr)
-            print("Your project uses the old lane structure (tasks/planned/, tasks/doing/, etc.).", file=sys.stderr)
+            print(
+                "Your project uses the old lane structure (tasks/planned/, tasks/doing/, etc.).",
+                file=sys.stderr,
+            )
             print("Run `spec-kitty upgrade` to migrate to frontmatter-only lanes.", file=sys.stderr)
             print("", file=sys.stderr)
             print("Benefits of upgrading:", file=sys.stderr)
@@ -197,7 +200,9 @@ def update_command(args: argparse.Namespace) -> None:
     )
 
     if args.dry_run:
-        print(f"[dry-run] Would update {wp.work_package_id or wp.path.name} to lane '{validated_lane}'")
+        print(
+            f"[dry-run] Would update {wp.work_package_id or wp.path.name} to lane '{validated_lane}'"
+        )
         print(f"[dry-run] File stays at: {updated_path.relative_to(repo_root)}")
         return
 
@@ -476,7 +481,9 @@ def accept_command(args: argparse.Namespace) -> None:
     if not summary.ok and not args.allow_fail:
         for line in _summary_to_text(summary):
             print(line)
-        print("\n❌ Outstanding items detected. Fix them or re-run with --allow-fail for checklist mode.")
+        print(
+            "\n❌ Outstanding items detected. Fix them or re-run with --allow-fail for checklist mode."
+        )
         sys.exit(1)
 
     try:
@@ -587,6 +594,7 @@ def _finalize_merge_metadata(meta_path: Optional[Path], merge_commit: str) -> No
 
     meta_path.write_text(json.dumps(meta, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
+
 def merge_command(args: argparse.Namespace) -> None:
     repo_root = find_repo_root()
     feature = _resolve_feature(repo_root, args.feature)
@@ -594,13 +602,18 @@ def merge_command(args: argparse.Namespace) -> None:
     # Resolve target branch dynamically if not specified
     if args.target is None:
         from specify_cli.core.git_ops import resolve_primary_branch
+
         args.target = resolve_primary_branch(repo_root)
 
-    current_branch = run_git([
-        "rev-parse",
-        "--abbrev-ref",
-        "HEAD",
-    ], cwd=repo_root, check=True).stdout.strip()
+    current_branch = run_git(
+        [
+            "rev-parse",
+            "--abbrev-ref",
+            "HEAD",
+        ],
+        cwd=repo_root,
+        check=True,
+    ).stdout.strip()
 
     if current_branch == args.target:
         raise TaskCliError(
@@ -614,7 +627,9 @@ def merge_command(args: argparse.Namespace) -> None:
         )
 
     try:
-        git_common = run_git(["rev-parse", "--git-common-dir"], cwd=repo_root, check=True).stdout.strip()
+        git_common = run_git(
+            ["rev-parse", "--git-common-dir"], cwd=repo_root, check=True
+        ).stdout.strip()
         primary_repo_root = Path(git_common).resolve().parent
     except TaskCliError:
         primary_repo_root = Path(repo_root).resolve()
@@ -655,7 +670,9 @@ def merge_command(args: argparse.Namespace) -> None:
         print("\n".join(steps))
         return
 
-    def git(cmd: List[str], *, cwd: Path = primary_repo_root, check: bool = True) -> subprocess.CompletedProcess:
+    def git(
+        cmd: List[str], *, cwd: Path = primary_repo_root, check: bool = True
+    ) -> subprocess.CompletedProcess:
         return run_git(cmd, cwd=cwd, check=check)
 
     git(["checkout", args.target])
@@ -684,7 +701,9 @@ def merge_command(args: argparse.Namespace) -> None:
             raise TaskCliError(
                 "Merge failed. Resolve conflicts manually, commit, then rerun with --keep-worktree --keep-branch."
             )
-        meta_path = _prepare_merge_metadata(primary_repo_root, feature, args.target, args.strategy, args.push)
+        meta_path = _prepare_merge_metadata(
+            primary_repo_root, feature, args.target, args.strategy, args.push
+        )
         if meta_path:
             meta_rel = str(meta_path.relative_to(primary_repo_root))
             git(["add", meta_rel])
@@ -695,7 +714,9 @@ def merge_command(args: argparse.Namespace) -> None:
             raise TaskCliError(
                 "Merge failed. Resolve conflicts manually, commit, then rerun with --keep-worktree --keep-branch."
             )
-        meta_path = _prepare_merge_metadata(primary_repo_root, feature, args.target, args.strategy, args.push)
+        meta_path = _prepare_merge_metadata(
+            primary_repo_root, feature, args.target, args.strategy, args.push
+        )
         if meta_path:
             meta_rel = str(meta_path.relative_to(primary_repo_root))
             git(["add", meta_rel])
@@ -711,7 +732,9 @@ def merge_command(args: argparse.Namespace) -> None:
     if args.push and has_remote:
         push_result = git(["push", "origin", args.target], check=False)
         if push_result.returncode != 0:
-            raise TaskCliError(f"Merge succeeded but push failed. Run `git push origin {args.target}` manually.")
+            raise TaskCliError(
+                f"Merge succeeded but push failed. Run `git push origin {args.target}` manually."
+            )
     elif args.push and not has_remote:
         print("[spec-kitty] Skipping push: no remote configured.", file=sys.stderr)
 
@@ -725,6 +748,8 @@ def merge_command(args: argparse.Namespace) -> None:
             git(["branch", "-D", feature])
 
     print(f"Merge complete: {feature} -> {args.target}")
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Spec Kitty task utilities")
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -734,12 +759,20 @@ def build_parser() -> argparse.ArgumentParser:
     update.add_argument("work_package", help="Work package identifier (e.g., WP03)")
     update.add_argument("lane", help=f"Target lane ({', '.join(LANES)})")
     update.add_argument("--note", help="Activity note to record with the update")
-    update.add_argument("--agent", help="Agent identifier to record (defaults to existing agent/system)")
+    update.add_argument(
+        "--agent", help="Agent identifier to record (defaults to existing agent/system)"
+    )
     update.add_argument("--assignee", help="Friendly assignee name to store in frontmatter")
     update.add_argument("--shell-pid", help="Shell PID to capture in frontmatter/history")
     update.add_argument("--timestamp", help="Override UTC timestamp (YYYY-MM-DDTHH:mm:ssZ)")
-    update.add_argument("--dry-run", action="store_true", help="Show what would happen without touching files or git")
-    update.add_argument("--force", action="store_true", help="Ignore other staged work-package files")
+    update.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Show what would happen without touching files or git",
+    )
+    update.add_argument(
+        "--force", action="store_true", help="Ignore other staged work-package files"
+    )
 
     history = subparsers.add_parser("history", help="Append a history entry without changing lanes")
     history.add_argument("feature", help="Feature directory slug")
@@ -749,9 +782,13 @@ def build_parser() -> argparse.ArgumentParser:
     history.add_argument("--agent", help="Agent identifier (defaults to frontmatter/system)")
     history.add_argument("--assignee", help="Assignee value to set/override")
     history.add_argument("--shell-pid", help="Shell PID to record")
-    history.add_argument("--update-shell", action="store_true", help="Persist the provided shell PID to frontmatter")
+    history.add_argument(
+        "--update-shell", action="store_true", help="Persist the provided shell PID to frontmatter"
+    )
     history.add_argument("--timestamp", help="Override UTC timestamp")
-    history.add_argument("--dry-run", action="store_true", help="Show the log entry without updating files")
+    history.add_argument(
+        "--dry-run", action="store_true", help="Show the log entry without updating files"
+    )
 
     list_parser = subparsers.add_parser("list", help="List work packages by lane")
     list_parser.add_argument("feature", help="Feature directory slug")
@@ -764,8 +801,12 @@ def build_parser() -> argparse.ArgumentParser:
     rollback.add_argument("--assignee", help="Assignee override to apply")
     rollback.add_argument("--shell-pid", help="Shell PID to capture")
     rollback.add_argument("--timestamp", help="Override UTC timestamp")
-    rollback.add_argument("--dry-run", action="store_true", help="Report planned rollback without modifying files")
-    rollback.add_argument("--force", action="store_true", help="Ignore other staged work-package files")
+    rollback.add_argument(
+        "--dry-run", action="store_true", help="Report planned rollback without modifying files"
+    )
+    rollback.add_argument(
+        "--force", action="store_true", help="Ignore other staged work-package files"
+    )
 
     status = subparsers.add_parser("status", help="Summarize work packages for a feature")
     status.add_argument("--feature", help="Feature directory slug (auto-detect by default)")
@@ -791,11 +832,15 @@ def build_parser() -> argparse.ArgumentParser:
     accept.add_argument("--feature", help="Feature directory slug (auto-detect by default)")
     accept.add_argument("--mode", choices=["auto", "pr", "local", "checklist"], default="auto")
     accept.add_argument("--actor", help="Override acceptance author (defaults to system/user)")
-    accept.add_argument("--test", action="append", help="Record validation command executed (repeatable)")
+    accept.add_argument(
+        "--test", action="append", help="Record validation command executed (repeatable)"
+    )
     accept.add_argument("--json", action="store_true", help="Emit JSON result")
     accept.add_argument("--lenient", action="store_true", help="Skip strict metadata validation")
     accept.add_argument("--no-commit", action="store_true", help="Skip auto-commit (report only)")
-    accept.add_argument("--allow-fail", action="store_true", help="Allow outstanding issues (for manual workflows)")
+    accept.add_argument(
+        "--allow-fail", action="store_true", help="Allow outstanding issues (for manual workflows)"
+    )
     accept.add_argument(
         "--normalize-encoding",
         action="store_true",
@@ -809,7 +854,9 @@ def build_parser() -> argparse.ArgumentParser:
     merge.add_argument("--push", action="store_true", help="Push to origin after merging")
     merge.add_argument("--delete-branch", dest="delete_branch", action="store_true", default=True)
     merge.add_argument("--keep-branch", dest="delete_branch", action="store_false")
-    merge.add_argument("--remove-worktree", dest="remove_worktree", action="store_true", default=True)
+    merge.add_argument(
+        "--remove-worktree", dest="remove_worktree", action="store_true", default=True
+    )
     merge.add_argument("--keep-worktree", dest="remove_worktree", action="store_false")
     merge.add_argument("--dry-run", action="store_true", help="Show actions without executing")
 

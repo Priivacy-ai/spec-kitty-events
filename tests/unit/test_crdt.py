@@ -1,4 +1,5 @@
 """Unit tests for CRDT merge functions."""
+
 import uuid
 from datetime import datetime
 from ulid import ULID

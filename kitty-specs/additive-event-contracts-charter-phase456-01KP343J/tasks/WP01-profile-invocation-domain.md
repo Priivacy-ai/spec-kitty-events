@@ -115,6 +115,7 @@ spec-kitty agent action implement WP01 --agent <name>
 
        Emitted when the runtime begins executing a step under a resolved agent profile.
        """
+
        model_config = ConfigDict(frozen=True, extra="forbid")
 
        mission_id: str = Field(..., min_length=1, description="Mission identifier")
@@ -152,16 +153,20 @@ spec-kitty agent action implement WP01 --agent <name>
 **Steps**:
 1. After the `PROFILE_INVOCATION_STARTED` constant, add:
    ```python
-   PROFILE_INVOCATION_COMPLETED: str = "ProfileInvocationCompleted"  # Reserved — payload contract deferred
+   PROFILE_INVOCATION_COMPLETED: str = (
+       "ProfileInvocationCompleted"  # Reserved — payload contract deferred
+   )
    PROFILE_INVOCATION_FAILED: str = "ProfileInvocationFailed"  # Reserved — payload contract deferred
    ```
 2. Define the event types frozen set including all three:
    ```python
-   PROFILE_INVOCATION_EVENT_TYPES: FrozenSet[str] = frozenset({
-       PROFILE_INVOCATION_STARTED,
-       PROFILE_INVOCATION_COMPLETED,  # Reserved — payload deferred
-       PROFILE_INVOCATION_FAILED,     # Reserved — payload deferred
-   })
+   PROFILE_INVOCATION_EVENT_TYPES: FrozenSet[str] = frozenset(
+       {
+           PROFILE_INVOCATION_STARTED,
+           PROFILE_INVOCATION_COMPLETED,  # Reserved — payload deferred
+           PROFILE_INVOCATION_FAILED,  # Reserved — payload deferred
+       }
+   )
    ```
 
 **Validation**:
@@ -208,6 +213,7 @@ def _make_actor(**overrides):
     defaults = {"actor_id": "test-actor", "actor_type": "llm"}
     defaults.update(overrides)
     return RuntimeActorIdentity(**defaults)
+
 
 def _make_payload(**overrides):
     defaults = {

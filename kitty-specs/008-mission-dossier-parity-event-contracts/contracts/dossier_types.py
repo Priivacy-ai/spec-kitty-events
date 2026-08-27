@@ -7,6 +7,7 @@ The real implementation lives in src/spec_kitty_events/dossier.py.
 
 Section numbers match plan.md WP01 sections.
 """
+
 from __future__ import annotations
 
 from typing import Dict, FrozenSet, Literal, Optional, Sequence, Tuple
@@ -21,14 +22,17 @@ MISSION_DOSSIER_ARTIFACT_MISSING: str = "MissionDossierArtifactMissing"
 MISSION_DOSSIER_SNAPSHOT_COMPUTED: str = "MissionDossierSnapshotComputed"
 MISSION_DOSSIER_PARITY_DRIFT_DETECTED: str = "MissionDossierParityDriftDetected"
 
-DOSSIER_EVENT_TYPES: FrozenSet[str] = frozenset({
-    MISSION_DOSSIER_ARTIFACT_INDEXED,
-    MISSION_DOSSIER_ARTIFACT_MISSING,
-    MISSION_DOSSIER_SNAPSHOT_COMPUTED,
-    MISSION_DOSSIER_PARITY_DRIFT_DETECTED,
-})
+DOSSIER_EVENT_TYPES: FrozenSet[str] = frozenset(
+    {
+        MISSION_DOSSIER_ARTIFACT_INDEXED,
+        MISSION_DOSSIER_ARTIFACT_MISSING,
+        MISSION_DOSSIER_SNAPSHOT_COMPUTED,
+        MISSION_DOSSIER_PARITY_DRIFT_DETECTED,
+    }
+)
 
 # ── Section 2: Exception ──────────────────────────────────────────────────────
+
 
 class NamespaceMixedStreamError(ValueError):
     """Raised when reduce_mission_dossier() detects events from multiple namespaces.
@@ -38,12 +42,17 @@ class NamespaceMixedStreamError(ValueError):
         "Namespace mismatch in dossier event stream. Expected: <ns>. Got: <ns>."
     """
 
+
 # ── Section 3: Value Objects (provenance sub-types) ───────────────────────────
 
 ArtifactClassT = Literal["input", "workflow", "output", "evidence", "policy", "runtime"]
 DriftKindT = Literal[
-    "artifact_added", "artifact_removed", "artifact_mutated",
-    "anomaly_introduced", "anomaly_resolved", "manifest_version_changed",
+    "artifact_added",
+    "artifact_removed",
+    "artifact_mutated",
+    "anomaly_introduced",
+    "anomaly_resolved",
+    "manifest_version_changed",
 ]
 AlgorithmT = Literal["sha256", "sha512", "md5"]
 ParityStatusT = Literal["clean", "drifted", "unknown"]
@@ -52,6 +61,7 @@ ActorKindT = Literal["human", "llm", "system"]
 
 class LocalNamespaceTuple(BaseModel):
     """Minimum collision-safe key for parity baseline scoping."""
+
     model_config = ConfigDict(frozen=True)
 
     project_uuid: str = Field(..., min_length=1)
@@ -68,6 +78,7 @@ class ArtifactIdentity(BaseModel):
     artifact_class is the SINGLE source of truth for artifact taxonomy.
     Event payloads MUST NOT duplicate this field at the top level.
     """
+
     model_config = ConfigDict(frozen=True)
 
     mission_key: str = Field(..., min_length=1)
@@ -79,6 +90,7 @@ class ArtifactIdentity(BaseModel):
 
 class ContentHashRef(BaseModel):
     """Content fingerprint with optional size and encoding metadata."""
+
     model_config = ConfigDict(frozen=True)
 
     hash: str = Field(..., min_length=1, description="Hex-encoded content hash")
@@ -89,6 +101,7 @@ class ContentHashRef(BaseModel):
 
 class ProvenanceRef(BaseModel):
     """Source trace connecting an artifact or event to its authoritative origin."""
+
     model_config = ConfigDict(frozen=True)
 
     source_event_ids: Optional[Tuple[str, ...]] = Field(default=None)
@@ -98,13 +111,15 @@ class ProvenanceRef(BaseModel):
     actor_kind: Optional[ActorKindT] = Field(default=None)
     revised_at: Optional[str] = Field(default=None, description="ISO 8601")
 
+
 # ── Section 4: Payload Models ─────────────────────────────────────────────────
+
 
 class MissionDossierArtifactIndexedPayload(BaseModel):
     model_config = ConfigDict(frozen=True)
 
     namespace: LocalNamespaceTuple = Field(...)
-    artifact_id: ArtifactIdentity = Field(...)        # artifact_class lives here only
+    artifact_id: ArtifactIdentity = Field(...)  # artifact_class lives here only
     content_ref: ContentHashRef = Field(...)
     indexed_at: str = Field(..., description="ISO 8601")
     provenance: Optional[ProvenanceRef] = Field(default=None)
@@ -129,7 +144,7 @@ class MissionDossierArtifactMissingPayload(BaseModel):
 class MissionDossierSnapshotComputedPayload(BaseModel):
     model_config = ConfigDict(frozen=True)
 
-    namespace: LocalNamespaceTuple = Field(...)       # manifest_version lives here only
+    namespace: LocalNamespaceTuple = Field(...)  # manifest_version lives here only
     snapshot_hash: str = Field(..., min_length=1, description="Hex-encoded deterministic hash")
     artifact_count: int = Field(..., ge=0)
     anomaly_count: int = Field(..., ge=0)
@@ -151,7 +166,9 @@ class MissionDossierParityDriftDetectedPayload(BaseModel):
     rebuild_hint: Optional[str] = Field(default=None)
     context_diagnostics: Optional[Dict[str, str]] = Field(default=None)
 
+
 # ── Section 5: Reducer Output Models ─────────────────────────────────────────
+
 
 class ArtifactEntry(BaseModel):
     model_config = ConfigDict(frozen=True)
@@ -191,6 +208,7 @@ class DriftRecord(BaseModel):
 
 class MissionDossierState(BaseModel):
     """Deterministic projection output of reduce_mission_dossier()."""
+
     model_config = ConfigDict(frozen=True)
 
     namespace: Optional[LocalNamespaceTuple] = None
@@ -201,7 +219,9 @@ class MissionDossierState(BaseModel):
     parity_status: ParityStatusT = "unknown"
     event_count: int = 0
 
+
 # ── Section 6: Reducer Signature ──────────────────────────────────────────────
+
 
 def reduce_mission_dossier(events: Sequence[Event]) -> MissionDossierState:
     """Fold dossier events into deterministic MissionDossierState.

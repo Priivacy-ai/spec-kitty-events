@@ -227,9 +227,20 @@ decode (zeitgeist EventArgs ``propertyNames.maxLength``; JSON Schema
 #: module docstring for why this is a mirror, not an import).
 ZEITGEIST_FORBIDDEN_KEYS_V1: frozenset[str] = frozenset(
     {
-        "token", "authorization", "bearer", "password", "detail", "team",
-        "team_id", "deployment", "deployment_id", "membership", "role",
-        "user_id", "url", "runtime_url",
+        "token",
+        "authorization",
+        "bearer",
+        "password",
+        "detail",
+        "team",
+        "team_id",
+        "deployment",
+        "deployment_id",
+        "membership",
+        "role",
+        "user_id",
+        "url",
+        "runtime_url",
     }
 )
 
@@ -338,7 +349,10 @@ PAYLOAD_MODEL_BY_EVENT_TYPE: Mapping[str, type[BaseModel] | tuple[type[BaseModel
     DECISION_INPUT_ANSWERED: DecisionInputAnsweredPayload,
     MISSION_RUN_COMPLETED: MissionRunCompletedPayload,
     DECISION_POINT_OPENED: (DecisionPointOpenedAdrPayload, DecisionPointOpenedInterviewPayload),
-    DECISION_POINT_RESOLVED: (DecisionPointResolvedAdrPayload, DecisionPointResolvedInterviewPayload),
+    DECISION_POINT_RESOLVED: (
+        DecisionPointResolvedAdrPayload,
+        DecisionPointResolvedInterviewPayload,
+    ),
     SPECIFY_STARTED: SpecifyStartedPayload,
     SPECIFY_COMPLETED: SpecifyCompletedPayload,
     PLAN_STARTED: PlanStartedPayload,
@@ -377,7 +391,14 @@ UNBROADCAST_FIELDS: Mapping[str, frozenset[str]] = {
     DECISION_INPUT_REQUESTED: frozenset({"options", "question"}),
     DECISION_INPUT_ANSWERED: frozenset({"answer"}),
     DECISION_POINT_OPENED: frozenset(
-        {"question", "options", "rationale", "alternatives_considered", "evidence_refs", "recorded_at"}
+        {
+            "question",
+            "options",
+            "rationale",
+            "alternatives_considered",
+            "evidence_refs",
+            "recorded_at",
+        }
     ),
     DECISION_POINT_RESOLVED: frozenset(
         {
@@ -489,7 +510,9 @@ def _truncate_utf8(value: str, max_bytes: int) -> str:
     return encoded[:budget].decode("utf-8", errors="ignore") + marker
 
 
-def _bounded_summary(clauses: Sequence[str], max_bytes: int = ZEITGEIST_ATTRS_MAX_BYTES) -> str | None:
+def _bounded_summary(
+    clauses: Sequence[str], max_bytes: int = ZEITGEIST_ATTRS_MAX_BYTES
+) -> str | None:
     """Join non-empty clauses with ``"; "`` into one bounded one-line summary.
 
     Returns ``None`` (attr omitted) when every clause is empty/absent —
@@ -578,8 +601,7 @@ def _encode_scalar(field: str, value: Any) -> str:
         encoded = str(value)
     else:
         raise UnencodableFieldValueError(
-            f"field {field!r} of type {type(value).__name__} has no "
-            "bounded flat-string encoding"
+            f"field {field!r} of type {type(value).__name__} has no bounded flat-string encoding"
         )
     return encoded
 
@@ -729,16 +751,11 @@ def to_zeitgeist_attrs(payload: BaseModel, envelope: Event) -> dict[str, str]:
 
     bad_keys = sorted(attrs.keys() & FORBIDDEN_ATTR_KEYS)
     if bad_keys:
-        raise ZeitgeistAttrsForbiddenKeyError(
-            f"refusing to emit forbidden attr keys: {bad_keys}"
-        )
-    oversized_keys = sorted(
-        key for key in attrs if len(key) > ZEITGEIST_ATTR_KEY_MAX_CHARS
-    )
+        raise ZeitgeistAttrsForbiddenKeyError(f"refusing to emit forbidden attr keys: {bad_keys}")
+    oversized_keys = sorted(key for key in attrs if len(key) > ZEITGEIST_ATTR_KEY_MAX_CHARS)
     if oversized_keys:
         raise ZeitgeistAttrsOverflowError(
-            f"attr keys exceed the {ZEITGEIST_ATTR_KEY_MAX_CHARS}-char bound: "
-            f"{oversized_keys}"
+            f"attr keys exceed the {ZEITGEIST_ATTR_KEY_MAX_CHARS}-char bound: {oversized_keys}"
         )
     oversized_values = sorted(
         key
@@ -747,13 +764,11 @@ def to_zeitgeist_attrs(payload: BaseModel, envelope: Event) -> dict[str, str]:
     )
     if oversized_values:
         raise ZeitgeistAttrsOverflowError(
-            f"attr values exceed the {ZEITGEIST_ATTRS_MAX_BYTES}-byte bound: "
-            f"{oversized_values}"
+            f"attr values exceed the {ZEITGEIST_ATTRS_MAX_BYTES}-byte bound: {oversized_values}"
         )
     if len(attrs) > ZEITGEIST_ATTRS_MAX_KEYS:
         raise ZeitgeistAttrsOverflowError(
-            f"projection has {len(attrs)} attrs; the bound is "
-            f"{ZEITGEIST_ATTRS_MAX_KEYS}"
+            f"projection has {len(attrs)} attrs; the bound is {ZEITGEIST_ATTRS_MAX_KEYS}"
         )
     return attrs
 
@@ -798,7 +813,9 @@ def zeitgeist_ref_for(event_type: str, payload: BaseModel) -> str | None:
             :data:`ZEITGEIST_ATTRS_MAX_BYTES` (the frame's ``ref`` carries
             the same bound as an attrs entry; see the module docstring).
     """
-    if event_type not in PAYLOAD_MODEL_BY_EVENT_TYPE or type(payload) not in _payload_types(event_type):
+    if event_type not in PAYLOAD_MODEL_BY_EVENT_TYPE or type(payload) not in _payload_types(
+        event_type
+    ):
         raise UnknownVolatileEventTypeError(
             f"{type(payload).__name__} is not the payload of volatile event "
             f"type {event_type!r}; known: {sorted(PAYLOAD_MODEL_BY_EVENT_TYPE)}"
@@ -930,7 +947,9 @@ def _required_schema_keys(event_type: str) -> frozenset[str]:
     omission when the source is empty), even on kinds where a valid payload
     happens to always produce one today.
     """
-    variants = [_required_schema_keys_for_model(event_type, model) for model in _payload_types(event_type)]
+    variants = [
+        _required_schema_keys_for_model(event_type, model) for model in _payload_types(event_type)
+    ]
     keys = variants[0]
     for other in variants[1:]:
         keys &= other
@@ -943,9 +962,7 @@ _REQUIRED_KEYS_BY_EVENT_TYPE: Mapping[str, frozenset[str]] = {
 }
 
 
-def from_zeitgeist_attrs(
-    event_type: str, attrs: Mapping[str, str]
-) -> VolatileMoment:
+def from_zeitgeist_attrs(event_type: str, attrs: Mapping[str, str]) -> VolatileMoment:
     """Validate inbound attrs against the kind's closed key vocabulary.
 
     The attrs are opaque on the wire; this function is the only place that
@@ -997,21 +1014,16 @@ def from_zeitgeist_attrs(
     allowed = _ALLOWED_KEYS_BY_EVENT_TYPE[event_type]
     unknown = sorted(attrs.keys() - allowed)
     if unknown:
-        raise ZeitgeistAttrsError(
-            f"attrs carry keys outside the {event_type} schema: {unknown}"
-        )
+        raise ZeitgeistAttrsError(f"attrs carry keys outside the {event_type} schema: {unknown}")
 
     bad_keys = sorted(attrs.keys() & FORBIDDEN_ATTR_KEYS)
     if bad_keys:
         raise ZeitgeistAttrsForbiddenKeyError(f"forbidden attr keys: {bad_keys}")
 
-    oversized_keys = sorted(
-        key for key in attrs if len(key) > ZEITGEIST_ATTR_KEY_MAX_CHARS
-    )
+    oversized_keys = sorted(key for key in attrs if len(key) > ZEITGEIST_ATTR_KEY_MAX_CHARS)
     if oversized_keys:
         raise ZeitgeistAttrsOverflowError(
-            f"attr keys exceed the {ZEITGEIST_ATTR_KEY_MAX_CHARS}-char bound: "
-            f"{oversized_keys}"
+            f"attr keys exceed the {ZEITGEIST_ATTR_KEY_MAX_CHARS}-char bound: {oversized_keys}"
         )
     # UTF-8 byte counts, matching the relay's `maxUtf8Bytes` clause — the
     # actually-binding one, since byte count >= char count means satisfying
@@ -1027,8 +1039,7 @@ def from_zeitgeist_attrs(
     )
     if oversized_values:
         raise ZeitgeistAttrsOverflowError(
-            f"attr values exceed the {ZEITGEIST_ATTRS_MAX_BYTES}-byte bound: "
-            f"{oversized_values}"
+            f"attr values exceed the {ZEITGEIST_ATTRS_MAX_BYTES}-byte bound: {oversized_values}"
         )
     if len(attrs) > ZEITGEIST_ATTRS_MAX_KEYS:
         raise ZeitgeistAttrsOverflowError(
@@ -1038,8 +1049,7 @@ def from_zeitgeist_attrs(
     missing = sorted(_REQUIRED_KEYS_BY_EVENT_TYPE[event_type] - attrs.keys())
     if missing:
         raise ZeitgeistAttrsError(
-            f"attrs are missing keys the {event_type} schema always carries "
-            f"on encode: {missing}"
+            f"attrs are missing keys the {event_type} schema always carries on encode: {missing}"
         )
 
     decoded_attrs = dict(attrs)
@@ -1049,9 +1059,7 @@ def from_zeitgeist_attrs(
         try:
             decoded_attrs["event_id"] = normalize_event_id(event_id)
         except ValueError as exc:
-            raise ZeitgeistAttrsError(
-                f"attr 'event_id' is malformed: {exc}"
-            ) from exc
+            raise ZeitgeistAttrsError(f"attr 'event_id' is malformed: {exc}") from exc
     occurred_at = attrs.get("occurred_at")
     if occurred_at is not None:
         try:
@@ -1061,9 +1069,7 @@ def from_zeitgeist_attrs(
                 f"attr 'occurred_at' is not ISO-8601: {occurred_at!r}"
             ) from exc
         if parsed_occurred_at.tzinfo is None:
-            raise ZeitgeistAttrsError(
-                f"attr 'occurred_at' must be timezone-aware: {occurred_at!r}"
-            )
+            raise ZeitgeistAttrsError(f"attr 'occurred_at' must be timezone-aware: {occurred_at!r}")
 
     return VolatileMoment(
         kind=event_type,

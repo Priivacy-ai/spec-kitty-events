@@ -111,13 +111,9 @@ spec-kitty implement WP04 --base <branch-with-WP02-and-WP03>
      @pytest.mark.parametrize("case", _INVALID_CASES, ids=[c.id for c in _INVALID_CASES])
      def test_invalid_fixture_fails_conformance(case):
          result = validate_event(case.payload, case.event_type, strict=True)
-         assert not result.valid, (
-             f"Fixture {case.id} should be invalid but passed validation"
-         )
+         assert not result.valid, f"Fixture {case.id} should be invalid but passed validation"
          total_violations = len(result.model_violations) + len(result.schema_violations)
-         assert total_violations >= 1, (
-             f"Fixture {case.id} is invalid but no violations were reported"
-         )
+         assert total_violations >= 1, f"Fixture {case.id} is invalid but no violations were reported"
      ```
 
 - **Files**: `tests/test_dossier_conformance.py` (new file)
@@ -178,9 +174,7 @@ spec-kitty implement WP04 --base <branch-with-WP02-and-WP03>
       for case in _INVALID_CASES:
           result = validate_event(case.payload, case.event_type, strict=True)
           total = len(result.model_violations) + len(result.schema_violations)
-          assert total >= 1, (
-              f"{case.id}: invalid fixture produced zero violations in both layers"
-          )
+          assert total >= 1, f"{case.id}: invalid fixture produced zero violations in both layers"
   ```
 
 - **Files**: `tests/test_dossier_conformance.py`
@@ -250,7 +244,10 @@ spec-kitty implement WP04 --base <branch-with-WP02-and-WP03>
       events = _events_from_replay("dossier-replay-happy-path")
       # Inject a non-dossier event
       from spec_kitty_events.models import Event
-      fake = events[0].model_copy(update={"event_type": "SomeRandomEvent", "event_id": "01JNRFAKEEV00000000000001"})
+
+      fake = events[0].model_copy(
+          update={"event_type": "SomeRandomEvent", "event_id": "01JNRFAKEEV00000000000001"}
+      )
       mixed = [fake] + events
       # Should not raise; unknown events are skipped
       state = reduce_mission_dossier(mixed)
@@ -281,6 +278,7 @@ spec-kitty implement WP04 --base <branch-with-WP02-and-WP03>
 
       # Build a second event with a different feature_slug
       import copy, json
+
       second_ns_event = json.loads(events[-1].model_dump_json())
       second_ns_event["event_id"] = "01JNRNS2EVENT0000000000001"
       second_ns_event["lamport_clock"] = 999

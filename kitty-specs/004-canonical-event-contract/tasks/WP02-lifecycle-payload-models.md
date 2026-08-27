@@ -79,14 +79,18 @@ from pydantic import BaseModel, ConfigDict, Field
 ```python
 class MissionStatus(str, Enum):
     """Mission lifecycle states."""
+
     ACTIVE = "active"
     COMPLETED = "completed"
     CANCELLED = "cancelled"
 
-TERMINAL_MISSION_STATUSES: FrozenSet[MissionStatus] = frozenset({
-    MissionStatus.COMPLETED,
-    MissionStatus.CANCELLED,
-})
+
+TERMINAL_MISSION_STATUSES: FrozenSet[MissionStatus] = frozenset(
+    {
+        MissionStatus.COMPLETED,
+        MissionStatus.CANCELLED,
+    }
+)
 ```
 
 **Design notes**:
@@ -108,13 +112,15 @@ MISSION_CANCELLED: str = "MissionCancelled"
 PHASE_ENTERED: str = "PhaseEntered"
 REVIEW_ROLLBACK: str = "ReviewRollback"
 
-MISSION_EVENT_TYPES: FrozenSet[str] = frozenset({
-    MISSION_STARTED,
-    MISSION_COMPLETED,
-    MISSION_CANCELLED,
-    PHASE_ENTERED,
-    REVIEW_ROLLBACK,
-})
+MISSION_EVENT_TYPES: FrozenSet[str] = frozenset(
+    {
+        MISSION_STARTED,
+        MISSION_COMPLETED,
+        MISSION_CANCELLED,
+        PHASE_ENTERED,
+        REVIEW_ROLLBACK,
+    }
+)
 ```
 
 **Design notes**:
@@ -129,16 +135,20 @@ MISSION_EVENT_TYPES: FrozenSet[str] = frozenset({
 ```python
 class MissionStartedPayload(BaseModel):
     """Typed payload for MissionStarted events."""
+
     model_config = ConfigDict(frozen=True)
 
     mission_id: str = Field(..., min_length=1, description="Mission identifier")
-    mission_type: str = Field(..., min_length=1, description="Mission type (e.g., 'software-dev', 'research', 'plan')")
+    mission_type: str = Field(
+        ..., min_length=1, description="Mission type (e.g., 'software-dev', 'research', 'plan')"
+    )
     initial_phase: str = Field(..., min_length=1, description="First phase of the mission")
     actor: str = Field(..., min_length=1, description="Actor who started the mission")
 
 
 class MissionCompletedPayload(BaseModel):
     """Typed payload for MissionCompleted events."""
+
     model_config = ConfigDict(frozen=True)
 
     mission_id: str = Field(..., min_length=1, description="Mission identifier")
@@ -159,32 +169,43 @@ class MissionCompletedPayload(BaseModel):
 ```python
 class MissionCancelledPayload(BaseModel):
     """Typed payload for MissionCancelled events."""
+
     model_config = ConfigDict(frozen=True)
 
     mission_id: str = Field(..., min_length=1, description="Mission identifier")
     reason: str = Field(..., min_length=1, description="Reason for cancellation (required)")
     actor: str = Field(..., min_length=1, description="Actor who cancelled the mission")
-    cancelled_wp_ids: List[str] = Field(default_factory=list, description="WP IDs affected by cancellation")
+    cancelled_wp_ids: List[str] = Field(
+        default_factory=list, description="WP IDs affected by cancellation"
+    )
 
 
 class PhaseEnteredPayload(BaseModel):
     """Typed payload for PhaseEntered events."""
+
     model_config = ConfigDict(frozen=True)
 
     mission_id: str = Field(..., min_length=1, description="Mission identifier")
     phase_name: str = Field(..., min_length=1, description="Phase being entered")
-    previous_phase: Optional[str] = Field(None, min_length=1, description="Phase being exited (None for initial)")
+    previous_phase: Optional[str] = Field(
+        None, min_length=1, description="Phase being exited (None for initial)"
+    )
     actor: str = Field(..., min_length=1, description="Actor triggering phase transition")
 
 
 class ReviewRollbackPayload(BaseModel):
     """Typed payload for ReviewRollback events."""
+
     model_config = ConfigDict(frozen=True)
 
     mission_id: str = Field(..., min_length=1, description="Mission identifier")
-    review_ref: str = Field(..., min_length=1, description="Reference to the review that triggered rollback")
+    review_ref: str = Field(
+        ..., min_length=1, description="Reference to the review that triggered rollback"
+    )
     target_phase: str = Field(..., min_length=1, description="Phase to roll back to")
-    affected_wp_ids: List[str] = Field(default_factory=list, description="WP IDs affected by rollback")
+    affected_wp_ids: List[str] = Field(
+        default_factory=list, description="WP IDs affected by rollback"
+    )
     actor: str = Field(..., min_length=1, description="Actor triggering rollback")
 ```
 

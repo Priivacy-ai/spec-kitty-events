@@ -104,9 +104,7 @@ _DONE_EVIDENCE = {
         "reference": "feedback://034/WP01/approval",
     },
     "repos": [{"repo": "demo", "branch": "kitty/m-01", "commit": "abc1234567890"}],
-    "verification": [
-        {"command": "make test-fast", "result": "pass", "summary": "green"}
-    ],
+    "verification": [{"command": "make test-fast", "result": "pass", "summary": "green"}],
 }
 
 _REVIEW_RESULT = {
@@ -128,9 +126,7 @@ class TestReduceEmpty:
         assert state.last_event_id is None
         assert state.work_packages == {}
         # NON_DISPLAY_LANES (genesis, uninitialized) are excluded from the summary
-        assert state.summary == {
-            lane.value: 0 for lane in Lane if lane not in NON_DISPLAY_LANES
-        }
+        assert state.summary == {lane.value: 0 for lane in Lane if lane not in NON_DISPLAY_LANES}
 
     def test_reduce_generator_input(self) -> None:
         rows = iter([_row(_ulid(1))])
@@ -573,9 +569,7 @@ class TestAnnotationFolding:
                 to_lane="claimed",
                 policy_metadata={"shell_pid": 5, "agent": "claude"},
             ),
-            _annotation(
-                _ulid(2), delta={"assignee": "avery", "release_runtime_claim": True}
-            ),
+            _annotation(_ulid(2), delta={"assignee": "avery", "release_runtime_claim": True}),
         ]
         state = reduce(events)
         wp = state.work_packages["WP01"]
@@ -654,9 +648,7 @@ class TestRowPartition:
         "event_type",
         ["RetrospectiveCaptured", "RetrospectiveCaptureFailed", "RetrospectiveSkipped"],
     )
-    def test_type_envelope_retrospective_lifecycle_rows_are_ignored(
-        self, event_type: str
-    ) -> None:
+    def test_type_envelope_retrospective_lifecycle_rows_are_ignored(self, event_type: str) -> None:
         """The CLI's top-level `type` retrospective lifecycle rows are non-lane (#41/#42)."""
         lifecycle_row = {
             "type": event_type,
@@ -717,12 +709,8 @@ class TestTypedFoldParity:
         rows = [_row(_ulid(1)), _annotation(_ulid(2), delta={"note": "n"})]
         a = reduce(list(rows))
         b = reduce(list(reversed(rows)))
-        doc_a = (
-            json.dumps(a.to_dict(), sort_keys=True, indent=2, ensure_ascii=False) + "\n"
-        )
-        doc_b = (
-            json.dumps(b.to_dict(), sort_keys=True, indent=2, ensure_ascii=False) + "\n"
-        )
+        doc_a = json.dumps(a.to_dict(), sort_keys=True, indent=2, ensure_ascii=False) + "\n"
+        doc_b = json.dumps(b.to_dict(), sort_keys=True, indent=2, ensure_ascii=False) + "\n"
         assert doc_a == doc_b
 
 
@@ -778,9 +766,7 @@ def test_every_golden_stream_has_a_registered_pair() -> None:
 
 def test_status_event_round_trips_through_the_row_shape() -> None:
     """StatusEvent.to_dict rows re-parse losslessly (wire-format stability)."""
-    event = StatusEvent.from_dict(
-        _row(_ulid(9), to_lane="done", evidence=_DONE_EVIDENCE)
-    )
+    event = StatusEvent.from_dict(_row(_ulid(9), to_lane="done", evidence=_DONE_EVIDENCE))
     reparsed = StatusEvent.from_dict(event.to_dict())
     assert reparsed == event
 

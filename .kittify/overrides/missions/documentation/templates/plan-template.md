@@ -148,15 +148,15 @@ docs/
 **Sphinx Configuration** (Python):
 ```python
 # docs/conf.py
-project = '[PROJECT NAME]'
+project = "[PROJECT NAME]"
 extensions = [
-    'sphinx.ext.autodoc',      # Generate docs from docstrings
-    'sphinx.ext.napoleon',     # Support Google/NumPy docstring styles
-    'sphinx.ext.viewcode',     # Add source code links
-    'sphinx.ext.intersphinx',  # Link to other projects' docs
+    "sphinx.ext.autodoc",  # Generate docs from docstrings
+    "sphinx.ext.napoleon",  # Support Google/NumPy docstring styles
+    "sphinx.ext.viewcode",  # Add source code links
+    "sphinx.ext.intersphinx",  # Link to other projects' docs
 ]
-html_theme = 'sphinx_rtd_theme'
-html_static_path = ['_static']
+html_theme = "sphinx_rtd_theme"
+html_static_path = ["_static"]
 ```
 
 **JSDoc Configuration** (JavaScript):

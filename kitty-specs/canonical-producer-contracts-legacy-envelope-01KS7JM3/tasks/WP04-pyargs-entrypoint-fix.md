@@ -230,10 +230,17 @@ Append two entries:
 Modify `_event_fixture_params()`:
 
 ```python
-_WRAPPER_KEYS = frozenset({
-    "class", "expected", "input", "notes", "expected_error_code",
-    "expected_reason", "legacy_shape",
-})
+_WRAPPER_KEYS = frozenset(
+    {
+        "class",
+        "expected",
+        "input",
+        "notes",
+        "expected_error_code",
+        "expected_reason",
+        "legacy_shape",
+    }
+)
 
 
 def _is_wrapper_shape(obj: Any) -> bool:
@@ -274,9 +281,11 @@ Updated filter:
 ```python
 def _event_fixture_entries() -> List[Dict[str, Any]]:
     return [
-        f for f in _MANIFEST["fixtures"]
+        f
+        for f in _MANIFEST["fixtures"]
         if f["event_type"] not in ("LaneMapping", "LegacyEnvelope")
-        and f.get("fixture_type") not in (
+        and f.get("fixture_type")
+        not in (
             "replay_stream",
             "reducer_output",
             "timestamp_semantics",

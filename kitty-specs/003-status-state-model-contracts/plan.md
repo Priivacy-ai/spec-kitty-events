@@ -104,15 +104,17 @@ Alias normalization via standalone `normalize_lane()` function, not a classmetho
 ### D3: Transition Matrix — Data-Driven
 
 ```python
-_ALLOWED_TRANSITIONS: FrozenSet[Tuple[Optional[Lane], Lane]] = frozenset({
-    (None, Lane.PLANNED),
-    (Lane.PLANNED, Lane.CLAIMED),
-    (Lane.CLAIMED, Lane.IN_PROGRESS),
-    (Lane.IN_PROGRESS, Lane.FOR_REVIEW),
-    (Lane.FOR_REVIEW, Lane.DONE),
-    (Lane.FOR_REVIEW, Lane.IN_PROGRESS),
-    (Lane.IN_PROGRESS, Lane.PLANNED),
-})
+_ALLOWED_TRANSITIONS: FrozenSet[Tuple[Optional[Lane], Lane]] = frozenset(
+    {
+        (None, Lane.PLANNED),
+        (Lane.PLANNED, Lane.CLAIMED),
+        (Lane.CLAIMED, Lane.IN_PROGRESS),
+        (Lane.IN_PROGRESS, Lane.FOR_REVIEW),
+        (Lane.FOR_REVIEW, Lane.DONE),
+        (Lane.FOR_REVIEW, Lane.IN_PROGRESS),
+        (Lane.IN_PROGRESS, Lane.PLANNED),
+    }
+)
 
 # "any non-terminal -> blocked" and "any non-terminal -> canceled" handled programmatically
 # "blocked -> in_progress" as explicit entry

@@ -67,6 +67,7 @@ Consumers can import these to write their own conformance assertions:
         assert_lane_mapping,
     )
 """
+
 from __future__ import annotations
 
 from typing import Any
@@ -93,8 +94,7 @@ def assert_payload_conforms(
         for v in result.schema_violations:
             violations.append(f"  Schema: {v.json_path} — {v.message}")
         raise AssertionError(
-            f"Payload for {event_type!r} failed conformance:\n"
-            + "\n".join(violations)
+            f"Payload for {event_type!r} failed conformance:\n" + "\n".join(violations)
         )
     return result
 
@@ -122,8 +122,7 @@ def assert_lane_mapping(
     lane = Lane(canonical_value)
     sync = canonical_to_sync_v1(lane)
     assert sync == SyncLaneV1(expected_sync_value), (
-        f"Expected {canonical_value!r} → {expected_sync_value!r}, "
-        f"got {sync.value!r}"
+        f"Expected {canonical_value!r} → {expected_sync_value!r}, got {sync.value!r}"
     )
 ```
 
@@ -144,6 +143,7 @@ def assert_lane_mapping(
 
 ```python
 """Shared pytest fixtures for conformance tests."""
+
 from __future__ import annotations
 
 import json
@@ -173,10 +173,12 @@ def fixture_cases(manifest: dict[str, Any], fixtures_dir: Path) -> list[dict[str
     for entry in manifest["fixtures"]:
         fixture_path = fixtures_dir / entry["path"]
         payload = json.loads(fixture_path.read_text(encoding="utf-8"))
-        cases.append({
-            **entry,
-            "payload": payload,
-        })
+        cases.append(
+            {
+                **entry,
+                "payload": payload,
+            }
+        )
     return cases
 ```
 
@@ -198,6 +200,7 @@ def fixture_cases(manifest: dict[str, Any], fixtures_dir: Path) -> list[dict[str
 
 Run: pytest --pyargs spec_kitty_events.conformance
 """
+
 from __future__ import annotations
 
 import json
@@ -218,9 +221,7 @@ from spec_kitty_events.status import Lane, SyncLaneV1, CANONICAL_TO_SYNC_V1
 # --- Manifest-driven fixture tests ---
 
 _FIXTURES_DIR = Path(__file__).parent / "fixtures"
-_MANIFEST = json.loads(
-    (_FIXTURES_DIR / "manifest.json").read_text(encoding="utf-8")
-)
+_MANIFEST = json.loads((_FIXTURES_DIR / "manifest.json").read_text(encoding="utf-8"))
 
 
 def _fixture_ids() -> list[str]:
@@ -247,6 +248,7 @@ def test_fixture_conformance(case: dict[str, Any]) -> None:
 
 # --- Lane mapping tests ---
 
+
 def test_lane_mapping_v1_completeness() -> None:
     """All canonical lanes have a sync mapping."""
     assert set(CANONICAL_TO_SYNC_V1.keys()) == set(Lane)
@@ -267,6 +269,7 @@ def test_lane_mapping_v1_each_lane(lane: Lane) -> None:
 
 # --- Schema integrity tests ---
 
+
 def test_all_schemas_present() -> None:
     """All expected schemas exist."""
     schemas = list_schemas()
@@ -283,9 +286,11 @@ def test_schema_is_valid_json_schema(name: str) -> None:
 
 # --- Round-trip serialization tests ---
 
+
 def test_event_round_trip() -> None:
     """Event model round-trips through JSON."""
     from spec_kitty_events.models import Event
+
     event = Event(
         event_id="01JEXAMPLE00000000000000A",
         event_type="TestEvent",

@@ -152,6 +152,7 @@ Mission requirements covered: FR-007, FR-008, FR-009, FR-013 (coverage assertion
      ```python
      from spec_kitty_events.status import RECONCILIATION_REASON_CODES
 
+
      def test_every_reason_code_has_a_fixture() -> None:
          manifest = _load_manifest()
          covered = {

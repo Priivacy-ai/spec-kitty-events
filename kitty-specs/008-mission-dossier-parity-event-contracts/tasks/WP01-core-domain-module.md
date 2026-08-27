@@ -102,12 +102,14 @@ spec-kitty implement WP01
      MISSION_DOSSIER_SNAPSHOT_COMPUTED: str = "MissionDossierSnapshotComputed"
      MISSION_DOSSIER_PARITY_DRIFT_DETECTED: str = "MissionDossierParityDriftDetected"
 
-     DOSSIER_EVENT_TYPES: FrozenSet[str] = frozenset({
-         MISSION_DOSSIER_ARTIFACT_INDEXED,
-         MISSION_DOSSIER_ARTIFACT_MISSING,
-         MISSION_DOSSIER_SNAPSHOT_COMPUTED,
-         MISSION_DOSSIER_PARITY_DRIFT_DETECTED,
-     })
+     DOSSIER_EVENT_TYPES: FrozenSet[str] = frozenset(
+         {
+             MISSION_DOSSIER_ARTIFACT_INDEXED,
+             MISSION_DOSSIER_ARTIFACT_MISSING,
+             MISSION_DOSSIER_SNAPSHOT_COMPUTED,
+             MISSION_DOSSIER_PARITY_DRIFT_DETECTED,
+         }
+     )
      ```
   2. Add the module docstring, imports, and `from __future__ import annotations` at the very top.
 - **Files**: `src/spec_kitty_events/dossier.py` (new file)
@@ -154,9 +156,9 @@ spec-kitty implement WP01
       model_config = ConfigDict(frozen=True)
       mission_key: str = Field(..., min_length=1)
       path: str = Field(..., min_length=1)
-      artifact_class: Literal[
-          "input", "workflow", "output", "evidence", "policy", "runtime"
-      ] = Field(...)
+      artifact_class: Literal["input", "workflow", "output", "evidence", "policy", "runtime"] = Field(
+          ...
+      )
       run_id: Optional[str] = Field(default=None)
       wp_id: Optional[str] = Field(default=None)
   ```
@@ -229,6 +231,7 @@ spec-kitty implement WP01
       superseded: bool = False
       step_id: Optional[str] = None
 
+
   class AnomalyEntry(BaseModel):
       model_config = ConfigDict(frozen=True)
       anomaly_type: Literal["missing_artifact"] = "missing_artifact"
@@ -236,6 +239,7 @@ spec-kitty implement WP01
       manifest_step: str
       checked_at: str
       remediation_hint: Optional[str] = None
+
 
   class SnapshotSummary(BaseModel):
       model_config = ConfigDict(frozen=True)
@@ -245,12 +249,14 @@ spec-kitty implement WP01
       computed_at: str
       algorithm: str = "sha256"
 
+
   class DriftRecord(BaseModel):
       model_config = ConfigDict(frozen=True)
       expected_hash: str
       actual_hash: str
       drift_kind: str
       detected_at: str
+
 
   class MissionDossierState(BaseModel):
       model_config = ConfigDict(frozen=True)

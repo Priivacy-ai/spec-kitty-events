@@ -154,9 +154,7 @@ class TestMissionRunStartedPayload:
 
     def test_missing_run_id(self) -> None:
         with pytest.raises(PydanticValidationError):
-            MissionRunStartedPayload(
-                mission_type="software-dev", actor=_make_actor()
-            )  # type: ignore[call-arg]
+            MissionRunStartedPayload(mission_type="software-dev", actor=_make_actor())  # type: ignore[call-arg]
 
     def test_frozen(self) -> None:
         p = MissionRunStartedPayload(
@@ -178,17 +176,13 @@ class TestNextStepIssuedPayload:
     """Tests for NextStepIssuedPayload."""
 
     def test_valid(self) -> None:
-        p = NextStepIssuedPayload(
-            run_id="run-1", step_id="s1", agent_id="a1", actor=_make_actor()
-        )
+        p = NextStepIssuedPayload(run_id="run-1", step_id="s1", agent_id="a1", actor=_make_actor())
         assert p.step_id == "s1"
         assert p.agent_id == "a1"
 
     def test_missing_step_id(self) -> None:
         with pytest.raises(PydanticValidationError):
-            NextStepIssuedPayload(
-                run_id="run-1", agent_id="a1", actor=_make_actor()
-            )  # type: ignore[call-arg]
+            NextStepIssuedPayload(run_id="run-1", agent_id="a1", actor=_make_actor())  # type: ignore[call-arg]
 
 
 class TestNextStepAutoCompletedPayload:
@@ -196,16 +190,14 @@ class TestNextStepAutoCompletedPayload:
 
     def test_valid(self) -> None:
         p = NextStepAutoCompletedPayload(
-            run_id="run-1", step_id="s1", agent_id="a1",
-            result="success", actor=_make_actor()
+            run_id="run-1", step_id="s1", agent_id="a1", result="success", actor=_make_actor()
         )
         assert p.result == "success"
 
     def test_missing_result(self) -> None:
         with pytest.raises(PydanticValidationError):
             NextStepAutoCompletedPayload(
-                run_id="run-1", step_id="s1", agent_id="a1",
-                actor=_make_actor()
+                run_id="run-1", step_id="s1", agent_id="a1", actor=_make_actor()
             )  # type: ignore[call-arg]
 
 
@@ -214,9 +206,12 @@ class TestDecisionInputRequestedPayload:
 
     def test_valid(self) -> None:
         p = DecisionInputRequestedPayload(
-            run_id="run-1", decision_id="d1", step_id="s1",
-            question="Which DB?", options=("pg", "mysql"),
-            actor=_make_actor()
+            run_id="run-1",
+            decision_id="d1",
+            step_id="s1",
+            question="Which DB?",
+            options=("pg", "mysql"),
+            actor=_make_actor(),
         )
         assert p.question == "Which DB?"
         assert p.options == ("pg", "mysql")
@@ -224,21 +219,23 @@ class TestDecisionInputRequestedPayload:
     def test_missing_question(self) -> None:
         with pytest.raises(PydanticValidationError):
             DecisionInputRequestedPayload(
-                run_id="run-1", decision_id="d1", step_id="s1",
-                actor=_make_actor()
+                run_id="run-1", decision_id="d1", step_id="s1", actor=_make_actor()
             )  # type: ignore[call-arg]
 
     def test_optional_input_key(self) -> None:
         p = DecisionInputRequestedPayload(
-            run_id="run-1", decision_id="d1", step_id="s1",
-            question="Q?", actor=_make_actor()
+            run_id="run-1", decision_id="d1", step_id="s1", question="Q?", actor=_make_actor()
         )
         assert p.input_key is None
 
     def test_with_input_key(self) -> None:
         p = DecisionInputRequestedPayload(
-            run_id="run-1", decision_id="input:pw", step_id="s1",
-            question="Q?", input_key="pw", actor=_make_actor()
+            run_id="run-1",
+            decision_id="input:pw",
+            step_id="s1",
+            question="Q?",
+            input_key="pw",
+            actor=_make_actor(),
         )
         assert p.input_key == "pw"
 
@@ -248,17 +245,16 @@ class TestDecisionInputAnsweredPayload:
 
     def test_valid(self) -> None:
         p = DecisionInputAnsweredPayload(
-            run_id="run-1", decision_id="d1", answer="pg",
-            actor=_make_actor(actor_type="human", actor_id="user-1")
+            run_id="run-1",
+            decision_id="d1",
+            answer="pg",
+            actor=_make_actor(actor_type="human", actor_id="user-1"),
         )
         assert p.answer == "pg"
 
     def test_missing_answer(self) -> None:
         with pytest.raises(PydanticValidationError):
-            DecisionInputAnsweredPayload(
-                run_id="run-1", decision_id="d1",
-                actor=_make_actor()
-            )  # type: ignore[call-arg]
+            DecisionInputAnsweredPayload(run_id="run-1", decision_id="d1", actor=_make_actor())  # type: ignore[call-arg]
 
 
 class TestMissionRunCompletedPayload:
@@ -273,9 +269,7 @@ class TestMissionRunCompletedPayload:
 
     def test_missing_mission_type(self) -> None:
         with pytest.raises(PydanticValidationError):
-            MissionRunCompletedPayload(
-                run_id="run-1", actor=_make_actor()
-            )  # type: ignore[call-arg]
+            MissionRunCompletedPayload(run_id="run-1", actor=_make_actor())  # type: ignore[call-arg]
 
 
 # ── Anomaly Model ────────────────────────────────────────────────────────────
@@ -286,15 +280,12 @@ class TestMissionNextAnomaly:
 
     def test_valid(self) -> None:
         a = MissionNextAnomaly(
-            event_id="evt1", event_type="MissionRunStarted",
-            reason="Duplicate start"
+            event_id="evt1", event_type="MissionRunStarted", reason="Duplicate start"
         )
         assert a.reason == "Duplicate start"
 
     def test_frozen(self) -> None:
-        a = MissionNextAnomaly(
-            event_id="evt1", event_type="X", reason="Y"
-        )
+        a = MissionNextAnomaly(event_id="evt1", event_type="X", reason="Y")
         with pytest.raises(Exception):
             a.reason = "Z"  # type: ignore[misc]
 

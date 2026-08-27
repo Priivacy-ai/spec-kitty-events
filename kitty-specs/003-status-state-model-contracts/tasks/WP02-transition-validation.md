@@ -82,21 +82,23 @@ Implement the transition matrix, `TransitionValidationResult`, and `validate_tra
 
 2. Define the explicit allowed transitions:
    ```python
-   _ALLOWED_TRANSITIONS: FrozenSet[Tuple[Optional[Lane], Lane]] = frozenset({
-       # Initial
-       (None, Lane.PLANNED),
-       # Happy path
-       (Lane.PLANNED, Lane.CLAIMED),
-       (Lane.CLAIMED, Lane.IN_PROGRESS),
-       (Lane.IN_PROGRESS, Lane.FOR_REVIEW),
-       (Lane.FOR_REVIEW, Lane.DONE),
-       # Review rollback
-       (Lane.FOR_REVIEW, Lane.IN_PROGRESS),
-       # Abandon/reassign
-       (Lane.IN_PROGRESS, Lane.PLANNED),
-       # Unblock
-       (Lane.BLOCKED, Lane.IN_PROGRESS),
-   })
+   _ALLOWED_TRANSITIONS: FrozenSet[Tuple[Optional[Lane], Lane]] = frozenset(
+       {
+           # Initial
+           (None, Lane.PLANNED),
+           # Happy path
+           (Lane.PLANNED, Lane.CLAIMED),
+           (Lane.CLAIMED, Lane.IN_PROGRESS),
+           (Lane.IN_PROGRESS, Lane.FOR_REVIEW),
+           (Lane.FOR_REVIEW, Lane.DONE),
+           # Review rollback
+           (Lane.FOR_REVIEW, Lane.IN_PROGRESS),
+           # Abandon/reassign
+           (Lane.IN_PROGRESS, Lane.PLANNED),
+           # Unblock
+           (Lane.BLOCKED, Lane.IN_PROGRESS),
+       }
+   )
    ```
 
 3. The `→ blocked` and `→ canceled` rules are programmatic (any non-terminal lane can transition to blocked or canceled). These are checked in the validator logic, not in the frozenset.
@@ -115,9 +117,11 @@ Implement the transition matrix, `TransitionValidationResult`, and `validate_tra
    ```python
    from dataclasses import dataclass
 
+
    @dataclass(frozen=True)
    class TransitionValidationResult:
        """Result of validating a proposed status transition."""
+
        valid: bool
        violations: Tuple[str, ...] = ()
    ```
@@ -188,18 +192,21 @@ Implement the transition matrix, `TransitionValidationResult`, and `validate_tra
 
 2. **test_all_legal_default_transitions**: Parametrize over all 9 legal transitions (including blocked/canceled):
    ```python
-   @pytest.mark.parametrize("from_lane,to_lane", [
-       (None, Lane.PLANNED),
-       (Lane.PLANNED, Lane.CLAIMED),
-       (Lane.CLAIMED, Lane.IN_PROGRESS),
-       (Lane.IN_PROGRESS, Lane.FOR_REVIEW),
-       (Lane.FOR_REVIEW, Lane.DONE),       # needs evidence
-       (Lane.FOR_REVIEW, Lane.IN_PROGRESS), # needs review_ref
-       (Lane.IN_PROGRESS, Lane.PLANNED),    # needs reason
-       (Lane.BLOCKED, Lane.IN_PROGRESS),
-       (Lane.PLANNED, Lane.BLOCKED),        # any non-terminal -> blocked
-       (Lane.IN_PROGRESS, Lane.CANCELED),   # any non-terminal -> canceled
-   ])
+   @pytest.mark.parametrize(
+       "from_lane,to_lane",
+       [
+           (None, Lane.PLANNED),
+           (Lane.PLANNED, Lane.CLAIMED),
+           (Lane.CLAIMED, Lane.IN_PROGRESS),
+           (Lane.IN_PROGRESS, Lane.FOR_REVIEW),
+           (Lane.FOR_REVIEW, Lane.DONE),  # needs evidence
+           (Lane.FOR_REVIEW, Lane.IN_PROGRESS),  # needs review_ref
+           (Lane.IN_PROGRESS, Lane.PLANNED),  # needs reason
+           (Lane.BLOCKED, Lane.IN_PROGRESS),
+           (Lane.PLANNED, Lane.BLOCKED),  # any non-terminal -> blocked
+           (Lane.IN_PROGRESS, Lane.CANCELED),  # any non-terminal -> canceled
+       ],
+   )
    def test_legal_transition(self, from_lane, to_lane):
        # Build payload with all required guards satisfied
        ...

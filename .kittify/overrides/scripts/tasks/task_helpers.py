@@ -459,6 +459,7 @@ def get_lane_from_frontmatter(wp_path: Path, warn_on_missing: bool = True) -> st
             # Import here to avoid circular dependency issues
             try:
                 from rich.console import Console
+
                 console = Console(stderr=True)
                 console.print(
                     f"[yellow]Warning: {wp_path.name} missing lane field, "
@@ -466,16 +467,16 @@ def get_lane_from_frontmatter(wp_path: Path, warn_on_missing: bool = True) -> st
                 )
             except ImportError:
                 import sys
+
                 print(
                     f"Warning: {wp_path.name} missing lane field, defaulting to 'planned'",
-                    file=sys.stderr
+                    file=sys.stderr,
                 )
         return "planned"
 
     if lane not in LANES:
         raise ValueError(
-            f"Invalid lane '{lane}' in {wp_path.name}. "
-            f"Valid lanes: {', '.join(LANES)}"
+            f"Invalid lane '{lane}' in {wp_path.name}. Valid lanes: {', '.join(LANES)}"
         )
 
     return lane

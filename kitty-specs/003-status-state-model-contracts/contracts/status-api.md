@@ -12,16 +12,16 @@ All symbols below are exported from `spec_kitty_events.__init__` and included in
 
 ```python
 # Lane enumeration (str, Enum for Python 3.10 compat)
-Lane.PLANNED        # "planned"
-Lane.CLAIMED        # "claimed"
-Lane.IN_PROGRESS    # "in_progress"
-Lane.FOR_REVIEW     # "for_review"
-Lane.DONE           # "done"
-Lane.BLOCKED        # "blocked"
-Lane.CANCELED       # "canceled"
+Lane.PLANNED  # "planned"
+Lane.CLAIMED  # "claimed"
+Lane.IN_PROGRESS  # "in_progress"
+Lane.FOR_REVIEW  # "for_review"
+Lane.DONE  # "done"
+Lane.BLOCKED  # "blocked"
+Lane.CANCELED  # "canceled"
 
 # Execution mode enumeration
-ExecutionMode.WORKTREE     # "worktree"
+ExecutionMode.WORKTREE  # "worktree"
 ExecutionMode.DIRECT_REPO  # "direct_repo"
 ```
 
@@ -35,6 +35,7 @@ def normalize_lane(value: str) -> Lane:
     Raises spec_kitty_events.ValidationError for unknown values.
     """
 
+
 def validate_transition(payload: StatusTransitionPayload) -> TransitionValidationResult:
     """Validate a proposed status transition against the transition matrix.
 
@@ -47,6 +48,7 @@ def validate_transition(payload: StatusTransitionPayload) -> TransitionValidatio
     Never raises exceptions for business rule violations.
     """
 
+
 def status_event_sort_key(event: Event) -> Tuple[int, str, str]:
     """Deterministic sort key for status events.
 
@@ -54,12 +56,14 @@ def status_event_sort_key(event: Event) -> Tuple[int, str, str]:
     Provides total ordering: lamport_clock first, then wall-clock, then ULID.
     """
 
+
 def dedup_events(events: Sequence[Event]) -> List[Event]:
     """Remove duplicate events by event_id.
 
     Preserves first occurrence in input order.
     Input should be pre-sorted for canonical results.
     """
+
 
 def reduce_status_events(events: Sequence[Event]) -> ReducedStatus:
     """Reduce a list of status events to per-WP current state.
@@ -89,15 +93,16 @@ ForceMetadata(force=True, actor=..., reason=...)
 
 # Core transition payload
 StatusTransitionPayload(
-    feature_slug=..., wp_id=...,
+    feature_slug=...,
+    wp_id=...,
     from_lane=None,  # Optional[Lane], None for initial
-    to_lane=...,     # Lane (aliases normalized)
+    to_lane=...,  # Lane (aliases normalized)
     actor=...,
-    force=False,     # bool
-    reason=None,     # Optional[str], required when force=True
+    force=False,  # bool
+    reason=None,  # Optional[str], required when force=True
     execution_mode=...,  # ExecutionMode
-    review_ref=None,     # Optional[str], required for review rollback
-    evidence=None,       # Optional[DoneEvidence], required for ->done
+    review_ref=None,  # Optional[str], required for review rollback
+    evidence=None,  # Optional[DoneEvidence], required for ->done
 )
 
 # Reducer output models
@@ -117,16 +122,16 @@ TransitionValidationResult(valid=False, violations=("done is terminal without fo
 
 ```python
 TransitionError(SpecKittyEventsError)
-    # Available for consumers who want to raise on invalid transitions.
-    # Not raised by the library's reducer (which records anomalies instead).
+# Available for consumers who want to raise on invalid transitions.
+# Not raised by the library's reducer (which records anomalies instead).
 ```
 
 ### Constants
 
 ```python
 TERMINAL_LANES: FrozenSet[Lane]  # {Lane.DONE, Lane.CANCELED}
-LANE_ALIASES: Dict[str, Lane]   # {"doing": Lane.IN_PROGRESS}
-WP_STATUS_CHANGED: str           # "WPStatusChanged" — canonical event_type
+LANE_ALIASES: Dict[str, Lane]  # {"doing": Lane.IN_PROGRESS}
+WP_STATUS_CHANGED: str  # "WPStatusChanged" — canonical event_type
 ```
 
 ## Total New Exports (added to __init__.py __all__)

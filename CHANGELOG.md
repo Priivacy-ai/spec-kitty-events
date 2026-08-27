@@ -661,7 +661,9 @@ To emit dossier events:
 ```python
 from spec_kitty_events import (
     MissionDossierArtifactIndexedPayload,
-    LocalNamespaceTuple, ArtifactIdentity, ContentHashRef,
+    LocalNamespaceTuple,
+    ArtifactIdentity,
+    ContentHashRef,
     MISSION_DOSSIER_ARTIFACT_INDEXED,
 )
 ```
@@ -673,6 +675,7 @@ To reduce a dossier event stream:
 
 ```python
 from spec_kitty_events import reduce_mission_dossier, NamespaceMixedStreamError
+
 try:
     state = reduce_mission_dossier(events)
 except NamespaceMixedStreamError:
@@ -865,6 +868,7 @@ partition by namespace before calling `reduce_mission_dossier()`.
        PLANNED = "planned"
        DOING = "doing"
        ...
+
 
    # After:
    from spec_kitty_events import SyncLaneV1

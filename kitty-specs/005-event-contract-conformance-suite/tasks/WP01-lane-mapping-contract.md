@@ -74,15 +74,17 @@ The mapping is currently hardcoded in each consumer. This WP formalizes it as a 
 1. Import `MappingProxyType` from `types` at the top of `status.py`.
 2. Define the mapping after `SyncLaneV1`:
    ```python
-   CANONICAL_TO_SYNC_V1: MappingProxyType[Lane, SyncLaneV1] = MappingProxyType({
-       Lane.PLANNED: SyncLaneV1.PLANNED,
-       Lane.CLAIMED: SyncLaneV1.PLANNED,
-       Lane.IN_PROGRESS: SyncLaneV1.DOING,
-       Lane.FOR_REVIEW: SyncLaneV1.FOR_REVIEW,
-       Lane.DONE: SyncLaneV1.DONE,
-       Lane.BLOCKED: SyncLaneV1.DOING,
-       Lane.CANCELED: SyncLaneV1.PLANNED,
-   })
+   CANONICAL_TO_SYNC_V1: MappingProxyType[Lane, SyncLaneV1] = MappingProxyType(
+       {
+           Lane.PLANNED: SyncLaneV1.PLANNED,
+           Lane.CLAIMED: SyncLaneV1.PLANNED,
+           Lane.IN_PROGRESS: SyncLaneV1.DOING,
+           Lane.FOR_REVIEW: SyncLaneV1.FOR_REVIEW,
+           Lane.DONE: SyncLaneV1.DONE,
+           Lane.BLOCKED: SyncLaneV1.DOING,
+           Lane.CANCELED: SyncLaneV1.PLANNED,
+       }
+   )
    ```
 3. The type annotation must satisfy `mypy --strict`.
 

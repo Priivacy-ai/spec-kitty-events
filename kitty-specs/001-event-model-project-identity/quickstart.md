@@ -41,8 +41,8 @@ event = Event(
 event_store.save_event(event)
 
 # Access identity fields
-print(event.project_uuid)   # UUID('550e8400-...')
-print(event.project_slug)   # 'my-project'
+print(event.project_uuid)  # UUID('550e8400-...')
+print(event.project_slug)  # 'my-project'
 ```
 
 ## Serialization Round-Trip

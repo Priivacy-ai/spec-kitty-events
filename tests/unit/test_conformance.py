@@ -21,6 +21,7 @@ from spec_kitty_events.conformance import (
 def _make_ulid() -> str:
     """Generate a valid 26-character ULID-like string."""
     from ulid import ULID
+
     return str(ULID())
 
 

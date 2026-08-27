@@ -1,4 +1,5 @@
 """Build-time JSON Schema generation script for spec-kitty-events models."""
+
 from __future__ import annotations
 
 import argparse
@@ -465,7 +466,10 @@ def check_drift() -> int:
     else:
         actual_support_matrix = SUPPORT_MATRIX_PATH.read_text(encoding="utf-8")
         if actual_support_matrix != expected_support_matrix:
-            print(f"ERROR: support_matrix.json drift detected at {SUPPORT_MATRIX_PATH}", file=sys.stderr)
+            print(
+                f"ERROR: support_matrix.json drift detected at {SUPPORT_MATRIX_PATH}",
+                file=sys.stderr,
+            )
             drift_detected = True
 
     if drift_detected:

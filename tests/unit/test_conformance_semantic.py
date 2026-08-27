@@ -5,6 +5,7 @@ Mission: canonical-producer-contracts-legacy-envelope-01KS7JM3.
 Covers FR-001..FR-005, the regression for force-with-empty-reason, and
 the substring-routing contract that downstream consumers rely on.
 """
+
 from __future__ import annotations
 
 from typing import Any, Dict
@@ -38,16 +39,12 @@ def _unforced_payload(from_lane: str, to_lane: str) -> Dict[str, Any]:
 
 
 @pytest.mark.parametrize(("from_lane", "to_lane"), _UNFORCED_BACKWARD_CASES)
-def test_validate_event_rejects_unforced_review_rejection(
-    from_lane: str, to_lane: str
-) -> None:
+def test_validate_event_rejects_unforced_review_rejection(from_lane: str, to_lane: str) -> None:
     """FR-001/FR-003: every review-rejection family transition without
     force=True fails through the public conformance gate."""
     payload = _unforced_payload(from_lane, to_lane)
     result = validate_event(payload, "WPStatusChanged")
-    assert not result.valid, (
-        f"Unforced {from_lane}->{to_lane} should fail; got valid=True"
-    )
+    assert not result.valid, f"Unforced {from_lane}->{to_lane} should fail; got valid=True"
     assert result.model_violations
     messages = [v.message for v in result.model_violations]
     assert any("force=True" in m for m in messages), messages
@@ -126,8 +123,7 @@ def test_validate_event_violation_field_and_type_are_documented() -> None:
     payload = _unforced_payload("for_review", "planned")
     result = validate_event(payload, "WPStatusChanged")
     transition_violations = [
-        v for v in result.model_violations
-        if v.violation_type == "transition_rule"
+        v for v in result.model_violations if v.violation_type == "transition_rule"
     ]
     assert transition_violations
     for v in transition_violations:

@@ -97,8 +97,7 @@ def _extract_envelope_timestamp(envelope: Union[Mapping[str, Any], Event]) -> da
         parsed = datetime.fromisoformat(raw.replace("Z", "+00:00"))
         return _to_utc(parsed)
     raise TypeError(
-        f"envelope['timestamp'] must be a datetime or ISO-8601 string; "
-        f"got {type(raw).__name__}"
+        f"envelope['timestamp'] must be a datetime or ISO-8601 string; got {type(raw).__name__}"
     )
 
 
@@ -160,9 +159,7 @@ def load_timestamp_semantics_fixture(name: str, *, expectation: str) -> dict[str
         FileNotFoundError: If the fixture file does not exist.
     """
     if expectation not in {"valid", "invalid"}:
-        raise ValueError(
-            f"expectation must be 'valid' or 'invalid'; got {expectation!r}"
-        )
+        raise ValueError(f"expectation must be 'valid' or 'invalid'; got {expectation!r}")
     path = _FIXTURE_ROOT / expectation / f"{name}.json"
     with path.open("r", encoding="utf-8") as fh:
         result: dict[str, Any] = json.load(fh)

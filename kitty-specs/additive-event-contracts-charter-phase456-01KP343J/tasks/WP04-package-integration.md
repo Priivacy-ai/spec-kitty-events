@@ -144,19 +144,19 @@ spec-kitty agent action implement WP04 --agent <name>
 4. Add new symbols to `__all__` list:
    ```python
    # Profile invocation contracts (3.1.0)
-   "PROFILE_INVOCATION_SCHEMA_VERSION",
-   "PROFILE_INVOCATION_STARTED",
-   "PROFILE_INVOCATION_COMPLETED",
-   "PROFILE_INVOCATION_FAILED",
-   "PROFILE_INVOCATION_EVENT_TYPES",
-   "ProfileInvocationStartedPayload",
+   ("PROFILE_INVOCATION_SCHEMA_VERSION",)
+   ("PROFILE_INVOCATION_STARTED",)
+   ("PROFILE_INVOCATION_COMPLETED",)
+   ("PROFILE_INVOCATION_FAILED",)
+   ("PROFILE_INVOCATION_EVENT_TYPES",)
+   ("ProfileInvocationStartedPayload",)
    # Retrospective contracts (3.1.0)
-   "RETROSPECTIVE_SCHEMA_VERSION",
-   "RETROSPECTIVE_COMPLETED",
-   "RETROSPECTIVE_SKIPPED",
-   "RETROSPECTIVE_EVENT_TYPES",
-   "RetrospectiveCompletedPayload",
-   "RetrospectiveSkippedPayload",
+   ("RETROSPECTIVE_SCHEMA_VERSION",)
+   ("RETROSPECTIVE_COMPLETED",)
+   ("RETROSPECTIVE_SKIPPED",)
+   ("RETROSPECTIVE_EVENT_TYPES",)
+   ("RetrospectiveCompletedPayload",)
+   ("RetrospectiveSkippedPayload",)
    ```
 
 **Validation**:

@@ -147,6 +147,7 @@ Implement `status_event_sort_key()`, `dedup_events()`, reducer output models (WP
    ```python
    class WPState(BaseModel):
        """Per-work-package current state from reducer."""
+
        model_config = ConfigDict(frozen=True)
 
        wp_id: str = Field(..., min_length=1)
@@ -160,6 +161,7 @@ Implement `status_event_sort_key()`, `dedup_events()`, reducer output models (WP
    ```python
    class TransitionAnomaly(BaseModel):
        """Records an invalid transition encountered during reduction."""
+
        model_config = ConfigDict(frozen=True)
 
        event_id: str = Field(..., min_length=1)
@@ -173,6 +175,7 @@ Implement `status_event_sort_key()`, `dedup_events()`, reducer output models (WP
    ```python
    class ReducedStatus(BaseModel):
        """Output of the reference reducer."""
+
        model_config = ConfigDict(frozen=True)
 
        wp_states: Dict[str, WPState] = Field(default_factory=dict)
@@ -255,33 +258,39 @@ Implement `status_event_sort_key()`, `dedup_events()`, reducer output models (WP
        if not result.valid:
            # Check if current_lane matches payload.from_lane
            if current_lane != payload.from_lane:
-               anomalies.append(TransitionAnomaly(
+               anomalies.append(
+                   TransitionAnomaly(
+                       event_id=event.event_id,
+                       wp_id=wp_id,
+                       from_lane=payload.from_lane,
+                       to_lane=payload.to_lane,
+                       reason=f"Expected from_lane={current_lane}, got {payload.from_lane}; "
+                       f"violations: {'; '.join(result.violations)}",
+                   )
+               )
+               continue
+           anomalies.append(
+               TransitionAnomaly(
                    event_id=event.event_id,
                    wp_id=wp_id,
                    from_lane=payload.from_lane,
                    to_lane=payload.to_lane,
-                   reason=f"Expected from_lane={current_lane}, got {payload.from_lane}; "
-                          f"violations: {'; '.join(result.violations)}",
-               ))
-               continue
-           anomalies.append(TransitionAnomaly(
-               event_id=event.event_id,
-               wp_id=wp_id,
-               from_lane=payload.from_lane,
-               to_lane=payload.to_lane,
-               reason='; '.join(result.violations),
-           ))
+                   reason="; ".join(result.violations),
+               )
+           )
            continue
 
        # Check from_lane consistency with current state
        if current_lane != payload.from_lane:
-           anomalies.append(TransitionAnomaly(
-               event_id=event.event_id,
-               wp_id=wp_id,
-               from_lane=payload.from_lane,
-               to_lane=payload.to_lane,
-               reason=f"from_lane mismatch: WP is in {current_lane}, event says {payload.from_lane}",
-           ))
+           anomalies.append(
+               TransitionAnomaly(
+                   event_id=event.event_id,
+                   wp_id=wp_id,
+                   from_lane=payload.from_lane,
+                   to_lane=payload.to_lane,
+                   reason=f"from_lane mismatch: WP is in {current_lane}, event says {payload.from_lane}",
+               )
+           )
            continue
 
        # Apply transition
@@ -302,12 +311,17 @@ Implement `status_event_sort_key()`, `dedup_events()`, reducer output models (WP
 
    **Implementation approach**: Group parsed events by `(wp_id, lamport_clock)`. Within groups of size > 1, if any event is a reviewer rollback, apply it last. This can be done as a pre-processing sort within each concurrent group:
    ```python
-   def _rollback_aware_order(group: List[Tuple[Event, StatusTransitionPayload]]) -> List[Tuple[Event, StatusTransitionPayload]]:
+   def _rollback_aware_order(
+       group: List[Tuple[Event, StatusTransitionPayload]],
+   ) -> List[Tuple[Event, StatusTransitionPayload]]:
        """Within a concurrent group, ensure reviewer rollbacks are applied last."""
-       rollbacks = [(e, p) for e, p in group
-                    if p.from_lane == Lane.FOR_REVIEW
-                    and p.to_lane == Lane.IN_PROGRESS
-                    and p.review_ref is not None]
+       rollbacks = [
+           (e, p)
+           for e, p in group
+           if p.from_lane == Lane.FOR_REVIEW
+           and p.to_lane == Lane.IN_PROGRESS
+           and p.review_ref is not None
+       ]
        non_rollbacks = [(e, p) for e, p in group if (e, p) not in rollbacks]
        return non_rollbacks + rollbacks
    ```
@@ -405,6 +419,7 @@ Implement `status_event_sort_key()`, `dedup_events()`, reducer output models (WP
    ```python
    from hypothesis import given, settings
    from hypothesis import strategies as st
+
 
    @given(st.data())
    @settings(max_examples=50)

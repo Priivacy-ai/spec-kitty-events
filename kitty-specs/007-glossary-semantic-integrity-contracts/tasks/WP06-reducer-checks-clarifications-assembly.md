@@ -204,9 +204,7 @@ wp_code: WP06
          active_scopes=active_scopes,
          current_strictness=current_strictness,  # type: ignore[arg-type]
          strictness_history=tuple(strictness_history),
-         term_candidates={
-             k: tuple(v) for k, v in term_candidates.items()
-         },
+         term_candidates={k: tuple(v) for k, v in term_candidates.items()},
          term_senses=term_senses,
          clarifications=tuple(clarifications),
          semantic_checks=tuple(semantic_checks),

@@ -36,11 +36,13 @@ class MissionStartedPayload(BaseModel):
     initial_phase: str
     actor: str
 
+
 class MissionCompletedPayload(BaseModel):
     mission_id: str
     mission_type: str
     final_phase: str
     actor: str
+
 
 class MissionCancelledPayload(BaseModel):
     mission_id: str
@@ -48,11 +50,13 @@ class MissionCancelledPayload(BaseModel):
     actor: str
     cancelled_wp_ids: List[str]
 
+
 class PhaseEnteredPayload(BaseModel):
     mission_id: str
     phase_name: str
     previous_phase: Optional[str]
     actor: str
+
 
 class ReviewRollbackPayload(BaseModel):
     mission_id: str
@@ -67,13 +71,16 @@ class ReviewRollbackPayload(BaseModel):
 ```python
 class LifecycleAnomaly(BaseModel):
     """Flagged issue during lifecycle reduction."""
+
     model_config = ConfigDict(frozen=True)
     event_id: str
     event_type: str
     reason: str
 
+
 class ReducedMissionState(BaseModel):
     """Projected mission state from lifecycle event reduction."""
+
     model_config = ConfigDict(frozen=True)
     mission_id: Optional[str]
     mission_status: Optional[MissionStatus]
@@ -112,16 +119,16 @@ class Event(BaseModel):
     # ... existing fields unchanged ...
 
     correlation_id: str = Field(
-        ..., min_length=26, max_length=26,
-        description="ULID grouping all events in the same mission execution"
+        ...,
+        min_length=26,
+        max_length=26,
+        description="ULID grouping all events in the same mission execution",
     )
     schema_version: str = Field(
-        default="1.0.0", pattern=r"^\d+\.\d+\.\d+$",
-        description="Envelope schema version (semver)"
+        default="1.0.0", pattern=r"^\d+\.\d+\.\d+$", description="Envelope schema version (semver)"
     )
     data_tier: int = Field(
-        default=0, ge=0, le=4,
-        description="Progressive data sharing tier (0=local, 4=telemetry)"
+        default=0, ge=0, le=4, description="Progressive data sharing tier (0=local, 4=telemetry)"
     )
 ```
 

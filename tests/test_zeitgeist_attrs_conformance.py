@@ -56,6 +56,7 @@ def _build_payload(event_type: str, fields: dict):
         return factory(**fields)
     return PAYLOAD_MODEL_BY_EVENT_TYPE[event_type](**fields)
 
+
 _ERROR_CLASSES = {
     "UnknownVolatileEventTypeError": UnknownVolatileEventTypeError,
     "ZeitgeistAttrsError": ZeitgeistAttrsError,
@@ -124,18 +125,14 @@ def test_codec_fixtures_stay_out_of_the_packaged_event_gate() -> None:
     )
 
     manifest_paths = {
-        f["path"]
-        for f in _MANIFEST["fixtures"]
-        if f["path"].startswith("zeitgeist_attrs/")
+        f["path"] for f in _MANIFEST["fixtures"] if f["path"].startswith("zeitgeist_attrs/")
     }
     assert manifest_paths, (
         "zeitgeist_attrs codec fixtures vanished from the manifest; if the "
         "category was renamed on purpose, update this guard with it"
     )
     leaked = sorted(
-        f["path"]
-        for f in _event_fixture_entries()
-        if f["path"].startswith("zeitgeist_attrs/")
+        f["path"] for f in _event_fixture_entries() if f["path"].startswith("zeitgeist_attrs/")
     )
     assert not leaked, (
         "codec fixtures reached the packaged event gate; validating them as "
@@ -154,9 +151,7 @@ def test_packaged_event_gate_fixture_entries_match_manifest_expectations() -> No
     for case in _event_fixture_params():
         result = validate_event(case["payload"], case["event_type"])
         if case["expected_result"] == "valid" and result.model_violations:
-            violations = "; ".join(
-                f"{v.field}: {v.message}" for v in result.model_violations
-            )
+            violations = "; ".join(f"{v.field}: {v.message}" for v in result.model_violations)
             failures.append(f"{case['id']} unexpectedly failed: {violations}")
         elif case["expected_result"] == "invalid" and result.valid:
             failures.append(f"{case['id']} unexpectedly passed")

@@ -4,6 +4,7 @@ Covers: constant values, enum members, payload validation, mandatory audit field
 authority role constraints, frozen model immutability, V1 discriminated-union
 payloads (Opened/Discussing/Resolved), Widened payload, and Overridden extension.
 """
+
 from __future__ import annotations
 
 from datetime import datetime, timezone
@@ -56,13 +57,15 @@ class TestConstants:
 
     def test_event_types_frozenset(self) -> None:
         assert isinstance(DECISION_POINT_EVENT_TYPES, frozenset)
-        assert DECISION_POINT_EVENT_TYPES == frozenset({
-            "DecisionPointOpened",
-            "DecisionPointWidened",
-            "DecisionPointDiscussing",
-            "DecisionPointResolved",
-            "DecisionPointOverridden",
-        })
+        assert DECISION_POINT_EVENT_TYPES == frozenset(
+            {
+                "DecisionPointOpened",
+                "DecisionPointWidened",
+                "DecisionPointDiscussing",
+                "DecisionPointResolved",
+                "DecisionPointOverridden",
+            }
+        )
         assert len(DECISION_POINT_EVENT_TYPES) == 5
 
     def test_schema_version(self) -> None:
@@ -194,12 +197,15 @@ def _valid_widened_dict() -> dict:
 class TestPayloadValidation:
     """Test that all payload models validate mandatory fields."""
 
-    @pytest.mark.parametrize("payload_cls", [
-        DecisionPointOpenedPayload,
-        DecisionPointDiscussingPayload,
-        DecisionPointResolvedPayload,
-        DecisionPointOverriddenPayload,
-    ])
+    @pytest.mark.parametrize(
+        "payload_cls",
+        [
+            DecisionPointOpenedPayload,
+            DecisionPointDiscussingPayload,
+            DecisionPointResolvedPayload,
+            DecisionPointOverriddenPayload,
+        ],
+    )
     def test_valid_payload_succeeds(self, payload_cls: type) -> None:
         payload = payload_cls.model_validate(_valid_payload_dict())
         assert payload.decision_point_id == "dp-001"
@@ -215,24 +221,27 @@ class TestPayloadValidation:
         assert len(payload.alternatives_considered) == 2
         assert len(payload.evidence_refs) == 1
 
-    @pytest.mark.parametrize("missing_field", [
-        "decision_point_id",
-        "mission_id",
-        "run_id",
-        "mission_slug",
-        "mission_type",
-        "phase",
-        "actor_id",
-        "actor_type",
-        "authority_role",
-        "mission_owner_authority_flag",
-        "mission_owner_authority_path",
-        "rationale",
-        "alternatives_considered",
-        "evidence_refs",
-        "state_entered_at",
-        "recorded_at",
-    ])
+    @pytest.mark.parametrize(
+        "missing_field",
+        [
+            "decision_point_id",
+            "mission_id",
+            "run_id",
+            "mission_slug",
+            "mission_type",
+            "phase",
+            "actor_id",
+            "actor_type",
+            "authority_role",
+            "mission_owner_authority_flag",
+            "mission_owner_authority_path",
+            "rationale",
+            "alternatives_considered",
+            "evidence_refs",
+            "state_entered_at",
+            "recorded_at",
+        ],
+    )
     def test_missing_mandatory_field_raises(self, missing_field: str) -> None:
         data = _valid_adr_payload_dict()
         del data[missing_field]
@@ -252,9 +261,16 @@ class TestPayloadValidation:
             DecisionPointOpenedPayload.model_validate(data)
 
     def test_empty_string_fields_raise(self) -> None:
-        for field in ["decision_point_id", "mission_id", "run_id", "mission_slug",
-                       "mission_type",
-                       "phase", "actor_id", "rationale"]:
+        for field in [
+            "decision_point_id",
+            "mission_id",
+            "run_id",
+            "mission_slug",
+            "mission_type",
+            "phase",
+            "actor_id",
+            "rationale",
+        ]:
             data = _valid_adr_payload_dict()
             data[field] = ""
             with pytest.raises(ValidationError):
@@ -289,8 +305,12 @@ class TestFrozenModels:
             payload.rationale = "changed"  # type: ignore[misc]
 
     def test_all_payload_types_frozen(self) -> None:
-        for cls in [DecisionPointOpenedPayload, DecisionPointDiscussingPayload,
-                     DecisionPointResolvedPayload, DecisionPointOverriddenPayload]:
+        for cls in [
+            DecisionPointOpenedPayload,
+            DecisionPointDiscussingPayload,
+            DecisionPointResolvedPayload,
+            DecisionPointOverriddenPayload,
+        ]:
             payload = cls.model_validate(_valid_payload_dict())
             assert payload.model_config.get("frozen") is True
 
@@ -322,9 +342,7 @@ class TestOpenedDiscriminatedUnion:
 
     def test_interview_direct_construction_succeeds(self) -> None:
         """DecisionPointOpenedInterviewPayload can be constructed directly."""
-        payload = DecisionPointOpenedInterviewPayload.model_validate(
-            _valid_interview_opened_dict()
-        )
+        payload = DecisionPointOpenedInterviewPayload.model_validate(_valid_interview_opened_dict())
         assert payload.origin_surface == OriginSurface.PLANNING_INTERVIEW
 
     def test_adr_variant_rejects_interview_origin_surface(self) -> None:
@@ -360,9 +378,7 @@ class TestOpenedDiscriminatedUnion:
         assert not hasattr(payload, "origin_flow")
 
     def test_interview_variant_has_no_adr_fields(self) -> None:
-        payload = DecisionPointOpenedInterviewPayload.model_validate(
-            _valid_interview_opened_dict()
-        )
+        payload = DecisionPointOpenedInterviewPayload.model_validate(_valid_interview_opened_dict())
         assert not hasattr(payload, "rationale")
         assert not hasattr(payload, "alternatives_considered")
         assert not hasattr(payload, "authority_role")
@@ -506,9 +522,11 @@ class TestResolvedDiscriminatedUnion:
         assert payload.origin_surface == OriginSurface.ADR
 
     def test_interview_resolved_outcome_succeeds(self) -> None:
-        data = {**_valid_resolved_interview_base(),
-                "terminal_outcome": "resolved",
-                "final_answer": "Option A"}
+        data = {
+            **_valid_resolved_interview_base(),
+            "terminal_outcome": "resolved",
+            "final_answer": "Option A",
+        }
         payload = DecisionPointResolvedPayload.model_validate(data)
         assert isinstance(payload, DecisionPointResolvedInterviewPayload)
         assert payload.terminal_outcome == TerminalOutcome.RESOLVED
@@ -516,27 +534,33 @@ class TestResolvedDiscriminatedUnion:
         assert payload.other_answer is False
 
     def test_interview_resolved_other_answer_succeeds(self) -> None:
-        data = {**_valid_resolved_interview_base(),
-                "terminal_outcome": "resolved",
-                "final_answer": "Custom free-form answer",
-                "other_answer": True}
+        data = {
+            **_valid_resolved_interview_base(),
+            "terminal_outcome": "resolved",
+            "final_answer": "Custom free-form answer",
+            "other_answer": True,
+        }
         payload = DecisionPointResolvedInterviewPayload.model_validate(data)
         assert payload.other_answer is True
         assert payload.final_answer == "Custom free-form answer"
 
     def test_interview_deferred_outcome_succeeds(self) -> None:
-        data = {**_valid_resolved_interview_base(),
-                "terminal_outcome": "deferred",
-                "rationale": "Need more info before deciding"}
+        data = {
+            **_valid_resolved_interview_base(),
+            "terminal_outcome": "deferred",
+            "rationale": "Need more info before deciding",
+        }
         payload = DecisionPointResolvedInterviewPayload.model_validate(data)
         assert payload.terminal_outcome == TerminalOutcome.DEFERRED
         assert payload.final_answer is None
         assert payload.rationale == "Need more info before deciding"
 
     def test_interview_canceled_outcome_succeeds(self) -> None:
-        data = {**_valid_resolved_interview_base(),
-                "terminal_outcome": "canceled",
-                "rationale": "Decision no longer relevant"}
+        data = {
+            **_valid_resolved_interview_base(),
+            "terminal_outcome": "canceled",
+            "rationale": "Decision no longer relevant",
+        }
         payload = DecisionPointResolvedInterviewPayload.model_validate(data)
         assert payload.terminal_outcome == TerminalOutcome.CANCELED
         assert payload.final_answer is None
@@ -551,18 +575,22 @@ class TestResolvedDiscriminatedUnion:
 
     def test_resolved_with_empty_final_answer_fails(self) -> None:
         """terminal=resolved with empty string final_answer fails."""
-        data = {**_valid_resolved_interview_base(),
-                "terminal_outcome": "resolved",
-                "final_answer": ""}
+        data = {
+            **_valid_resolved_interview_base(),
+            "terminal_outcome": "resolved",
+            "final_answer": "",
+        }
         with pytest.raises(ValidationError, match="final_answer is required"):
             DecisionPointResolvedInterviewPayload.model_validate(data)
 
     def test_deferred_with_final_answer_fails(self) -> None:
         """terminal=deferred must NOT have final_answer."""
-        data = {**_valid_resolved_interview_base(),
-                "terminal_outcome": "deferred",
-                "final_answer": "some answer",
-                "rationale": "reason"}
+        data = {
+            **_valid_resolved_interview_base(),
+            "terminal_outcome": "deferred",
+            "final_answer": "some answer",
+            "rationale": "reason",
+        }
         with pytest.raises(ValidationError, match="final_answer must be absent"):
             DecisionPointResolvedInterviewPayload.model_validate(data)
 
@@ -574,19 +602,23 @@ class TestResolvedDiscriminatedUnion:
 
     def test_deferred_with_other_answer_true_fails(self) -> None:
         """terminal=deferred must have other_answer=False."""
-        data = {**_valid_resolved_interview_base(),
-                "terminal_outcome": "deferred",
-                "rationale": "reason",
-                "other_answer": True}
+        data = {
+            **_valid_resolved_interview_base(),
+            "terminal_outcome": "deferred",
+            "rationale": "reason",
+            "other_answer": True,
+        }
         with pytest.raises(ValidationError, match="other_answer must be False"):
             DecisionPointResolvedInterviewPayload.model_validate(data)
 
     def test_canceled_with_other_answer_true_fails(self) -> None:
         """terminal=canceled must have other_answer=False."""
-        data = {**_valid_resolved_interview_base(),
-                "terminal_outcome": "canceled",
-                "rationale": "reason",
-                "other_answer": True}
+        data = {
+            **_valid_resolved_interview_base(),
+            "terminal_outcome": "canceled",
+            "rationale": "reason",
+            "other_answer": True,
+        }
         with pytest.raises(ValidationError, match="other_answer must be False"):
             DecisionPointResolvedInterviewPayload.model_validate(data)
 

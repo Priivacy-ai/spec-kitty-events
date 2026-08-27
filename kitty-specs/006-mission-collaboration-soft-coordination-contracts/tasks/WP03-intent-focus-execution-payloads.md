@@ -80,6 +80,7 @@ Add the 4 intent/focus/execution payload models to `collaboration.py` Section 3:
      ```python
      class DriveIntentSetPayload(BaseModel):
          """Typed payload for DriveIntentSet events."""
+
          model_config = ConfigDict(frozen=True)
          participant_id: str = Field(..., min_length=1, description="Participant declaring intent")
          mission_id: str = Field(..., min_length=1, description="Mission context")
@@ -97,11 +98,14 @@ Add the 4 intent/focus/execution payload models to `collaboration.py` Section 3:
      ```python
      class FocusChangedPayload(BaseModel):
          """Typed payload for FocusChanged events."""
+
          model_config = ConfigDict(frozen=True)
          participant_id: str = Field(..., min_length=1, description="Participant changing focus")
          mission_id: str = Field(..., min_length=1, description="Mission context")
          focus_target: FocusTarget = Field(..., description="New focus target")
-         previous_focus_target: Optional[FocusTarget] = Field(None, description="Previous focus (if any)")
+         previous_focus_target: Optional[FocusTarget] = Field(
+             None, description="Previous focus (if any)"
+         )
      ```
   2. Verify nested `FocusTarget` round-trips correctly through `model_dump()` / `model_validate()`
   3. Verify `previous_focus_target` defaults to None when not provided
@@ -117,6 +121,7 @@ Add the 4 intent/focus/execution payload models to `collaboration.py` Section 3:
      ```python
      class PromptStepExecutionStartedPayload(BaseModel):
          """Typed payload for PromptStepExecutionStarted events."""
+
          model_config = ConfigDict(frozen=True)
          participant_id: str = Field(..., min_length=1, description="Executing participant")
          mission_id: str = Field(..., min_length=1, description="Mission context")
@@ -135,6 +140,7 @@ Add the 4 intent/focus/execution payload models to `collaboration.py` Section 3:
      ```python
      class PromptStepExecutionCompletedPayload(BaseModel):
          """Typed payload for PromptStepExecutionCompleted events."""
+
          model_config = ConfigDict(frozen=True)
          participant_id: str = Field(..., min_length=1, description="Completing participant")
          mission_id: str = Field(..., min_length=1, description="Mission context")

@@ -1,4 +1,5 @@
 """Core data models for spec-kitty-events library."""
+
 import re
 import uuid
 
@@ -36,9 +37,7 @@ def normalize_event_id(v: object) -> str:
             accepted format.
     """
     if not isinstance(v, str):
-        raise ValueError(
-            f"event_id must be a string; got {type(v).__name__}"
-        )
+        raise ValueError(f"event_id must be a string; got {type(v).__name__}")
     if len(v) == 26:
         if not _ULID_RE.match(v):
             raise ValueError(
@@ -86,18 +85,13 @@ class Event(BaseModel):
         json_schema_extra={"pattern": _EVENT_ID_PATTERN},
     )
     event_type: str = Field(
-        ...,
-        min_length=1,
-        description="Event type identifier (e.g., 'WPStatusChanged', 'TagAdded')"
+        ..., min_length=1, description="Event type identifier (e.g., 'WPStatusChanged', 'TagAdded')"
     )
     aggregate_id: str = Field(
-        ...,
-        min_length=1,
-        description="Identifier of the entity this event modifies"
+        ..., min_length=1, description="Identifier of the entity this event modifies"
     )
     payload: Dict[str, Any] = Field(
-        default_factory=dict,
-        description="Event-specific data (opaque to library)"
+        default_factory=dict, description="Event-specific data (opaque to library)"
     )
     timestamp: datetime = Field(
         ...,
@@ -116,17 +110,15 @@ class Event(BaseModel):
     build_id: str = Field(
         ...,
         min_length=1,
-        description="Canonical checkout or worktree identity that produced this event"
+        description="Canonical checkout or worktree identity that produced this event",
     )
     node_id: str = Field(
         ...,
         min_length=1,
-        description="Required causal emitter identity used for Lamport ordering and deterministic tie-breaking"
+        description="Required causal emitter identity used for Lamport ordering and deterministic tie-breaking",
     )
     lamport_clock: int = Field(
-        ...,
-        ge=0,
-        description="Lamport logical clock value (monotonically increasing)"
+        ..., ge=0, description="Lamport logical clock value (monotonically increasing)"
     )
     causation_id: Optional[str] = Field(
         None,
@@ -135,13 +127,9 @@ class Event(BaseModel):
         description="Event ID of the parent event (26-char ULID or UUID accepted, None for root events)",
         json_schema_extra={"pattern": _EVENT_ID_PATTERN},
     )
-    project_uuid: uuid.UUID = Field(
-        ...,
-        description="UUID of the project this event belongs to"
-    )
+    project_uuid: uuid.UUID = Field(..., description="UUID of the project this event belongs to")
     project_slug: Optional[str] = Field(
-        None,
-        description="Human-readable project identifier (optional)"
+        None, description="Human-readable project identifier (optional)"
     )
     correlation_id: str = Field(
         ...,
@@ -151,15 +139,10 @@ class Event(BaseModel):
         json_schema_extra={"pattern": _EVENT_ID_PATTERN},
     )
     schema_version: str = Field(
-        default="3.0.0",
-        pattern=r"^\d+\.\d+\.\d+$",
-        description="Envelope schema version (semver)"
+        default="3.0.0", pattern=r"^\d+\.\d+\.\d+$", description="Envelope schema version (semver)"
     )
     data_tier: int = Field(
-        default=0,
-        ge=0,
-        le=4,
-        description="Progressive data sharing tier (0=local, 4=telemetry)"
+        default=0, ge=0, le=4, description="Progressive data sharing tier (0=local, 4=telemetry)"
     )
 
     @field_validator("event_id", "causation_id", "correlation_id", mode="before")
@@ -193,28 +176,13 @@ class Event(BaseModel):
 class ErrorEntry(BaseModel):
     """Record of a failed action for agent learning."""
 
-    timestamp: datetime = Field(
-        ...,
-        description="When the error occurred (ISO 8601 format)"
-    )
-    action_attempted: str = Field(
-        ...,
-        min_length=1,
-        description="What the agent/user tried to do"
-    )
-    error_message: str = Field(
-        ...,
-        min_length=1,
-        description="Error output or exception message"
-    )
+    timestamp: datetime = Field(..., description="When the error occurred (ISO 8601 format)")
+    action_attempted: str = Field(..., min_length=1, description="What the agent/user tried to do")
+    error_message: str = Field(..., min_length=1, description="Error output or exception message")
     resolution: str = Field(
-        default="",
-        description="How the error was resolved (empty if unresolved)"
+        default="", description="How the error was resolved (empty if unresolved)"
     )
-    agent: str = Field(
-        default="unknown",
-        description="Which agent encountered the error"
-    )
+    agent: str = Field(default="unknown", description="Which agent encountered the error")
 
     def __repr__(self) -> str:
         """Human-readable representation."""
@@ -246,19 +214,23 @@ class ConflictResolution:
 # Custom Exceptions
 class SpecKittyEventsError(Exception):
     """Base exception for all library errors."""
+
     pass
 
 
 class StorageError(SpecKittyEventsError):
     """Storage adapter failure."""
+
     pass
 
 
 class ValidationError(SpecKittyEventsError):
     """Event or ErrorEntry validation failed."""
+
     pass
 
 
 class CyclicDependencyError(SpecKittyEventsError):
     """Events form cycle in causation graph."""
+
     pass

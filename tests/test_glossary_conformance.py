@@ -102,9 +102,7 @@ class TestValidGlossaryFixtures:
     def test_valid_fixture_passes_conformance(self, path: str, event_type: str) -> None:
         data = _load_fixture(path)
         result = validate_event(data, event_type)
-        assert result.valid is True, (
-            f"Conformance failure for {path}: {result.model_violations}"
-        )
+        assert result.valid is True, f"Conformance failure for {path}: {result.model_violations}"
 
     def test_nine_valid_glossary_fixtures_exist(self) -> None:
         valid_dir = _FIXTURES_DIR / "glossary" / "valid"
@@ -207,8 +205,9 @@ class TestHighSeverityBlockScenario:
             _make_event("GlossaryScopeActivated", scope_data, lamport_clock=1),
             _make_event("GlossaryStrictnessSet", strictness_data, lamport_clock=2),
             _make_event("TermCandidateObserved", term_data, lamport_clock=3),
-            _make_event("SemanticCheckEvaluated", check_data, lamport_clock=4,
-                        event_id=check_event_id),
+            _make_event(
+                "SemanticCheckEvaluated", check_data, lamport_clock=4, event_id=check_event_id
+            ),
             _make_event("GenerationBlockedBySemanticConflict", blocked_data, lamport_clock=5),
         ]
 
@@ -259,8 +258,12 @@ class TestBurstCap:
 
         events: List[Event] = [
             _make_event("GlossaryScopeActivated", scope_data, lamport_clock=1),
-            _make_event("SemanticCheckEvaluated", check_data, lamport_clock=2,
-                        event_id=shared_check_event_id),
+            _make_event(
+                "SemanticCheckEvaluated",
+                check_data,
+                lamport_clock=2,
+                event_id=shared_check_event_id,
+            ),
         ]
 
         # 5 clarification requests all referencing the same semantic check
@@ -290,9 +293,7 @@ class TestBurstCap:
         assert len(state.clarifications) == 3
 
         # 2 excess requests generated anomalies
-        burst_anomalies = [
-            a for a in state.anomalies if "Burst cap exceeded" in a.reason
-        ]
+        burst_anomalies = [a for a in state.anomalies if "Burst cap exceeded" in a.reason]
         assert len(burst_anomalies) == 2
 
     def test_burst_cap_strict_raises(self) -> None:
@@ -306,8 +307,12 @@ class TestBurstCap:
 
         events: List[Event] = [
             _make_event("GlossaryScopeActivated", scope_data, lamport_clock=1),
-            _make_event("SemanticCheckEvaluated", check_data, lamport_clock=2,
-                        event_id=shared_check_event_id),
+            _make_event(
+                "SemanticCheckEvaluated",
+                check_data,
+                lamport_clock=2,
+                event_id=shared_check_event_id,
+            ),
         ]
 
         for i in range(4):
