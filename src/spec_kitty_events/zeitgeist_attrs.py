@@ -1075,10 +1075,15 @@ def from_zeitgeist_attrs(
         # version. A well-formed value has at most this one trailing "Z"; if
         # another "Z" remains after stripping it, the input was already
         # malformed and must not be laundered into something 3.10's laxer
-        # fromisoformat() would accept (e.g. a doubled "...00ZZ").
+        # fromisoformat() would accept (e.g. a doubled "...00ZZ"). The
+        # residual check is case-insensitive: a mixed-case doubled
+        # designator (e.g. "...00zZ") is just as malformed, and Python
+        # 3.11+'s fromisoformat is itself case-insensitive on "Z", so a
+        # case-sensitive guard here would let it through on some
+        # interpreters and not others — the exact split this fix removes.
         if occurred_at.endswith("Z"):
             candidate = occurred_at[:-1]
-            if "Z" in candidate:
+            if "z" in candidate.lower():
                 raise ZeitgeistAttrsError(
                     f"attr 'occurred_at' is not ISO-8601: {occurred_at!r}"
                 )

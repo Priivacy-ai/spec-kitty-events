@@ -687,6 +687,21 @@ def test_decode_rejects_a_doubled_trailing_z_occurred_at() -> None:
         from_zeitgeist_attrs("WPStatusChanged", attrs)
 
 
+def test_decode_rejects_a_mixed_case_doubled_z_occurred_at() -> None:
+    """A doubled UTC designator must be rejected regardless of case. The
+    guard that strips a single trailing "Z" and checks for a residual one
+    has to fold case before comparing: a case-sensitive check misses a
+    lowercase "z" left behind by a mixed-case doubled designator (e.g.
+    "...00zZ"), laundering it into "...00z+00:00" — which both Python
+    3.10's and 3.12's ``fromisoformat`` accept, a strictness regression at
+    this repo's declared 3.10 floor (spec-kitty-events#55 squad finding,
+    PR #99)."""
+    attrs = to_zeitgeist_attrs(_transition(), _envelope("WPStatusChanged"))
+    attrs["occurred_at"] = "2026-08-25T09:00:00zZ"
+    with pytest.raises(ZeitgeistAttrsError, match="occurred_at"):
+        from_zeitgeist_attrs("WPStatusChanged", attrs)
+
+
 def test_decode_rejects_unknown_keys() -> None:
     with pytest.raises(ZeitgeistAttrsError):
         from_zeitgeist_attrs("WPStatusChanged", {"not_in_schema": "x"})
