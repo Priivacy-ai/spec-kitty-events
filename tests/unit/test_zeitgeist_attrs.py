@@ -1187,6 +1187,27 @@ def test_every_current_family_guarantees_its_ref_field() -> None:
         )
 
 
+@pytest.mark.parametrize("event_type", sorted(PAYLOAD_MODEL_BY_EVENT_TYPE))
+@pytest.mark.parametrize("omitted", sorted(zeitgeist_attrs.ENVELOPE_ATTR_KEYS))
+def test_every_kind_requires_both_envelope_attrs(event_type: str, omitted: str) -> None:
+    """events#158: PR #110 replaced ``from_zeitgeist_attrs``'s
+    ``attrs.get(...)`` + ``is not None`` envelope guards with direct
+    ``attrs["event_id"]``/``attrs["occurred_at"]`` indexing. That is only
+    safe while ENVELOPE_ATTR_KEYS is required for every kind (today, via the
+    union at ``_REQUIRED_KEYS_BY_EVENT_TYPE``). Pin the static invariant and
+    its decode-level consequence together: omitting either envelope key must
+    raise the documented ``ZeitgeistAttrsError`` from the missing-keys check
+    before the indexing is ever reached, never an undocumented ``KeyError``
+    a future per-kind override could otherwise expose to a consumer that
+    only catches the types this function documents."""
+    required = zeitgeist_attrs._REQUIRED_KEYS_BY_EVENT_TYPE[event_type]
+    assert zeitgeist_attrs.ENVELOPE_ATTR_KEYS <= required
+
+    attrs = {key: "v" for key in required if key != omitted}
+    with pytest.raises(ZeitgeistAttrsError, match="missing keys"):
+        from_zeitgeist_attrs(event_type, attrs)
+
+
 def test_moment_is_frozen() -> None:
     moment = from_zeitgeist_attrs(
         "WPStatusChanged",
