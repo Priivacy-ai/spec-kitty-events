@@ -83,6 +83,7 @@ from __future__ import annotations
 
 import dataclasses
 from collections.abc import Mapping
+from datetime import datetime
 from enum import Enum
 from typing import Any, Union, get_args, get_origin
 
@@ -495,7 +496,8 @@ def from_zeitgeist_attrs(
         UnknownVolatileEventTypeError: *event_type* is not in the volatile
             vocabulary.
         ZeitgeistAttrsError: a value is not ``str`` or a key is outside the
-            kind's closed key set.
+            kind's closed key set, or an ``event_id``/``occurred_at`` attr is
+            present but malformed (empty, or not ISO-8601, respectively).
         ZeitgeistAttrsForbiddenKeyError: a forbidden key is present.
         ZeitgeistAttrsOverflowError: the bound is exceeded.
     """
@@ -535,5 +537,17 @@ def from_zeitgeist_attrs(
         raise ZeitgeistAttrsOverflowError(
             f"{len(attrs)} attrs exceed the bound of {ZEITGEIST_ATTRS_MAX_KEYS}"
         )
+
+    event_id = attrs.get("event_id")
+    if event_id is not None and not event_id:
+        raise ZeitgeistAttrsError("attr 'event_id' must not be empty")
+    occurred_at = attrs.get("occurred_at")
+    if occurred_at is not None:
+        try:
+            datetime.fromisoformat(occurred_at)
+        except ValueError as exc:
+            raise ZeitgeistAttrsError(
+                f"attr 'occurred_at' is not ISO-8601: {occurred_at!r}"
+            ) from exc
 
     return VolatileMoment(kind=event_type, ref=attrs.get(REF_FIELD_BY_EVENT_TYPE[event_type]), attrs=dict(attrs))
