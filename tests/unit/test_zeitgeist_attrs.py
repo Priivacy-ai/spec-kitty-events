@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import dataclasses
 from datetime import datetime, timezone
+from typing import Optional
 from uuid import UUID
 
 import pytest
@@ -182,13 +183,108 @@ def test_forbidden_keys_union_the_zeitgeist_mirror_and_legacy_set() -> None:
     assert FORBIDDEN_ATTR_KEYS == ZEITGEIST_FORBIDDEN_KEYS_V1 | FORBIDDEN_LEGACY_KEYS
 
 
+def _reachable_nested_models(event_type: str, model: type[BaseModel]):
+    """Every nested ``BaseModel`` *model*'s top-level fields actually walk
+    into, mirroring :func:`zeitgeist_attrs._schema_keys_for_model` exactly: a
+    field the kind's ``UNBROADCAST_FIELDS`` skips, or that
+    ``PROJECTED_FIELD_BY_EVENT_TYPE`` redirects to a scalar attribute
+    (e.g. ``actor`` -> ``actor_label``), is never walked into by encode or
+    decode either, so it contributes no reachable nested model here. One
+    level: a second level of nesting is not a silent-leak risk because
+    :func:`zeitgeist_attrs._encode_fields` hard-raises on it rather than
+    emitting anything (EXPERIMENTAL-spec-kitty-events#21).
+    """
+    skip = UNBROADCAST_FIELDS.get(event_type, frozenset())
+    projected = PROJECTED_FIELD_BY_EVENT_TYPE.get(event_type, {})
+    for name, field in model.model_fields.items():
+        if name in skip or name in projected:
+            continue
+        annotation = zeitgeist_attrs._unwrap_optional(field.annotation)
+        if isinstance(annotation, type) and issubclass(annotation, BaseModel):
+            yield annotation
+
+
 def test_no_declared_field_name_is_forbidden() -> None:
-    """Structural guarantee behind "never emit forbidden keys": today's
-    vocabulary cannot collide; if a future field does, this fails first."""
+    """Structural guarantee behind "never emit forbidden keys", extended to
+    every nested-model subfield encode/decode actually walk into — not just
+    a payload's top-level fields. A top-level-only walk stays green even if
+    a future *reachable* nested field collides with a forbidden name
+    (EXPERIMENTAL-spec-kitty-events#21). Today's vocabulary cannot collide;
+    if a future field does, this fails first."""
     for event_type in PAYLOAD_MODEL_BY_EVENT_TYPE:
         for model in zeitgeist_attrs._payload_types(event_type):
             for name in model.model_fields:
                 assert name not in FORBIDDEN_ATTR_KEYS, (model.__name__, name)
+            for nested in _reachable_nested_models(event_type, model):
+                for name in nested.model_fields:
+                    assert name not in FORBIDDEN_ATTR_KEYS, (nested.__name__, name)
+
+
+def _forbidden_collisions(event_type: str, model: type[BaseModel]) -> list[str]:
+    return [
+        name
+        for nested in _reachable_nested_models(event_type, model)
+        for name in nested.model_fields
+        if name in FORBIDDEN_ATTR_KEYS
+    ]
+
+
+def test_reachable_nested_model_collision_fails_the_structural_guard(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Pins that the extension in ``test_no_declared_field_name_is_forbidden``
+    actually fires — not just a mechanism that never executes, since no
+    payload in today's vocabulary has a reachable (non-skipped,
+    non-projected) nested model. A field on a nested, *reachable* model that
+    collides with a forbidden name is caught; the identical field on a
+    *skipped* nested model (mirroring ``ClosureMessageRef.url`` under
+    ``DecisionPointResolved``'s ``closure_message``, which is unreachable
+    today only because it is skipped) is correctly left alone
+    (EXPERIMENTAL-spec-kitty-events#21)."""
+
+    class _Nested(BaseModel):
+        url: str
+
+    class _FuturePayload(BaseModel):
+        x: str
+        nested: _Nested
+
+    assert _forbidden_collisions("FutureType", _FuturePayload) == ["url"]
+
+    monkeypatch.setitem(zeitgeist_attrs.UNBROADCAST_FIELDS, "FutureTypeSkipped", frozenset({"nested"}))
+    assert _forbidden_collisions("FutureTypeSkipped", _FuturePayload) == []
+
+
+def test_schema_keys_unwrap_optional_nested_models() -> None:
+    """Regression pin (EXPERIMENTAL-spec-kitty-events#21): the decode schema
+    builder must nest into a subfield typed ``Optional[BaseModel]`` (both the
+    ``typing.Optional[X]`` and the PEP 604 ``X | None`` spelling) exactly as
+    it does for a required nested model — matching what :func:`_encode_fields`
+    actually emits, since encode checks the *value*, not the static
+    annotation, and a payload can carry ``None`` for that field. A decode
+    schema built from the bare (non-unwrapped) annotation would silently stop
+    matching the keys encode emits the moment a nested field is loosened to
+    ``Optional``.
+    """
+
+    class _Inner(BaseModel):
+        a: str
+        b: str
+
+    class _OptionalSpelling(BaseModel):
+        x: str
+        nested: Optional[_Inner] = None
+
+    class _Pep604Spelling(BaseModel):
+        x: str
+        nested: _Inner | None = None
+
+    for fake_type, model in (
+        ("_OptionalSpelling", _OptionalSpelling),
+        ("_Pep604Spelling", _Pep604Spelling),
+    ):
+        keys = zeitgeist_attrs._schema_keys_for_model(fake_type, model)
+        assert keys == {"x", "nested.a", "nested.b"}, (fake_type, keys)
 
 
 # ── encode ───────────────────────────────────────────────────────────────────
@@ -440,6 +536,22 @@ def test_emit_refuses_a_future_field_collision(monkeypatch: pytest.MonkeyPatch) 
     refuses rather than broadcasting it."""
     monkeypatch.setattr(zeitgeist_attrs, "FORBIDDEN_ATTR_KEYS", frozenset({"wp_id"}))
     with pytest.raises(ZeitgeistAttrsForbiddenKeyError):
+        to_zeitgeist_attrs(_transition(), _envelope("WPStatusChanged"))
+
+
+def test_emit_refuses_a_forbidden_name_under_a_nested_dotted_key(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A nested one-level projection (``<field>.<sub>``) leaking a forbidden
+    name under its trailing segment is refused even though the full dotted
+    string is never itself added to ``FORBIDDEN_ATTR_KEYS``
+    (EXPERIMENTAL-spec-kitty-events#21)."""
+    real_encode_fields = zeitgeist_attrs._encode_fields
+    monkeypatch.setattr(
+        zeitgeist_attrs, "_encode_fields",
+        lambda *a, **k: {**real_encode_fields(*a, **k), "actor.token": "leaked"},
+    )
+    with pytest.raises(ZeitgeistAttrsForbiddenKeyError, match=r"actor\.token"):
         to_zeitgeist_attrs(_transition(), _envelope("WPStatusChanged"))
 
 
@@ -854,6 +966,19 @@ def test_decode_forbidden_guard_wins_when_a_key_is_schema_legal(
     )
     with pytest.raises(ZeitgeistAttrsForbiddenKeyError):
         from_zeitgeist_attrs("MissionClosed", {"team": "t"})
+
+
+def test_decode_forbidden_guard_catches_a_nested_dotted_key(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Symmetric with the encode-side check: an inbound dotted key whose
+    trailing segment is forbidden is refused even if the closed schema for
+    the kind admits the full dotted string (EXPERIMENTAL-spec-kitty-events#21)."""
+    monkeypatch.setitem(
+        zeitgeist_attrs._ALLOWED_KEYS_BY_EVENT_TYPE, "MissionClosed", frozenset({"actor.token"})
+    )
+    with pytest.raises(ZeitgeistAttrsForbiddenKeyError, match=r"actor\.token"):
+        from_zeitgeist_attrs("MissionClosed", {"actor.token": "t"})
 
 
 def test_decode_key_count_overflow_is_rejected(monkeypatch: pytest.MonkeyPatch) -> None:

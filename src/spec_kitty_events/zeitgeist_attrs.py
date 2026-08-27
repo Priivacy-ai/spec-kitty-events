@@ -117,8 +117,12 @@ with a mirror of zeitgeist's direction-agnostic ingress set
 suffix — zeitgeist owns transport policy, this package owns vocabulary, and
 neither imports the other; same idiom as the harness-observation bounds
 that mirror zeitgeist ``FIELD_MAX``). :func:`to_zeitgeist_attrs` refuses to
-emit any of them. Keys are checked as flat strings; dotted keys would be
-distinct strings from their segments, though today's vocabulary emits none.
+emit any of them, checking both the exact key and, for a one-level nested
+key (``<field>.<sub>``), its trailing dot-segment — so a future nested
+field named e.g. ``token`` cannot leak past the guard under a dotted key
+just because the dotted string itself was never added to the forbidden set
+(EXPERIMENTAL-spec-kitty-events#21). :func:`from_zeitgeist_attrs` applies
+the identical check on the way in, for the same reason.
 
 Mirrored from zeitgeist commit ``85be771f`` (``zeitgeist/capabilities.py``,
 lines 135-140: ``FORBIDDEN_KEYS_VERSION = 1`` and the ``FORBIDDEN_KEYS_V1``
@@ -681,6 +685,22 @@ def _reject_control_characters(subject: str, value: str) -> None:
         )
 
 
+def _forbidden_key_hits(keys: Sequence[str]) -> list[str]:
+    """Keys forbidden either as an exact match or by their trailing dot-segment.
+
+    A one-level nested projection (``<field>.<sub>``, see :func:`_encode_fields`)
+    can carry a forbidden name under its trailing segment (e.g. ``actor.token``)
+    without the full dotted string itself ever being added to
+    :data:`FORBIDDEN_ATTR_KEYS` — the exact-match check alone would miss it
+    (EXPERIMENTAL-spec-kitty-events#21).
+    """
+    return sorted(
+        key
+        for key in keys
+        if key in FORBIDDEN_ATTR_KEYS or key.rsplit(".", 1)[-1] in FORBIDDEN_ATTR_KEYS
+    )
+
+
 def _utf8_size(subject: str, value: str) -> int:
     """Return UTF-8 byte size, preserving the typed attrs error contract."""
     try:
@@ -758,7 +778,7 @@ def to_zeitgeist_attrs(payload: BaseModel, envelope: Event) -> dict[str, str]:
         if summary is not None:
             attrs["summary"] = summary
 
-    bad_keys = sorted(attrs.keys() & FORBIDDEN_ATTR_KEYS)
+    bad_keys = _forbidden_key_hits(list(attrs))
     if bad_keys:
         raise ZeitgeistAttrsForbiddenKeyError(
             f"refusing to emit forbidden attr keys: {bad_keys}"
@@ -1032,7 +1052,7 @@ def from_zeitgeist_attrs(
             f"attrs carry keys outside the {event_type} schema: {unknown}"
         )
 
-    bad_keys = sorted(attrs.keys() & FORBIDDEN_ATTR_KEYS)
+    bad_keys = _forbidden_key_hits(list(attrs))
     if bad_keys:
         raise ZeitgeistAttrsForbiddenKeyError(f"forbidden attr keys: {bad_keys}")
 
