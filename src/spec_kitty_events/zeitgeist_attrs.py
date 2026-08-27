@@ -294,11 +294,16 @@ class VolatileMoment:
     (:data:`REF_FIELD_BY_EVENT_TYPE`) as one of the payload's required,
     non-``Optional`` fields (pinned by
     ``test_every_current_family_guarantees_its_ref_field``), so ``ref`` is
-    currently always a non-empty string on both :func:`from_zeitgeist_attrs`
-    and :func:`zeitgeist_ref_for`. The ``None`` arm of the type is reserved
-    for a hypothetical future family whose ref field is itself ``Optional``
-    and can be absent from the encode — no family in
-    :data:`PAYLOAD_MODEL_BY_EVENT_TYPE` today produces ``ref=None``.
+    currently always present and a ``str`` on both
+    :func:`from_zeitgeist_attrs` and :func:`zeitgeist_ref_for` — and always
+    *non-empty* on :func:`zeitgeist_ref_for`, whose ref fields are all
+    ``min_length=1``. :func:`from_zeitgeist_attrs` validates presence and
+    shape, not value correctness (see its own docstring), so it decodes an
+    empty ref attr straight through as ``""``, not ``None``. The ``None``
+    arm of the type is reserved for a hypothetical future family whose ref
+    field is itself ``Optional`` and can be absent from the encode — no
+    family in :data:`PAYLOAD_MODEL_BY_EVENT_TYPE` today produces
+    ``ref=None``.
     """
 
     kind: str
@@ -877,9 +882,13 @@ def zeitgeist_ref_for(event_type: str, payload: BaseModel) -> str | None:
     """Return the frame ``ref`` for a volatile payload, or ``None``.
 
     No family in :data:`PAYLOAD_MODEL_BY_EVENT_TYPE` today declares its ref
-    field ``Optional``, so the ``None`` return is unreachable for every
-    current type (see :class:`VolatileMoment`'s docstring) — it is kept
-    for a hypothetical future family whose ref field can be absent.
+    field ``Optional``, so the ``None`` return is unreachable for any
+    *validated* payload (see :class:`VolatileMoment`'s docstring). It is
+    reachable via ``payload.model_construct()``, which skips validation and
+    can produce an instance missing the ref field entirely — the
+    ``getattr(..., None)`` default below is what makes that return real,
+    not dead code. The ``None`` arm is kept for a hypothetical future
+    family whose ref field can be absent from a validated payload too.
 
     Raises:
         UnknownVolatileEventTypeError: *event_type* is unknown or *payload*
@@ -897,7 +906,7 @@ def zeitgeist_ref_for(event_type: str, payload: BaseModel) -> str | None:
         )
     value = getattr(payload, REF_FIELD_BY_EVENT_TYPE[event_type], None)
     if value is None:
-        return None  # unreachable today; see docstring
+        return None  # unreachable for a validated payload; see docstring
     ref = str(value)
     if _utf8_size(f"{event_type} ref", ref) > ZEITGEIST_ATTRS_MAX_BYTES:
         raise ZeitgeistAttrsOverflowError(
