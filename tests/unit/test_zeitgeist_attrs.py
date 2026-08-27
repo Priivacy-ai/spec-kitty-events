@@ -32,6 +32,7 @@ from spec_kitty_events.zeitgeist_attrs import (
     VOLATILE_EVENT_TYPES,
     ZEITGEIST_ATTRS_MAX_BYTES,
     ZEITGEIST_ATTRS_MAX_KEYS,
+    ZEITGEIST_ATTR_KEY_MAX_CHARS,
     ZEITGEIST_FORBIDDEN_KEYS_V1,
     UnencodableFieldValueError,
     UnknownVolatileEventTypeError,
@@ -431,6 +432,45 @@ def test_ref_derival_and_mismatch_fail_closed() -> None:
 def test_bounds_constants_match_the_zeitgeist_frame_contract() -> None:
     assert ZEITGEIST_ATTRS_MAX_KEYS == 16
     assert ZEITGEIST_ATTRS_MAX_BYTES == 240
+    assert ZEITGEIST_ATTR_KEY_MAX_CHARS == 64
+
+
+def test_encode_rejects_a_key_over_the_64_char_bound(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Regression pin for spec-kitty-events#16: a >64-char key must not
+    reach the wire, even though it is well under the 240-byte value bound
+    the old combined scan checked it against."""
+    monkeypatch.setattr(
+        zeitgeist_attrs, "_encode_fields", lambda *a, **k: {"a" * 65: "v"}
+    )
+    with pytest.raises(ZeitgeistAttrsOverflowError):
+        to_zeitgeist_attrs(_transition(), _envelope("WPStatusChanged"))
+
+
+def test_encode_admits_a_multibyte_value_within_the_stricter_byte_bound() -> None:
+    """Encode's byte bound is intentionally stricter than the relay's
+    240-character bound (spec-kitty-events#16); a multi-byte value that
+    fits under both must still encode."""
+    payload = MissionClosedPayload(
+        mission_slug="é" * 100, mission_number=1, mission_type="software-dev"
+    )
+    attrs = to_zeitgeist_attrs(payload, _envelope("MissionClosed"))
+    assert attrs["mission_slug"] == "é" * 100
+
+
+def test_encode_rejects_a_multibyte_value_over_the_byte_bound_though_under_240_chars() -> None:
+    """The stricter 240-UTF-8-byte encode bound can reject a value that is
+    within the relay's true 240-*character* bound — over-rejecting here is
+    the accepted safe side of spec-kitty-events#16."""
+    value = "é" * 121  # 121 characters, 242 UTF-8 bytes
+    assert len(value) <= 240
+    assert len(value.encode("utf-8")) > ZEITGEIST_ATTRS_MAX_BYTES
+    payload = MissionClosedPayload(
+        mission_slug=value, mission_number=1, mission_type="software-dev"
+    )
+    with pytest.raises(ZeitgeistAttrsOverflowError):
+        to_zeitgeist_attrs(payload, _envelope("MissionClosed"))
 
 
 # ── decode ───────────────────────────────────────────────────────────────────
@@ -498,6 +538,49 @@ def test_decode_rejects_lone_surrogates_with_typed_error() -> None:
         from_zeitgeist_attrs("WPStatusChanged", attrs)
 
 
+def test_decode_admits_a_multibyte_value_within_the_byte_bound() -> None:
+    """A multi-byte value that fits the relay's 240-UTF-8-byte bound (and
+    therefore also its 240-character bound, since bytes >= chars) decodes."""
+    attrs = to_zeitgeist_attrs(_transition(), _envelope("WPStatusChanged"))
+    value = "é" * 100  # 100 characters, 200 UTF-8 bytes — relay-valid
+    assert len(value.encode("utf-8")) <= ZEITGEIST_ATTRS_MAX_BYTES
+    attrs["actor"] = value
+    moment = from_zeitgeist_attrs("WPStatusChanged", attrs)
+    assert moment.attrs["actor"] == value
+
+
+def test_decode_rejects_a_multibyte_value_over_the_byte_bound_though_under_240_chars() -> None:
+    """spec-kitty-events#16: the relay's `EventArgs` schema bounds values by
+    UTF-8 bytes (`maxUtf8Bytes: 240`) *and* by characters (`maxLength: 240`)
+    independently (zeitgeist commit 30d3ab4415, closing zeitgeist#20), so a
+    value at 121 characters / 242 UTF-8 bytes is relay-*invalid* — decode
+    must reject it, matching encode's already-correct byte bound."""
+    attrs = to_zeitgeist_attrs(_transition(), _envelope("WPStatusChanged"))
+    value = "é" * 121  # 121 characters, 242 UTF-8 bytes — relay-invalid
+    assert len(value) <= 240
+    assert len(value.encode("utf-8")) > ZEITGEIST_ATTRS_MAX_BYTES
+    attrs["actor"] = value
+    with pytest.raises(ZeitgeistAttrsOverflowError):
+        from_zeitgeist_attrs("WPStatusChanged", attrs)
+
+
+def test_decode_rejects_a_key_over_the_64_char_bound(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    long_key = "a" * 65
+    monkeypatch.setattr(
+        zeitgeist_attrs, "_ALLOWED_KEYS_BY_EVENT_TYPE",
+        dict(zeitgeist_attrs._ALLOWED_KEYS_BY_EVENT_TYPE),
+    )
+    monkeypatch.setitem(
+        zeitgeist_attrs._ALLOWED_KEYS_BY_EVENT_TYPE,
+        "WPStatusChanged",
+        frozenset({long_key}),
+    )
+    with pytest.raises(ZeitgeistAttrsOverflowError):
+        from_zeitgeist_attrs("WPStatusChanged", {long_key: "v"})
+
+
 def test_decode_rejects_unknown_event_type() -> None:
     with pytest.raises(UnknownVolatileEventTypeError):
         from_zeitgeist_attrs("MissionStarted", {"mission_id": "m1"})
@@ -528,6 +611,53 @@ def test_decode_key_count_overflow_is_rejected(monkeypatch: pytest.MonkeyPatch) 
     attrs = {f"k{i}": "v" for i in range(zeitgeist_attrs.ZEITGEIST_ATTRS_MAX_KEYS + 1)}
     with pytest.raises(ZeitgeistAttrsOverflowError):
         from_zeitgeist_attrs("WPStatusChanged", attrs)
+
+
+def test_decode_rejects_structurally_incomplete_attrs() -> None:
+    """Regression pin (events#19): every kind here has a required ref field
+    on emit, so an empty mapping is not a moment `to_zeitgeist_attrs` could
+    ever have produced and must not decode as one."""
+    with pytest.raises(ZeitgeistAttrsError):
+        from_zeitgeist_attrs("MissionClosed", {})
+
+
+def test_decode_rejects_a_schema_legal_subset_missing_required_keys() -> None:
+    """events#19: `{"to_lane": "done"}` is a legal key/value pair for
+    WPStatusChanged but omits mission_slug/wp_id/actor/execution_mode/force/
+    event_id/occurred_at, none of which to_zeitgeist_attrs ever omits."""
+    with pytest.raises(ZeitgeistAttrsError, match="missing keys"):
+        from_zeitgeist_attrs("WPStatusChanged", {"to_lane": "done"})
+
+
+def test_decode_requires_the_ref_key_when_the_family_guarantees_one() -> None:
+    attrs = to_zeitgeist_attrs(_transition(), _envelope("WPStatusChanged"))
+    del attrs["mission_slug"]
+    with pytest.raises(ZeitgeistAttrsError, match="missing keys"):
+        from_zeitgeist_attrs("WPStatusChanged", attrs)
+
+
+def test_decode_permits_an_absent_ref_when_the_family_leaves_it_optional() -> None:
+    """PhaseEntered's ``mission_slug`` is a genuinely optional back-compat
+    field (unlike every other family's required ref), so decode must still
+    accept its absence and report ``ref=None`` rather than requiring it."""
+    from spec_kitty_events.lifecycle import PhaseEnteredPayload
+
+    payload = PhaseEnteredPayload(
+        mission_id="mission-demo", phase_name="build", actor="robert"
+    )
+    attrs = to_zeitgeist_attrs(payload, _envelope("PhaseEntered"))
+    assert "mission_slug" not in attrs
+    moment = from_zeitgeist_attrs("PhaseEntered", attrs)
+    assert moment.ref is None
+
+
+def test_required_keys_exclude_optional_typed_fields_pydantic_still_requires() -> None:
+    """MissionCreatedPayload.mission_number is `Optional[int] = Field(...)`:
+    pydantic requires the kwarg be passed, but the payload may still pass
+    None, in which case to_zeitgeist_attrs omits the key. Decode must not
+    require a key that a legitimate encode can omit."""
+    assert "mission_number" not in zeitgeist_attrs._REQUIRED_KEYS_BY_EVENT_TYPE["MissionCreated"]
+    assert "mission_slug" in zeitgeist_attrs._REQUIRED_KEYS_BY_EVENT_TYPE["MissionCreated"]
 
 
 def test_moment_is_frozen() -> None:

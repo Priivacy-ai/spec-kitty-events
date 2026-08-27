@@ -3,10 +3,31 @@
 The Ephemeral Team Status design broadcasts mission/WP moments through each
 team's Zeitgeist relay as *opaque bounded attributes*: one ``event`` frame is
 ``{kind, ref?, attrs}`` where ``attrs`` must be a flat ``str:str`` mapping
-with at most 16 keys and at most 240 bytes per key and per value, and no
-forbidden key anywhere (zeitgeist issue: ``EventArgs {kind: ident,
-ref?: string≤240, attrs: {str:str}, ≤16 keys, ≤240 B each}``; design page
+with at most 16 keys, at most 64 characters per key, and at most 240
+characters per value, and no forbidden key anywhere (zeitgeist issue:
+``EventArgs {kind: ident, ref?: string≤240, attrs: {str:str}, ≤16 keys,
+keys≤64 chars, values≤240 chars}``; design page
 ``ephemeral-team-status.html``, "The vocabulary" paragraph).
+
+The relay's ``EventArgs`` schema bounds ``attrs`` keys at ≤64 *characters*
+(``propertyNames.maxLength``, ASCII-only pattern so chars==bytes there) and
+bounds values (and the frame's ``ref``) at ≤240 characters *and*
+independently at ≤240 UTF-8 bytes (``maxLength: 240`` **and**
+``maxUtf8Bytes: 240`` both present on ``attrs``'s ``additionalProperties``
+and on ``ref``, in ``managed_control.schema.json`` and
+``managed_live.schema.json`` since zeitgeist commit ``30d3ab4415``,
+"Enforce event field byte limits", closing zeitgeist#20). The relay checks
+both clauses independently (``capabilities.py``'s validator), so the
+UTF-8-byte bound is the one that actually binds — a character count can
+satisfy ≤240 chars while still exceeding 240 bytes, and the relay rejects
+that. :func:`to_zeitgeist_attrs` enforces the 240-UTF-8-byte bound on
+values and the 64-character bound on keys, both exactly matching the
+relay's, since encode is where an over-length attr must be caught before
+it ever reaches the wire. :func:`from_zeitgeist_attrs` checks the same
+240-UTF-8-byte bound on values (not a character count — a value within
+240 characters can still be relay-invalid at >240 bytes) and the
+64-character bound on keys, so it does not accept an inbound frame the
+relay itself would never forward (spec-kitty-events#16).
 
 This module is the single owner of the mapping between this package's
 volatile payload vocabulary and that wire shape:
@@ -85,6 +106,7 @@ import dataclasses
 from collections.abc import Mapping
 from datetime import datetime
 from enum import Enum
+from types import UnionType
 from typing import Any, Union, get_args, get_origin
 
 from pydantic import BaseModel
@@ -124,6 +146,7 @@ __all__ = [
     "VOLATILE_EVENT_TYPES",
     "ZEITGEIST_ATTRS_MAX_BYTES",
     "ZEITGEIST_ATTRS_MAX_KEYS",
+    "ZEITGEIST_ATTR_KEY_MAX_CHARS",
     "ZEITGEIST_FORBIDDEN_KEYS_V1",
     "UnencodableFieldValueError",
     "UnknownVolatileEventTypeError",
@@ -141,8 +164,18 @@ ZEITGEIST_ATTRS_MAX_KEYS: int = 16
 """Maximum number of entries in one attrs mapping (zeitgeist EventArgs)."""
 
 ZEITGEIST_ATTRS_MAX_BYTES: int = 240
-"""Maximum UTF-8 size of one attr key or value (zeitgeist EventArgs; the
-frame's ``ref`` carries the same bound independently)."""
+"""Maximum size of one attr value: 240 UTF-8 bytes, checked on both encode
+and decode. The relay's schema also carries an independent ≤240-character
+bound (``maxLength``), but UTF-8 byte count is always ≥ character count, so
+enforcing the byte bound here also guarantees the character bound — a
+value can never pass this check while still exceeding the relay's
+character bound (spec-kitty-events#16). The frame's ``ref`` carries the
+same pair of bounds independently."""
+
+ZEITGEIST_ATTR_KEY_MAX_CHARS: int = 64
+"""Maximum character length of one attr key, enforced on both encode and
+decode (zeitgeist EventArgs ``propertyNames.maxLength``; JSON Schema
+``maxLength`` counts characters, not UTF-8 bytes — spec-kitty-events#16)."""
 
 #: Mirror of zeitgeist ``capabilities.FORBIDDEN_KEYS_V1`` (by value; see the
 #: module docstring for why this is a mirror, not an import).
@@ -163,9 +196,15 @@ class VolatileMoment:
     """The typed view of one broadcast moment: a full ``event`` frame body.
 
     ``kind`` is the frame's event type, ``ref`` its aggregate identity
-    (≤240 bytes; ``None`` when the family has no single identity field),
-    ``attrs`` the validated bounded projection. Consumers render from this;
-    nobody re-parses raw attr strings outside this module's vocabulary.
+    (≤240 bytes), ``attrs`` the validated bounded projection. Consumers
+    render from this; nobody re-parses raw attr strings outside this
+    module's vocabulary.
+
+    ``ref`` is ``None`` only when the family's ref field is itself
+    ``Optional`` and was absent from the encode (today, only
+    ``PhaseEntered``'s back-compat ``mission_slug``) — :func:`from_zeitgeist_attrs`
+    requires the ref key whenever the family's payload guarantees it, so a
+    family with a required ref field never decodes to ``ref=None``.
     """
 
     kind: str
@@ -344,8 +383,9 @@ def to_zeitgeist_attrs(payload: BaseModel, envelope: Event) -> dict[str, str]:
         ZeitgeistAttrsError: *envelope* declares a different event type.
         UnencodableFieldValueError: a carried field has no string encoding.
         ZeitgeistAttrsForbiddenKeyError: an emitted key is forbidden.
-        ZeitgeistAttrsOverflowError: the projection exceeds the key-count or
-            byte bounds. No truncation is ever applied.
+        ZeitgeistAttrsOverflowError: the projection exceeds the key-count,
+            key-length, or value-length bounds. No truncation is ever
+            applied.
     """
     event_type = next(
         (k for k, v in PAYLOAD_MODEL_BY_EVENT_TYPE.items() if type(payload) is v),
@@ -381,16 +421,23 @@ def to_zeitgeist_attrs(payload: BaseModel, envelope: Event) -> dict[str, str]:
         raise ZeitgeistAttrsForbiddenKeyError(
             f"refusing to emit forbidden attr keys: {bad_keys}"
         )
-    oversized = sorted(
+    oversized_keys = sorted(
+        key for key in attrs if len(key) > ZEITGEIST_ATTR_KEY_MAX_CHARS
+    )
+    if oversized_keys:
+        raise ZeitgeistAttrsOverflowError(
+            f"attr keys exceed the {ZEITGEIST_ATTR_KEY_MAX_CHARS}-char bound: "
+            f"{oversized_keys}"
+        )
+    oversized_values = sorted(
         key
         for key, value in attrs.items()
-        if _utf8_size(f"attr key {key!r}", key) > ZEITGEIST_ATTRS_MAX_BYTES
-        or _utf8_size(f"attr {key!r} value", value) > ZEITGEIST_ATTRS_MAX_BYTES
+        if _utf8_size(f"attr {key!r} value", value) > ZEITGEIST_ATTRS_MAX_BYTES
     )
-    if oversized:
+    if oversized_values:
         raise ZeitgeistAttrsOverflowError(
-            f"attr entries exceed the {ZEITGEIST_ATTRS_MAX_BYTES}-byte bound: "
-            f"{oversized}"
+            f"attr values exceed the {ZEITGEIST_ATTRS_MAX_BYTES}-byte bound: "
+            f"{oversized_values}"
         )
     if len(attrs) > ZEITGEIST_ATTRS_MAX_KEYS:
         raise ZeitgeistAttrsOverflowError(
@@ -438,8 +485,16 @@ def zeitgeist_ref_for(event_type: str, payload: BaseModel) -> str | None:
 
 
 def _unwrap_optional(annotation: Any) -> Any:
-    """See through ``Optional[X]`` to the payload annotation beneath it."""
-    if get_origin(annotation) is Union:
+    """See through ``Optional[X]`` to the payload annotation beneath it.
+
+    Handles both spellings pydantic resolves ``model_fields`` annotations
+    to: ``typing.Optional``/``typing.Union`` (``get_origin`` is
+    ``typing.Union``) and the PEP 604 ``X | None`` form (``get_origin`` is
+    ``types.UnionType``) — the two are distinct origins at runtime, and
+    several payload models in this package use the ``X | None`` spelling.
+    """
+    origin = get_origin(annotation)
+    if origin is Union or origin is UnionType:
         args = tuple(a for a in get_args(annotation) if a is not type(None))
         if len(args) == 1:
             return args[0]
@@ -477,6 +532,47 @@ _ALLOWED_KEYS_BY_EVENT_TYPE: Mapping[str, frozenset[str]] = {
 }
 
 
+def _required_schema_keys(event_type: str, model: type[BaseModel]) -> frozenset[str]:
+    """The subset of :func:`_schema_keys` decode can insist on.
+
+    A key is required only when :func:`to_zeitgeist_attrs` can never omit
+    it: a projected actor-label key (:data:`PROJECTED_FIELD_BY_EVENT_TYPE`
+    — every current entry projects a *required* nested actor identity via a
+    property that always returns a non-empty label) or a payload field
+    whose annotation does not admit ``None``. A field pydantic marks
+    required but whose type is ``Optional`` (e.g.
+    ``MissionCreatedPayload.mission_number``) can still be passed as
+    explicit ``None`` and vanish from the wire on encode, so it is never
+    required here — requiring it would reject attrs :func:`to_zeitgeist_attrs`
+    genuinely produces. A nested, non-optional, non-projected value object
+    would need its own required sub-keys computed recursively; no kind in
+    today's vocabulary has one, so that case is left unhandled rather than
+    guessed at.
+    """
+    skip = UNBROADCAST_FIELDS.get(event_type, frozenset())
+    projected = PROJECTED_FIELD_BY_EVENT_TYPE.get(event_type, {})
+    keys: set[str] = set()
+    for name, field in model.model_fields.items():
+        if name in skip:
+            continue
+        if name in projected:
+            keys.add(name)
+            continue
+        annotation = field.annotation
+        unwrapped = _unwrap_optional(annotation)
+        if isinstance(unwrapped, type) and issubclass(unwrapped, BaseModel):
+            continue
+        if unwrapped is annotation:
+            keys.add(name)
+    return frozenset(keys)
+
+
+_REQUIRED_KEYS_BY_EVENT_TYPE: Mapping[str, frozenset[str]] = {
+    event_type: _required_schema_keys(event_type, model) | ENVELOPE_ATTR_KEYS
+    for event_type, model in PAYLOAD_MODEL_BY_EVENT_TYPE.items()
+}
+
+
 def from_zeitgeist_attrs(
     event_type: str, attrs: Mapping[str, str]
 ) -> VolatileMoment:
@@ -485,18 +581,28 @@ def from_zeitgeist_attrs(
     The attrs are opaque on the wire; this function is the only place that
     gives them back their meaning. It enforces the shape :func:`to_zeitgeist_attrs`
     guarantees on emit — flat ``str:str``, within the bound, no forbidden
-    keys, no keys outside the kind's schema — and wraps the result, with the
-    frame's identity, in a :class:`VolatileMoment` for rendering. It checks
-    the shape of moments, not their completeness: an inbound mapping missing
-    optional payload keys decodes with those keys absent, and rebuilding the
-    journal payload remains impossible by design ("Projection, not
-    reconstruction").
+    keys, no keys outside the kind's schema, and every key the kind's
+    payload can never omit on a successful encode (its non-``Optional``
+    fields, the projected actor-label key, and the envelope's ``event_id``/
+    ``occurred_at``) actually present — and wraps the result, with the
+    frame's identity, in a :class:`VolatileMoment` for rendering.
+
+    This validates presence and shape, not value correctness: beyond being
+    ``str``-typed and within the byte bound, a present value's format is
+    opaque — an int-typed field's string need not parse as an int, an
+    enum-typed field's string need not be one of its members — because
+    values are not reparsed here, only rendered later by a consumer that
+    knows the kind. An inbound mapping missing an *optional* payload key
+    (one whose annotation admits ``None``) decodes with that key absent,
+    since rebuilding the journal payload remains impossible by design
+    ("Projection, not reconstruction").
 
     Raises:
         UnknownVolatileEventTypeError: *event_type* is not in the volatile
             vocabulary.
-        ZeitgeistAttrsError: a value is not ``str`` or a key is outside the
-            kind's closed key set, or an ``event_id``/``occurred_at`` attr is
+        ZeitgeistAttrsError: a value is not ``str``, a key is outside the
+            kind's closed key set, a key the kind's payload always carries
+            on encode is missing, or an ``event_id``/``occurred_at`` attr is
             present but malformed (empty, or not ISO-8601, respectively).
         ZeitgeistAttrsForbiddenKeyError: a forbidden key is present.
         ZeitgeistAttrsOverflowError: the bound is exceeded.
@@ -522,20 +628,41 @@ def from_zeitgeist_attrs(
     if bad_keys:
         raise ZeitgeistAttrsForbiddenKeyError(f"forbidden attr keys: {bad_keys}")
 
-    oversized = sorted(
+    oversized_keys = sorted(
+        key for key in attrs if len(key) > ZEITGEIST_ATTR_KEY_MAX_CHARS
+    )
+    if oversized_keys:
+        raise ZeitgeistAttrsOverflowError(
+            f"attr keys exceed the {ZEITGEIST_ATTR_KEY_MAX_CHARS}-char bound: "
+            f"{oversized_keys}"
+        )
+    # UTF-8 byte counts, matching the relay's `maxUtf8Bytes` clause — the
+    # actually-binding one, since byte count >= char count means satisfying
+    # it also satisfies the relay's independent `maxLength` (character)
+    # clause (spec-kitty-events#16). A char-count check here would
+    # under-reject a value the relay itself rejects (e.g. "é" * 121 is 121
+    # characters but 242 UTF-8 bytes, over the relay's byte bound). This
+    # also catches a lone surrogate with a typed error, same as before.
+    oversized_values = sorted(
         key
         for key, value in attrs.items()
-        if _utf8_size(f"attr key {key!r}", key) > ZEITGEIST_ATTRS_MAX_BYTES
-        or _utf8_size(f"attr {key!r} value", value) > ZEITGEIST_ATTRS_MAX_BYTES
+        if _utf8_size(f"attr {key!r} value", value) > ZEITGEIST_ATTRS_MAX_BYTES
     )
-    if oversized:
+    if oversized_values:
         raise ZeitgeistAttrsOverflowError(
-            f"attr entries exceed the {ZEITGEIST_ATTRS_MAX_BYTES}-byte bound: "
-            f"{oversized}"
+            f"attr values exceed the {ZEITGEIST_ATTRS_MAX_BYTES}-byte bound: "
+            f"{oversized_values}"
         )
     if len(attrs) > ZEITGEIST_ATTRS_MAX_KEYS:
         raise ZeitgeistAttrsOverflowError(
             f"{len(attrs)} attrs exceed the bound of {ZEITGEIST_ATTRS_MAX_KEYS}"
+        )
+
+    missing = sorted(_REQUIRED_KEYS_BY_EVENT_TYPE[event_type] - attrs.keys())
+    if missing:
+        raise ZeitgeistAttrsError(
+            f"attrs are missing keys the {event_type} schema always carries "
+            f"on encode: {missing}"
         )
 
     event_id = attrs.get("event_id")
