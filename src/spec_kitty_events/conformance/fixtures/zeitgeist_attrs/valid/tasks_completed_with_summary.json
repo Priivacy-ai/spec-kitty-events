@@ -1,0 +1,29 @@
+{
+  "event_type": "TasksCompleted",
+  "envelope": {
+    "event_id": "e2e00000-0000-4000-8000-000000000112",
+    "timestamp": "2026-08-25T09:00:00+00:00"
+  },
+  "payload": {
+    "mission_slug": "demo-mission",
+    "mission_number": 12,
+    "actor": "actor-01",
+    "at": "2026-08-25T09:05:00+00:00",
+    "artifact_path": "specs/demo-mission/tasks.md",
+    "wp_count": 3,
+    "summary": "WP01-03 generated, no blockers."
+  },
+  "expected_attrs": {
+    "event_id": "e2e00000-0000-4000-8000-000000000112",
+    "occurred_at": "2026-08-25T09:00:00+00:00",
+    "mission_slug": "demo-mission",
+    "mission_number": "12",
+    "actor": "actor-01",
+    "at": "2026-08-25T09:05:00+00:00",
+    "artifact_path": "specs/demo-mission/tasks.md",
+    "wp_count": "3",
+    "summary": "WP01-03 generated, no blockers."
+  },
+  "expected_ref": "demo-mission",
+  "notes": "Artifact-lifecycle Completed for the tasks phase with wp_count and a producer-supplied summary."
+}

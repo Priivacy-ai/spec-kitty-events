@@ -61,7 +61,28 @@ declared in :data:`UNBROADCAST_FIELDS` and stay local:
 Everything else the family declares rides in attrs; any carried value over
 the bound raises rather than truncates: an oversize payload simply does not
 broadcast (the CLI fan-out seam is fire-and-forget; a dropped moment is
-lost *by design*, exactly like a downed relay or an expired budget).
+lost *by design*, exactly like a downed relay or an expired budget). This
+fail-closed rule is universal, with exactly one deliberate exception — see
+"Bounded moment summaries" below.
+
+Bounded moment summaries
+-------------------------
+:data:`SUMMARY_SOURCE_EVENT_TYPES` names the kinds whose moment needs a
+short, human-readable gist alongside its identifiers: decision points
+(question/answer plus a bounded slice of the rationale), mission creation
+(friendly name plus purpose), and the three artifact-lifecycle ``*Completed``
+kinds (their own producer-supplied ``summary`` field). For these kinds only,
+:func:`to_zeitgeist_attrs` derives a single extra ``summary`` attr by joining
+a fixed, per-kind, deterministic sequence of source fields with ``"; "``,
+collapsing whitespace to one line. Unlike every other attr, ``summary`` is
+allowed to carry short prose at all (projecting no human-readable gist would
+defeat the point of these kinds' moment), and an oversize ``summary`` is
+truncated — never raised — to the 240-UTF-8-byte bound with a trailing
+``"…"`` marker, always splitting on a whole UTF-8 codepoint. When every
+source field is empty, ``summary`` is omitted entirely rather than emitted
+as an empty string. This is the one place this module's contract differs
+from a raw payload field: everywhere else, prose stays local (see above) and
+a value is never touched between "fits" and "raises".
 
 Envelope identity rides too
 ---------------------------
@@ -103,7 +124,7 @@ distinct strings from their segments, though today's vocabulary emits none.
 from __future__ import annotations
 
 import dataclasses
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from datetime import datetime
 from enum import Enum
 from types import UnionType
@@ -111,6 +132,14 @@ from typing import Any, Union, get_args, get_origin
 
 from pydantic import BaseModel
 
+from spec_kitty_events.decisionpoint import (
+    DECISION_POINT_OPENED,
+    DECISION_POINT_RESOLVED,
+    DecisionPointOpenedAdrPayload,
+    DecisionPointOpenedInterviewPayload,
+    DecisionPointResolvedAdrPayload,
+    DecisionPointResolvedInterviewPayload,
+)
 from spec_kitty_events.forbidden_keys import FORBIDDEN_LEGACY_KEYS
 from spec_kitty_events.lifecycle import (
     MISSION_CLOSED,
@@ -135,13 +164,29 @@ from spec_kitty_events.mission_next import (
     NextStepIssuedPayload,
 )
 from spec_kitty_events.models import Event
+from spec_kitty_events.project_lifecycle import (
+    PLAN_COMPLETED,
+    PLAN_STARTED,
+    SPECIFY_COMPLETED,
+    SPECIFY_STARTED,
+    TASKS_COMPLETED,
+    TASKS_STARTED,
+    PlanCompletedPayload,
+    PlanStartedPayload,
+    SpecifyCompletedPayload,
+    SpecifyStartedPayload,
+    TasksCompletedPayload,
+    TasksStartedPayload,
+)
 from spec_kitty_events.status import WP_STATUS_CHANGED, StatusTransitionPayload
 
 __all__ = [
+    "DETAIL_REF_SYNTAX",
     "FORBIDDEN_ATTR_KEYS",
     "PAYLOAD_MODEL_BY_EVENT_TYPE",
     "PROJECTED_FIELD_BY_EVENT_TYPE",
     "REF_FIELD_BY_EVENT_TYPE",
+    "SUMMARY_SOURCE_EVENT_TYPES",
     "UNBROADCAST_FIELDS",
     "VOLATILE_EVENT_TYPES",
     "ZEITGEIST_ATTRS_MAX_BYTES",
@@ -239,6 +284,14 @@ class ZeitgeistAttrsControlCharacterError(ZeitgeistAttrsError):
 
 #: The event families the Ephemeral Team Status design moves to ``volatile``
 #: (design page "The vocabulary"; epic E2). Mirrored by the support matrix.
+#:
+#: ``DecisionPointOpened``/``DecisionPointResolved`` (decision-point moments;
+#: EXPERIMENTAL-spec-kitty-events#77) and the six artifact-lifecycle beats
+#: (``Specify``/``Plan``/``Tasks`` × ``Started``/``Completed``) joined the
+#: vocabulary in 8.2.0. ``DecisionPointWidened``/``Discussing``/``Overridden``
+#: are deliberately absent: the MVP moment vocabulary is Opened/Resolved only
+#: (planning#235's "Decisions as moments" bullet); the Slack-widening states
+#: are a separate, not-yet-scoped concern.
 VOLATILE_EVENT_TYPES: frozenset[str] = frozenset(
     {
         WP_STATUS_CHANGED,
@@ -251,13 +304,27 @@ VOLATILE_EVENT_TYPES: frozenset[str] = frozenset(
         DECISION_INPUT_REQUESTED,
         DECISION_INPUT_ANSWERED,
         MISSION_RUN_COMPLETED,
+        DECISION_POINT_OPENED,
+        DECISION_POINT_RESOLVED,
+        SPECIFY_STARTED,
+        SPECIFY_COMPLETED,
+        PLAN_STARTED,
+        PLAN_COMPLETED,
+        TASKS_STARTED,
+        TASKS_COMPLETED,
     }
 )
 
-#: Closed dispatch table: event type -> payload model. ``NextStepPlanned`` is
-#: deliberately absent — its payload contract is reserved, not defined
+#: Closed dispatch table: event type -> payload model(s). ``NextStepPlanned``
+#: is deliberately absent — its payload contract is reserved, not defined
 #: (``mission_next.py``), so there is nothing to encode yet.
-PAYLOAD_MODEL_BY_EVENT_TYPE: Mapping[str, type[BaseModel]] = {
+#:
+#: ``DecisionPointOpened``/``DecisionPointResolved`` are discriminated unions
+#: (``origin_surface`` ∈ {adr, planning_interview}) with two concrete variant
+#: classes each, so their entries are a *tuple* of models rather than one —
+#: every dispatch site below (encode's reverse-lookup, ``zeitgeist_ref_for``,
+#: the decode schema builders) normalizes through :func:`_payload_types`.
+PAYLOAD_MODEL_BY_EVENT_TYPE: Mapping[str, type[BaseModel] | tuple[type[BaseModel], ...]] = {
     WP_STATUS_CHANGED: StatusTransitionPayload,
     MISSION_CREATED: MissionCreatedPayload,
     MISSION_CLOSED: MissionClosedPayload,
@@ -268,16 +335,63 @@ PAYLOAD_MODEL_BY_EVENT_TYPE: Mapping[str, type[BaseModel]] = {
     DECISION_INPUT_REQUESTED: DecisionInputRequestedPayload,
     DECISION_INPUT_ANSWERED: DecisionInputAnsweredPayload,
     MISSION_RUN_COMPLETED: MissionRunCompletedPayload,
+    DECISION_POINT_OPENED: (DecisionPointOpenedAdrPayload, DecisionPointOpenedInterviewPayload),
+    DECISION_POINT_RESOLVED: (DecisionPointResolvedAdrPayload, DecisionPointResolvedInterviewPayload),
+    SPECIFY_STARTED: SpecifyStartedPayload,
+    SPECIFY_COMPLETED: SpecifyCompletedPayload,
+    PLAN_STARTED: PlanStartedPayload,
+    PLAN_COMPLETED: PlanCompletedPayload,
+    TASKS_STARTED: TasksStartedPayload,
+    TASKS_COMPLETED: TasksCompletedPayload,
 }
+
+
+def _payload_types(event_type: str) -> tuple[type[BaseModel], ...]:
+    """Normalize one :data:`PAYLOAD_MODEL_BY_EVENT_TYPE` entry to a tuple."""
+    entry = PAYLOAD_MODEL_BY_EVENT_TYPE[event_type]
+    return entry if isinstance(entry, tuple) else (entry,)
+
 
 #: Per-type fields that never ride the relay: structured shapes that cannot
 #: fit flat bounded attrs, and free-text prose (see "Projection, not
 #: reconstruction" above). Everything else MUST survive.
+#:
+#: DecisionPoint Opened/Resolved fold their prose (``question``/``options``
+#: on Opened, ``final_answer``/``rationale`` on Resolved, and ADR's
+#: ``alternatives_considered``) into the single derived ``summary`` attr
+#: (see :func:`_decision_summary`) instead of dropping it outright — the
+#: bounded one-line projection this issue asks for, not the plain exclusion
+#: every other family's prose gets. ``evidence_refs`` (ADR) and the
+#: Slack-widening fields on the interview Resolved variant
+#: (``summary`` the nested ``SummaryBlock``, ``actual_participants``,
+#: ``closure_message``) have no MVP moment use and are dropped outright, not
+#: folded. ``recorded_at`` is dropped on both DecisionPoint kinds: it is
+#: redundant with the envelope's own ``occurred_at`` and dropping it is what
+#: keeps the ADR-Resolved projection (the tightest of the four variants)
+#: inside the 16-key bound.
 UNBROADCAST_FIELDS: Mapping[str, frozenset[str]] = {
     WP_STATUS_CHANGED: frozenset({"evidence", "reason"}),
     MISSION_CREATED: frozenset({"friendly_name", "purpose_tldr", "purpose_context"}),
     DECISION_INPUT_REQUESTED: frozenset({"options", "question"}),
     DECISION_INPUT_ANSWERED: frozenset({"answer"}),
+    DECISION_POINT_OPENED: frozenset(
+        {"question", "options", "rationale", "alternatives_considered", "evidence_refs", "recorded_at"}
+    ),
+    DECISION_POINT_RESOLVED: frozenset(
+        {
+            "final_answer",
+            "rationale",
+            "alternatives_considered",
+            "evidence_refs",
+            "summary",
+            "actual_participants",
+            "closure_message",
+            "recorded_at",
+        }
+    ),
+    SPECIFY_COMPLETED: frozenset({"summary"}),
+    PLAN_COMPLETED: frozenset({"summary"}),
+    TASKS_COMPLETED: frozenset({"summary"}),
 }
 
 #: Per-type field projections: attr key -> canonical attribute carried under
@@ -298,6 +412,151 @@ PROJECTED_FIELD_BY_EVENT_TYPE: Mapping[str, Mapping[str, str]] = {
 #: "Envelope identity rides too" above).
 ENVELOPE_ATTR_KEYS: frozenset[str] = frozenset({"event_id", "occurred_at"})
 
+#: Event types whose projection carries a derived ``summary`` attr: a
+#: bounded, single-line, human-readable projection built from prose fields
+#: that :data:`UNBROADCAST_FIELDS` would otherwise drop outright (see
+#: "Bounded moment summaries" below). ``WPStatusChanged`` is deliberately
+#: absent — ``StatusTransitionPayload`` carries no title/objective/purpose
+#: field at all (that data lives only on the separate ``WPCreated`` event,
+#: local to the CLI producer at emit time), and this contract only ever
+#: derives a summary from data the *payload itself* carries.
+SUMMARY_SOURCE_EVENT_TYPES: frozenset[str] = frozenset(
+    {
+        MISSION_CREATED,
+        DECISION_POINT_OPENED,
+        DECISION_POINT_RESOLVED,
+        SPECIFY_COMPLETED,
+        PLAN_COMPLETED,
+        TASKS_COMPLETED,
+    }
+)
+
+#: Reserved (not yet implemented) syntax for an opaque ``detail_ref`` attr:
+#: a future moment could carry this alongside ``summary`` so a post-MVP read
+#: service can resolve the full local detail behind a bounded projection
+#: (planning#235 lists that service as post-MVP). No payload in this
+#: package's vocabulary emits it yet — reserving the syntax now means a
+#: future producer/consumer pair does not have to invent one under time
+#: pressure. Syntax: ``"<event_type>:<event_id>"`` — the pair a consumer
+#: already has on every decoded :class:`VolatileMoment` (``kind`` and
+#: ``attrs["event_id"]``), so no new identifier scheme is needed; a future
+#: read service resolves it by looking up that event in the local journal.
+DETAIL_REF_SYNTAX: str = "<event_type>:<event_id>"
+
+
+# ── bounded moment summaries ────────────────────────────────────────────────
+#
+# Some prose fields carry information a moment consumer genuinely wants at a
+# glance — a decision's question, a mission's purpose, a completed artifact's
+# one-liner — where every other family's free text (see "Projection, not
+# reconstruction" in the module docstring) simply stays local. For exactly
+# the event types in :data:`SUMMARY_SOURCE_EVENT_TYPES`, :func:`to_zeitgeist_attrs`
+# derives one additional bounded ``summary`` attr instead of dropping that
+# prose outright. It is still bounded like every other attr (≤240 UTF-8
+# bytes) but, unlike the rest of this module's fail-closed contract, an
+# oversize summary is truncated rather than raised: prose is inherently
+# unbounded producer input, and failing the whole moment closed over a long
+# sentence would defeat the point of carrying it at all. Deterministic
+# truncation: cut on a UTF-8 byte boundary (never splitting a multi-byte
+# codepoint) and append a single ``"…"`` marker so a reader can always tell
+# a summary was cut. Missing source prose is omission, not truncation: the
+# attr key is absent, exactly like any other absent-optional field.
+
+
+def _oneline(text: str) -> str:
+    """Collapse internal whitespace/newlines to single spaces."""
+    return " ".join(text.split())
+
+
+def _truncate_utf8(value: str, max_bytes: int) -> str:
+    """Truncate to at most *max_bytes* UTF-8 bytes on a UTF-8 boundary.
+
+    A single ``"…"`` marker (3 UTF-8 bytes) replaces the cut tail so a
+    truncated summary is always visibly truncated. Never splits a
+    multi-byte codepoint: the raw byte-sliced prefix is decoded with
+    ``errors="ignore"`` after re-encoding, which drops only a trailing
+    partial codepoint, not a full character.
+    """
+    encoded = value.encode("utf-8")
+    if len(encoded) <= max_bytes:
+        return value
+    marker = "…"
+    budget = max_bytes - len(marker.encode("utf-8"))
+    if budget <= 0:
+        return ""
+    return encoded[:budget].decode("utf-8", errors="ignore") + marker
+
+
+def _bounded_summary(clauses: Sequence[str], max_bytes: int = ZEITGEIST_ATTRS_MAX_BYTES) -> str | None:
+    """Join non-empty clauses with ``"; "`` into one bounded one-line summary.
+
+    Returns ``None`` (attr omitted) when every clause is empty/absent —
+    deterministic omission, never a placeholder string.
+    """
+    cleaned = [_oneline(c) for c in clauses if c and c.strip()]
+    if not cleaned:
+        return None
+    return _truncate_utf8("; ".join(cleaned), max_bytes)
+
+
+#: Fixed field-read order for the DecisionPoint Opened/Resolved derived
+#: summary: every variant of both event types is walked through the same
+#: order, so the same underlying prose always yields byte-identical output
+#: regardless of ``origin_surface``. A field absent from a given variant (or
+#: left empty on that instance) contributes nothing.
+_DECISION_SUMMARY_FIELD_ORDER: tuple[str, ...] = (
+    "question",
+    "final_answer",
+    "rationale",
+    "options",
+    "alternatives_considered",
+)
+
+
+def _decision_summary(payload: BaseModel) -> str | None:
+    """Derive DecisionPointOpened/Resolved's bounded ``summary`` attr.
+
+    Walks :data:`_DECISION_SUMMARY_FIELD_ORDER`: ``question`` (interview
+    Opened), ``final_answer`` (interview Resolved), ``rationale`` (both
+    kinds, both variants), ``options`` (interview Opened, tuple), then
+    ``alternatives_considered`` (ADR, tuple). Tuple fields join their
+    entries with ``", "`` before joining into the overall clause list.
+    """
+    clauses: list[str] = []
+    for field in _DECISION_SUMMARY_FIELD_ORDER:
+        value = getattr(payload, field, None)
+        if not value:
+            continue
+        clauses.append(", ".join(value) if isinstance(value, tuple) else str(value))
+    return _bounded_summary(clauses)
+
+
+def _mission_created_summary(payload: BaseModel) -> str | None:
+    """Derive MissionCreated's bounded ``summary``: title + one-line purpose.
+
+    Both ``friendly_name`` and ``purpose_tldr`` are required non-empty
+    fields, so this always returns a value for a valid payload.
+    """
+    return _bounded_summary([payload.friendly_name, payload.purpose_tldr])
+
+
+def _artifact_completed_summary(payload: BaseModel) -> str | None:
+    """Derive an artifact-lifecycle ``*Completed`` payload's bounded
+    ``summary`` from its own optional ``summary: str | None`` field —
+    absent when the producer supplied none (deterministic omission)."""
+    return _bounded_summary([payload.summary or ""])
+
+
+#: Per-type summary builder, keyed the same as :data:`SUMMARY_SOURCE_EVENT_TYPES`.
+_SUMMARY_BUILDER_BY_EVENT_TYPE: Mapping[str, Any] = {
+    MISSION_CREATED: _mission_created_summary,
+    DECISION_POINT_OPENED: _decision_summary,
+    DECISION_POINT_RESOLVED: _decision_summary,
+    SPECIFY_COMPLETED: _artifact_completed_summary,
+    PLAN_COMPLETED: _artifact_completed_summary,
+    TASKS_COMPLETED: _artifact_completed_summary,
+}
+
 
 # ── encode ───────────────────────────────────────────────────────────────────
 
@@ -306,6 +565,8 @@ def _encode_scalar(field: str, value: Any) -> str:
     """Encode one leaf value as its bounded string form."""
     if isinstance(value, bool):  # before int: bool subclasses int
         return "true" if value else "false"
+    if isinstance(value, datetime):
+        return value.isoformat()
     if isinstance(value, Enum):
         raw = value.value
         encoded = raw if isinstance(raw, str) else str(raw)
@@ -417,7 +678,7 @@ def to_zeitgeist_attrs(payload: BaseModel, envelope: Event) -> dict[str, str]:
             applied.
     """
     event_type = next(
-        (k for k, v in PAYLOAD_MODEL_BY_EVENT_TYPE.items() if type(payload) is v),
+        (k for k in PAYLOAD_MODEL_BY_EVENT_TYPE if type(payload) in _payload_types(k)),
         None,
     )
     if event_type is None:
@@ -444,6 +705,10 @@ def to_zeitgeist_attrs(payload: BaseModel, envelope: Event) -> dict[str, str]:
             projected=PROJECTED_FIELD_BY_EVENT_TYPE.get(event_type),
         )
     )
+    if event_type in SUMMARY_SOURCE_EVENT_TYPES:
+        summary = _SUMMARY_BUILDER_BY_EVENT_TYPE[event_type](payload)
+        if summary is not None:
+            attrs["summary"] = summary
 
     bad_keys = sorted(attrs.keys() & FORBIDDEN_ATTR_KEYS)
     if bad_keys:
@@ -495,6 +760,14 @@ REF_FIELD_BY_EVENT_TYPE: Mapping[str, str] = {
     DECISION_INPUT_REQUESTED: "run_id",
     DECISION_INPUT_ANSWERED: "run_id",
     MISSION_RUN_COMPLETED: "run_id",
+    DECISION_POINT_OPENED: "decision_point_id",
+    DECISION_POINT_RESOLVED: "decision_point_id",
+    SPECIFY_STARTED: "mission_slug",
+    SPECIFY_COMPLETED: "mission_slug",
+    PLAN_STARTED: "mission_slug",
+    PLAN_COMPLETED: "mission_slug",
+    TASKS_STARTED: "mission_slug",
+    TASKS_COMPLETED: "mission_slug",
 }
 
 
@@ -508,8 +781,7 @@ def zeitgeist_ref_for(event_type: str, payload: BaseModel) -> str | None:
             :data:`ZEITGEIST_ATTRS_MAX_BYTES` (the frame's ``ref`` carries
             the same bound as an attrs entry; see the module docstring).
     """
-    model = PAYLOAD_MODEL_BY_EVENT_TYPE.get(event_type)
-    if model is None or type(payload) is not model:
+    if event_type not in PAYLOAD_MODEL_BY_EVENT_TYPE or type(payload) not in _payload_types(event_type):
         raise UnknownVolatileEventTypeError(
             f"{type(payload).__name__} is not the payload of volatile event "
             f"type {event_type!r}; known: {sorted(PAYLOAD_MODEL_BY_EVENT_TYPE)}"
@@ -545,8 +817,8 @@ def _unwrap_optional(annotation: Any) -> Any:
     return annotation
 
 
-def _schema_keys(event_type: str, model: type[BaseModel]) -> frozenset[str]:
-    """Every payload-sourced attr key the kind's projection may carry.
+def _schema_keys_for_model(event_type: str, model: type[BaseModel]) -> frozenset[str]:
+    """Every payload-sourced attr key one payload model may carry.
 
     Mirrors :func:`_encode_fields`: skipped fields contribute nothing,
     projected fields contribute their plain field name (the projection
@@ -570,14 +842,33 @@ def _schema_keys(event_type: str, model: type[BaseModel]) -> frozenset[str]:
     return frozenset(keys)
 
 
+def _schema_keys(event_type: str) -> frozenset[str]:
+    """Every attr key the kind's projection may carry, envelope excluded.
+
+    A discriminated-union event type (:data:`DECISION_POINT_OPENED`,
+    :data:`DECISION_POINT_RESOLVED`) has more than one payload model; decode
+    cannot know which variant produced a given frame, so the allowed set is
+    the *union* across every variant — a key any one variant can carry is
+    schema-legal. The derived ``summary`` attr
+    (:data:`SUMMARY_SOURCE_EVENT_TYPES`) is not a model field at all, so it
+    is added explicitly.
+    """
+    keys: set[str] = set()
+    for model in _payload_types(event_type):
+        keys |= _schema_keys_for_model(event_type, model)
+    if event_type in SUMMARY_SOURCE_EVENT_TYPES:
+        keys.add("summary")
+    return frozenset(keys)
+
+
 _ALLOWED_KEYS_BY_EVENT_TYPE: Mapping[str, frozenset[str]] = {
-    event_type: _schema_keys(event_type, model) | ENVELOPE_ATTR_KEYS
-    for event_type, model in PAYLOAD_MODEL_BY_EVENT_TYPE.items()
+    event_type: _schema_keys(event_type) | ENVELOPE_ATTR_KEYS
+    for event_type in PAYLOAD_MODEL_BY_EVENT_TYPE
 }
 
 
-def _required_schema_keys(event_type: str, model: type[BaseModel]) -> frozenset[str]:
-    """The subset of :func:`_schema_keys` decode can insist on.
+def _required_schema_keys_for_model(event_type: str, model: type[BaseModel]) -> frozenset[str]:
+    """The subset of one payload model's schema keys decode can insist on.
 
     A key is required only when :func:`to_zeitgeist_attrs` can never omit
     it: a projected actor-label key (:data:`PROJECTED_FIELD_BY_EVENT_TYPE`
@@ -611,9 +902,27 @@ def _required_schema_keys(event_type: str, model: type[BaseModel]) -> frozenset[
     return frozenset(keys)
 
 
+def _required_schema_keys(event_type: str) -> frozenset[str]:
+    """The subset of :func:`_schema_keys` decode can insist on.
+
+    For a discriminated-union event type, a key is required only when
+    *every* variant guarantees it — decode sees one frame and does not know
+    which variant produced it, so it can only insist on the *intersection*
+    across variants. The derived ``summary`` attr is never required: it is
+    always omittable prose by this contract's own design (deterministic
+    omission when the source is empty), even on kinds where a valid payload
+    happens to always produce one today.
+    """
+    variants = [_required_schema_keys_for_model(event_type, model) for model in _payload_types(event_type)]
+    keys = variants[0]
+    for other in variants[1:]:
+        keys &= other
+    return keys
+
+
 _REQUIRED_KEYS_BY_EVENT_TYPE: Mapping[str, frozenset[str]] = {
-    event_type: _required_schema_keys(event_type, model) | ENVELOPE_ATTR_KEYS
-    for event_type, model in PAYLOAD_MODEL_BY_EVENT_TYPE.items()
+    event_type: _required_schema_keys(event_type) | ENVELOPE_ATTR_KEYS
+    for event_type in PAYLOAD_MODEL_BY_EVENT_TYPE
 }
 
 

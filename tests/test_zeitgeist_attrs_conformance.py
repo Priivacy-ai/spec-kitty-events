@@ -22,6 +22,12 @@ import pytest
 
 from spec_kitty_events.conformance import validate_event
 from spec_kitty_events.conformance.loader import FixtureCase, load_fixtures
+from spec_kitty_events.decisionpoint import (
+    DECISION_POINT_OPENED,
+    DECISION_POINT_RESOLVED,
+    DecisionPointOpenedPayload,
+    DecisionPointResolvedPayload,
+)
 from spec_kitty_events.models import Event
 from spec_kitty_events.zeitgeist_attrs import (
     PAYLOAD_MODEL_BY_EVENT_TYPE,
@@ -32,6 +38,23 @@ from spec_kitty_events.zeitgeist_attrs import (
     to_zeitgeist_attrs,
     zeitgeist_ref_for,
 )
+
+# The discriminated-union event types register a tuple of variant models in
+# PAYLOAD_MODEL_BY_EVENT_TYPE (decode cannot know which variant produced a
+# frame, so both must be schema-legal); fixtures still need one concrete
+# payload instance, built through decisionpoint.py's own discriminating
+# factory callables rather than calling the tuple directly.
+_PAYLOAD_FACTORY_BY_EVENT_TYPE = {
+    DECISION_POINT_OPENED: DecisionPointOpenedPayload,
+    DECISION_POINT_RESOLVED: DecisionPointResolvedPayload,
+}
+
+
+def _build_payload(event_type: str, fields: dict):
+    factory = _PAYLOAD_FACTORY_BY_EVENT_TYPE.get(event_type)
+    if factory is not None:
+        return factory(**fields)
+    return PAYLOAD_MODEL_BY_EVENT_TYPE[event_type](**fields)
 
 _ERROR_CLASSES = {
     "UnknownVolatileEventTypeError": UnknownVolatileEventTypeError,
@@ -70,10 +93,10 @@ def zeitgeist_attrs_fixtures():
 
 
 def test_fixtures_loaded(zeitgeist_attrs_fixtures) -> None:
-    """14 valid + 4 invalid fixtures are on disk and manifest-registered."""
-    assert len(zeitgeist_attrs_fixtures) == 18
-    assert len([f for f in zeitgeist_attrs_fixtures if f.expected_valid]) == 14
-    assert len([f for f in zeitgeist_attrs_fixtures if not f.expected_valid]) == 4
+    """28 valid + 6 invalid fixtures are on disk and manifest-registered."""
+    assert len(zeitgeist_attrs_fixtures) == 34
+    assert len([f for f in zeitgeist_attrs_fixtures if f.expected_valid]) == 28
+    assert len([f for f in zeitgeist_attrs_fixtures if not f.expected_valid]) == 6
 
 
 def test_every_valid_fixture_covers_one_volatile_event_type(
@@ -149,8 +172,7 @@ def test_packaged_event_gate_fixture_entries_match_manifest_expectations() -> No
 def test_zeitgeist_attrs_both_directions(fixture: FixtureCase) -> None:
     """Golden attrs pin the projection; the decode validates them back."""
     case = fixture.payload
-    model = PAYLOAD_MODEL_BY_EVENT_TYPE[fixture.event_type]
-    payload = model(**case["payload"])
+    payload = _build_payload(fixture.event_type, case["payload"])
     envelope = _fixture_envelope(fixture.event_type, case)
 
     # to-direction: bounded projection matches the committed bytes exactly.
@@ -177,8 +199,7 @@ def test_zeitgeist_attrs_rejections(fixture: FixtureCase) -> None:
     case = fixture.payload
     expected_error = _ERROR_CLASSES[case["expected_error"]]
     if case["direction"] == "to":
-        model = PAYLOAD_MODEL_BY_EVENT_TYPE[fixture.event_type]
-        payload = model(**case["payload"])
+        payload = _build_payload(fixture.event_type, case["payload"])
         envelope = _fixture_envelope(fixture.event_type, case)
         with pytest.raises(expected_error):
             to_zeitgeist_attrs(payload, envelope)
