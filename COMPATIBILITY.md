@@ -48,11 +48,13 @@ That switch is a single call only for the event types
 lifecycle/WP/project/harness allowlist) — `validate_strict_envelope()`
 rejects every other event type with `UNKNOWN_EVENT_TYPE` regardless of
 whether the envelope is otherwise well-formed. Callers whose event type is
-outside that allowlist must reproduce the removed gate's two checks
-directly instead: `forbidden_keys.find_forbidden_keys(record,
-forbidden=FORBIDDEN_LEGACY_KEYS)` for the recursive legacy-key walk, plus
-an explicit `record.get("schema_version") == "3.0.0"` check for the
-envelope signal.
+outside that allowlist must reproduce the removed gate's checks directly
+instead: `forbidden_keys.find_forbidden_keys(record,
+forbidden=FORBIDDEN_LEGACY_KEYS)` for the recursive legacy-key walk, an
+explicit `record.get("schema_version") == "3.0.0"` check for the envelope
+signal, and `record.get("aggregate_id", "").split("/", 1)[0] not in
+strict.FORBIDDEN_LEGACY_AGGREGATE_NAMES` for the forbidden legacy
+aggregate-name prefix.
 
 Migration: pin `>=8.0.0`; delete or re-home any import of the three
 modules. There are no aliases. See `CHANGELOG.md` (`### Breaking`) for the
