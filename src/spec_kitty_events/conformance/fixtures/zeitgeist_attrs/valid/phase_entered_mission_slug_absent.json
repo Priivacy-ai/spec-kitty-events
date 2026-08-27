@@ -1,7 +1,7 @@
 {
   "event_type": "PhaseEntered",
   "envelope": {
-    "event_id": "e2e00000-0000-4000-8000-000000000007",
+    "event_id": "e2e00000-0000-4000-8000-000000000015",
     "timestamp": "2026-08-25T09:00:00+00:00"
   },
   "payload": {
@@ -9,16 +9,15 @@
     "phase_name": "build",
     "previous_phase": null,
     "actor": "robert",
-    "mission_slug": "demo-mission"
+    "mission_slug": null
   },
   "expected_attrs": {
-    "event_id": "e2e00000-0000-4000-8000-000000000007",
+    "event_id": "e2e00000-0000-4000-8000-000000000015",
     "occurred_at": "2026-08-25T09:00:00+00:00",
     "mission_id": "mission-demo",
     "phase_name": "build",
-    "actor": "robert",
-    "mission_slug": "demo-mission"
+    "actor": "robert"
   },
   "expected_ref": "mission-demo",
-  "notes": "previous_phase None: key omitted on emit, default restored on read. ref derives from mission_id (required identity), not mission_slug (optional display/back-compat)."
+  "notes": "mission_slug (optional display/back-compat) absent on an otherwise-valid payload: the frame ref still derives from the required mission_id, so identity is never lost (issue #18)."
 }

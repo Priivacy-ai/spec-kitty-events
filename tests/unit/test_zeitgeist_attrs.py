@@ -11,7 +11,11 @@ from pydantic import BaseModel
 
 from spec_kitty_events import zeitgeist_attrs
 from spec_kitty_events.forbidden_keys import FORBIDDEN_LEGACY_KEYS
-from spec_kitty_events.lifecycle import MissionClosedPayload, MissionStartedPayload
+from spec_kitty_events.lifecycle import (
+    MissionClosedPayload,
+    MissionStartedPayload,
+    PhaseEnteredPayload,
+)
 from spec_kitty_events.mission_next import (
     DecisionInputAnsweredPayload,
     DecisionInputRequestedPayload,
@@ -426,6 +430,36 @@ def test_ref_derival_and_mismatch_fail_closed() -> None:
     assert zeitgeist_ref_for("WPStatusChanged", _transition()) == "demo-mission"
     with pytest.raises(UnknownVolatileEventTypeError):
         zeitgeist_ref_for("MissionClosed", _transition())
+
+
+def test_phase_entered_ref_derives_from_mission_id_when_slug_is_absent() -> None:
+    """mission_slug is optional display/back-compat; mission_id is the
+    identity (PhaseEnteredPayload's own field description). A valid payload
+    without the compat field must still yield a ref."""
+    payload = PhaseEnteredPayload(
+        mission_id="mission-demo", phase_name="build", actor="robert",
+        mission_slug=None,
+    )
+    assert zeitgeist_ref_for("PhaseEntered", payload) == "mission-demo"
+
+
+def test_phase_entered_ref_ignores_mission_slug_when_present() -> None:
+    """mission_id is the identity regardless of the compat field's value —
+    ref derivation does not silently prefer the display slug."""
+    payload = PhaseEnteredPayload(
+        mission_id="mission-demo", phase_name="build", actor="robert",
+        mission_slug="a-totally-different-slug",
+    )
+    assert zeitgeist_ref_for("PhaseEntered", payload) == "mission-demo"
+
+
+def test_ref_over_bound_raises_rather_than_emitting_unbounded() -> None:
+    """The module documents the frame ref as carrying the same ≤240-byte
+    bound as an attrs entry independently of attrs; zeitgeist_ref_for must
+    enforce it, not just to_zeitgeist_attrs."""
+    payload = _transition(mission_slug="s" * 241)
+    with pytest.raises(ZeitgeistAttrsOverflowError):
+        zeitgeist_ref_for("WPStatusChanged", payload)
 
 
 def test_bounds_constants_match_the_zeitgeist_frame_contract() -> None:
