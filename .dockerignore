@@ -61,6 +61,7 @@
 **/.github/copilot
 **/.kittify/.dashboard
 **/.kittify/missions/__pycache__
+**/.kittify/encoding-provenance
 **/.kittify/derived
 **/.kittify/runtime
 **/.kittify/.migration-backup
