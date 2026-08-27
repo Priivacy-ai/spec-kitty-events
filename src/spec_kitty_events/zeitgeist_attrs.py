@@ -4,13 +4,23 @@ The Ephemeral Team Status design broadcasts mission/WP moments through each
 team's Zeitgeist relay as *opaque bounded attributes*: one ``event`` frame is
 ``{kind, ref?, attrs}`` where ``attrs`` must be a flat ``str:str`` mapping
 with at most 16 keys, at most 64 characters per key, and at most 240
-characters per value, and no forbidden key anywhere (zeitgeist issue:
+UTF-8 bytes per value (which subsumes ≤240 characters, since a string's
+UTF-8 byte length is never shorter than its character length), and no
+forbidden key anywhere (zeitgeist issue:
 ``EventArgs {kind: ident, ref?: string≤240, attrs: {str:str}, ≤16 keys,
-keys≤64 chars, values≤240 chars}``; design page
+keys≤64 chars, values≤240 chars AND ≤240 B}``; design page
 ``ephemeral-team-status.html``, "The vocabulary" paragraph).
 
 The relay's ``EventArgs`` schema bounds ``attrs`` keys at ≤64 *characters*
-(``propertyNames.maxLength``, ASCII-only pattern so chars==bytes there) and
+(``propertyNames.pattern`` **and** ``propertyNames.maxLength``: the
+pattern is the ASCII-only ``[A-Za-z0-9][A-Za-z0-9._@+-]{0,63}``, and the
+relay's validator checks it with a whole-string match — ``capabilities.py``
+``_validate_node`` calls ``re.fullmatch``, not JSON Schema's usual
+unanchored search — so it binds every character of the key, not just a
+substring, and chars==bytes there. Independently of the pattern,
+``propertyNames`` also carries no ``maxUtf8Bytes`` clause, unlike ``ref``
+and ``additionalProperties`` below, so a character count is the only
+key-length bound the relay applies either way) and
 bounds values (and the frame's ``ref``) at ≤240 characters *and*
 independently at ≤240 UTF-8 bytes (``maxLength: 240`` **and**
 ``maxUtf8Bytes: 240`` both present on ``attrs``'s ``additionalProperties``
