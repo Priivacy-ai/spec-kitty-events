@@ -2015,6 +2015,14 @@
       "min_version": "8.0.0"
     },
     {
+      "id": "phase_entered_mission_slug_absent",
+      "path": "zeitgeist_attrs/valid/phase_entered_mission_slug_absent.json",
+      "expected_result": "valid",
+      "event_type": "PhaseEntered",
+      "notes": "mission_slug (optional display/back-compat) absent: ref derives from the required mission_id, not the compat field (issue #18).",
+      "min_version": "8.1.0"
+    },
+    {
       "id": "mission_run_started_actor_label",
       "path": "zeitgeist_attrs/valid/mission_run_started_actor_label.json",
       "expected_result": "valid",

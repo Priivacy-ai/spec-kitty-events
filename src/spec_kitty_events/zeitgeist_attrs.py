@@ -449,11 +449,16 @@ def to_zeitgeist_attrs(payload: BaseModel, envelope: Event) -> dict[str, str]:
 # ── frame ref ────────────────────────────────────────────────────────────────
 
 #: The payload field each family uses as the frame's aggregate identity.
+#: ``PhaseEnteredPayload`` uses ``mission_id`` (required) rather than
+#: ``mission_slug`` (optional display/back-compat; see the field's own
+#: description) — that field alone can be absent on an otherwise-valid
+#: payload, which would otherwise make identity loss the normal producer
+#: outcome rather than an edge case.
 REF_FIELD_BY_EVENT_TYPE: Mapping[str, str] = {
     WP_STATUS_CHANGED: "mission_slug",
     MISSION_CREATED: "mission_slug",
     MISSION_CLOSED: "mission_slug",
-    PHASE_ENTERED: "mission_slug",
+    PHASE_ENTERED: "mission_id",
     MISSION_RUN_STARTED: "run_id",
     NEXT_STEP_ISSUED: "run_id",
     NEXT_STEP_AUTO_COMPLETED: "run_id",
@@ -469,6 +474,9 @@ def zeitgeist_ref_for(event_type: str, payload: BaseModel) -> str | None:
     Raises:
         UnknownVolatileEventTypeError: *event_type* is unknown or *payload*
             is not that event type's payload model.
+        ZeitgeistAttrsOverflowError: the ref exceeds
+            :data:`ZEITGEIST_ATTRS_MAX_BYTES` (the frame's ``ref`` carries
+            the same bound as an attrs entry; see the module docstring).
     """
     model = PAYLOAD_MODEL_BY_EVENT_TYPE.get(event_type)
     if model is None or type(payload) is not model:
@@ -477,7 +485,14 @@ def zeitgeist_ref_for(event_type: str, payload: BaseModel) -> str | None:
             f"type {event_type!r}; known: {sorted(PAYLOAD_MODEL_BY_EVENT_TYPE)}"
         )
     value = getattr(payload, REF_FIELD_BY_EVENT_TYPE[event_type], None)
-    return None if value is None else str(value)
+    if value is None:
+        return None
+    ref = str(value)
+    if _utf8_size(f"{event_type} ref", ref) > ZEITGEIST_ATTRS_MAX_BYTES:
+        raise ZeitgeistAttrsOverflowError(
+            f"{event_type} ref exceeds the {ZEITGEIST_ATTRS_MAX_BYTES}-byte bound"
+        )
+    return ref
 
 
 # ── decode ───────────────────────────────────────────────────────────────────

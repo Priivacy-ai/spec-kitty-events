@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Keep E2 mission-run support-matrix `min_consumer_package` aligned with
   `strict_since` and the conformance fixture `min_version` floor.
+- `zeitgeist_ref_for` now enforces `ZEITGEIST_ATTRS_MAX_BYTES` on the frame
+  `ref` it returns, matching the module's documented bound instead of
+  relying on every ref field also riding as a bounded attr value.
+- `PhaseEntered`'s frame `ref` now derives from the required `mission_id`
+  instead of the optional display/back-compat `mission_slug`, so a valid
+  payload without that compat field no longer loses identity on the relay.
 - **`zeitgeist_attrs` bounds now match zeitgeist's `EventArgs` schema**
   (spec-kitty-events#16): the relay's schema bounds attrs keys at ≤64
   *characters* and bounds values (and `ref`) at ≤240 characters **and**
