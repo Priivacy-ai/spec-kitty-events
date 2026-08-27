@@ -66,16 +66,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **`zeitgeist_attrs` bounds now match zeitgeist's `EventArgs` schema**
   (spec-kitty-events#16): the relay's schema bounds attrs keys at ≤64
   *characters* and bounds values (and `ref`) at ≤240 characters **and**
-  independently at ≤240 UTF-8 bytes (`maxLength` and `maxUtf8Bytes` both
-  present since zeitgeist commit `30d3ab4415`, closing zeitgeist#20). The
-  byte bound is the one that actually binds, since byte count is always
-  ≥ character count. `from_zeitgeist_attrs` now checks values by UTF-8
-  byte count (previously it counted characters, which would have accepted
-  a value like `"é" * 121` — 121 characters but 242 UTF-8 bytes — that the
-  relay itself rejects). `to_zeitgeist_attrs`/`from_zeitgeist_attrs` both
-  now enforce a new `ZEITGEIST_ATTR_KEY_MAX_CHARS = 64` bound on keys,
-  which was previously unchecked (keys only went through the 240-byte
-  value scan).
+  independently at ≤240 UTF-8 bytes (`maxLength` and `maxUtf8Bytes: 240`
+  both present since zeitgeist commit `30d3ab4415`, closing zeitgeist#20).
+  The byte bound is the one that actually binds, since byte count is
+  always ≥ character count; `from_zeitgeist_attrs`'s existing UTF-8-byte
+  check on values now cites that schema as its authority. The
+  release-visible change is a new `ZEITGEIST_ATTR_KEY_MAX_CHARS = 64`
+  bound, now enforced on keys by both `to_zeitgeist_attrs` and
+  `from_zeitgeist_attrs`, which was previously unchecked (keys only went
+  through the 240-byte value scan).
 
 ## [8.1.0] - 2026-08-26
 
