@@ -205,6 +205,27 @@ class TestReduceOutOfOrder:
         assert state.last_event_id == _ulid(3)
 
 
+class TestReduceSameTimestampTiebreak:
+    def test_distinct_same_at_events_are_order_independent(self) -> None:
+        """Two distinct events for one WP sharing `at` still fold deterministically.
+
+        The sort key is ``(at, event_id)``, not ``at`` alone: without the
+        ``event_id`` tiebreak, a stable sort would apply same-``at`` events in
+        *list* order, so the fold would depend on the order rows happen to
+        appear in ``status.events.jsonl`` rather than on the events themselves.
+        """
+        claim = _row(_ulid(1), from_lane="planned", to_lane="claimed")
+        start = _row(_ulid(2), from_lane="claimed", to_lane="in_progress")
+        assert claim["at"] == start["at"]  # concurrent: the tiebreak is what matters
+
+        forward = reduce([claim, start])
+        reversed_order = reduce([start, claim])
+
+        assert forward.to_dict() == reversed_order.to_dict()
+        assert forward.work_packages["WP01"]["lane"] == "in_progress"
+        assert forward.work_packages["WP01"]["last_event_id"] == _ulid(2)
+
+
 class TestReduceDeduplication:
     def test_reduce_deduplication(self) -> None:
         """Duplicate event_ids are deduplicated; first occurrence kept."""
