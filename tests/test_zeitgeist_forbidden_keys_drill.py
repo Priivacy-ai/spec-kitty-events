@@ -64,18 +64,14 @@ def test_forbidden_keys_v1_matches_zeitgeist_source() -> None:
         )
     source = path.read_text()
 
-    zeitgeist_keys = _literal_eval_frozenset_call(
-        _module_level_value(source, "FORBIDDEN_KEYS_V1")
-    )
+    zeitgeist_keys = _literal_eval_frozenset_call(_module_level_value(source, "FORBIDDEN_KEYS_V1"))
     assert zeitgeist_keys == ZEITGEIST_FORBIDDEN_KEYS_V1, (
         "zeitgeist's FORBIDDEN_KEYS_V1 has diverged from the mirror in "
         "zeitgeist_attrs.ZEITGEIST_FORBIDDEN_KEYS_V1 -- update the mirror and its "
         "provenance comment together (spec-kitty-events#17)"
     )
 
-    zeitgeist_version = ast.literal_eval(
-        _module_level_value(source, "FORBIDDEN_KEYS_VERSION")
-    )
+    zeitgeist_version = ast.literal_eval(_module_level_value(source, "FORBIDDEN_KEYS_VERSION"))
     assert zeitgeist_version == ZEITGEIST_FORBIDDEN_KEYS_VERSION, (
         "zeitgeist bumped FORBIDDEN_KEYS_VERSION without a matching bump to "
         "zeitgeist_attrs.ZEITGEIST_FORBIDDEN_KEYS_VERSION -- treat this as a new "

@@ -1141,9 +1141,7 @@ def from_zeitgeist_attrs(event_type: str, attrs: Mapping[str, str]) -> VolatileM
         if occurred_at.endswith("Z"):
             candidate = occurred_at[:-1]
             if "z" in candidate.lower():
-                raise ZeitgeistAttrsError(
-                    f"attr 'occurred_at' is not ISO-8601: {occurred_at!r}"
-                )
+                raise ZeitgeistAttrsError(f"attr 'occurred_at' is not ISO-8601: {occurred_at!r}")
             candidate += "+00:00"
         else:
             candidate = occurred_at

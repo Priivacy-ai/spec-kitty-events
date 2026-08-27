@@ -12,7 +12,7 @@ Before adding a fixture, find the next free id and update this file in the
 same PR:
 
 ```
-grep -rho 'e2e00000-0000-4000-8000-[0-9]\{12\}' . | sort -u | tail -1
+grep -rho --include='*.json' 'e2e00000-0000-4000-8000-[0-9]\{12\}' . | sort -u | tail -1
 ```
 
 **Next free id: `e2e00000-0000-4000-8000-000000000118`**
