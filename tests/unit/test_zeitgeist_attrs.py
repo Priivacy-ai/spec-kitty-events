@@ -734,6 +734,17 @@ def test_encode_rejects_an_ansi_escape_in_a_value_with_typed_error() -> None:
         to_zeitgeist_attrs(payload, _envelope("WPStatusChanged"))
 
 
+def test_encode_admits_a_key_at_the_64_char_bound(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Boundary complement to the rejection above (spec-kitty-events#59): a
+    key at exactly 64 characters must still reach the wire — the bound is
+    ``> 64``, not ``>= 64``."""
+    monkeypatch.setattr(zeitgeist_attrs, "_encode_fields", lambda *a, **k: {"a" * 64: "v"})
+    attrs = to_zeitgeist_attrs(_transition(), _envelope("WPStatusChanged"))
+    assert attrs["a" * 64] == "v"
+
+
 def test_encode_admits_a_multibyte_value_within_the_stricter_byte_bound() -> None:
     """Encode's byte bound is intentionally stricter than the relay's
     240-character bound (spec-kitty-events#16); a multi-byte value that
@@ -1042,6 +1053,29 @@ def test_decode_rejects_a_key_over_the_64_char_bound(
     )
     with pytest.raises(ZeitgeistAttrsOverflowError):
         from_zeitgeist_attrs("WPStatusChanged", {long_key: "v"})
+
+
+def test_decode_admits_a_key_at_the_64_char_bound(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Boundary complement to the rejection above (spec-kitty-events#59): a
+    64-char key must still decode alongside the family's real required keys
+    — the bound is ``> 64``, not ``>= 64``."""
+    long_key = "a" * 64
+    monkeypatch.setattr(
+        zeitgeist_attrs,
+        "_ALLOWED_KEYS_BY_EVENT_TYPE",
+        dict(zeitgeist_attrs._ALLOWED_KEYS_BY_EVENT_TYPE),
+    )
+    monkeypatch.setitem(
+        zeitgeist_attrs._ALLOWED_KEYS_BY_EVENT_TYPE,
+        "WPStatusChanged",
+        zeitgeist_attrs._ALLOWED_KEYS_BY_EVENT_TYPE["WPStatusChanged"] | {long_key},
+    )
+    attrs = dict(to_zeitgeist_attrs(_transition(), _envelope("WPStatusChanged")))
+    attrs[long_key] = "v"
+    moment = from_zeitgeist_attrs("WPStatusChanged", attrs)
+    assert moment.attrs[long_key] == "v"
 
 
 def test_decode_rejects_unknown_event_type() -> None:
