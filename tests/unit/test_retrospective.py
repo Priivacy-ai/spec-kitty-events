@@ -142,6 +142,25 @@ class TestRetrospectiveCompletedPayload:
         payload = _make_completed(completed_at="2026-04-13")
         assert payload.completed_at == "2026-04-13"
 
+    @pytest.mark.parametrize(
+        "completed_at",
+        [
+            pytest.param("2026-04-13T10:00:00.123456789Z", id="z-suffix-nanosecond-fraction"),
+            pytest.param("20260413T100000Z", id="basic-format-z-suffix"),
+            pytest.param("20260413T100000+0200", id="basic-format-numeric-offset"),
+        ],
+    )
+    def test_completed_timestamp_shapes_that_split_by_python_version_accepted(
+        self, completed_at: str
+    ) -> None:
+        """spec-kitty-events#135: ``datetime.fromisoformat`` on 3.10 rejects
+        an arbitrary-precision fractional-second part (3.10 only accepts
+        0/3/6 digits) and basic (no ``-``/``:``) format, both accepted on
+        3.11+ for the same wire bytes. ``_assert_iso8601_timestamp`` must
+        accept these identically regardless of the interpreter running it."""
+        payload = _make_completed(completed_at=completed_at)
+        assert payload.completed_at == completed_at
+
 
 # ── RetrospectiveSkippedPayload tests ─────────────────────────────────────────
 

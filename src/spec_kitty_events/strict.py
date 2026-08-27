@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 from datetime import datetime
 from typing import Any, Literal, Mapping, Optional, Tuple
 
@@ -440,13 +441,64 @@ def _envelope_shape_error(**details: object) -> ValidationError:
     )
 
 
+#: Matches an ISO-8601/RFC-3339 timestamp in either extended
+#: (``2026-08-25T09:00:00.123456+00:00``) or basic (``20260825T090000Z``)
+#: format, with an optional fractional-second part of *any* digit count and
+#: an optional ``Z``/numeric offset. Used only to reshape a match into the
+#: one extended-with-6-digit-fraction spelling ``fromisoformat`` accepts
+#: identically on every supported interpreter (see
+#: ``_normalize_iso8601_shape``); a non-match is passed through unchanged so
+#: a genuinely malformed string still reaches ``fromisoformat``'s own error.
+_ISO8601_SHAPE_RE = re.compile(
+    r"^(?P<date>\d{4}-\d{2}-\d{2}|\d{8})"
+    r"[T ]"
+    r"(?P<time>\d{2}:\d{2}:\d{2}|\d{6})"
+    r"(?P<frac>[.,]\d+)?"
+    r"(?P<offset>Z|[+-]\d{2}:?\d{2})?$"
+)
+
+
+def _normalize_iso8601_shape(value: str) -> str:
+    """Reshape *value* so ``datetime.fromisoformat`` parses it identically
+    on Python 3.10 and 3.11+.
+
+    3.10's ``fromisoformat`` has two gaps 3.11+ closed: it only accepts a
+    fractional-second part of exactly 0, 3, or 6 digits (rejecting, e.g.,
+    Go's ``time.RFC3339Nano`` 9-digit output), and it only accepts the
+    ``-``/``:``-separated "extended" format (rejecting basic format like
+    ``20260825T090000Z``). Both gaps let the same wire bytes decode on one
+    interpreter and raise on the other (spec-kitty-events#122, #135).
+
+    This truncates/pads any fractional part to 6 digits — the precision
+    ``datetime`` itself stores — and inserts the extended-format separators
+    when given basic format, then normalizes a trailing ``Z`` to
+    ``+00:00`` so the result parses the same way everywhere. A value that
+    does not match the expected timestamp shape at all (already malformed,
+    or a format this repo does not need to handle) is returned unchanged,
+    so it still fails ``fromisoformat`` with its ordinary ``ValueError``.
+    """
+    match = _ISO8601_SHAPE_RE.match(value)
+    if match is None:
+        return value
+    date, time, frac, offset = match.group("date", "time", "frac", "offset")
+    if len(date) == 8:
+        date = f"{date[0:4]}-{date[4:6]}-{date[6:8]}"
+    if len(time) == 6:
+        time = f"{time[0:2]}:{time[2:4]}:{time[4:6]}"
+    fraction = f".{frac[1:][:6].ljust(6, '0')}" if frac else ""
+    if offset is None:
+        offset = ""
+    elif offset == "Z":
+        offset = "+00:00"
+    elif ":" not in offset:
+        offset = f"{offset[:3]}:{offset[3:]}"
+    return f"{date}T{time}{fraction}{offset}"
+
+
 def _parse_iso8601(value: str) -> datetime | None:
     """Best-effort ISO-8601 parse. Returns None when unparsable."""
-    text = value
-    if text.endswith("Z"):
-        text = text[:-1] + "+00:00"
     try:
-        return datetime.fromisoformat(text)
+        return datetime.fromisoformat(_normalize_iso8601_shape(value))
     except ValueError:
         return None
 

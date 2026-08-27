@@ -9,6 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- `_parse_iso8601` (`strict.py`, backing the packaged/exported
+  `validate_strict_envelope`), `_assert_iso8601_timestamp` (`retrospective.py`),
+  and `_extract_envelope_timestamp` (the packaged conformance helper
+  `timestamp_semantics.py`) now reshape a timestamp's fractional-second
+  digit count and basic/extended format before calling
+  `datetime.fromisoformat`, so a fractional-second part of any digit count
+  (e.g. Go's `time.RFC3339Nano` 9-digit output) and basic (no `-`/`:`)
+  ISO-8601 format parse identically on Python 3.10 and 3.11+ instead of
+  splitting by interpreter (EXPERIMENTAL-spec-kitty-events#135, the mirror
+  of #122's rejection-split fix at these three sibling call sites).
 - `from_zeitgeist_attrs` now enforces the same `event_id`/`occurred_at`
   contract the envelope itself guarantees, instead of the weaker
   emptiness/parses-at-all checks closing #28 left behind
