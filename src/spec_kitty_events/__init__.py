@@ -186,6 +186,7 @@ from spec_kitty_events.zeitgeist_attrs import (
     VolatileMoment,
     ZEITGEIST_ATTRS_MAX_BYTES,
     ZEITGEIST_ATTRS_MAX_KEYS,
+    ZEITGEIST_ATTR_KEY_MAX_CHARS,
     from_zeitgeist_attrs,
     to_zeitgeist_attrs,
 )
@@ -911,6 +912,7 @@ __all__ = [
     "VolatileMoment",
     "ZEITGEIST_ATTRS_MAX_BYTES",
     "ZEITGEIST_ATTRS_MAX_KEYS",
+    "ZEITGEIST_ATTR_KEY_MAX_CHARS",
     "from_zeitgeist_attrs",
     "to_zeitgeist_attrs",
 ]

@@ -11,6 +11,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Keep E2 mission-run support-matrix `min_consumer_package` aligned with
   `strict_since` and the conformance fixture `min_version` floor.
+- **`zeitgeist_attrs` bounds now match zeitgeist's `EventArgs` schema**
+  (spec-kitty-events#16): the relay's schema bounds attrs values at ≤240
+  *characters* and keys at ≤64 *characters* (JSON Schema `maxLength` counts
+  characters, not UTF-8 bytes). `from_zeitgeist_attrs` now checks values by
+  character count, so it no longer over-rejects a relay-valid multi-byte
+  value (e.g. `"é" * 121` is 121 characters but 242 UTF-8 bytes).
+  `to_zeitgeist_attrs`/`from_zeitgeist_attrs` both now enforce a new
+  `ZEITGEIST_ATTR_KEY_MAX_CHARS = 64` bound on keys, which was previously
+  unchecked (keys only went through the 240-byte value scan).
+  `to_zeitgeist_attrs` keeps its stricter 240-UTF-8-byte bound on values —
+  over-rejecting a relay-valid value on encode is safe; under-accepting on
+  decode was not.
 
 ## [8.1.0] - 2026-08-26
 
