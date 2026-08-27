@@ -766,6 +766,8 @@ def to_zeitgeist_attrs(payload: BaseModel, envelope: Event) -> dict[str, str]:
             payload model.
         ZeitgeistAttrsError: *envelope* declares a different event type.
         UnencodableFieldValueError: a carried field has no string encoding.
+        ZeitgeistAttrsControlCharacterError: a value carries a non-printable
+            character (``not str.isprintable()``).
         ZeitgeistAttrsForbiddenKeyError: an emitted key is forbidden.
         ZeitgeistAttrsOverflowError: the projection exceeds the key-count,
             key-length, or value-length bounds. No truncation is ever
@@ -809,6 +811,9 @@ def to_zeitgeist_attrs(payload: BaseModel, envelope: Event) -> dict[str, str]:
         summary = _SUMMARY_BUILDER_BY_EVENT_TYPE[event_type](payload)
         if summary is not None:
             attrs["summary"] = summary
+
+    for key, value in attrs.items():
+        _reject_control_characters(f"attr {key!r} value", value)
 
     bad_keys = _forbidden_key_hits(list(attrs))
     if bad_keys:
