@@ -119,6 +119,19 @@ neither imports the other; same idiom as the harness-observation bounds
 that mirror zeitgeist ``FIELD_MAX``). :func:`to_zeitgeist_attrs` refuses to
 emit any of them. Keys are checked as flat strings; dotted keys would be
 distinct strings from their segments, though today's vocabulary emits none.
+
+Mirrored from zeitgeist commit ``85be771f`` (``zeitgeist/capabilities.py``,
+lines 135-140: ``FORBIDDEN_KEYS_VERSION = 1`` and the ``FORBIDDEN_KEYS_V1``
+frozenset immediately below it), unchanged since. Nothing pins this value
+automatically — zeitgeist's own ``registry_digest()`` hashes only
+``registry.json`` and its managed schema files, not this constant — so
+``tests/test_zeitgeist_forbidden_keys_drill.py`` reads the sibling
+zeitgeist checkout's source (never imports the package: see above) and
+asserts both set equality and :data:`ZEITGEIST_FORBIDDEN_KEYS_VERSION`
+agreement. That drill skips when no sibling checkout is available; on
+drift or a version bump, update :data:`ZEITGEIST_FORBIDDEN_KEYS_V1`,
+:data:`ZEITGEIST_FORBIDDEN_KEYS_VERSION`, and this paragraph together
+(spec-kitty-events#17).
 """
 
 from __future__ import annotations
@@ -193,6 +206,7 @@ __all__ = [
     "ZEITGEIST_ATTRS_MAX_KEYS",
     "ZEITGEIST_ATTR_KEY_MAX_CHARS",
     "ZEITGEIST_FORBIDDEN_KEYS_V1",
+    "ZEITGEIST_FORBIDDEN_KEYS_VERSION",
     "UnencodableFieldValueError",
     "UnknownVolatileEventTypeError",
     "VolatileMoment",
@@ -222,6 +236,11 @@ ZEITGEIST_ATTR_KEY_MAX_CHARS: int = 64
 """Maximum character length of one attr key, enforced on both encode and
 decode (zeitgeist EventArgs ``propertyNames.maxLength``; JSON Schema
 ``maxLength`` counts characters, not UTF-8 bytes — spec-kitty-events#16)."""
+
+#: Mirror of zeitgeist ``capabilities.FORBIDDEN_KEYS_VERSION`` (by value; see
+#: the module docstring's "Forbidden keys" paragraph for the pinned zeitgeist
+#: revision and the drill that checks this hasn't drifted).
+ZEITGEIST_FORBIDDEN_KEYS_VERSION: int = 1
 
 #: Mirror of zeitgeist ``capabilities.FORBIDDEN_KEYS_V1`` (by value; see the
 #: module docstring for why this is a mirror, not an import).
