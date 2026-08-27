@@ -15,4 +15,8 @@ same PR:
 grep -rho 'e2e00000-0000-4000-8000-[0-9]\{12\}' . | sort -u | tail -1
 ```
 
-**Next free id: `e2e00000-0000-4000-8000-000000000118`**
+`...000118` is already spent — by `tests/test_zeitgeist_attrs_conformance.py:296`,
+a test-local synthetic envelope outside this directory that the grep above
+cannot see. Leave `...118` unused here too so no JSON fixture ever duplicates it.
+
+**Next free id: `e2e00000-0000-4000-8000-000000000119`**
