@@ -166,6 +166,39 @@ def test_packaged_event_gate_fixture_entries_match_manifest_expectations() -> No
 
 @pytest.mark.parametrize(
     "fixture",
+    [
+        f
+        for f in load_fixtures("zeitgeist_attrs")
+        if f.expected_valid and f.event_type == "WPStatusChanged"
+    ],
+    ids=lambda f: f.id,
+)
+def test_wp_status_changed_fixtures_pass_strict_domain_validation(
+    fixture: FixtureCase,
+) -> None:
+    """Every WPStatusChanged codec golden also passes domain transition rules.
+
+    A codec fixture is deliberately excluded from the packaged event gate
+    (``test_codec_fixtures_stay_out_of_the_packaged_event_gate`` above), so
+    nothing enforces this today — but a payload that no conforming producer
+    could ever emit is a latent trap for the next person who wires this
+    category into ``validate_event``. Pinned here so a fixture can never
+    regress back to one (events#30).
+    """
+    case = fixture.payload
+    result = validate_event(
+        {"event_type": fixture.event_type, "payload": case["payload"]},
+        fixture.event_type,
+        strict=True,
+    )
+    assert result.valid, (
+        f"{fixture.id} pins a payload that fails strict domain validation: "
+        f"{[v.message for v in result.model_violations]}"
+    )
+
+
+@pytest.mark.parametrize(
+    "fixture",
     [f for f in load_fixtures("zeitgeist_attrs") if f.expected_valid],
     ids=lambda f: f.id,
 )

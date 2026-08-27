@@ -8,7 +8,7 @@
     "mission_slug": "demo-mission",
     "wp_id": "WP02",
     "from_lane": "claimed",
-    "to_lane": "for_review",
+    "to_lane": "in_progress",
     "actor": {
       "role": "implementer",
       "profile": "ox-alpha"
@@ -25,7 +25,7 @@
     "mission_slug": "demo-mission",
     "wp_id": "WP02",
     "from_lane": "claimed",
-    "to_lane": "for_review",
+    "to_lane": "in_progress",
     "actor": "ox-alpha",
     "force": "false",
     "execution_mode": "direct_repo"

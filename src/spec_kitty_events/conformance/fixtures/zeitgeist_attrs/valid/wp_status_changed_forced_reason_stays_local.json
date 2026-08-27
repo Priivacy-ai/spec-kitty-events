@@ -8,7 +8,7 @@
     "mission_slug": "demo-mission",
     "wp_id": "WP04",
     "from_lane": "in_review",
-    "to_lane": "in_progress",
+    "to_lane": "planned",
     "actor": "merge-agent",
     "force": true,
     "reason": "flaky gate, Robert said ship it on the launch call",
@@ -22,11 +22,11 @@
     "mission_slug": "demo-mission",
     "wp_id": "WP04",
     "from_lane": "in_review",
-    "to_lane": "in_progress",
+    "to_lane": "planned",
     "actor": "merge-agent",
     "force": "true",
     "execution_mode": "worktree"
   },
   "expected_ref": "demo-mission",
-  "notes": "A forced transition broadcasts that it happened (force=true) but its reason is prose and stays in the local journal — identifiers only on the relay."
+  "notes": "A forced review-rejection rollback (in_review -> planned, force=True, no review_ref needed) broadcasts that it happened (force=true) but its reason is prose and stays in the local journal — identifiers only on the relay."
 }

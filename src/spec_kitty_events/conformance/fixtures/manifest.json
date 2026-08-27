@@ -1963,7 +1963,7 @@
       "path": "zeitgeist_attrs/valid/wp_status_changed_planned_doing.json",
       "expected_result": "valid",
       "event_type": "WPStatusChanged",
-      "notes": "The MVP moment: a WP moves to doing; from_lane absent (key omitted) because the transition had no recorded origin lane; the two envelope attrs lead every projection.",
+      "notes": "The MVP moment: a WP is seeded to planned; from_lane absent (key omitted) because the transition had no recorded origin lane (the only domain-valid edge out of no-recorded-lane is None -> planned); the two envelope attrs lead every projection.",
       "min_version": "8.0.0"
     },
     {
@@ -1987,7 +1987,7 @@
       "path": "zeitgeist_attrs/valid/wp_status_changed_forced_reason_stays_local.json",
       "expected_result": "valid",
       "event_type": "WPStatusChanged",
-      "notes": "A forced transition broadcasts that it happened (force=true) but its reason is prose and stays in the local journal — identifiers only on the relay.",
+      "notes": "A forced review-rejection rollback (in_review -> planned, force=True, no review_ref needed) broadcasts that it happened (force=true) but its reason is prose and stays in the local journal — identifiers only on the relay.",
       "min_version": "8.0.0"
     },
     {
