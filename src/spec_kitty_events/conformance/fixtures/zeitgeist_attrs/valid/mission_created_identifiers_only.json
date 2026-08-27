@@ -25,8 +25,9 @@
     "mission_type": "software-dev",
     "target_branch": "main",
     "wp_count": "3",
-    "actor": "robert"
+    "actor": "robert",
+    "summary": "Board approved 40M for the counterparty rollout; Bob Smith (bob@acme.com) is the counterparty contact."
   },
   "expected_ref": "demo-mission",
-  "notes": "Int fields pin the str() encoding; friendly_name/purpose_tldr/purpose_context are prose and stay local — none of their text may appear in the attrs. The optional actor is an opaque identifier and rides under the moment's ``actor`` key so the moment can say WHO created the mission."
+  "notes": "Int fields pin the str() encoding; the raw friendly_name/purpose_tldr/purpose_context fields stay local under their own names — none of those field NAMES ever reach the attrs. friendly_name and purpose_tldr do feed the bounded, deterministic ``summary`` moment attribute (issue #77); purpose_context never does and its text appears nowhere. The optional actor is an opaque identifier and rides under the moment's ``actor`` key so the moment can say WHO created the mission."
 }

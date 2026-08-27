@@ -100,6 +100,10 @@ def test_volatile_vocabulary_is_the_ephemeral_design_set() -> None:
         "WPStatusChanged", "MissionCreated", "MissionClosed", "PhaseEntered",
         "MissionRunStarted", "NextStepIssued", "NextStepAutoCompleted",
         "DecisionInputRequested", "DecisionInputAnswered", "MissionRunCompleted",
+        "DecisionPointOpened", "DecisionPointResolved",
+        "SpecifyStarted", "SpecifyCompleted",
+        "PlanStarted", "PlanCompleted",
+        "TasksStarted", "TasksCompleted",
     }
 
 
@@ -109,16 +113,22 @@ def test_dispatch_table_covers_exactly_the_volatile_types() -> None:
 
 def test_every_ref_field_is_a_declared_field_of_its_model() -> None:
     for event_type, ref_field in REF_FIELD_BY_EVENT_TYPE.items():
-        model = PAYLOAD_MODEL_BY_EVENT_TYPE[event_type]
-        assert ref_field in model.model_fields, event_type
+        for model in zeitgeist_attrs._payload_types(event_type):
+            assert ref_field in model.model_fields, event_type
 
 
 def test_unbroadcast_fields_exist_on_their_models() -> None:
-    """The skip lists cannot silently rot when a payload is renamed."""
+    """The skip lists cannot silently rot when a payload is renamed.
+
+    A discriminated-union event type's skip set is the union of every
+    variant's own prose/nested fields, so a given name need only exist on
+    at least one variant (e.g. ``rationale`` exists on the ADR variant of
+    ``DecisionPointResolved`` but not the interview one).
+    """
     for event_type, fields in UNBROADCAST_FIELDS.items():
-        model = PAYLOAD_MODEL_BY_EVENT_TYPE[event_type]
+        variants = zeitgeist_attrs._payload_types(event_type)
         for name in fields:
-            assert name in model.model_fields, (event_type, name)
+            assert any(name in model.model_fields for model in variants), (event_type, name)
 
 
 def test_every_structured_actor_family_projects_to_a_single_label() -> None:
@@ -127,17 +137,17 @@ def test_every_structured_actor_family_projects_to_a_single_label() -> None:
     Families whose ``actor`` is a plain (optionally absent) string need no
     projection — the value itself rides under the ``actor`` key."""
     for event_type in VOLATILE_EVENT_TYPES:
-        model = PAYLOAD_MODEL_BY_EVENT_TYPE[event_type]
-        field = model.model_fields.get("actor")
-        if field is None:
-            continue
-        base = zeitgeist_attrs._unwrap_optional(field.annotation)
-        if not (isinstance(base, type) and issubclass(base, BaseModel)):
-            continue
-        assert PROJECTED_FIELD_BY_EVENT_TYPE[event_type].get("actor") == "actor_label", (
-            event_type,
-            field.annotation,
-        )
+        for model in zeitgeist_attrs._payload_types(event_type):
+            field = model.model_fields.get("actor")
+            if field is None:
+                continue
+            base = zeitgeist_attrs._unwrap_optional(field.annotation)
+            if not (isinstance(base, type) and issubclass(base, BaseModel)):
+                continue
+            assert PROJECTED_FIELD_BY_EVENT_TYPE[event_type].get("actor") == "actor_label", (
+                event_type,
+                field.annotation,
+            )
 
 
 def test_actor_label_is_exactly_the_opaque_machine_id() -> None:
@@ -170,9 +180,10 @@ def test_forbidden_keys_union_the_zeitgeist_mirror_and_legacy_set() -> None:
 def test_no_declared_field_name_is_forbidden() -> None:
     """Structural guarantee behind "never emit forbidden keys": today's
     vocabulary cannot collide; if a future field does, this fails first."""
-    for model in PAYLOAD_MODEL_BY_EVENT_TYPE.values():
-        for name in model.model_fields:
-            assert name not in FORBIDDEN_ATTR_KEYS, (model.__name__, name)
+    for event_type in PAYLOAD_MODEL_BY_EVENT_TYPE:
+        for model in zeitgeist_attrs._payload_types(event_type):
+            for name in model.model_fields:
+                assert name not in FORBIDDEN_ATTR_KEYS, (model.__name__, name)
 
 
 # ── encode ───────────────────────────────────────────────────────────────────
@@ -324,9 +335,14 @@ def test_no_volatile_projection_emits_dotted_keys() -> None:
 
 
 def test_prose_never_reaches_the_broadcast() -> None:
-    """Identifiers only: none of the free-text payload content may appear in
-    the attrs — not as keys and not as values (the 72 h relay is public-ish
-    real estate; the journal is where prose lives)."""
+    """Identifiers only, with one deliberate, scoped exception: none of the
+    raw free-text payload fields ever ride the wire under their own key,
+    and no *non-summary* attr value carries prose (the 72 h relay is
+    public-ish real estate; the journal is where prose lives). The single
+    sanctioned exception is the derived ``summary`` attr itself — the
+    bounded moment-attribute projection this module now owns (issue #77)
+    folds a deterministic, truncated slice of specific prose fields into
+    that one key, and nowhere else."""
     from spec_kitty_events.lifecycle import MissionCreatedPayload
 
     payload = MissionCreatedPayload(
@@ -340,10 +356,14 @@ def test_prose_never_reaches_the_broadcast() -> None:
         purpose_context="Broadcast through the team relay for 72 hours.",
     )
     attrs = to_zeitgeist_attrs(payload, _envelope("MissionCreated"))
-    blob = " ".join(attrs.values())
-    assert "friendly_name" not in attrs and "40M" not in blob
-    assert "purpose_tldr" not in attrs and "bob@acme.com" not in blob
-    assert "purpose_context" not in attrs and "72 hours" not in blob
+    non_summary_blob = " ".join(v for k, v in attrs.items() if k != "summary")
+    assert "friendly_name" not in attrs and "40M" not in non_summary_blob
+    assert "purpose_tldr" not in attrs and "bob@acme.com" not in non_summary_blob
+    # purpose_context never feeds the summary builder, so it stays out entirely.
+    assert "purpose_context" not in attrs and "72 hours" not in attrs["summary"]
+    assert attrs["summary"] == (
+        "Board approved 40M for the rollout; Bob Smith (bob@acme.com) is the counterparty contact."
+    )
 
 
 def test_decision_question_and_answer_stay_local() -> None:

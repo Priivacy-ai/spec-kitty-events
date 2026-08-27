@@ -1,0 +1,27 @@
+{
+  "event_type": "PlanCompleted",
+  "envelope": {
+    "event_id": "e2e00000-0000-4000-8000-000000000110",
+    "timestamp": "2026-08-25T09:00:00+00:00"
+  },
+  "payload": {
+    "mission_slug": "demo-mission",
+    "mission_number": 12,
+    "actor": "actor-01",
+    "at": "2026-08-25T09:05:00+00:00",
+    "artifact_path": "specs/demo-mission/plan.md",
+    "summary": "Three work packages, sequential rollout."
+  },
+  "expected_attrs": {
+    "event_id": "e2e00000-0000-4000-8000-000000000110",
+    "occurred_at": "2026-08-25T09:00:00+00:00",
+    "mission_slug": "demo-mission",
+    "mission_number": "12",
+    "actor": "actor-01",
+    "at": "2026-08-25T09:05:00+00:00",
+    "artifact_path": "specs/demo-mission/plan.md",
+    "summary": "Three work packages, sequential rollout."
+  },
+  "expected_ref": "demo-mission",
+  "notes": "Artifact-lifecycle Completed for the plan phase with a producer-supplied summary."
+}

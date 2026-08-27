@@ -2103,6 +2103,134 @@
       "min_version": "8.0.0"
     },
     {
+      "id": "decision_point_opened_adr",
+      "path": "zeitgeist_attrs/valid/decision_point_opened_adr.json",
+      "expected_result": "valid",
+      "event_type": "DecisionPointOpened",
+      "notes": "ADR-origin Opened: rationale/alternatives_considered/evidence_refs stay local under their own names; the bounded summary folds rationale + alternatives into one deterministic clause order.",
+      "min_version": "8.2.0"
+    },
+    {
+      "id": "decision_point_opened_interview_multiple_options",
+      "path": "zeitgeist_attrs/valid/decision_point_opened_interview_multiple_options.json",
+      "expected_result": "valid",
+      "event_type": "DecisionPointOpened",
+      "notes": "Interview-origin Opened with three options: question/options stay local under their own names; the bounded summary joins question then every option, comma-separated, in declared order.",
+      "min_version": "8.2.0"
+    },
+    {
+      "id": "decision_point_opened_interview_missing_options",
+      "path": "zeitgeist_attrs/valid/decision_point_opened_interview_missing_options.json",
+      "expected_result": "valid",
+      "event_type": "DecisionPointOpened",
+      "notes": "Interview-origin Opened with no options offered (free-form question): the bounded summary omits the options clause entirely rather than emitting an empty one — deterministic omission, not a placeholder.",
+      "min_version": "8.2.0"
+    },
+    {
+      "id": "decision_point_resolved_adr",
+      "path": "zeitgeist_attrs/valid/decision_point_resolved_adr.json",
+      "expected_result": "valid",
+      "event_type": "DecisionPointResolved",
+      "notes": "ADR-origin Resolved: same identity as its Opened counterpart; rationale/alternatives_considered/evidence_refs stay local, folded into the bounded summary instead.",
+      "min_version": "8.2.0"
+    },
+    {
+      "id": "decision_point_resolved_interview_final_answer",
+      "path": "zeitgeist_attrs/valid/decision_point_resolved_interview_final_answer.json",
+      "expected_result": "valid",
+      "event_type": "DecisionPointResolved",
+      "notes": "Interview-origin Resolved, terminal_outcome=resolved: final_answer stays local under its own name; the bounded summary carries it as the sole clause (no rationale on a resolved outcome).",
+      "min_version": "8.2.0"
+    },
+    {
+      "id": "decision_point_resolved_interview_rationale_abandoned",
+      "path": "zeitgeist_attrs/valid/decision_point_resolved_interview_rationale_abandoned.json",
+      "expected_result": "valid",
+      "event_type": "DecisionPointResolved",
+      "notes": "Interview-origin Resolved, terminal_outcome=canceled (no final_answer on a non-resolved outcome): the bounded summary falls back to rationale as its sole clause.",
+      "min_version": "8.2.0"
+    },
+    {
+      "id": "decision_point_opened_multibyte_max_boundary",
+      "path": "zeitgeist_attrs/valid/decision_point_opened_multibyte_max_boundary.json",
+      "expected_result": "valid",
+      "event_type": "DecisionPointOpened",
+      "notes": "Multibyte, over-length question forces the bounded summary to its 240-byte max: deterministic UTF-8-safe truncation with a single trailing ellipsis marker, never splitting a multibyte codepoint or raising.",
+      "min_version": "8.2.0"
+    },
+    {
+      "id": "specify_started_minimal",
+      "path": "zeitgeist_attrs/valid/specify_started_minimal.json",
+      "expected_result": "valid",
+      "event_type": "SpecifyStarted",
+      "notes": "Minimal artifact-lifecycle Started moment: identity + actor + at, no summary source exists on this kind.",
+      "min_version": "8.2.0"
+    },
+    {
+      "id": "specify_completed_with_summary",
+      "path": "zeitgeist_attrs/valid/specify_completed_with_summary.json",
+      "expected_result": "valid",
+      "event_type": "SpecifyCompleted",
+      "notes": "Artifact-lifecycle Completed with a producer-supplied summary: the raw field folds straight into the bounded summary attr unchanged (already short prose).",
+      "min_version": "8.2.0"
+    },
+    {
+      "id": "plan_started_minimal",
+      "path": "zeitgeist_attrs/valid/plan_started_minimal.json",
+      "expected_result": "valid",
+      "event_type": "PlanStarted",
+      "notes": "Minimal artifact-lifecycle Started moment for the plan phase.",
+      "min_version": "8.2.0"
+    },
+    {
+      "id": "plan_completed_with_summary",
+      "path": "zeitgeist_attrs/valid/plan_completed_with_summary.json",
+      "expected_result": "valid",
+      "event_type": "PlanCompleted",
+      "notes": "Artifact-lifecycle Completed for the plan phase with a producer-supplied summary.",
+      "min_version": "8.2.0"
+    },
+    {
+      "id": "tasks_started_minimal",
+      "path": "zeitgeist_attrs/valid/tasks_started_minimal.json",
+      "expected_result": "valid",
+      "event_type": "TasksStarted",
+      "notes": "Minimal artifact-lifecycle Started moment for the tasks phase.",
+      "min_version": "8.2.0"
+    },
+    {
+      "id": "tasks_completed_with_summary",
+      "path": "zeitgeist_attrs/valid/tasks_completed_with_summary.json",
+      "expected_result": "valid",
+      "event_type": "TasksCompleted",
+      "notes": "Artifact-lifecycle Completed for the tasks phase with wp_count and a producer-supplied summary.",
+      "min_version": "8.2.0"
+    },
+    {
+      "id": "tasks_completed_missing_summary",
+      "path": "zeitgeist_attrs/valid/tasks_completed_missing_summary.json",
+      "expected_result": "valid",
+      "event_type": "TasksCompleted",
+      "notes": "Artifact-lifecycle Completed with no producer-supplied summary (None): the derived summary attr is omitted entirely rather than emitted empty — deterministic omission when the source prose is absent.",
+      "min_version": "8.2.0"
+    },
+    {
+      "id": "decision_point_opened_value_over_bound",
+      "path": "zeitgeist_attrs/invalid/decision_point_opened_value_over_bound.json",
+      "expected_result": "invalid",
+      "event_type": "DecisionPointOpened",
+      "notes": "A 243-byte decision_point_id exceeds the 240 B bound; encoding raises instead of truncating this identity field. The new bounded-summary mechanism only ever truncates the derived summary attr — every raw scalar field, on any new event type, still fails closed exactly like the pre-existing vocabulary.",
+      "min_version": "8.2.0"
+    },
+    {
+      "id": "specify_completed_unknown_attr",
+      "path": "zeitgeist_attrs/invalid/specify_completed_unknown_attr.json",
+      "expected_result": "invalid",
+      "event_type": "SpecifyCompleted",
+      "notes": "friendly_name is not part of SpecifyCompleted's schema (it belongs to MissionCreated); keys outside a kind's closed schema are rejected on decode, so vocabulary drift or cross-kind confusion cannot smuggle fields past the reader.",
+      "min_version": "8.2.0"
+    },
+    {
       "id": "cutover-boundary-accept-schema-version-missing",
       "path": "cutover_boundary/accepted_by_validate_event/schema_version_missing.json",
       "expected_result": "valid",

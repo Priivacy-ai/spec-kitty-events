@@ -1,0 +1,23 @@
+{
+  "event_type": "SpecifyStarted",
+  "envelope": {
+    "event_id": "e2e00000-0000-4000-8000-000000000107",
+    "timestamp": "2026-08-25T09:00:00+00:00"
+  },
+  "payload": {
+    "mission_slug": "demo-mission",
+    "mission_number": 12,
+    "actor": "actor-01",
+    "at": "2026-08-25T09:00:00+00:00"
+  },
+  "expected_attrs": {
+    "event_id": "e2e00000-0000-4000-8000-000000000107",
+    "occurred_at": "2026-08-25T09:00:00+00:00",
+    "mission_slug": "demo-mission",
+    "mission_number": "12",
+    "actor": "actor-01",
+    "at": "2026-08-25T09:00:00+00:00"
+  },
+  "expected_ref": "demo-mission",
+  "notes": "Minimal artifact-lifecycle Started moment: identity + actor + at, no summary source exists on this kind."
+}

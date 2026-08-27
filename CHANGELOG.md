@@ -7,6 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [8.2.0] - 2026-08-27
+
+### Added
+
+- Bounded moment-attribute projections for `DecisionPointOpened`,
+  `DecisionPointResolved`, the `Specify`/`Plan`/`Tasks` `Started`/`Completed`
+  lifecycle kinds, and a derived `summary` attr on `MissionCreated` and the
+  three artifact-lifecycle `*Completed` kinds (EXPERIMENTAL-spec-kitty-events#77).
+  `to_zeitgeist_attrs` now builds this `summary` attr, when the kind has one,
+  by joining a fixed, per-kind, deterministic sequence of source fields with
+  `"; "`; it is the one attr this module allows to carry short prose, and an
+  oversize `summary` is truncated (never rejected) to the 240-UTF-8-byte
+  bound with a trailing `"…"` marker, always split on a whole codepoint, and
+  omitted entirely rather than emitted empty when every source field is
+  blank. Every other attr keeps the module's existing fail-closed,
+  identifiers-only contract unchanged. `DecisionPointOpened`/
+  `DecisionPointResolved` reuse the existing discriminated-union payload
+  models unchanged (ADR vs. interview origin surfaces); `_schema_keys`/
+  `_required_schema_keys` now compute the union/intersection of allowed and
+  required keys across a kind's variants instead of assuming one payload
+  model per event type. 16 new golden fixtures (14 valid, 2 invalid) cover
+  max-boundary + multibyte truncation, missing optional prose, multiple
+  decision options, and round-trip decode for every newly-added event type.
+  `WPStatusChanged` is not given a `summary`: `StatusTransitionPayload` has
+  no bounded prose source field today, and adding one is out of scope for a
+  contract/projection-only change.
+
 ### Fixed
 
 - `from_zeitgeist_attrs` now rejects an empty `event_id` and an

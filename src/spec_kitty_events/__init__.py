@@ -13,13 +13,19 @@ This release publishes:
   ``spec_kitty_events.status.reduce``): the shared
   ``status.events.jsonl`` -> kanban-state fold for the CLI and the Team Kitty
   repo dossier.
+- Bounded moment-attribute projections (``spec_kitty_events.zeitgeist_attrs``):
+  ``DecisionPointOpened``/``DecisionPointResolved`` and the
+  ``Specify``/``Plan``/``Tasks`` ``Started``/``Completed`` lifecycle kinds
+  join the volatile vocabulary, and a derived, bounded, truncatable
+  ``summary`` attr is added for ``MissionCreated`` and the artifact-lifecycle
+  ``*Completed`` kinds.
 
 The offline sync/cutover surfaces (``spec_kitty_events.sync``, ``legacy``,
 ``cutover``) were removed in ``8.0.0``; envelope-level fail-closed gating now
 lives in ``spec_kitty_events.strict.validate_strict_envelope``.
 """
 
-__version__ = "8.1.0"
+__version__ = "8.2.0"
 
 # Core data models
 from spec_kitty_events.models import (
