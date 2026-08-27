@@ -17,6 +17,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `PhaseEntered`'s frame `ref` now derives from the required `mission_id`
   instead of the optional display/back-compat `mission_slug`, so a valid
   payload without that compat field no longer loses identity on the relay.
+- **`zeitgeist_attrs` bounds now match zeitgeist's `EventArgs` schema**
+  (spec-kitty-events#16): the relay's schema bounds attrs keys at ≤64
+  *characters* and bounds values (and `ref`) at ≤240 characters **and**
+  independently at ≤240 UTF-8 bytes (`maxLength` and `maxUtf8Bytes` both
+  present since zeitgeist commit `30d3ab4415`, closing zeitgeist#20). The
+  byte bound is the one that actually binds, since byte count is always
+  ≥ character count. `from_zeitgeist_attrs` now checks values by UTF-8
+  byte count (previously it counted characters, which would have accepted
+  a value like `"é" * 121` — 121 characters but 242 UTF-8 bytes — that the
+  relay itself rejects). `to_zeitgeist_attrs`/`from_zeitgeist_attrs` both
+  now enforce a new `ZEITGEIST_ATTR_KEY_MAX_CHARS = 64` bound on keys,
+  which was previously unchecked (keys only went through the 240-byte
+  value scan).
 
 ## [8.1.0] - 2026-08-26
 
