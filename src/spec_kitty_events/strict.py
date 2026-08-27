@@ -441,10 +441,19 @@ def _envelope_shape_error(**details: object) -> ValidationError:
 
 
 def _parse_iso8601(value: str) -> datetime | None:
-    """Best-effort ISO-8601 parse. Returns None when unparsable."""
+    """Best-effort ISO-8601 parse. Returns None when unparsable.
+
+    A well-formed value has at most one trailing ``Z``; if another ``Z``
+    remains after stripping it, the input was already malformed and must not
+    be laundered into something Python 3.10's laxer ``fromisoformat`` would
+    accept (e.g. a doubled ``...00ZZ``) (spec-kitty-events#55/#107/#115).
+    """
     text = value
     if text.endswith("Z"):
-        text = text[:-1] + "+00:00"
+        text = text[:-1]
+        if "Z" in text:
+            return None
+        text += "+00:00"
     try:
         return datetime.fromisoformat(text)
     except ValueError:
