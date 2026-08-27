@@ -3,7 +3,7 @@
 This repo is part of the `EXPERIMENTAL-spec-kitty-*` programme. There is no pre-programme
 branch ladder here: **`main` IS the integration branch** — every PR targets `main`,
 nothing deploys on merge, and nothing on GitHub enforces anything (no branch protection,
-no required reviews; the leftover `.github/workflows/` YAML is pre-programme and inert).
+no required reviews; there is no `.github/workflows/` directory — GitHub Actions are not used).
 The binding process is the programme constitution —
 [`EXPERIMENTAL-spec-kitty-planning/PROGRAM.md`](https://github.com/spec-kitty/EXPERIMENTAL-spec-kitty-planning/blob/main/PROGRAM.md) §5–§9:
 
