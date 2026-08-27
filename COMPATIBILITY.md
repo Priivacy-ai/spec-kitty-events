@@ -52,9 +52,14 @@ outside that allowlist must reproduce the removed gate's checks directly
 instead: `forbidden_keys.find_forbidden_keys(record,
 forbidden=FORBIDDEN_LEGACY_KEYS)` for the recursive legacy-key walk, an
 explicit `record.get("schema_version") == "3.0.0"` check for the envelope
-signal, and `record.get("aggregate_id", "").split("/", 1)[0] not in
+signal, `record.get("aggregate_id", "").split("/", 1)[0] not in
 strict.FORBIDDEN_LEGACY_AGGREGATE_NAMES` for the forbidden legacy
-aggregate-name prefix.
+aggregate-name prefix, and `record.get("event_type") not in {"FeatureCreated",
+"FeatureClosed"}` for the forbidden legacy event names (see `## Forbidden
+Legacy Surfaces` below for that list's source). Unlike the other three
+checks, no package constant survives for the legacy event names — they were
+deleted outright in `8.0.0` and not re-homed — so this document is the only
+place a caller outside the strict profile can find them.
 
 Migration: pin `>=8.0.0`; delete or re-home any import of the three
 modules. There are no aliases. See `CHANGELOG.md` (`### Breaking`) for the
