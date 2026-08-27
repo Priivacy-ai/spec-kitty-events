@@ -130,6 +130,21 @@ def test_helper_handles_z_suffix_iso_string() -> None:
     assert_producer_occurrence_preserved(envelope, datetime(2026, 1, 1, tzinfo=timezone.utc))
 
 
+def test_helper_rejects_a_doubled_trailing_z_timestamp() -> None:
+    """A doubled trailing "Z" must be rejected on every interpreter version.
+
+    Stripping only the final "Z" and appending "+00:00" would otherwise turn
+    this into "...00Z+00:00", which Python 3.10's laxer ``fromisoformat``
+    accepts even though it is not a valid ISO-8601 timestamp
+    (spec-kitty-events#55/#107).
+    """
+    envelope = {"timestamp": "2026-01-01T00:00:00ZZ"}
+    with pytest.raises(ValueError, match="not ISO-8601"):
+        assert_producer_occurrence_preserved(
+            envelope, datetime(2026, 1, 1, tzinfo=timezone.utc)
+        )
+
+
 def test_helper_raises_on_one_second_drift() -> None:
     """Even a one-second substitution must raise (proves it is exact, not approximate)."""
     envelope = {"timestamp": "2026-01-01T00:00:00+00:00"}
