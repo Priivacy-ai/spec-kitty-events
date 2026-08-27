@@ -484,6 +484,26 @@ def test_ref_over_bound_raises_rather_than_emitting_unbounded() -> None:
         zeitgeist_ref_for("WPStatusChanged", payload)
 
 
+def test_ref_derival_admits_a_multibyte_value_within_the_stricter_byte_bound() -> None:
+    """Mirrors test_encode_admits_a_multibyte_value_within_the_stricter_byte_bound:
+    a multi-byte ref that fits under the byte bound must still be returned."""
+    payload = _transition(mission_slug="é" * 100)
+    assert zeitgeist_ref_for("WPStatusChanged", payload) == "é" * 100
+
+
+def test_ref_derival_rejects_multibyte_over_the_byte_bound_though_under_240_chars() -> None:
+    """Mirrors test_encode_rejects_a_multibyte_value_over_the_byte_bound_though_under_240_chars:
+    the ASCII-only ``"s" * 241`` case above cannot distinguish a UTF-8-byte
+    bound from a character-count bound (spec-kitty-events#70) — this pins
+    the byte semantics zeitgeist_ref_for's docstring claims."""
+    value = "é" * 121  # 121 characters, 242 UTF-8 bytes
+    assert len(value) <= 240
+    assert len(value.encode("utf-8")) > ZEITGEIST_ATTRS_MAX_BYTES
+    payload = _transition(mission_slug=value)
+    with pytest.raises(ZeitgeistAttrsOverflowError):
+        zeitgeist_ref_for("WPStatusChanged", payload)
+
+
 def test_bounds_constants_match_the_zeitgeist_frame_contract() -> None:
     assert ZEITGEIST_ATTRS_MAX_KEYS == 16
     assert ZEITGEIST_ATTRS_MAX_BYTES == 240
