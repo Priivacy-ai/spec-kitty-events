@@ -1,0 +1,17 @@
+**/.git
+**/.venv
+**/venv
+**/ENV
+**/env
+**/__pycache__
+**/*.py[cod]
+**/*.egg-info
+**/.pytest_cache
+**/.hypothesis
+**/.mypy_cache
+**/.coverage
+**/htmlcov
+**/build
+**/dist
+**/node_modules
+**/.DS_Store
