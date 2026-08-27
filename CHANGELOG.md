@@ -43,6 +43,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   3.10, a strict superset, so that lane and its `TIMESTAMP_PARSING_TESTS` list
   were removed as of this change to avoid running the same tests on 3.10
   twice.
+- `test-floor` now runs in its own `UV_PROJECT_ENVIRONMENT` (`.venv-floor`)
+  instead of the default `.venv`. `uv run --python 3.10` replaces whatever
+  `.venv` it is pointed at, so with `test-full: test-floor` sharing the
+  default `.venv`, `test-floor` running first silently downgraded
+  `test-full`'s own coverage recipe to 3.10 too — dropping default-interpreter
+  coverage from `test-full` entirely, the opposite of the intended "3.10 as
+  well as the default interpreter" (squad finding on PR #130).
 - `from_zeitgeist_attrs` now enforces the same `event_id`/`occurred_at`
   contract the envelope itself guarantees, instead of the weaker
   emptiness/parses-at-all checks closing #28 left behind
