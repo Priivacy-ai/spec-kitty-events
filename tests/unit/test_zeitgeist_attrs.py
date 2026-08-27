@@ -539,6 +539,20 @@ def test_emit_refuses_a_future_field_collision(monkeypatch: pytest.MonkeyPatch) 
         to_zeitgeist_attrs(_transition(), _envelope("WPStatusChanged"))
 
 
+def test_forbidden_key_hits_catches_every_segment_position(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """``_forbidden_key_hits`` must catch a forbidden name in the prefix or
+    middle segment of a dotted key, not just an exact match or the trailing
+    segment (EXPERIMENTAL-spec-kitty-events#133)."""
+    monkeypatch.setattr(zeitgeist_attrs, "FORBIDDEN_ATTR_KEYS", frozenset({"token"}))
+    assert zeitgeist_attrs._forbidden_key_hits(["actor.token"]) == ["actor.token"]
+    assert zeitgeist_attrs._forbidden_key_hits(["token.sub"]) == ["token.sub"]
+    assert zeitgeist_attrs._forbidden_key_hits(["a.token.b"]) == ["a.token.b"]
+    assert zeitgeist_attrs._forbidden_key_hits(["token"]) == ["token"]
+    assert zeitgeist_attrs._forbidden_key_hits(["safe.key"]) == []
+
+
 def test_emit_refuses_a_forbidden_name_under_a_nested_dotted_key(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
