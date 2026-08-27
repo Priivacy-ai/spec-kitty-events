@@ -515,17 +515,30 @@ def test_decode_rejects_lone_surrogates_with_typed_error() -> None:
         from_zeitgeist_attrs("WPStatusChanged", attrs)
 
 
-def test_decode_admits_a_relay_valid_multibyte_value_over_240_bytes() -> None:
-    """Regression pin for spec-kitty-events#16: decode counts characters,
-    like the relay's own schema does, so it must not over-reject a frame
-    the relay already accepted just because UTF-8 needs >1 byte/char."""
+def test_decode_admits_a_multibyte_value_within_the_byte_bound() -> None:
+    """A multi-byte value that fits the relay's 240-UTF-8-byte bound (and
+    therefore also its 240-character bound, since bytes >= chars) decodes."""
     attrs = to_zeitgeist_attrs(_transition(), _envelope("WPStatusChanged"))
-    value = "é" * 121  # 121 characters, 242 UTF-8 bytes — relay-valid
-    assert len(value) <= 240
-    assert len(value.encode("utf-8")) > ZEITGEIST_ATTRS_MAX_BYTES
+    value = "é" * 100  # 100 characters, 200 UTF-8 bytes — relay-valid
+    assert len(value.encode("utf-8")) <= ZEITGEIST_ATTRS_MAX_BYTES
     attrs["actor"] = value
     moment = from_zeitgeist_attrs("WPStatusChanged", attrs)
     assert moment.attrs["actor"] == value
+
+
+def test_decode_rejects_a_multibyte_value_over_the_byte_bound_though_under_240_chars() -> None:
+    """spec-kitty-events#16: the relay's `EventArgs` schema bounds values by
+    UTF-8 bytes (`maxUtf8Bytes: 240`) *and* by characters (`maxLength: 240`)
+    independently (zeitgeist commit 30d3ab4415, closing zeitgeist#20), so a
+    value at 121 characters / 242 UTF-8 bytes is relay-*invalid* — decode
+    must reject it, matching encode's already-correct byte bound."""
+    attrs = to_zeitgeist_attrs(_transition(), _envelope("WPStatusChanged"))
+    value = "é" * 121  # 121 characters, 242 UTF-8 bytes — relay-invalid
+    assert len(value) <= 240
+    assert len(value.encode("utf-8")) > ZEITGEIST_ATTRS_MAX_BYTES
+    attrs["actor"] = value
+    with pytest.raises(ZeitgeistAttrsOverflowError):
+        from_zeitgeist_attrs("WPStatusChanged", attrs)
 
 
 def test_decode_rejects_a_key_over_the_64_char_bound(
