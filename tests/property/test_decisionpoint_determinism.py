@@ -17,7 +17,6 @@ from ulid import ULID
 
 from spec_kitty_events.decision_moment import (
     OriginFlow,
-    OriginSurface,
     SummarySource,
     TerminalOutcome,
 )

@@ -1,6 +1,6 @@
 .DEFAULT_GOAL := help
 
-.PHONY: help test-fast test-full
+.PHONY: help test-fast test-full lint
 
 help: ## Show available targets
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
@@ -13,3 +13,9 @@ test-fast: ## Run the whole suite without coverage (~16s) — the implementer bl
 
 test-full: ## Run the whole suite with the configured coverage report — what the CI agent runs
 	uv run pytest $(ARGS)
+
+# ruff format --check is intentionally not part of this target yet: the repo
+# predates ruff and has never been run through its formatter (issue #12
+# follow-up). `lint` covers the pinned, configured check gate only.
+lint: ## Run the pinned, configured ruff check gate (see pyproject.toml [tool.ruff])
+	uv run ruff check .

@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import pytest
 
 from spec_kitty_events.conformance.loader import load_fixtures, load_replay_stream
 from spec_kitty_events.conformance.validators import validate_event

@@ -17,14 +17,12 @@ from spec_kitty_events.collaboration import (
     DRIVE_INTENT_SET,
     FOCUS_CHANGED,
     PARTICIPANT_JOINED,
-    PARTICIPANT_LEFT,
     PRESENCE_HEARTBEAT,
     PROMPT_STEP_EXECUTION_COMPLETED,
     PROMPT_STEP_EXECUTION_STARTED,
     SESSION_LINKED,
     WARNING_ACKNOWLEDGED,
     ParticipantIdentity,
-    ReducedCollaborationState,
     reduce_collaboration_events,
 )
 from spec_kitty_events.models import Event

@@ -705,6 +705,12 @@ __all__ = [
     "MissionNextAnomaly",
     "ReducedMissionRunState",
     "reduce_mission_next_events",
+    # Analytics event contracts
+    "TOKEN_USAGE_RECORDED",
+    "DIFF_SUMMARY_RECORDED",
+    "ANALYTICS_EVENT_TYPES",
+    "TokenUsageRecordedPayload",
+    "DiffSummaryRecordedPayload",
     # Dossier event contracts
     "MISSION_DOSSIER_ARTIFACT_INDEXED",
     "MISSION_DOSSIER_ARTIFACT_MISSING",

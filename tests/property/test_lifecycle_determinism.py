@@ -19,7 +19,6 @@ from spec_kitty_events.lifecycle import (
     MissionStartedPayload,
     MissionStatus,
     PhaseEnteredPayload,
-    ReducedMissionState,
     reduce_lifecycle_events,
 )
 from spec_kitty_events.models import Event

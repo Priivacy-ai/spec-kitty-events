@@ -63,7 +63,7 @@ class TestConstants:
 
     def test_all_constants_are_nonempty(self) -> None:
         for c in self.ALL_CONSTANTS:
-            assert len(c) > 0, f"Constant is empty"
+            assert len(c) > 0, "Constant is empty"
 
     def test_frozenset_has_14_elements(self) -> None:
         assert len(COLLABORATION_EVENT_TYPES) == 14

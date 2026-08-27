@@ -22,14 +22,8 @@ from spec_kitty_events.collaboration import (
     PROMPT_STEP_EXECUTION_STARTED,
     SESSION_LINKED,
     WARNING_ACKNOWLEDGED,
-    CollaborationAnomaly,
-    CommentEntry,
-    DecisionEntry,
-    FocusTarget,
     ParticipantIdentity,
-    ReducedCollaborationState,
     UnknownParticipantError,
-    WarningEntry,
     reduce_collaboration_events,
 )
 from spec_kitty_events.models import Event, SpecKittyEventsError

@@ -8,7 +8,6 @@ from __future__ import annotations
 
 import json
 import uuid
-from pathlib import Path
 from typing import Any, Dict, List
 
 import pytest
@@ -20,14 +19,6 @@ from spec_kitty_events.conformance.validators import (
     validate_event,
 )
 from spec_kitty_events.glossary import (
-    ClarificationRecord,
-    GlossaryAnomaly,
-    GlossaryClarificationRequestedPayload,
-    GlossaryScopeActivatedPayload,
-    GlossaryStrictnessSetPayload,
-    ReducedGlossaryState,
-    SemanticCheckEvaluatedPayload,
-    TermCandidateObservedPayload,
     reduce_glossary_events,
 )
 from spec_kitty_events.models import Event
