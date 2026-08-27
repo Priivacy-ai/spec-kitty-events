@@ -611,6 +611,75 @@ def test_decode_rejects_an_ansi_escape_in_a_value_with_typed_error() -> None:
         from_zeitgeist_attrs("WPStatusChanged", attrs)
 
 
+def test_decode_rejects_a_c1_next_line_control_with_typed_error() -> None:
+    """``U+0085`` NEL is a C1 control, outside the C0+DEL range #25 covered
+    but inside zeitgeist's ``clean_field`` ``isprintable()`` doctrine
+    (issue #63)."""
+    attrs = to_zeitgeist_attrs(_transition(), _envelope("WPStatusChanged"))
+    attrs["actor"] = "actor\x85rumor"
+    with pytest.raises(ZeitgeistAttrsControlCharacterError, match="attr 'actor' value"):
+        from_zeitgeist_attrs("WPStatusChanged", attrs)
+
+
+def test_decode_rejects_a_c1_csi_introducer_with_typed_error() -> None:
+    """``U+009B`` CSI is a C1 control that xterm-family terminals in UTF-8
+    mode can interpret as a bare ANSI CSI introducer — the same
+    ANSI-smuggling shape ESC carries, without ever using ``U+001B``
+    (issue #63)."""
+    attrs = to_zeitgeist_attrs(_transition(), _envelope("WPStatusChanged"))
+    attrs["actor"] = "\x9b[31mactor"
+    with pytest.raises(ZeitgeistAttrsControlCharacterError, match="attr 'actor' value"):
+        from_zeitgeist_attrs("WPStatusChanged", attrs)
+
+
+def test_decode_rejects_a_unicode_line_separator_with_typed_error() -> None:
+    """``U+2028`` LINE SEPARATOR is a line terminator in JavaScript source
+    and several log/JSONL readers — the "forge an extra line" shape one
+    encoding up from a bare LF (issue #63)."""
+    attrs = to_zeitgeist_attrs(_transition(), _envelope("WPStatusChanged"))
+    attrs["actor"] = "actor rumor: fake status line"
+    with pytest.raises(ZeitgeistAttrsControlCharacterError, match="attr 'actor' value"):
+        from_zeitgeist_attrs("WPStatusChanged", attrs)
+
+
+def test_decode_rejects_a_unicode_paragraph_separator_with_typed_error() -> None:
+    """``U+2029`` PARAGRAPH SEPARATOR, same family as ``U+2028`` (issue
+    #63)."""
+    attrs = to_zeitgeist_attrs(_transition(), _envelope("WPStatusChanged"))
+    attrs["actor"] = "actor rumor"
+    with pytest.raises(ZeitgeistAttrsControlCharacterError, match="attr 'actor' value"):
+        from_zeitgeist_attrs("WPStatusChanged", attrs)
+
+
+def test_decode_rejects_a_right_to_left_override_with_typed_error() -> None:
+    """``U+202E`` RIGHT-TO-LEFT OVERRIDE is the trojan-source shape: rendered
+    text reads differently from the stored bytes, in a field whose whole
+    job is to say who did something (issue #63)."""
+    attrs = to_zeitgeist_attrs(_transition(), _envelope("WPStatusChanged"))
+    attrs["actor"] = "actor‮rumor"
+    with pytest.raises(ZeitgeistAttrsControlCharacterError, match="attr 'actor' value"):
+        from_zeitgeist_attrs("WPStatusChanged", attrs)
+
+
+def test_decode_rejects_a_zero_width_space_with_typed_error() -> None:
+    """``U+200B`` ZERO WIDTH SPACE is an invisible ``Cf``-adjacent formatting
+    character that ``isprintable()`` also rejects (issue #63)."""
+    attrs = to_zeitgeist_attrs(_transition(), _envelope("WPStatusChanged"))
+    attrs["actor"] = "actor​rumor"
+    with pytest.raises(ZeitgeistAttrsControlCharacterError, match="attr 'actor' value"):
+        from_zeitgeist_attrs("WPStatusChanged", attrs)
+
+
+def test_decode_admits_an_ordinary_space_and_printable_unicode() -> None:
+    """Space is printable, so ordinary values with plain spaces and
+    printable non-ASCII text are unaffected by the widened check (issue
+    #63)."""
+    attrs = to_zeitgeist_attrs(_transition(), _envelope("WPStatusChanged"))
+    attrs["actor"] = "a name with spaces café"
+    moment = from_zeitgeist_attrs("WPStatusChanged", attrs)
+    assert moment.attrs["actor"] == "a name with spaces café"
+
+
 def test_decode_admits_a_multibyte_value_within_the_byte_bound() -> None:
     """A multi-byte value that fits the relay's 240-UTF-8-byte bound (and
     therefore also its 240-character bound, since bytes >= chars) decodes."""

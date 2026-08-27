@@ -279,7 +279,9 @@ class ZeitgeistAttrsForbiddenKeyError(ZeitgeistAttrsError):
 
 
 class ZeitgeistAttrsControlCharacterError(ZeitgeistAttrsError):
-    """A value carries a C0 control character (or DEL)."""
+    """A value carries a non-printable character (``not str.isprintable()``:
+    C0/C1 controls, DEL, the Unicode line/paragraph separators, or a bidi/
+    zero-width formatting character)."""
 
 
 #: The event families the Ephemeral Team Status design moves to ``volatile``
@@ -622,26 +624,41 @@ def _encode_fields(
 
 
 def _reject_control_characters(subject: str, value: str) -> None:
-    """Refuse a value carrying a C0 control character (``U+0000``-``U+001F``)
-    or DEL (``U+007F``).
+    """Refuse a value carrying any non-printable character.
 
     This is the decode-seam hardening `EXPERIMENTAL-spec-kitty-events#25`_
-    asks for: an inbound attrs mapping is opaque wire data from a relay a
-    hostile teammate or hostile relay frame can shape, and free-text keys
-    (the actor label, ``review_ref``, ...) carry it verbatim into
-    :class:`VolatileMoment`. A bare newline could forge extra frame lines
-    for whatever renders the moment next; a bare ESC could smuggle ANSI
-    into a terminal or log. Zeitgeist's own ingest doctrine strips these
-    (``editor.clean_field``); this module rejects instead of stripping,
-    matching the rest of this file's fail-closed contract (over-bound
-    values raise rather than truncate).
+    asks for, widened by `EXPERIMENTAL-spec-kitty-events#63`_ to full parity
+    with zeitgeist's own ``editor.clean_field`` doctrine: an inbound attrs
+    mapping is opaque wire data from a relay a hostile teammate or hostile
+    relay frame can shape, and free-text keys (the actor label,
+    ``review_ref``, ...) carry it verbatim into :class:`VolatileMoment`.
+    ``str.isprintable()`` is the same predicate zeitgeist's ``clean_field``
+    uses (space is printable, so ordinary values are unaffected) and it
+    rejects strictly more than C0 (``U+0000``-``U+001F``) and DEL
+    (``U+007F``) alone would:
+
+    * the C1 controls (e.g. ``U+0085`` NEL, ``U+009B`` CSI) — the same
+      ANSI-smuggling shape ESC carries, since xterm-family terminals in
+      UTF-8 mode can interpret ``U+009B`` as a bare CSI introducer;
+    * the Unicode line/paragraph separators ``U+2028``/``U+2029`` — line
+      terminators to JavaScript and to several log/JSONL readers, the same
+      "forge an extra line" shape as a bare LF;
+    * bidi/formatting ``Cf`` characters such as ``U+202E`` (RIGHT-TO-LEFT
+      OVERRIDE, the trojan-source shape: rendered text reads differently
+      from the stored bytes) and zero-width characters such as ``U+200B``.
+
+    Zeitgeist's own ingest doctrine strips these (``editor.clean_field``);
+    this module rejects instead of stripping, matching the rest of this
+    file's fail-closed contract (over-bound values raise rather than
+    truncate).
 
     .. _EXPERIMENTAL-spec-kitty-events#25: https://github.com/spec-kitty/EXPERIMENTAL-spec-kitty-events/issues/25
+    .. _EXPERIMENTAL-spec-kitty-events#63: https://github.com/spec-kitty/EXPERIMENTAL-spec-kitty-events/issues/63
     """
-    bad = sorted({f"U+{ord(ch):04X}" for ch in value if ord(ch) < 0x20 or ord(ch) == 0x7F})
+    bad = sorted({f"U+{ord(ch):04X}" for ch in value if not ch.isprintable()})
     if bad:
         raise ZeitgeistAttrsControlCharacterError(
-            f"{subject} contains control characters: {bad}"
+            f"{subject} contains non-printable characters: {bad}"
         )
 
 
@@ -957,8 +974,8 @@ def from_zeitgeist_attrs(
             kind's closed key set, a key the kind's payload always carries
             on encode is missing, or an ``event_id``/``occurred_at`` attr is
             present but malformed (empty, or not ISO-8601, respectively).
-        ZeitgeistAttrsControlCharacterError: a value carries a C0 control
-            character or DEL.
+        ZeitgeistAttrsControlCharacterError: a value carries a non-printable
+            character (``not str.isprintable()``).
         ZeitgeistAttrsForbiddenKeyError: a forbidden key is present.
         ZeitgeistAttrsOverflowError: the bound is exceeded.
     """
