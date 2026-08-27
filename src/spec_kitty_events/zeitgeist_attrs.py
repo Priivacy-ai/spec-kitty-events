@@ -3,10 +3,31 @@
 The Ephemeral Team Status design broadcasts mission/WP moments through each
 team's Zeitgeist relay as *opaque bounded attributes*: one ``event`` frame is
 ``{kind, ref?, attrs}`` where ``attrs`` must be a flat ``str:str`` mapping
-with at most 16 keys and at most 240 bytes per key and per value, and no
-forbidden key anywhere (zeitgeist issue: ``EventArgs {kind: ident,
-ref?: string≤240, attrs: {str:str}, ≤16 keys, ≤240 B each}``; design page
+with at most 16 keys, at most 64 characters per key, and at most 240
+characters per value, and no forbidden key anywhere (zeitgeist issue:
+``EventArgs {kind: ident, ref?: string≤240, attrs: {str:str}, ≤16 keys,
+keys≤64 chars, values≤240 chars}``; design page
 ``ephemeral-team-status.html``, "The vocabulary" paragraph).
+
+The relay's ``EventArgs`` schema bounds ``attrs`` keys at ≤64 *characters*
+(``propertyNames.maxLength``, ASCII-only pattern so chars==bytes there) and
+bounds values (and the frame's ``ref``) at ≤240 characters *and*
+independently at ≤240 UTF-8 bytes (``maxLength: 240`` **and**
+``maxUtf8Bytes: 240`` both present on ``attrs``'s ``additionalProperties``
+and on ``ref``, in ``managed_control.schema.json`` and
+``managed_live.schema.json`` since zeitgeist commit ``30d3ab4415``,
+"Enforce event field byte limits", closing zeitgeist#20). The relay checks
+both clauses independently (``capabilities.py``'s validator), so the
+UTF-8-byte bound is the one that actually binds — a character count can
+satisfy ≤240 chars while still exceeding 240 bytes, and the relay rejects
+that. :func:`to_zeitgeist_attrs` enforces the 240-UTF-8-byte bound on
+values and the 64-character bound on keys, both exactly matching the
+relay's, since encode is where an over-length attr must be caught before
+it ever reaches the wire. :func:`from_zeitgeist_attrs` checks the same
+240-UTF-8-byte bound on values (not a character count — a value within
+240 characters can still be relay-invalid at >240 bytes) and the
+64-character bound on keys, so it does not accept an inbound frame the
+relay itself would never forward (spec-kitty-events#16).
 
 This module is the single owner of the mapping between this package's
 volatile payload vocabulary and that wire shape:
@@ -123,6 +144,7 @@ __all__ = [
     "VOLATILE_EVENT_TYPES",
     "ZEITGEIST_ATTRS_MAX_BYTES",
     "ZEITGEIST_ATTRS_MAX_KEYS",
+    "ZEITGEIST_ATTR_KEY_MAX_CHARS",
     "ZEITGEIST_FORBIDDEN_KEYS_V1",
     "UnencodableFieldValueError",
     "UnknownVolatileEventTypeError",
@@ -140,8 +162,18 @@ ZEITGEIST_ATTRS_MAX_KEYS: int = 16
 """Maximum number of entries in one attrs mapping (zeitgeist EventArgs)."""
 
 ZEITGEIST_ATTRS_MAX_BYTES: int = 240
-"""Maximum UTF-8 size of one attr key or value (zeitgeist EventArgs; the
-frame's ``ref`` carries the same bound independently)."""
+"""Maximum size of one attr value: 240 UTF-8 bytes, checked on both encode
+and decode. The relay's schema also carries an independent ≤240-character
+bound (``maxLength``), but UTF-8 byte count is always ≥ character count, so
+enforcing the byte bound here also guarantees the character bound — a
+value can never pass this check while still exceeding the relay's
+character bound (spec-kitty-events#16). The frame's ``ref`` carries the
+same pair of bounds independently."""
+
+ZEITGEIST_ATTR_KEY_MAX_CHARS: int = 64
+"""Maximum character length of one attr key, enforced on both encode and
+decode (zeitgeist EventArgs ``propertyNames.maxLength``; JSON Schema
+``maxLength`` counts characters, not UTF-8 bytes — spec-kitty-events#16)."""
 
 #: Mirror of zeitgeist ``capabilities.FORBIDDEN_KEYS_V1`` (by value; see the
 #: module docstring for why this is a mirror, not an import).
@@ -343,8 +375,9 @@ def to_zeitgeist_attrs(payload: BaseModel, envelope: Event) -> dict[str, str]:
         ZeitgeistAttrsError: *envelope* declares a different event type.
         UnencodableFieldValueError: a carried field has no string encoding.
         ZeitgeistAttrsForbiddenKeyError: an emitted key is forbidden.
-        ZeitgeistAttrsOverflowError: the projection exceeds the key-count or
-            byte bounds. No truncation is ever applied.
+        ZeitgeistAttrsOverflowError: the projection exceeds the key-count,
+            key-length, or value-length bounds. No truncation is ever
+            applied.
     """
     event_type = next(
         (k for k, v in PAYLOAD_MODEL_BY_EVENT_TYPE.items() if type(payload) is v),
@@ -380,16 +413,23 @@ def to_zeitgeist_attrs(payload: BaseModel, envelope: Event) -> dict[str, str]:
         raise ZeitgeistAttrsForbiddenKeyError(
             f"refusing to emit forbidden attr keys: {bad_keys}"
         )
-    oversized = sorted(
+    oversized_keys = sorted(
+        key for key in attrs if len(key) > ZEITGEIST_ATTR_KEY_MAX_CHARS
+    )
+    if oversized_keys:
+        raise ZeitgeistAttrsOverflowError(
+            f"attr keys exceed the {ZEITGEIST_ATTR_KEY_MAX_CHARS}-char bound: "
+            f"{oversized_keys}"
+        )
+    oversized_values = sorted(
         key
         for key, value in attrs.items()
-        if _utf8_size(f"attr key {key!r}", key) > ZEITGEIST_ATTRS_MAX_BYTES
-        or _utf8_size(f"attr {key!r} value", value) > ZEITGEIST_ATTRS_MAX_BYTES
+        if _utf8_size(f"attr {key!r} value", value) > ZEITGEIST_ATTRS_MAX_BYTES
     )
-    if oversized:
+    if oversized_values:
         raise ZeitgeistAttrsOverflowError(
-            f"attr entries exceed the {ZEITGEIST_ATTRS_MAX_BYTES}-byte bound: "
-            f"{oversized}"
+            f"attr values exceed the {ZEITGEIST_ATTRS_MAX_BYTES}-byte bound: "
+            f"{oversized_values}"
         )
     if len(attrs) > ZEITGEIST_ATTRS_MAX_KEYS:
         raise ZeitgeistAttrsOverflowError(
@@ -520,16 +560,30 @@ def from_zeitgeist_attrs(
     if bad_keys:
         raise ZeitgeistAttrsForbiddenKeyError(f"forbidden attr keys: {bad_keys}")
 
-    oversized = sorted(
+    oversized_keys = sorted(
+        key for key in attrs if len(key) > ZEITGEIST_ATTR_KEY_MAX_CHARS
+    )
+    if oversized_keys:
+        raise ZeitgeistAttrsOverflowError(
+            f"attr keys exceed the {ZEITGEIST_ATTR_KEY_MAX_CHARS}-char bound: "
+            f"{oversized_keys}"
+        )
+    # UTF-8 byte counts, matching the relay's `maxUtf8Bytes` clause — the
+    # actually-binding one, since byte count >= char count means satisfying
+    # it also satisfies the relay's independent `maxLength` (character)
+    # clause (spec-kitty-events#16). A char-count check here would
+    # under-reject a value the relay itself rejects (e.g. "é" * 121 is 121
+    # characters but 242 UTF-8 bytes, over the relay's byte bound). This
+    # also catches a lone surrogate with a typed error, same as before.
+    oversized_values = sorted(
         key
         for key, value in attrs.items()
-        if _utf8_size(f"attr key {key!r}", key) > ZEITGEIST_ATTRS_MAX_BYTES
-        or _utf8_size(f"attr {key!r} value", value) > ZEITGEIST_ATTRS_MAX_BYTES
+        if _utf8_size(f"attr {key!r} value", value) > ZEITGEIST_ATTRS_MAX_BYTES
     )
-    if oversized:
+    if oversized_values:
         raise ZeitgeistAttrsOverflowError(
-            f"attr entries exceed the {ZEITGEIST_ATTRS_MAX_BYTES}-byte bound: "
-            f"{oversized}"
+            f"attr values exceed the {ZEITGEIST_ATTRS_MAX_BYTES}-byte bound: "
+            f"{oversized_values}"
         )
     if len(attrs) > ZEITGEIST_ATTRS_MAX_KEYS:
         raise ZeitgeistAttrsOverflowError(
