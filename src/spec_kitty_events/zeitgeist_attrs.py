@@ -84,6 +84,7 @@ from __future__ import annotations
 import dataclasses
 from collections.abc import Mapping
 from enum import Enum
+from types import UnionType
 from typing import Any, Union, get_args, get_origin
 
 from pydantic import BaseModel
@@ -162,9 +163,15 @@ class VolatileMoment:
     """The typed view of one broadcast moment: a full ``event`` frame body.
 
     ``kind`` is the frame's event type, ``ref`` its aggregate identity
-    (≤240 bytes; ``None`` when the family has no single identity field),
-    ``attrs`` the validated bounded projection. Consumers render from this;
-    nobody re-parses raw attr strings outside this module's vocabulary.
+    (≤240 bytes), ``attrs`` the validated bounded projection. Consumers
+    render from this; nobody re-parses raw attr strings outside this
+    module's vocabulary.
+
+    ``ref`` is ``None`` only when the family's ref field is itself
+    ``Optional`` and was absent from the encode (today, only
+    ``PhaseEntered``'s back-compat ``mission_slug``) — :func:`from_zeitgeist_attrs`
+    requires the ref key whenever the family's payload guarantees it, so a
+    family with a required ref field never decodes to ``ref=None``.
     """
 
     kind: str
@@ -437,8 +444,16 @@ def zeitgeist_ref_for(event_type: str, payload: BaseModel) -> str | None:
 
 
 def _unwrap_optional(annotation: Any) -> Any:
-    """See through ``Optional[X]`` to the payload annotation beneath it."""
-    if get_origin(annotation) is Union:
+    """See through ``Optional[X]`` to the payload annotation beneath it.
+
+    Handles both spellings pydantic resolves ``model_fields`` annotations
+    to: ``typing.Optional``/``typing.Union`` (``get_origin`` is
+    ``typing.Union``) and the PEP 604 ``X | None`` form (``get_origin`` is
+    ``types.UnionType``) — the two are distinct origins at runtime, and
+    several payload models in this package use the ``X | None`` spelling.
+    """
+    origin = get_origin(annotation)
+    if origin is Union or origin is UnionType:
         args = tuple(a for a in get_args(annotation) if a is not type(None))
         if len(args) == 1:
             return args[0]
@@ -476,6 +491,47 @@ _ALLOWED_KEYS_BY_EVENT_TYPE: Mapping[str, frozenset[str]] = {
 }
 
 
+def _required_schema_keys(event_type: str, model: type[BaseModel]) -> frozenset[str]:
+    """The subset of :func:`_schema_keys` decode can insist on.
+
+    A key is required only when :func:`to_zeitgeist_attrs` can never omit
+    it: a projected actor-label key (:data:`PROJECTED_FIELD_BY_EVENT_TYPE`
+    — every current entry projects a *required* nested actor identity via a
+    property that always returns a non-empty label) or a payload field
+    whose annotation does not admit ``None``. A field pydantic marks
+    required but whose type is ``Optional`` (e.g.
+    ``MissionCreatedPayload.mission_number``) can still be passed as
+    explicit ``None`` and vanish from the wire on encode, so it is never
+    required here — requiring it would reject attrs :func:`to_zeitgeist_attrs`
+    genuinely produces. A nested, non-optional, non-projected value object
+    would need its own required sub-keys computed recursively; no kind in
+    today's vocabulary has one, so that case is left unhandled rather than
+    guessed at.
+    """
+    skip = UNBROADCAST_FIELDS.get(event_type, frozenset())
+    projected = PROJECTED_FIELD_BY_EVENT_TYPE.get(event_type, {})
+    keys: set[str] = set()
+    for name, field in model.model_fields.items():
+        if name in skip:
+            continue
+        if name in projected:
+            keys.add(name)
+            continue
+        annotation = field.annotation
+        unwrapped = _unwrap_optional(annotation)
+        if isinstance(unwrapped, type) and issubclass(unwrapped, BaseModel):
+            continue
+        if unwrapped is annotation:
+            keys.add(name)
+    return frozenset(keys)
+
+
+_REQUIRED_KEYS_BY_EVENT_TYPE: Mapping[str, frozenset[str]] = {
+    event_type: _required_schema_keys(event_type, model) | ENVELOPE_ATTR_KEYS
+    for event_type, model in PAYLOAD_MODEL_BY_EVENT_TYPE.items()
+}
+
+
 def from_zeitgeist_attrs(
     event_type: str, attrs: Mapping[str, str]
 ) -> VolatileMoment:
@@ -484,18 +540,28 @@ def from_zeitgeist_attrs(
     The attrs are opaque on the wire; this function is the only place that
     gives them back their meaning. It enforces the shape :func:`to_zeitgeist_attrs`
     guarantees on emit — flat ``str:str``, within the bound, no forbidden
-    keys, no keys outside the kind's schema — and wraps the result, with the
-    frame's identity, in a :class:`VolatileMoment` for rendering. It checks
-    the shape of moments, not their completeness: an inbound mapping missing
-    optional payload keys decodes with those keys absent, and rebuilding the
-    journal payload remains impossible by design ("Projection, not
-    reconstruction").
+    keys, no keys outside the kind's schema, and every key the kind's
+    payload can never omit on a successful encode (its non-``Optional``
+    fields, the projected actor-label key, and the envelope's ``event_id``/
+    ``occurred_at``) actually present — and wraps the result, with the
+    frame's identity, in a :class:`VolatileMoment` for rendering.
+
+    This validates presence and shape, not value correctness: beyond being
+    ``str``-typed and within the byte bound, a present value's format is
+    opaque — an int-typed field's string need not parse as an int, an
+    enum-typed field's string need not be one of its members — because
+    values are not reparsed here, only rendered later by a consumer that
+    knows the kind. An inbound mapping missing an *optional* payload key
+    (one whose annotation admits ``None``) decodes with that key absent,
+    since rebuilding the journal payload remains impossible by design
+    ("Projection, not reconstruction").
 
     Raises:
         UnknownVolatileEventTypeError: *event_type* is not in the volatile
             vocabulary.
-        ZeitgeistAttrsError: a value is not ``str`` or a key is outside the
-            kind's closed key set.
+        ZeitgeistAttrsError: a value is not ``str``, a key is outside the
+            kind's closed key set, or a key the kind's payload always
+            carries on encode is missing.
         ZeitgeistAttrsForbiddenKeyError: a forbidden key is present.
         ZeitgeistAttrsOverflowError: the bound is exceeded.
     """
@@ -534,6 +600,13 @@ def from_zeitgeist_attrs(
     if len(attrs) > ZEITGEIST_ATTRS_MAX_KEYS:
         raise ZeitgeistAttrsOverflowError(
             f"{len(attrs)} attrs exceed the bound of {ZEITGEIST_ATTRS_MAX_KEYS}"
+        )
+
+    missing = sorted(_REQUIRED_KEYS_BY_EVENT_TYPE[event_type] - attrs.keys())
+    if missing:
+        raise ZeitgeistAttrsError(
+            f"attrs are missing keys the {event_type} schema always carries "
+            f"on encode: {missing}"
         )
 
     return VolatileMoment(kind=event_type, ref=attrs.get(REF_FIELD_BY_EVENT_TYPE[event_type]), attrs=dict(attrs))

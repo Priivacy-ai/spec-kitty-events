@@ -507,6 +507,53 @@ def test_decode_key_count_overflow_is_rejected(monkeypatch: pytest.MonkeyPatch) 
         from_zeitgeist_attrs("WPStatusChanged", attrs)
 
 
+def test_decode_rejects_structurally_incomplete_attrs() -> None:
+    """Regression pin (events#19): every kind here has a required ref field
+    on emit, so an empty mapping is not a moment `to_zeitgeist_attrs` could
+    ever have produced and must not decode as one."""
+    with pytest.raises(ZeitgeistAttrsError):
+        from_zeitgeist_attrs("MissionClosed", {})
+
+
+def test_decode_rejects_a_schema_legal_subset_missing_required_keys() -> None:
+    """events#19: `{"to_lane": "done"}` is a legal key/value pair for
+    WPStatusChanged but omits mission_slug/wp_id/actor/execution_mode/force/
+    event_id/occurred_at, none of which to_zeitgeist_attrs ever omits."""
+    with pytest.raises(ZeitgeistAttrsError, match="missing keys"):
+        from_zeitgeist_attrs("WPStatusChanged", {"to_lane": "done"})
+
+
+def test_decode_requires_the_ref_key_when_the_family_guarantees_one() -> None:
+    attrs = to_zeitgeist_attrs(_transition(), _envelope("WPStatusChanged"))
+    del attrs["mission_slug"]
+    with pytest.raises(ZeitgeistAttrsError, match="missing keys"):
+        from_zeitgeist_attrs("WPStatusChanged", attrs)
+
+
+def test_decode_permits_an_absent_ref_when_the_family_leaves_it_optional() -> None:
+    """PhaseEntered's ``mission_slug`` is a genuinely optional back-compat
+    field (unlike every other family's required ref), so decode must still
+    accept its absence and report ``ref=None`` rather than requiring it."""
+    from spec_kitty_events.lifecycle import PhaseEnteredPayload
+
+    payload = PhaseEnteredPayload(
+        mission_id="mission-demo", phase_name="build", actor="robert"
+    )
+    attrs = to_zeitgeist_attrs(payload, _envelope("PhaseEntered"))
+    assert "mission_slug" not in attrs
+    moment = from_zeitgeist_attrs("PhaseEntered", attrs)
+    assert moment.ref is None
+
+
+def test_required_keys_exclude_optional_typed_fields_pydantic_still_requires() -> None:
+    """MissionCreatedPayload.mission_number is `Optional[int] = Field(...)`:
+    pydantic requires the kwarg be passed, but the payload may still pass
+    None, in which case to_zeitgeist_attrs omits the key. Decode must not
+    require a key that a legitimate encode can omit."""
+    assert "mission_number" not in zeitgeist_attrs._REQUIRED_KEYS_BY_EVENT_TYPE["MissionCreated"]
+    assert "mission_slug" in zeitgeist_attrs._REQUIRED_KEYS_BY_EVENT_TYPE["MissionCreated"]
+
+
 def test_moment_is_frozen() -> None:
     moment = from_zeitgeist_attrs(
         "WPStatusChanged",
