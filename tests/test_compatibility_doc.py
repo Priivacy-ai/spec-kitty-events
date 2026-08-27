@@ -13,10 +13,14 @@ a machine-readable line, and that line must equal ``__version__``.
 
 from __future__ import annotations
 
+import json
 import re
 from pathlib import Path
+from typing import Any
 
-from spec_kitty_events import __version__
+import pytest
+
+from spec_kitty_events import __version__, forbidden_keys, strict
 
 _REPO_ROOT = Path(__file__).resolve().parent.parent
 _COMPATIBILITY_PATH = _REPO_ROOT / "COMPATIBILITY.md"
@@ -114,4 +118,92 @@ def test_readme_version_matches_package() -> None:
         f"is {__version__!r}. Per contracts/versioning-and-compatibility.md, "
         f"user-facing docs are a required artifact on every bump -- update "
         f"the declaration."
+    )
+
+
+# ---------------------------------------------------------------------------
+# COMPATIBILITY.md's `8.0.0` migration recipe, executed against the
+# cutover_boundary fixtures (planning#95, MINOR from PR #84 pass 2).
+#
+# COMPATIBILITY.md documents an executable contract for callers whose event
+# type is outside `strict.STRICT_EVENT_TYPES` (`validate_strict_envelope`
+# rejects those with UNKNOWN_EVENT_TYPE regardless of shape, so it isn't an
+# option for them): reproduce the removed cutover gate's checks directly --
+# a forbidden-key walk, an explicit schema_version check, a forbidden legacy
+# aggregate-name prefix check, and a forbidden legacy event-name check. No
+# test executed that recipe, so it could drift from the boundary it claims
+# to police -- exactly what happened twice on PR #84 (pass 1 omitted the
+# aggregate check, pass 2 omitted the event-name check). `_ADMITTED_BY_
+# DOCUMENTED_RECIPE` is the recipe transcribed verbatim from
+# COMPATIBILITY.md's "8.0.0" section; if the two ever disagree, update both
+# together.
+# ---------------------------------------------------------------------------
+
+_CUTOVER_BOUNDARY_REJECTED_DIR = (
+    _REPO_ROOT
+    / "src"
+    / "spec_kitty_events"
+    / "conformance"
+    / "fixtures"
+    / "cutover_boundary"
+    / "rejected_by_strict_profile"
+)
+
+_FORBIDDEN_LEGACY_EVENT_NAMES = frozenset({"FeatureCreated", "FeatureClosed"})
+
+
+def _admitted_by_documented_recipe(record: dict[str, Any]) -> bool:
+    """Mirror COMPATIBILITY.md's documented `8.0.0` migration recipe.
+
+    Returns True only if ``record`` passes every documented check; False as
+    soon as one check finds a defect.
+    """
+    if (
+        forbidden_keys.validate_no_forbidden_keys(
+            record, forbidden=forbidden_keys.FORBIDDEN_LEGACY_KEYS
+        )
+        is not None
+    ):
+        return False
+    if record.get("schema_version") != "3.0.0":
+        return False
+    if record.get("aggregate_id", "").split("/", 1)[0] in strict.FORBIDDEN_LEGACY_AGGREGATE_NAMES:
+        return False
+    if record.get("event_type") in _FORBIDDEN_LEGACY_EVENT_NAMES:
+        return False
+    return True
+
+
+def _cutover_boundary_rejected_fixtures() -> list[Path]:
+    paths = sorted(_CUTOVER_BOUNDARY_REJECTED_DIR.glob("*.json"))
+    assert paths, f"No fixtures found under {_CUTOVER_BOUNDARY_REJECTED_DIR}"
+    return paths
+
+
+@pytest.mark.parametrize(
+    "fixture_path",
+    _cutover_boundary_rejected_fixtures(),
+    ids=[p.stem for p in _cutover_boundary_rejected_fixtures()],
+)
+def test_documented_recipe_rejects_cutover_boundary_fixtures(
+    fixture_path: Path,
+) -> None:
+    """The documented recipe rejects every `rejected_by_strict_profile` fixture.
+
+    These fixtures are the pinned authority for the boundary the removed
+    cutover gate used to police. A recipe that admits any of them has
+    drifted from that boundary -- as the merged recipe once did for
+    ``legacy_event_name.json`` (pass 1: omitted aggregate check; pass 2:
+    omitted event-name check, which is the one this fixture needs, since its
+    aggregate_id is ``mission/...`` and the aggregate check alone would not
+    catch it).
+    """
+    wrapper: dict[str, Any] = json.loads(fixture_path.read_text(encoding="utf-8"))
+    record = wrapper["input"]
+    assert not _admitted_by_documented_recipe(record), (
+        f"{fixture_path.name}: the documented `8.0.0` migration recipe "
+        f"admitted this record, but it is pinned as rejected by the "
+        f"cutover boundary. The recipe in COMPATIBILITY.md has drifted -- "
+        f"update _admitted_by_documented_recipe (and the doc, if the doc is "
+        f"wrong) to match."
     )
