@@ -3,7 +3,6 @@ import uuid
 from datetime import datetime
 from typing import List
 
-import pytest
 from ulid import ULID
 
 from spec_kitty_events.models import Event

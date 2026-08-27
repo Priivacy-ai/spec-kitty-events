@@ -22,10 +22,8 @@ from spec_kitty_events.mission_next import (
     DecisionInputRequestedPayload,
     MissionRunCompletedPayload,
     MissionRunStartedPayload,
-    MissionRunStatus,
     NextStepAutoCompletedPayload,
     NextStepIssuedPayload,
-    ReducedMissionRunState,
     RuntimeActorIdentity,
     reduce_mission_next_events,
 )

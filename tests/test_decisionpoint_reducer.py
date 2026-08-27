@@ -29,10 +29,6 @@ from spec_kitty_events.decisionpoint import (
     DECISION_POINT_RESOLVED,
     DECISION_POINT_WIDENED,
     DecisionAuthorityRole,
-    DecisionPointDiscussingPayload,
-    DecisionPointOpenedPayload,
-    DecisionPointOverriddenPayload,
-    DecisionPointResolvedPayload,
     DecisionPointState,
     reduce_decision_point_events,
 )
@@ -1125,7 +1121,6 @@ def test_reducer_closed_locally_while_widened_without_prior_widening_raises_anom
 
 def test_reducer_origin_mismatch_across_events_produces_anomaly() -> None:
     """Opened(ADR) → Resolved(interview): origin_mismatch anomaly, events still applied."""
-    adr_resolved = _adr_resolved_payload(lamport=2)
     # Swap origin_surface to interview to create a mismatch
     interview_resolved = _interview_resolved_payload(
         terminal_outcome="resolved", final_answer="PostgreSQL", lamport=2

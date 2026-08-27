@@ -5,7 +5,6 @@ import subprocess
 import sys
 from pathlib import Path
 
-import pytest
 
 # V1 schemas added in spec-kitty-events 4.0.0
 _V1_REQUIRED_SCHEMAS = [

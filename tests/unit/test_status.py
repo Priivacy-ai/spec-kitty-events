@@ -13,15 +13,12 @@ from spec_kitty_events import (
     ExecutionMode,
     ForceMetadata,
     Lane,
-    ReducedStatus,
     RepoEvidence,
     ReviewVerdict,
     StatusTransitionPayload,
-    TransitionAnomaly,
     TransitionError,
     TransitionValidationResult,
     VerificationEntry,
-    WPState,
     dedup_events,
     normalize_lane,
     reduce_status_events,
@@ -812,7 +809,7 @@ class TestTransitionMatrix:
 def _build_legal_set() -> set[tuple[Lane | None, Lane]]:
     """Build the full set of legal (from, to) pairs including dynamic ones."""
     legal: set[tuple[Lane | None, Lane]] = set(_ALLOWED_TRANSITIONS)
-    non_terminal = [l for l in Lane if l not in TERMINAL_LANES]
+    non_terminal = [lane for lane in Lane if lane not in TERMINAL_LANES]
     for src in non_terminal:
         legal.add((src, Lane.BLOCKED))
         legal.add((src, Lane.CANCELED))

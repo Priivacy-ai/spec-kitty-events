@@ -12,8 +12,6 @@ import pytest
 
 from spec_kitty_events.conformance.pytest_helpers import (
     assert_lane_mapping,
-    assert_payload_conforms,
-    assert_payload_fails,
 )
 from spec_kitty_events.conformance.validators import (
     _EVENT_TYPE_TO_MODEL,
@@ -259,7 +257,7 @@ def test_lane_mapping_v1_output_type() -> None:
         assert isinstance(sync_lane, SyncLaneV1)
 
 
-@pytest.mark.parametrize("lane", list(Lane), ids=[l.value for l in Lane])
+@pytest.mark.parametrize("lane", list(Lane), ids=[each.value for each in Lane])
 def test_lane_mapping_v1_each_lane(lane: Lane) -> None:
     """Each canonical lane maps to a SyncLaneV1."""
     result = CANONICAL_TO_SYNC_V1[lane]

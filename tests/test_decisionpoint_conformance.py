@@ -13,7 +13,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 import pytest
 
@@ -23,10 +23,7 @@ from spec_kitty_events.conformance import (
     validate_event,
 )
 from spec_kitty_events.decisionpoint import (
-    DecisionPointDiscussingPayload,
-    DecisionPointOpenedPayload,
     DecisionPointOverriddenPayload,
-    DecisionPointResolvedPayload,
     DecisionPointWidenedPayload,
     DecisionPointResolvedInterviewPayload,
     _OPENED_ADAPTER,

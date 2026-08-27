@@ -5,7 +5,6 @@ from __future__ import annotations
 import uuid
 from datetime import datetime, timezone
 
-import pytest
 from hypothesis import given, settings
 from hypothesis import strategies as st
 
@@ -17,7 +16,6 @@ from spec_kitty_events import (
 from spec_kitty_events.mission_next import (
     DECISION_INPUT_ANSWERED,
     DECISION_INPUT_REQUESTED,
-    MISSION_NEXT_EVENT_TYPES,
     MISSION_RUN_COMPLETED,
     MISSION_RUN_STARTED,
     NEXT_STEP_AUTO_COMPLETED,
