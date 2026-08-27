@@ -361,6 +361,23 @@ def test_e2_fixture_min_versions_match_mission_run_support_rows() -> None:
     assert checked == E2_MISSION_RUN_EVENT_TYPES
 
 
+def test_phase_entered_ref_derivation_fixtures_share_one_min_version() -> None:
+    """``phase_entered_optional_absent`` and ``phase_entered_mission_slug_absent``
+    both pin the same ref-derivation fix (issue #18: ``PhaseEntered``'s frame
+    ``ref`` comes from the required ``mission_id``, never the optional
+    ``mission_slug`` back-compat field) and must therefore publish one
+    floor. They drifted to two different, both-stale, floors (``8.0.0`` and
+    ``8.1.0``) while the behaviour they describe did not actually ship until
+    ``8.2.0`` (issue #72) — a consumer on either released version emitted
+    the pre-fix ``ref`` and could not satisfy either fixture."""
+    manifest = json.loads(_FIXTURE_MANIFEST_PATH.read_text(encoding="utf-8"))
+    by_id = {entry["id"]: entry for entry in manifest["fixtures"]}
+    ref_derivation_ids = {"phase_entered_optional_absent", "phase_entered_mission_slug_absent"}
+    assert ref_derivation_ids <= by_id.keys()
+    min_versions = {by_id[fixture_id]["min_version"] for fixture_id in ref_derivation_ids}
+    assert min_versions == {"8.2.0"}
+
+
 # ---------------------------------------------------------------------------
 # V6: simulated 6.x-consumer skew (draft §4 row V6)
 # ---------------------------------------------------------------------------
