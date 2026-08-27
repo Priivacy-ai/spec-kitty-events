@@ -109,6 +109,28 @@ def test_fixtures_loaded(zeitgeist_attrs_fixtures) -> None:
     assert len([f for f in zeitgeist_attrs_fixtures if not f.expected_valid]) == 8
 
 
+def test_fixture_event_ids_are_unique(zeitgeist_attrs_fixtures) -> None:
+    """No two fixtures may share an envelope/attrs ``event_id``.
+
+    Team Kitty deduplicates moments on ``(team, event_id)``; a fixture-id
+    clash is harmless to load but would silently collapse two distinct
+    moments if this directory were ever replayed through that reducer
+    (issue #73).
+    """
+    seen: dict[str, str] = {}
+    for fixture in zeitgeist_attrs_fixtures:
+        case = fixture.payload
+        event_id = (case.get("envelope") or case.get("attrs") or {}).get("event_id")
+        if event_id is None:
+            continue
+        if event_id in seen:
+            raise AssertionError(
+                f"event_id {event_id!r} used by both {seen[event_id]!r} and "
+                f"{fixture.id!r}"
+            )
+        seen[event_id] = fixture.id
+
+
 def test_every_valid_fixture_covers_one_volatile_event_type(
     zeitgeist_attrs_fixtures,
 ) -> None:
