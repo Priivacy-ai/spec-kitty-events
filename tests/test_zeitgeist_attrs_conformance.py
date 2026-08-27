@@ -297,7 +297,7 @@ def test_encode_rejects_an_unencodable_scalar() -> None:
         "MissionClosed",
         {
             "envelope": {
-                "event_id": "e2e00000-0000-4000-8000-000000000118",
+                "event_id": "e2e00000-0000-4000-8000-900000000001",
                 "timestamp": "2026-08-25T09:00:00+00:00",
             }
         },

@@ -12,11 +12,11 @@ Before adding a fixture, find the next free id and update this file in the
 same PR:
 
 ```
-grep -rho 'e2e00000-0000-4000-8000-[0-9]\{12\}' . | sort -u | tail -1
+grep -rho --include='*.json' 'e2e00000-0000-4000-8000-[0-9]\{12\}' . | sort -u | tail -1
 ```
 
-`...000118` is already spent — by `tests/test_zeitgeist_attrs_conformance.py:296`,
-a test-local synthetic envelope outside this directory that the grep above
-cannot see. Leave `...118` unused here too so no JSON fixture ever duplicates it.
+Test-local synthetic envelopes must use the reserved
+`e2e00000-0000-4000-8000-9000000000NN` block, never this fixture-allocation
+sequence. That keeps the JSON-only grep authoritative by construction.
 
-**Next free id: `e2e00000-0000-4000-8000-000000000119`**
+**Next free id: `e2e00000-0000-4000-8000-000000000118`**
