@@ -675,6 +675,18 @@ def test_decode_rejects_malformed_occurred_at_that_merely_ends_in_z() -> None:
         from_zeitgeist_attrs("WPStatusChanged", attrs)
 
 
+def test_decode_rejects_a_doubled_trailing_z_occurred_at() -> None:
+    """A doubled trailing "Z" must be rejected on every interpreter version.
+    Stripping only the final "Z" and appending "+00:00" would otherwise turn
+    this into "...00Z+00:00", which Python 3.10's laxer ``fromisoformat``
+    accepts even though it is not a valid ISO-8601 timestamp
+    (spec-kitty-events#55 squad finding, PR #99)."""
+    attrs = to_zeitgeist_attrs(_transition(), _envelope("WPStatusChanged"))
+    attrs["occurred_at"] = "2026-08-25T09:00:00ZZ"
+    with pytest.raises(ZeitgeistAttrsError, match="occurred_at"):
+        from_zeitgeist_attrs("WPStatusChanged", attrs)
+
+
 def test_decode_rejects_unknown_keys() -> None:
     with pytest.raises(ZeitgeistAttrsError):
         from_zeitgeist_attrs("WPStatusChanged", {"not_in_schema": "x"})

@@ -1072,11 +1072,10 @@ def from_zeitgeist_attrs(
         # rejected on 3.10 while passing on 3.11+ for the exact same wire
         # bytes (spec-kitty-events#55). Normalize before parsing so the
         # accept/reject outcome doesn't depend on the interpreter's minor
-        # version.
-        # A well-formed value has at most one trailing "Z"; if another "Z"
-        # remains after stripping it, the input was already malformed and
-        # must not be laundered into something 3.10's laxer fromisoformat()
-        # would accept (e.g. a doubled "...00ZZ").
+        # version. A well-formed value has at most this one trailing "Z"; if
+        # another "Z" remains after stripping it, the input was already
+        # malformed and must not be laundered into something 3.10's laxer
+        # fromisoformat() would accept (e.g. a doubled "...00ZZ").
         if occurred_at.endswith("Z"):
             candidate = occurred_at[:-1]
             if "Z" in candidate:
