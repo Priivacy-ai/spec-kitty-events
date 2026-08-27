@@ -647,10 +647,11 @@ def test_decode_requires_the_ref_key_when_the_family_guarantees_one() -> None:
         from_zeitgeist_attrs("WPStatusChanged", attrs)
 
 
-def test_decode_permits_an_absent_ref_when_the_family_leaves_it_optional() -> None:
+def test_decode_tolerates_the_optional_compat_field_absent_and_still_derives_ref() -> None:
     """PhaseEntered's ``mission_slug`` is a genuinely optional back-compat
-    field (unlike every other family's required ref), so decode must still
-    accept its absence and report ``ref=None`` rather than requiring it."""
+    field, unlike ``mission_id`` (the required ref field), so decode must
+    not require its presence -- but ref still resolves via ``mission_id``,
+    not ``None``."""
     from spec_kitty_events.lifecycle import PhaseEnteredPayload
 
     payload = PhaseEnteredPayload(
@@ -659,7 +660,7 @@ def test_decode_permits_an_absent_ref_when_the_family_leaves_it_optional() -> No
     attrs = to_zeitgeist_attrs(payload, _envelope("PhaseEntered"))
     assert "mission_slug" not in attrs
     moment = from_zeitgeist_attrs("PhaseEntered", attrs)
-    assert moment.ref is None
+    assert moment.ref == "mission-demo"
 
 
 def test_required_keys_exclude_optional_typed_fields_pydantic_still_requires() -> None:
