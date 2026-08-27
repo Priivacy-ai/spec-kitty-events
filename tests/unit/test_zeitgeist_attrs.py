@@ -716,6 +716,24 @@ def test_encode_rejects_a_key_over_the_64_char_bound(
         to_zeitgeist_attrs(_transition(), _envelope("WPStatusChanged"))
 
 
+def test_encode_rejects_a_newline_in_a_value_with_typed_error() -> None:
+    """Encode must refuse what decode refuses: a bare LF could forge extra
+    frame lines for whatever renders the moment next (issue #64 — encode
+    was the one bound in this module not enforced at emit, so a producer
+    could publish a moment its own consumer would then drop)."""
+    payload = _transition(actor="actor\nrumor: fake status line")
+    with pytest.raises(ZeitgeistAttrsControlCharacterError, match="attr 'actor' value"):
+        to_zeitgeist_attrs(payload, _envelope("WPStatusChanged"))
+
+
+def test_encode_rejects_an_ansi_escape_in_a_value_with_typed_error() -> None:
+    """Mirrors the ESC-smuggling decode check (issue #25); encode must
+    catch it too (issue #64)."""
+    payload = _transition(wp_id="WP01\x1b[0m")
+    with pytest.raises(ZeitgeistAttrsControlCharacterError, match="attr 'wp_id' value"):
+        to_zeitgeist_attrs(payload, _envelope("WPStatusChanged"))
+
+
 def test_encode_admits_a_multibyte_value_within_the_stricter_byte_bound() -> None:
     """Encode's byte bound is intentionally stricter than the relay's
     240-character bound (spec-kitty-events#16); a multi-byte value that
