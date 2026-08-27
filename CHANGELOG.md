@@ -44,6 +44,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   bullet moves under a dated release heading, in past tense, once #104
   lands.
 
+## [8.2.1] - 2026-08-27
+
+### Changed
+
+- Bumped the patch version only — no source-code change. `8.2.0` had been
+  declared at two distinct trees on `main`: the commit three consumers had
+  already adopted (`c93dbfbf`, pinned by `EXPERIMENTAL-spec-kitty`,
+  `-saas`, and `-zeitgeist`), and a later repo-wide `ruff format` pass
+  (`b67b7e0`) that also carried a real behaviour change to
+  `from_zeitgeist_attrs`'s `event_id` handling — validated against the
+  three `normalize_event_id` shapes and rewritten in the decoded output,
+  instead of only rejected when empty and passed through verbatim. Per
+  `PROGRAM.md` §2 ("a shared package's version number is spent once"),
+  `8.2.0` keeps its single adopted meaning at `c93dbfbf`; every tree from
+  `b67b7e0` onward is `8.2.1` (EXPERIMENTAL-spec-kitty-events#170).
+
 ## [8.2.0] - 2026-08-27
 
 ### Added
