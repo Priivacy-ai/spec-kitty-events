@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- `from_zeitgeist_attrs` now enforces the same `event_id`/`occurred_at`
+  contract the envelope itself guarantees, instead of the weaker
+  emptiness/parses-at-all checks closing #28 left behind
+  (EXPERIMENTAL-spec-kitty-events#62). `event_id` must match one of the
+  three shapes `normalize_event_id` accepts (26-char Crockford-base32 ULID,
+  36-char hyphenated UUID, 32-char bare hex UUID) and is canonicalized to
+  its normalized case in the returned `VolatileMoment.attrs`, so two
+  spellings of the same id dedupe identically; `occurred_at` must parse as
+  ISO-8601 *and* be timezone-aware, since the encoder only ever emits an
+  aware `datetime`'s `isoformat()` and every downstream comparison (the
+  72-hour feed window, the staleness guard) is against an aware "now".
+
 ## [8.2.0] - 2026-08-27
 
 ### Added
