@@ -9,6 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- `from_zeitgeist_attrs`'s docstring no longer claims "values are not
+  reparsed here" as a blanket statement — `event_id` and `occurred_at` are
+  reparsed (via `normalize_event_id` and `datetime.fromisoformat`
+  respectively); the opacity claim now scopes to payload values only, with
+  the two envelope-sourced exceptions stated. Also dropped the two
+  unreachable-false `is not None` presence guards around that reparsing:
+  `event_id`/`occurred_at` are unconditionally required for every event
+  type (`ENVELOPE_ATTR_KEYS` is unioned into every kind's required keys),
+  so the earlier missing-keys check always raises first when either is
+  absent (EXPERIMENTAL-spec-kitty-events#67, consolidating the same defect
+  class as #61).
 - `from_zeitgeist_attrs` now enforces the same `event_id`/`occurred_at`
   contract the envelope itself guarantees, instead of the weaker
   emptiness/parses-at-all checks closing #28 left behind
