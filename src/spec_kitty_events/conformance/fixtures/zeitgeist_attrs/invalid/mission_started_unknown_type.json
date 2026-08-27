@@ -1,0 +1,16 @@
+{
+  "event_type": "MissionStarted",
+  "envelope": {
+    "event_id": "e2e00000-0000-4000-8000-000000000117",
+    "timestamp": "2026-08-25T09:00:00+00:00"
+  },
+  "payload": {
+    "mission_id": "mission-01",
+    "mission_type": "software-dev",
+    "initial_phase": "plan",
+    "actor": "robert"
+  },
+  "direction": "to",
+  "expected_error": "UnknownVolatileEventTypeError",
+  "notes": "MissionStarted has no zeitgeist-attrs codec: it is not part of the volatile vocabulary, so to_zeitgeist_attrs's reverse payload-type lookup fails closed rather than broadcasting it."
+}

@@ -2231,6 +2231,22 @@
       "min_version": "8.2.0"
     },
     {
+      "id": "mission_closed_non_string_value",
+      "path": "zeitgeist_attrs/invalid/mission_closed_non_string_value.json",
+      "expected_result": "invalid",
+      "event_type": "MissionClosed",
+      "notes": "Inbound attrs must be flat str:str; a JSON integer where a string is expected (mission_number) is rejected before any other decode check runs, matching the relay's own opaque str:str EventArgs shape.",
+      "min_version": "8.2.0"
+    },
+    {
+      "id": "mission_started_unknown_type",
+      "path": "zeitgeist_attrs/invalid/mission_started_unknown_type.json",
+      "expected_result": "invalid",
+      "event_type": "MissionStarted",
+      "notes": "MissionStarted is a journal-only event type with no zeitgeist-attrs codec; encoding a payload outside the volatile vocabulary fails closed instead of silently broadcasting it (events#22).",
+      "min_version": "8.2.0"
+    },
+    {
       "id": "cutover-boundary-accept-schema-version-missing",
       "path": "cutover_boundary/accepted_by_validate_event/schema_version_missing.json",
       "expected_result": "valid",

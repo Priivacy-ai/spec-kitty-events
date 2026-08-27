@@ -28,12 +28,16 @@ from spec_kitty_events.decisionpoint import (
     DecisionPointOpenedPayload,
     DecisionPointResolvedPayload,
 )
+from spec_kitty_events.lifecycle import MissionClosedPayload, MissionStartedPayload
 from spec_kitty_events.models import Event
 from spec_kitty_events.zeitgeist_attrs import (
     PAYLOAD_MODEL_BY_EVENT_TYPE,
+    UnencodableFieldValueError,
     UnknownVolatileEventTypeError,
     VolatileMoment,
     ZeitgeistAttrsError,
+    ZeitgeistAttrsForbiddenKeyError,
+    _ALLOWED_KEYS_BY_EVENT_TYPE,
     from_zeitgeist_attrs,
     to_zeitgeist_attrs,
     zeitgeist_ref_for,
@@ -47,6 +51,11 @@ from spec_kitty_events.zeitgeist_attrs import (
 _PAYLOAD_FACTORY_BY_EVENT_TYPE = {
     DECISION_POINT_OPENED: DecisionPointOpenedPayload,
     DECISION_POINT_RESOLVED: DecisionPointResolvedPayload,
+    # MissionStarted has no zeitgeist-attrs codec at all; the
+    # mission_started_unknown_type fixture needs a real payload instance to
+    # feed to_zeitgeist_attrs so it can demonstrate the reverse-lookup
+    # rejection (events#22).
+    "MissionStarted": MissionStartedPayload,
 }
 
 
@@ -93,10 +102,10 @@ def zeitgeist_attrs_fixtures():
 
 
 def test_fixtures_loaded(zeitgeist_attrs_fixtures) -> None:
-    """28 valid + 6 invalid fixtures are on disk and manifest-registered."""
-    assert len(zeitgeist_attrs_fixtures) == 34
+    """28 valid + 8 invalid fixtures are on disk and manifest-registered."""
+    assert len(zeitgeist_attrs_fixtures) == 36
     assert len([f for f in zeitgeist_attrs_fixtures if f.expected_valid]) == 28
-    assert len([f for f in zeitgeist_attrs_fixtures if not f.expected_valid]) == 6
+    assert len([f for f in zeitgeist_attrs_fixtures if not f.expected_valid]) == 8
 
 
 def test_every_valid_fixture_covers_one_volatile_event_type(
@@ -207,3 +216,38 @@ def test_zeitgeist_attrs_rejections(fixture: FixtureCase) -> None:
         assert case["direction"] == "from"
         with pytest.raises(expected_error):
             from_zeitgeist_attrs(fixture.event_type, case["attrs"])
+
+
+def test_decode_rejects_a_forbidden_key_even_when_schema_legal(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Forbidden-key-on-ingest (events#22) is not expressible as a JSON
+    fixture: every real schema's allowed-key set is already disjoint from
+    ``FORBIDDEN_ATTR_KEYS``, so triggering the guard requires monkeypatching
+    ``_ALLOWED_KEYS_BY_EVENT_TYPE`` to admit a forbidden name first.
+    """
+    monkeypatch.setitem(_ALLOWED_KEYS_BY_EVENT_TYPE, "MissionClosed", frozenset({"team"}))
+    with pytest.raises(ZeitgeistAttrsForbiddenKeyError):
+        from_zeitgeist_attrs("MissionClosed", {"team": "t"})
+
+
+def test_encode_rejects_an_unencodable_scalar() -> None:
+    """Unencodable-scalar (events#22) is not expressible as a JSON fixture:
+    every volatile payload model is frozen and schema-validated, so no
+    fixture-built payload can carry a field value outside str/int/bool/str-Enum.
+    Forcing one on requires bypassing the frozen model with
+    ``object.__setattr__``, mirroring the unit-level regression pin.
+    """
+    payload = MissionClosedPayload(mission_slug="s", mission_number=1, mission_type="software-dev")
+    object.__setattr__(payload, "mission_number", 1.5)
+    envelope = _fixture_envelope(
+        "MissionClosed",
+        {
+            "envelope": {
+                "event_id": "e2e00000-0000-4000-8000-000000000118",
+                "timestamp": "2026-08-25T09:00:00+00:00",
+            }
+        },
+    )
+    with pytest.raises(UnencodableFieldValueError):
+        to_zeitgeist_attrs(payload, envelope)

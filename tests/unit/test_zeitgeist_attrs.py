@@ -469,6 +469,35 @@ def test_value_types_without_an_encoding_fail_closed() -> None:
         to_zeitgeist_attrs(payload, _envelope("MissionClosed"))
 
 
+class _NestedLeaf(BaseModel):
+    label: str
+
+
+class _NestedOuter(BaseModel):
+    inner: _NestedLeaf
+
+
+class _DoublyNestedPayload(BaseModel):
+    inner_model: _NestedOuter
+
+
+def test_encode_refuses_nesting_deeper_than_one_level(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Regression pin for events#22: no volatile payload nests a model inside
+    a model today, so `_encode_fields`'s deeper-than-one-level guard is
+    otherwise unreachable through the public API. A synthetic payload wired
+    into the dispatch table exercises it directly."""
+    monkeypatch.setitem(
+        zeitgeist_attrs.PAYLOAD_MODEL_BY_EVENT_TYPE,
+        "SyntheticDoublyNested",
+        _DoublyNestedPayload,
+    )
+    payload = _DoublyNestedPayload(inner_model=_NestedOuter(inner=_NestedLeaf(label="x")))
+    with pytest.raises(UnencodableFieldValueError, match="nesting deeper than one level"):
+        to_zeitgeist_attrs(payload, _envelope("SyntheticDoublyNested"))
+
+
 def test_ref_derival_and_mismatch_fail_closed() -> None:
     assert zeitgeist_ref_for("WPStatusChanged", _transition()) == "demo-mission"
     with pytest.raises(UnknownVolatileEventTypeError):
