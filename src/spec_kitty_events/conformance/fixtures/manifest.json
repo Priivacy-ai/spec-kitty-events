@@ -2011,8 +2011,8 @@
       "path": "zeitgeist_attrs/valid/phase_entered_optional_absent.json",
       "expected_result": "valid",
       "event_type": "PhaseEntered",
-      "notes": "previous_phase None: key omitted on emit, default restored on read.",
-      "min_version": "8.0.0"
+      "notes": "previous_phase None: key omitted on emit, default restored on read. expected_ref reflects the mission_id-derived ref (issue #18); a pre-8.2.0 consumer emitted mission_slug instead.",
+      "min_version": "8.2.0"
     },
     {
       "id": "phase_entered_mission_slug_absent",
@@ -2020,7 +2020,7 @@
       "expected_result": "valid",
       "event_type": "PhaseEntered",
       "notes": "mission_slug (optional display/back-compat) absent: ref derives from the required mission_id, not the compat field (issue #18).",
-      "min_version": "8.1.0"
+      "min_version": "8.2.0"
     },
     {
       "id": "mission_run_started_actor_label",
