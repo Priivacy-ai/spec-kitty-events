@@ -41,6 +41,7 @@ from spec_kitty_events.zeitgeist_attrs import (
     UnencodableFieldValueError,
     UnknownVolatileEventTypeError,
     VolatileMoment,
+    ZeitgeistAttrsControlCharacterError,
     ZeitgeistAttrsError,
     ZeitgeistAttrsForbiddenKeyError,
     ZeitgeistAttrsOverflowError,
@@ -546,6 +547,24 @@ def test_decode_rejects_lone_surrogates_with_typed_error() -> None:
     attrs = to_zeitgeist_attrs(_transition(), _envelope("WPStatusChanged"))
     attrs["actor"] = "\ud800"
     with pytest.raises(ZeitgeistAttrsError, match="attr 'actor' value"):
+        from_zeitgeist_attrs("WPStatusChanged", attrs)
+
+
+def test_decode_rejects_a_newline_in_a_value_with_typed_error() -> None:
+    """A bare LF/CR could forge extra frame lines for whatever renders the
+    moment next (issue #25, lens: security)."""
+    attrs = to_zeitgeist_attrs(_transition(), _envelope("WPStatusChanged"))
+    attrs["actor"] = "actor\nrumor: fake status line"
+    with pytest.raises(ZeitgeistAttrsControlCharacterError, match="attr 'actor' value"):
+        from_zeitgeist_attrs("WPStatusChanged", attrs)
+
+
+def test_decode_rejects_an_ansi_escape_in_a_value_with_typed_error() -> None:
+    """A bare ESC could smuggle ANSI into whatever terminal or log renders
+    the moment next (issue #25, lens: security)."""
+    attrs = to_zeitgeist_attrs(_transition(), _envelope("WPStatusChanged"))
+    attrs["actor"] = "\x1b[31mactor\x1b[0m"
+    with pytest.raises(ZeitgeistAttrsControlCharacterError, match="attr 'actor' value"):
         from_zeitgeist_attrs("WPStatusChanged", attrs)
 
 

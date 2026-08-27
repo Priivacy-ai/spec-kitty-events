@@ -150,6 +150,7 @@ __all__ = [
     "UnencodableFieldValueError",
     "UnknownVolatileEventTypeError",
     "VolatileMoment",
+    "ZeitgeistAttrsControlCharacterError",
     "ZeitgeistAttrsError",
     "ZeitgeistAttrsForbiddenKeyError",
     "ZeitgeistAttrsOverflowError",
@@ -229,6 +230,10 @@ class ZeitgeistAttrsOverflowError(ZeitgeistAttrsError):
 
 class ZeitgeistAttrsForbiddenKeyError(ZeitgeistAttrsError):
     """Encoding would emit a key in :data:`FORBIDDEN_ATTR_KEYS`."""
+
+
+class ZeitgeistAttrsControlCharacterError(ZeitgeistAttrsError):
+    """A value carries a C0 control character (or DEL)."""
 
 
 #: The event families the Ephemeral Team Status design moves to ``volatile``
@@ -352,6 +357,30 @@ def _encode_fields(
             continue
         entries[key] = _encode_scalar(key, value)
     return entries
+
+
+def _reject_control_characters(subject: str, value: str) -> None:
+    """Refuse a value carrying a C0 control character (``U+0000``-``U+001F``)
+    or DEL (``U+007F``).
+
+    This is the decode-seam hardening `EXPERIMENTAL-spec-kitty-events#25`_
+    asks for: an inbound attrs mapping is opaque wire data from a relay a
+    hostile teammate or hostile relay frame can shape, and free-text keys
+    (the actor label, ``review_ref``, ...) carry it verbatim into
+    :class:`VolatileMoment`. A bare newline could forge extra frame lines
+    for whatever renders the moment next; a bare ESC could smuggle ANSI
+    into a terminal or log. Zeitgeist's own ingest doctrine strips these
+    (``editor.clean_field``); this module rejects instead of stripping,
+    matching the rest of this file's fail-closed contract (over-bound
+    values raise rather than truncate).
+
+    .. _EXPERIMENTAL-spec-kitty-events#25: https://github.com/spec-kitty/EXPERIMENTAL-spec-kitty-events/issues/25
+    """
+    bad = sorted({f"U+{ord(ch):04X}" for ch in value if ord(ch) < 0x20 or ord(ch) == 0x7F})
+    if bad:
+        raise ZeitgeistAttrsControlCharacterError(
+            f"{subject} contains control characters: {bad}"
+        )
 
 
 def _utf8_size(subject: str, value: str) -> int:
@@ -617,6 +646,8 @@ def from_zeitgeist_attrs(
         ZeitgeistAttrsError: a value is not ``str``, a key is outside the
             kind's closed key set, or a key the kind's payload always
             carries on encode is missing.
+        ZeitgeistAttrsControlCharacterError: a value carries a C0 control
+            character or DEL.
         ZeitgeistAttrsForbiddenKeyError: a forbidden key is present.
         ZeitgeistAttrsOverflowError: the bound is exceeded.
     """
@@ -629,6 +660,7 @@ def from_zeitgeist_attrs(
     for key, value in attrs.items():
         if not isinstance(value, str):
             raise ZeitgeistAttrsError(f"attr {key!r}: expected str, got {type(value).__name__}")
+        _reject_control_characters(f"attr {key!r} value", value)
 
     allowed = _ALLOWED_KEYS_BY_EVENT_TYPE[event_type]
     unknown = sorted(attrs.keys() - allowed)
