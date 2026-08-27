@@ -143,21 +143,42 @@ class TestRetrospectiveCompletedPayload:
         assert payload.completed_at == "2026-04-13"
 
     @pytest.mark.parametrize(
-        "completed_at",
+        "completed_at,reshaped",
         [
-            pytest.param("2026-04-13T10:00:00.123456789Z", id="z-suffix-nanosecond-fraction"),
-            pytest.param("20260413T100000Z", id="basic-format-z-suffix"),
-            pytest.param("20260413T100000+0200", id="basic-format-numeric-offset"),
+            pytest.param(
+                "2026-04-13T10:00:00.123456789Z",
+                "2026-04-13T10:00:00.123456+00:00",
+                id="z-suffix-nanosecond-fraction",
+            ),
+            pytest.param(
+                "20260413T100000Z",
+                "2026-04-13T10:00:00+00:00",
+                id="basic-format-z-suffix",
+            ),
+            pytest.param(
+                "20260413T100000+0200",
+                "2026-04-13T10:00:00+02:00",
+                id="basic-format-numeric-offset",
+            ),
         ],
     )
     def test_completed_timestamp_shapes_that_split_by_python_version_accepted(
-        self, completed_at: str
+        self, completed_at: str, reshaped: str
     ) -> None:
         """spec-kitty-events#135: ``datetime.fromisoformat`` on 3.10 rejects
         an arbitrary-precision fractional-second part (3.10 only accepts
         0/3/6 digits) and basic (no ``-``/``:``) format, both accepted on
         3.11+ for the same wire bytes. ``_assert_iso8601_timestamp`` must
-        accept these identically regardless of the interpreter running it."""
+        accept these identically regardless of the interpreter running it.
+
+        Also asserts ``_normalize_iso8601_shape``'s exact output (squad
+        finding, 2026-08-27): asserting only that the payload round-trips
+        passes identically with the reshape deleted, on any interpreter
+        that already tolerates the shape natively — this repo's own test
+        runner included."""
+        from spec_kitty_events.retrospective import _normalize_iso8601_shape
+
+        assert _normalize_iso8601_shape(completed_at) == reshaped
         payload = _make_completed(completed_at=completed_at)
         assert payload.completed_at == completed_at
 

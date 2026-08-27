@@ -139,22 +139,43 @@ def test_helper_handles_z_suffix_iso_string() -> None:
 
 
 @pytest.mark.parametrize(
-    "timestamp",
+    "timestamp,reshaped",
     [
-        pytest.param("2026-01-01T00:00:00.123456789Z", id="z-suffix-nanosecond-fraction"),
-        pytest.param("20260101T000000Z", id="basic-format-z-suffix"),
-        pytest.param("20260101T020000+0200", id="basic-format-numeric-offset"),
+        pytest.param(
+            "2026-01-01T00:00:00.123456789Z",
+            "2026-01-01T00:00:00.123456+00:00",
+            id="z-suffix-nanosecond-fraction",
+        ),
+        pytest.param(
+            "20260101T000000Z",
+            "2026-01-01T00:00:00+00:00",
+            id="basic-format-z-suffix",
+        ),
+        pytest.param(
+            "20260101T020000+0200",
+            "2026-01-01T02:00:00+02:00",
+            id="basic-format-numeric-offset",
+        ),
     ],
 )
 def test_helper_accepts_timestamp_shapes_that_split_by_python_version(
-    timestamp: str,
+    timestamp: str, reshaped: str
 ) -> None:
     """spec-kitty-events#135: ``datetime.fromisoformat`` on 3.10 rejects an
     arbitrary-precision fractional-second part (3.10 only accepts 0/3/6
     digits) and basic (no ``-``/``:``) format, both accepted on 3.11+ for
     the same wire bytes. ``_extract_envelope_timestamp`` must accept these
     identically regardless of the interpreter running it, since this is
-    the packaged cross-repo conformance helper other repos import."""
+    the packaged cross-repo conformance helper other repos import.
+
+    Also asserts ``_normalize_iso8601_shape``'s exact output (squad
+    finding, 2026-08-27): asserting only that the round-trip preserves
+    the producer's occurrence time passes identically with the reshape
+    deleted, on any interpreter that already tolerates the shape
+    natively — this repo's own test runner included."""
+    from spec_kitty_events.conformance.timestamp_semantics import _normalize_iso8601_shape
+
+    assert _normalize_iso8601_shape(timestamp) == reshaped
     envelope = {"timestamp": timestamp}
     persisted = _parse_iso(timestamp)
     assert_producer_occurrence_preserved(envelope, persisted)

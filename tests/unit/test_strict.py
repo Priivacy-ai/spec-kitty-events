@@ -431,25 +431,59 @@ def test_t5b_timestamp_nanosecond_fraction_that_splits_by_python_version_accepte
     separate, pydantic-core-level parser that is not Python-version-
     dependent — always rejects basic format on every interpreter, so it
     is out of #135's scope and cannot round-trip through the full
-    envelope validator.)"""
+    envelope validator.)
+
+    Also asserts ``_normalize_iso8601_shape`` actually reshaped the value
+    (squad finding on this PR, 2026-08-27): asserting acceptance alone
+    passes identically whether or not the reshape ran, on any interpreter
+    that already tolerates 9-digit fractions (3.11+, which is what this
+    repo's own test runner uses) — so this fails on every interpreter if
+    the reshape is missing or broken, not only on 3.10."""
+    from spec_kitty_events.strict import _normalize_iso8601_shape
+
+    assert (
+        _normalize_iso8601_shape("2026-01-01T00:00:00.123456789Z")
+        == "2026-01-01T00:00:00.123456+00:00"
+    )
     envelope = _mission_started_envelope(timestamp="2026-01-01T00:00:00.123456789Z")
     assert validate_strict_envelope(envelope) == ()
 
 
 @pytest.mark.parametrize(
-    "value",
+    "value,reshaped",
     [
-        pytest.param("2026-01-01T00:00:00.123456789Z", id="z-suffix-nanosecond-fraction"),
-        pytest.param("20260101T000000Z", id="basic-format-z-suffix"),
-        pytest.param("20260101T020000+0200", id="basic-format-numeric-offset"),
+        pytest.param(
+            "2026-01-01T00:00:00.123456789Z",
+            "2026-01-01T00:00:00.123456+00:00",
+            id="z-suffix-nanosecond-fraction",
+        ),
+        pytest.param(
+            "20260101T000000Z",
+            "2026-01-01T00:00:00+00:00",
+            id="basic-format-z-suffix",
+        ),
+        pytest.param(
+            "20260101T020000+0200",
+            "2026-01-01T02:00:00+02:00",
+            id="basic-format-numeric-offset",
+        ),
     ],
 )
-def test_parse_iso8601_accepts_shapes_that_split_by_python_version(value: str) -> None:
+def test_parse_iso8601_accepts_shapes_that_split_by_python_version(
+    value: str, reshaped: str
+) -> None:
     """Unit-level check on ``_parse_iso8601`` itself (spec-kitty-events#135),
     isolated from ``Event.model_validate``'s separate, stricter parser
-    (see the docstring above)."""
-    from spec_kitty_events.strict import _parse_iso8601
+    (see the docstring above).
 
+    Asserts ``_normalize_iso8601_shape``'s exact output, not just that
+    ``_parse_iso8601`` accepted the value (squad finding, 2026-08-27):
+    the acceptance-only assertion passes identically with the reshape
+    code deleted entirely on any interpreter that natively tolerates
+    these shapes, so it never actually exercised the fix."""
+    from spec_kitty_events.strict import _normalize_iso8601_shape, _parse_iso8601
+
+    assert _normalize_iso8601_shape(value) == reshaped
     assert _parse_iso8601(value) is not None
 
 
