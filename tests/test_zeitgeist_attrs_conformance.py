@@ -125,8 +125,7 @@ def test_fixture_event_ids_are_unique(zeitgeist_attrs_fixtures) -> None:
             continue
         if event_id in seen:
             raise AssertionError(
-                f"event_id {event_id!r} used by both {seen[event_id]!r} and "
-                f"{fixture.id!r}"
+                f"event_id {event_id!r} used by both {seen[event_id]!r} and {fixture.id!r}"
             )
         seen[event_id] = fixture.id
 
