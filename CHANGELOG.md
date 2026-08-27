@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- `from_zeitgeist_attrs` now rejects an empty `event_id` and an
+  `occurred_at` that does not parse as ISO-8601, instead of decoding a
+  malformed envelope-sourced attr into a `VolatileMoment` a downstream
+  renderer would crash on or fail to dedupe
+  (EXPERIMENTAL-spec-kitty-events#28).
 - Keep E2 mission-run support-matrix `min_consumer_package` aligned with
   `strict_since` and the conformance fixture `min_version` floor.
 - `zeitgeist_ref_for` now enforces `ZEITGEIST_ATTRS_MAX_BYTES` on the frame

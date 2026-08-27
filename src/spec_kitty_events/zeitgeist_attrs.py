@@ -104,6 +104,7 @@ from __future__ import annotations
 
 import dataclasses
 from collections.abc import Mapping
+from datetime import datetime
 from enum import Enum
 from types import UnionType
 from typing import Any, Union, get_args, get_origin
@@ -644,8 +645,9 @@ def from_zeitgeist_attrs(
         UnknownVolatileEventTypeError: *event_type* is not in the volatile
             vocabulary.
         ZeitgeistAttrsError: a value is not ``str``, a key is outside the
-            kind's closed key set, or a key the kind's payload always
-            carries on encode is missing.
+            kind's closed key set, a key the kind's payload always carries
+            on encode is missing, or an ``event_id``/``occurred_at`` attr is
+            present but malformed (empty, or not ISO-8601, respectively).
         ZeitgeistAttrsControlCharacterError: a value carries a C0 control
             character or DEL.
         ZeitgeistAttrsForbiddenKeyError: a forbidden key is present.
@@ -709,5 +711,17 @@ def from_zeitgeist_attrs(
             f"attrs are missing keys the {event_type} schema always carries "
             f"on encode: {missing}"
         )
+
+    event_id = attrs.get("event_id")
+    if event_id is not None and not event_id:
+        raise ZeitgeistAttrsError("attr 'event_id' must not be empty")
+    occurred_at = attrs.get("occurred_at")
+    if occurred_at is not None:
+        try:
+            datetime.fromisoformat(occurred_at)
+        except ValueError as exc:
+            raise ZeitgeistAttrsError(
+                f"attr 'occurred_at' is not ISO-8601: {occurred_at!r}"
+            ) from exc
 
     return VolatileMoment(kind=event_type, ref=attrs.get(REF_FIELD_BY_EVENT_TYPE[event_type]), attrs=dict(attrs))

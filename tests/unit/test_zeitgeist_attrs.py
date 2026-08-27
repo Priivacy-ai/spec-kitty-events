@@ -526,6 +526,29 @@ def test_decode_admits_envelope_identity_attrs() -> None:
     assert moment.attrs["occurred_at"] == "2026-08-25T09:00:00+00:00"
 
 
+def test_decode_rejects_malformed_occurred_at() -> None:
+    attrs = to_zeitgeist_attrs(_transition(), _envelope("WPStatusChanged"))
+    attrs["occurred_at"] = "yesterday"
+    with pytest.raises(ZeitgeistAttrsError, match="occurred_at"):
+        from_zeitgeist_attrs("WPStatusChanged", attrs)
+
+
+def test_decode_rejects_empty_event_id() -> None:
+    attrs = to_zeitgeist_attrs(_transition(), _envelope("WPStatusChanged"))
+    attrs["event_id"] = ""
+    with pytest.raises(ZeitgeistAttrsError, match="event_id"):
+        from_zeitgeist_attrs("WPStatusChanged", attrs)
+
+
+def test_decode_accepts_a_bare_date_occurred_at() -> None:
+    """``datetime.fromisoformat`` accepts date-only strings; decode does too —
+    the check is "parses as ISO-8601", not "carries a time component"."""
+    attrs = to_zeitgeist_attrs(_transition(), _envelope("WPStatusChanged"))
+    attrs["occurred_at"] = "2026-08-25"
+    moment = from_zeitgeist_attrs("WPStatusChanged", attrs)
+    assert moment.attrs["occurred_at"] == "2026-08-25"
+
+
 def test_decode_rejects_unknown_keys() -> None:
     with pytest.raises(ZeitgeistAttrsError):
         from_zeitgeist_attrs("WPStatusChanged", {"not_in_schema": "x"})
