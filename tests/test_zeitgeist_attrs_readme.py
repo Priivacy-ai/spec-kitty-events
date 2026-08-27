@@ -20,12 +20,13 @@ _ALLOCATED_ID_PATTERN = re.compile(r"e2e00000-0000-4000-8000-([0-9]{12})")
 def test_readme_next_free_id_is_one_past_the_highest_allocated_fixture_id() -> None:
     """Pin the README's next-free declaration to committed fixture bytes."""
     readme = (_ZEITGEIST_ATTRS_FIXTURES_DIR / "README.md").read_text(encoding="utf-8")
-    declared_match = re.search(
-        r"Next free id: `(e2e00000-0000-4000-8000-[0-9]{12})`",
+    declared_ids = re.findall(
+        r"^\*\*Next free id: `(e2e00000-0000-4000-8000-[0-9]{12})`\*\*$",
         readme,
+        flags=re.MULTILINE,
     )
-    assert declared_match is not None, "README's bold 'Next free id' line not found"
-    declared = declared_match.group(1)
+    assert len(declared_ids) == 1, "README must contain exactly one bold 'Next free id' declaration"
+    declared = declared_ids[0]
 
     allocated_ids = [
         match.group(1)
