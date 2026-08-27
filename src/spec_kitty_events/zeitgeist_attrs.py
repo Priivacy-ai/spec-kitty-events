@@ -290,11 +290,15 @@ class VolatileMoment:
     render from this; nobody re-parses raw attr strings outside this
     module's vocabulary.
 
-    ``ref`` is ``None`` only when the family's ref field is itself
-    ``Optional`` and was absent from the encode (today, only
-    ``PhaseEntered``'s back-compat ``mission_slug``) — :func:`from_zeitgeist_attrs`
-    requires the ref key whenever the family's payload guarantees it, so a
-    family with a required ref field never decodes to ``ref=None``.
+    Every event type in today's vocabulary declares its ref field
+    (:data:`REF_FIELD_BY_EVENT_TYPE`) as one of the payload's required,
+    non-``Optional`` fields (pinned by
+    ``test_every_current_family_guarantees_its_ref_field``), so ``ref`` is
+    currently always a non-empty string on both :func:`from_zeitgeist_attrs`
+    and :func:`zeitgeist_ref_for`. The ``None`` arm of the type is reserved
+    for a hypothetical future family whose ref field is itself ``Optional``
+    and can be absent from the encode — no family in
+    :data:`PAYLOAD_MODEL_BY_EVENT_TYPE` today produces ``ref=None``.
     """
 
     kind: str
@@ -766,6 +770,8 @@ def to_zeitgeist_attrs(payload: BaseModel, envelope: Event) -> dict[str, str]:
             payload model.
         ZeitgeistAttrsError: *envelope* declares a different event type.
         UnencodableFieldValueError: a carried field has no string encoding.
+        ZeitgeistAttrsControlCharacterError: a value carries a non-printable
+            character (``not str.isprintable()``).
         ZeitgeistAttrsForbiddenKeyError: an emitted key is forbidden.
         ZeitgeistAttrsOverflowError: the projection exceeds the key-count,
             key-length, or value-length bounds. No truncation is ever
@@ -809,6 +815,9 @@ def to_zeitgeist_attrs(payload: BaseModel, envelope: Event) -> dict[str, str]:
         summary = _SUMMARY_BUILDER_BY_EVENT_TYPE[event_type](payload)
         if summary is not None:
             attrs["summary"] = summary
+
+    for key, value in attrs.items():
+        _reject_control_characters(f"attr {key!r} value", value)
 
     bad_keys = _forbidden_key_hits(list(attrs))
     if bad_keys:
@@ -867,6 +876,11 @@ REF_FIELD_BY_EVENT_TYPE: Mapping[str, str] = {
 def zeitgeist_ref_for(event_type: str, payload: BaseModel) -> str | None:
     """Return the frame ``ref`` for a volatile payload, or ``None``.
 
+    No family in :data:`PAYLOAD_MODEL_BY_EVENT_TYPE` today declares its ref
+    field ``Optional``, so the ``None`` return is unreachable for every
+    current type (see :class:`VolatileMoment`'s docstring) — it is kept
+    for a hypothetical future family whose ref field can be absent.
+
     Raises:
         UnknownVolatileEventTypeError: *event_type* is unknown or *payload*
             is not that event type's payload model.
@@ -883,7 +897,7 @@ def zeitgeist_ref_for(event_type: str, payload: BaseModel) -> str | None:
         )
     value = getattr(payload, REF_FIELD_BY_EVENT_TYPE[event_type], None)
     if value is None:
-        return None
+        return None  # unreachable today; see docstring
     ref = str(value)
     if _utf8_size(f"{event_type} ref", ref) > ZEITGEIST_ATTRS_MAX_BYTES:
         raise ZeitgeistAttrsOverflowError(

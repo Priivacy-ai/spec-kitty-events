@@ -260,7 +260,9 @@ def test_reachable_nested_model_collision_fails_the_structural_guard(
 
     assert _forbidden_collisions("FutureType", _FuturePayload) == ["url"]
 
-    monkeypatch.setitem(zeitgeist_attrs.UNBROADCAST_FIELDS, "FutureTypeSkipped", frozenset({"nested"}))
+    monkeypatch.setitem(
+        zeitgeist_attrs.UNBROADCAST_FIELDS, "FutureTypeSkipped", frozenset({"nested"})
+    )
     assert _forbidden_collisions("FutureTypeSkipped", _FuturePayload) == []
 
 
@@ -326,9 +328,7 @@ def test_encode_canonicalises_a_naive_timestamp_to_utc() -> None:
     naive as UTC) but from_zeitgeist_attrs (#62) rejects a naive occurred_at
     on decode. Encode must canonicalise rather than emit the naive value
     as-is, so the codec's own output always round-trips."""
-    envelope = _envelope(
-        "WPStatusChanged", timestamp=datetime(2026, 8, 25, 9, 0, 0)
-    )
+    envelope = _envelope("WPStatusChanged", timestamp=datetime(2026, 8, 25, 9, 0, 0))
     attrs = to_zeitgeist_attrs(_transition(), envelope)
     assert attrs["occurred_at"] == "2026-08-25T09:00:00+00:00"
 
@@ -576,7 +576,8 @@ def test_emit_refuses_a_forbidden_name_under_a_nested_dotted_key(
     (EXPERIMENTAL-spec-kitty-events#21)."""
     real_encode_fields = zeitgeist_attrs._encode_fields
     monkeypatch.setattr(
-        zeitgeist_attrs, "_encode_fields",
+        zeitgeist_attrs,
+        "_encode_fields",
         lambda *a, **k: {**real_encode_fields(*a, **k), "actor.token": "leaked"},
     )
     with pytest.raises(ZeitgeistAttrsForbiddenKeyError, match=r"actor\.token"):
@@ -713,6 +714,24 @@ def test_encode_rejects_a_key_over_the_64_char_bound(
     monkeypatch.setattr(zeitgeist_attrs, "_encode_fields", lambda *a, **k: {"a" * 65: "v"})
     with pytest.raises(ZeitgeistAttrsOverflowError):
         to_zeitgeist_attrs(_transition(), _envelope("WPStatusChanged"))
+
+
+def test_encode_rejects_a_newline_in_a_value_with_typed_error() -> None:
+    """Encode must refuse what decode refuses: a bare LF could forge extra
+    frame lines for whatever renders the moment next (issue #64 — encode
+    was the one bound in this module not enforced at emit, so a producer
+    could publish a moment its own consumer would then drop)."""
+    payload = _transition(actor="actor\nrumor: fake status line")
+    with pytest.raises(ZeitgeistAttrsControlCharacterError, match="attr 'actor' value"):
+        to_zeitgeist_attrs(payload, _envelope("WPStatusChanged"))
+
+
+def test_encode_rejects_an_ansi_escape_in_a_value_with_typed_error() -> None:
+    """Mirrors the ESC-smuggling decode check (issue #25); encode must
+    catch it too (issue #64)."""
+    payload = _transition(wp_id="WP01\x1b[0m")
+    with pytest.raises(ZeitgeistAttrsControlCharacterError, match="attr 'wp_id' value"):
+        to_zeitgeist_attrs(payload, _envelope("WPStatusChanged"))
 
 
 def test_encode_admits_a_multibyte_value_within_the_stricter_byte_bound() -> None:
@@ -1117,6 +1136,21 @@ def test_required_keys_exclude_optional_typed_fields_pydantic_still_requires() -
     require a key that a legitimate encode can omit."""
     assert "mission_number" not in zeitgeist_attrs._REQUIRED_KEYS_BY_EVENT_TYPE["MissionCreated"]
     assert "mission_slug" in zeitgeist_attrs._REQUIRED_KEYS_BY_EVENT_TYPE["MissionCreated"]
+
+
+def test_every_current_family_guarantees_its_ref_field() -> None:
+    """Pins the invariant VolatileMoment's docstring and zeitgeist_ref_for's
+    ``None`` branch rely on: every current family's ref field
+    (REF_FIELD_BY_EVENT_TYPE) is also one of decode's required keys
+    (_REQUIRED_KEYS_BY_EVENT_TYPE), so ref can never be None on decode for
+    any type in today's vocabulary (spec-kitty-events#71). If a future
+    family adds an Optional ref field, this test must be updated alongside
+    the docstrings that currently claim the branch is unreachable."""
+    for event_type, ref_field in REF_FIELD_BY_EVENT_TYPE.items():
+        assert ref_field in zeitgeist_attrs._REQUIRED_KEYS_BY_EVENT_TYPE[event_type], (
+            f"{event_type}'s ref field {ref_field!r} is not required; "
+            "zeitgeist_ref_for/from_zeitgeist_attrs could now decode ref=None"
+        )
 
 
 def test_moment_is_frozen() -> None:
