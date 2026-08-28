@@ -140,9 +140,7 @@ def test_helper_rejects_a_doubled_trailing_z_timestamp() -> None:
     """
     envelope = {"timestamp": "2026-01-01T00:00:00ZZ"}
     with pytest.raises(ValueError, match="not ISO-8601"):
-        assert_producer_occurrence_preserved(
-            envelope, datetime(2026, 1, 1, tzinfo=timezone.utc)
-        )
+        assert_producer_occurrence_preserved(envelope, datetime(2026, 1, 1, tzinfo=timezone.utc))
 
 
 def test_helper_raises_on_one_second_drift() -> None:
