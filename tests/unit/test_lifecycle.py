@@ -420,8 +420,21 @@ class TestMissionClosedPayload:
                 mission_slug="mission-contract-cutover",
                 mission_number=14,
                 mission_type="software-dev",
-                mission_id="M014",
+                feature_slug="legacy-feature",
             )
+
+    def test_accepts_optional_mission_id(self) -> None:
+        """mission_id is a sanctioned optional field (spec-kitty-events#69),
+        not a legacy catalog field — it rides alongside mission_slug so a
+        consumer can join this moment against PhaseEntered for the same
+        mission aggregate."""
+        payload = MissionClosedPayload(
+            mission_slug="mission-contract-cutover",
+            mission_number=14,
+            mission_type="software-dev",
+            mission_id="M014",
+        )
+        assert payload.mission_id == "M014"
 
 
 # ── MissionCancelledPayload ──────────────────────────────────────────────────
