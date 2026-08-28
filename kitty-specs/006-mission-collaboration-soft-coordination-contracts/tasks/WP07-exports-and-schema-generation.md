@@ -142,24 +142,24 @@ Make all collaboration symbols importable from `spec_kitty_events` and generate 
   2. Add 17 new entries (3 identity + 14 payload models):
      ```python
      # Collaboration identity models
-     ("participant_identity", ParticipantIdentity),
-     ("auth_principal_binding", AuthPrincipalBinding),
-     ("focus_target", FocusTarget),
+     (("participant_identity", ParticipantIdentity),)
+     (("auth_principal_binding", AuthPrincipalBinding),)
+     (("focus_target", FocusTarget),)
      # Collaboration payload models
-     ("participant_invited_payload", ParticipantInvitedPayload),
-     ("participant_joined_payload", ParticipantJoinedPayload),
-     ("participant_left_payload", ParticipantLeftPayload),
-     ("presence_heartbeat_payload", PresenceHeartbeatPayload),
-     ("drive_intent_set_payload", DriveIntentSetPayload),
-     ("focus_changed_payload", FocusChangedPayload),
-     ("prompt_step_execution_started_payload", PromptStepExecutionStartedPayload),
-     ("prompt_step_execution_completed_payload", PromptStepExecutionCompletedPayload),
-     ("concurrent_driver_warning_payload", ConcurrentDriverWarningPayload),
-     ("potential_step_collision_detected_payload", PotentialStepCollisionDetectedPayload),
-     ("warning_acknowledged_payload", WarningAcknowledgedPayload),
-     ("comment_posted_payload", CommentPostedPayload),
-     ("decision_captured_payload", DecisionCapturedPayload),
-     ("session_linked_payload", SessionLinkedPayload),
+     (("participant_invited_payload", ParticipantInvitedPayload),)
+     (("participant_joined_payload", ParticipantJoinedPayload),)
+     (("participant_left_payload", ParticipantLeftPayload),)
+     (("presence_heartbeat_payload", PresenceHeartbeatPayload),)
+     (("drive_intent_set_payload", DriveIntentSetPayload),)
+     (("focus_changed_payload", FocusChangedPayload),)
+     (("prompt_step_execution_started_payload", PromptStepExecutionStartedPayload),)
+     (("prompt_step_execution_completed_payload", PromptStepExecutionCompletedPayload),)
+     (("concurrent_driver_warning_payload", ConcurrentDriverWarningPayload),)
+     (("potential_step_collision_detected_payload", PotentialStepCollisionDetectedPayload),)
+     (("warning_acknowledged_payload", WarningAcknowledgedPayload),)
+     (("comment_posted_payload", CommentPostedPayload),)
+     (("decision_captured_payload", DecisionCapturedPayload),)
+     (("session_linked_payload", SessionLinkedPayload),)
      ```
   3. Add corresponding imports from `spec_kitty_events.collaboration`
   4. Do NOT register reducer output models (`ReducedCollaborationState`, etc.) — they are internal reducer state, not event schemas

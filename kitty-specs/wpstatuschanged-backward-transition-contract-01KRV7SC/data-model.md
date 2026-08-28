@@ -55,12 +55,22 @@ class ReconciliationDiagnostic(BaseModel):
 
     mission_slug: str = Field(..., min_length=1)
     wp_id: str = Field(..., min_length=1)
-    event_id: str = Field(..., min_length=1, description="event_id of the WPStatusChanged event that triggered the diagnostic")
+    event_id: str = Field(
+        ...,
+        min_length=1,
+        description="event_id of the WPStatusChanged event that triggered the diagnostic",
+    )
     expected_from_lane: Optional[Lane] = Field(None, description="from_lane on the offending event")
-    actual_projected_lane: Optional[Lane] = Field(None, description="Lane the consumer's projection had for this WP at receipt")
+    actual_projected_lane: Optional[Lane] = Field(
+        None, description="Lane the consumer's projection had for this WP at receipt"
+    )
     reason_code: ReconciliationReasonCode = Field(..., description="Closed-enum reason")
-    actor: str = Field(..., min_length=1, description="Audit identity of the consumer that produced the diagnostic")
-    detected_at: datetime = Field(..., description="UTC timestamp the consumer made the determination")
+    actor: str = Field(
+        ..., min_length=1, description="Audit identity of the consumer that produced the diagnostic"
+    )
+    detected_at: datetime = Field(
+        ..., description="UTC timestamp the consumer made the determination"
+    )
 ```
 
 **Invariants**:

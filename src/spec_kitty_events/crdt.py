@@ -1,4 +1,5 @@
 """CRDT merge functions for conflict resolution."""
+
 from typing import List, Set, Any
 from spec_kitty_events.models import Event
 

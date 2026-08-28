@@ -165,6 +165,7 @@ Create conformance fixtures and advanced tests:
          result2 = reduce_collaboration_events(shuffled, mode="strict")
          assert result1 == result2
 
+
      @given(events=collaboration_event_sequence())
      @settings(max_examples=200)
      def test_reducer_deterministic_permissive(events):
@@ -190,6 +191,7 @@ Create conformance fixtures and advanced tests:
      ```python
      import time
      import pytest
+
 
      @pytest.mark.benchmark
      def test_10k_events_under_1s():

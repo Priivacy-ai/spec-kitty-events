@@ -61,6 +61,7 @@ class LifecycleAnomaly(BaseModel):
     Anomalies are non-fatal — the reducer continues processing but records
     the issue for observability.
     """
+
     model_config = ConfigDict(frozen=True)
 
     event_id: str = Field(..., description="Event that caused the anomaly")
@@ -75,15 +76,22 @@ class ReducedMissionState(BaseModel):
     Produced by reduce_lifecycle_events(). Contains both mission-level
     state (status, phase) and delegated WP-level state (via reduce_status_events).
     """
+
     model_config = ConfigDict(frozen=True)
 
     mission_id: Optional[str] = Field(None, description="Mission ID from MissionStarted")
     mission_status: Optional[MissionStatus] = Field(None, description="Current mission status")
     mission_type: Optional[str] = Field(None, description="Mission type from MissionStarted")
     current_phase: Optional[str] = Field(None, description="Current phase from PhaseEntered")
-    phases_entered: tuple[str, ...] = Field(default_factory=tuple, description="Ordered list of phases entered")
-    wp_states: dict[str, "WPState"] = Field(default_factory=dict, description="WP states from delegated reduction")
-    anomalies: tuple[LifecycleAnomaly, ...] = Field(default_factory=tuple, description="Flagged issues")
+    phases_entered: tuple[str, ...] = Field(
+        default_factory=tuple, description="Ordered list of phases entered"
+    )
+    wp_states: dict[str, "WPState"] = Field(
+        default_factory=dict, description="WP states from delegated reduction"
+    )
+    anomalies: tuple[LifecycleAnomaly, ...] = Field(
+        default_factory=tuple, description="Flagged issues"
+    )
     event_count: int = Field(0, description="Total events processed")
     last_processed_event_id: Optional[str] = Field(None, description="Last event ID processed")
 ```
@@ -182,11 +190,13 @@ Within each concurrent group (events with same lamport_clock):
 # Within a concurrent group (same lamport_clock):
 group_events = [e for e in mission_events if e.lamport_clock == current_clock]
 
+
 # Sort: MissionCancelled events go last within the group
 def cancel_last_key(e: Event) -> tuple[int, str]:
     # 1 for cancel (sorts after 0), then by event_id for stability
     is_cancel = 1 if e.event_type == MISSION_CANCELLED else 0
     return (is_cancel, e.event_id)
+
 
 group_events.sort(key=cancel_last_key)
 ```
@@ -217,11 +227,13 @@ if event.event_type == REVIEW_ROLLBACK:
         current_phase = payload.target_phase
         phases_entered.append(payload.target_phase)
     except Exception:
-        anomalies.append(LifecycleAnomaly(
-            event_id=event.event_id,
-            event_type=event.event_type,
-            reason="Invalid ReviewRollback payload",
-        ))
+        anomalies.append(
+            LifecycleAnomaly(
+                event_id=event.event_id,
+                event_type=event.event_type,
+                reason="Invalid ReviewRollback payload",
+            )
+        )
 ```
 
 **F-Reducer-002 test scenario**:
@@ -275,6 +287,7 @@ No new code needed — just the test verifying the behavior.
 
 ```python
 """Property tests proving lifecycle reducer determinism."""
+
 import random
 from hypothesis import given, settings, assume
 from hypothesis import strategies as st
@@ -282,6 +295,7 @@ from hypothesis import strategies as st
 # Strategy: generate a valid mission event sequence
 # then shuffle preserving causal order (Lamport clock ordering)
 # and verify identical output
+
 
 @settings(max_examples=200, deadline=None)
 @given(seed=st.integers(min_value=0, max_value=2**32))

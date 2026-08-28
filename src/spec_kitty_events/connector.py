@@ -6,6 +6,7 @@ for the Connector Lifecycle contract.
 
 Covers FR-001, FR-002, FR-003, FR-006.
 """
+
 from __future__ import annotations
 
 from datetime import datetime
@@ -32,21 +33,25 @@ CONNECTOR_RECONNECTED: str = "ConnectorReconnected"
 USER_CONNECTED: str = "UserConnected"
 USER_DISCONNECTED: str = "UserDisconnected"
 
-CONNECTOR_EVENT_TYPES: FrozenSet[str] = frozenset({
-    CONNECTOR_PROVISIONED,
-    CONNECTOR_HEALTH_CHECKED,
-    CONNECTOR_DEGRADED,
-    CONNECTOR_REVOKED,
-    CONNECTOR_RECONNECTED,
-    USER_CONNECTED,
-    USER_DISCONNECTED,
-})
+CONNECTOR_EVENT_TYPES: FrozenSet[str] = frozenset(
+    {
+        CONNECTOR_PROVISIONED,
+        CONNECTOR_HEALTH_CHECKED,
+        CONNECTOR_DEGRADED,
+        CONNECTOR_REVOKED,
+        CONNECTOR_RECONNECTED,
+        USER_CONNECTED,
+        USER_DISCONNECTED,
+    }
+)
 
 # User-level event types (skip binding-level state transitions)
-_USER_LEVEL_EVENT_TYPES: FrozenSet[str] = frozenset({
-    USER_CONNECTED,
-    USER_DISCONNECTED,
-})
+_USER_LEVEL_EVENT_TYPES: FrozenSet[str] = frozenset(
+    {
+        USER_CONNECTED,
+        USER_DISCONNECTED,
+    }
+)
 
 # ── Section 3: Enums (FR-001) ────────────────────────────────────────────────
 
@@ -85,28 +90,38 @@ _EVENT_TO_STATE: Dict[str, ConnectorState] = {
 # Allowed transitions: from_state -> set of valid to_states (FR-006)
 _ALLOWED_TRANSITIONS: Dict[Optional[ConnectorState], FrozenSet[ConnectorState]] = {
     None: frozenset({ConnectorState.PROVISIONED}),
-    ConnectorState.PROVISIONED: frozenset({
-        ConnectorState.HEALTHY,
-        ConnectorState.DEGRADED,
-        ConnectorState.REVOKED,
-    }),
-    ConnectorState.HEALTHY: frozenset({
-        ConnectorState.DEGRADED,
-        ConnectorState.REVOKED,
-    }),
-    ConnectorState.DEGRADED: frozenset({
-        ConnectorState.HEALTHY,
-        ConnectorState.REVOKED,
-        ConnectorState.RECONNECTED,
-    }),
-    ConnectorState.REVOKED: frozenset({
-        ConnectorState.RECONNECTED,
-    }),
-    ConnectorState.RECONNECTED: frozenset({
-        ConnectorState.HEALTHY,
-        ConnectorState.DEGRADED,
-        ConnectorState.REVOKED,
-    }),
+    ConnectorState.PROVISIONED: frozenset(
+        {
+            ConnectorState.HEALTHY,
+            ConnectorState.DEGRADED,
+            ConnectorState.REVOKED,
+        }
+    ),
+    ConnectorState.HEALTHY: frozenset(
+        {
+            ConnectorState.DEGRADED,
+            ConnectorState.REVOKED,
+        }
+    ),
+    ConnectorState.DEGRADED: frozenset(
+        {
+            ConnectorState.HEALTHY,
+            ConnectorState.REVOKED,
+            ConnectorState.RECONNECTED,
+        }
+    ),
+    ConnectorState.REVOKED: frozenset(
+        {
+            ConnectorState.RECONNECTED,
+        }
+    ),
+    ConnectorState.RECONNECTED: frozenset(
+        {
+            ConnectorState.HEALTHY,
+            ConnectorState.DEGRADED,
+            ConnectorState.REVOKED,
+        }
+    ),
 }
 
 # ── Section 4: Anomaly Model ─────────────────────────────────────────────────
@@ -358,11 +373,13 @@ def reduce_connector_events(
         # Determine target state from event type
         target_state = _EVENT_TO_STATE.get(event_type)
         if target_state is None:
-            anomalies.append(ConnectorAnomaly(
-                kind="unknown_event_type",
-                event_id=event_id,
-                message=f"Unknown event type in Connector family: {event_type!r}",
-            ))
+            anomalies.append(
+                ConnectorAnomaly(
+                    kind="unknown_event_type",
+                    event_id=event_id,
+                    message=f"Unknown event type in Connector family: {event_type!r}",
+                )
+            )
             continue
 
         # Parse payload
@@ -370,11 +387,13 @@ def reduce_connector_events(
         try:
             payload: ConnectorPayload = payload_cls.model_validate(payload_dict)
         except Exception as exc:
-            anomalies.append(ConnectorAnomaly(
-                kind="malformed_payload",
-                event_id=event_id,
-                message=f"Payload validation failed for {event_type!r}: {exc}",
-            ))
+            anomalies.append(
+                ConnectorAnomaly(
+                    kind="malformed_payload",
+                    event_id=event_id,
+                    message=f"Payload validation failed for {event_type!r}: {exc}",
+                )
+            )
             continue
 
         # User-level events: update roster only, skip binding-level transitions
@@ -382,14 +401,16 @@ def reduce_connector_events(
             user_id_val = getattr(payload, "user_id", None)
             if isinstance(user_id_val, str) and user_id_val:
                 if event_type == USER_DISCONNECTED and user_id_val not in user_roster:
-                    anomalies.append(ConnectorAnomaly(
-                        kind="invalid_transition",
-                        event_id=event_id,
-                        message=(
-                            f"UserDisconnected for user {user_id_val!r} "
-                            f"who has no prior connection event"
-                        ),
-                    ))
+                    anomalies.append(
+                        ConnectorAnomaly(
+                            kind="invalid_transition",
+                            event_id=event_id,
+                            message=(
+                                f"UserDisconnected for user {user_id_val!r} "
+                                f"who has no prior connection event"
+                            ),
+                        )
+                    )
                 user_roster[user_id_val] = (
                     target_state,
                     payload.recorded_at,
@@ -399,15 +420,17 @@ def reduce_connector_events(
         # Check: valid binding-level transition
         allowed = _ALLOWED_TRANSITIONS.get(current_state, frozenset())
         if target_state not in allowed:
-            anomalies.append(ConnectorAnomaly(
-                kind="invalid_transition",
-                event_id=event_id,
-                message=(
-                    f"Invalid transition: "
-                    f"{current_state.value if current_state else 'None'} "
-                    f"-> {target_state.value}"
-                ),
-            ))
+            anomalies.append(
+                ConnectorAnomaly(
+                    kind="invalid_transition",
+                    event_id=event_id,
+                    message=(
+                        f"Invalid transition: "
+                        f"{current_state.value if current_state else 'None'} "
+                        f"-> {target_state.value}"
+                    ),
+                )
+            )
             continue
 
         # Apply binding-level transition

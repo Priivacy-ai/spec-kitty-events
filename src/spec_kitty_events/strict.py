@@ -76,10 +76,20 @@ STRICT_PROFILE_ID: str = "journal/v1"
 # 13). One rule, no subset list to maintain.
 STRICT_ENVELOPE_KEYS: frozenset[str] = frozenset(
     {
-        "event_id", "event_type", "aggregate_id", "payload", "timestamp",
-        "build_id", "node_id", "lamport_clock", "causation_id",
-        "project_uuid", "project_slug", "correlation_id",
-        "schema_version", "data_tier",
+        "event_id",
+        "event_type",
+        "aggregate_id",
+        "payload",
+        "timestamp",
+        "build_id",
+        "node_id",
+        "lamport_clock",
+        "causation_id",
+        "project_uuid",
+        "project_slug",
+        "correlation_id",
+        "schema_version",
+        "data_tier",
     }
 )
 
@@ -121,9 +131,7 @@ STRICT_TIMESTAMP_RULES: str = "iso8601-tz-aware"
 # policed — keys, event names, aggregate names — fails closed on live paths
 # again. Like FORBIDDEN_LEGACY_KEYS, membership changes are a contract
 # change under contracts/versioning-and-compatibility.md.
-FORBIDDEN_LEGACY_AGGREGATE_NAMES: frozenset[str] = frozenset(
-    {"feature", "feature_catalog"}
-)
+FORBIDDEN_LEGACY_AGGREGATE_NAMES: frozenset[str] = frozenset({"feature", "feature_catalog"})
 
 _REQUIRED_SCHEMA_VERSION = "3.0.0"
 
@@ -274,137 +282,185 @@ SUPPORT_MATRIX: Tuple[SupportRow, ...] = (
     # vocabulary broadcasts through the team's Zeitgeist relay instead of
     # syncing into durable server-side state.
     _volatile_row(
-        event_type="MissionCreated", family="lifecycle",
+        event_type="MissionCreated",
+        family="lifecycle",
         model="spec_kitty_events.lifecycle.MissionCreatedPayload",
-        schema="mission_created_payload.schema.json", introduced_in="3.0.0",
+        schema="mission_created_payload.schema.json",
+        introduced_in="3.0.0",
     ),
     _volatile_row(
-        event_type="MissionClosed", family="lifecycle",
+        event_type="MissionClosed",
+        family="lifecycle",
         model="spec_kitty_events.lifecycle.MissionClosedPayload",
-        schema="mission_closed_payload.schema.json", introduced_in="3.0.0",
+        schema="mission_closed_payload.schema.json",
+        introduced_in="3.0.0",
     ),
     _journal_row(
-        event_type="MissionStarted", family="lifecycle",
+        event_type="MissionStarted",
+        family="lifecycle",
         model="spec_kitty_events.lifecycle.MissionStartedPayload",
-        schema="mission_started_payload.schema.json", introduced_in="0.3.0-alpha",
+        schema="mission_started_payload.schema.json",
+        introduced_in="0.3.0-alpha",
         strict_since="7.0.0",
     ),
     _journal_row(
-        event_type="MissionCompleted", family="lifecycle",
+        event_type="MissionCompleted",
+        family="lifecycle",
         model="spec_kitty_events.lifecycle.MissionCompletedPayload",
-        schema="mission_completed_payload.schema.json", introduced_in="0.3.0-alpha",
+        schema="mission_completed_payload.schema.json",
+        introduced_in="0.3.0-alpha",
         strict_since="7.0.0",
     ),
     _journal_row(
-        event_type="MissionCancelled", family="lifecycle",
+        event_type="MissionCancelled",
+        family="lifecycle",
         model="spec_kitty_events.lifecycle.MissionCancelledPayload",
-        schema="mission_cancelled_payload.schema.json", introduced_in="0.3.0-alpha",
+        schema="mission_cancelled_payload.schema.json",
+        introduced_in="0.3.0-alpha",
         strict_since="7.0.0",
     ),
     _volatile_row(
-        event_type="PhaseEntered", family="lifecycle",
+        event_type="PhaseEntered",
+        family="lifecycle",
         model="spec_kitty_events.lifecycle.PhaseEnteredPayload",
-        schema="phase_entered_payload.schema.json", introduced_in="0.3.0-alpha",
+        schema="phase_entered_payload.schema.json",
+        introduced_in="0.3.0-alpha",
         strict_since="7.0.0",
     ),
     _journal_row(
-        event_type="ReviewRollback", family="lifecycle",
+        event_type="ReviewRollback",
+        family="lifecycle",
         model="spec_kitty_events.lifecycle.ReviewRollbackPayload",
-        schema="review_rollback_payload.schema.json", introduced_in="0.3.0-alpha",
+        schema="review_rollback_payload.schema.json",
+        introduced_in="0.3.0-alpha",
         strict_since="7.0.0",
     ),
     _journal_row(
-        event_type="MissionReopened", family="lifecycle",
+        event_type="MissionReopened",
+        family="lifecycle",
         model="spec_kitty_events.lifecycle.MissionReopenedPayload",
-        schema="mission_reopened_payload.schema.json", introduced_in="6.1.0",
+        schema="mission_reopened_payload.schema.json",
+        introduced_in="6.1.0",
     ),
     _journal_row(
-        event_type="FollowUpRecorded", family="lifecycle",
+        event_type="FollowUpRecorded",
+        family="lifecycle",
         model="spec_kitty_events.lifecycle.FollowUpRecordedPayload",
-        schema="follow_up_recorded_payload.schema.json", introduced_in="6.1.0",
+        schema="follow_up_recorded_payload.schema.json",
+        introduced_in="6.1.0",
     ),
     _volatile_row(
-        event_type="WPStatusChanged", family="wp",
+        event_type="WPStatusChanged",
+        family="wp",
         model="spec_kitty_events.status.StatusTransitionPayload",
-        schema="status_transition_payload.schema.json", introduced_in="0.2.0-alpha",
+        schema="status_transition_payload.schema.json",
+        introduced_in="0.2.0-alpha",
     ),
     _journal_row(
-        event_type="WPCreated", family="project",
+        event_type="WPCreated",
+        family="project",
         model="spec_kitty_events.project_lifecycle.WPCreatedPayload",
-        schema="wp_created_payload.schema.json", introduced_in="5.1.0",
+        schema="wp_created_payload.schema.json",
+        introduced_in="5.1.0",
     ),
     _journal_row(
-        event_type="ProjectInitialized", family="project",
+        event_type="ProjectInitialized",
+        family="project",
         model="spec_kitty_events.project_lifecycle.ProjectInitializedPayload",
-        schema="project_initialized_payload.schema.json", introduced_in="5.1.0",
+        schema="project_initialized_payload.schema.json",
+        introduced_in="5.1.0",
     ),
     _journal_row(
-        event_type="SpecifyStarted", family="project",
+        event_type="SpecifyStarted",
+        family="project",
         model="spec_kitty_events.project_lifecycle.SpecifyStartedPayload",
-        schema="specify_started_payload.schema.json", introduced_in="5.1.0",
+        schema="specify_started_payload.schema.json",
+        introduced_in="5.1.0",
     ),
     _journal_row(
-        event_type="SpecifyCompleted", family="project",
+        event_type="SpecifyCompleted",
+        family="project",
         model="spec_kitty_events.project_lifecycle.SpecifyCompletedPayload",
-        schema="specify_completed_payload.schema.json", introduced_in="5.1.0",
+        schema="specify_completed_payload.schema.json",
+        introduced_in="5.1.0",
     ),
     _journal_row(
-        event_type="PlanStarted", family="project",
+        event_type="PlanStarted",
+        family="project",
         model="spec_kitty_events.project_lifecycle.PlanStartedPayload",
-        schema="plan_started_payload.schema.json", introduced_in="5.1.0",
+        schema="plan_started_payload.schema.json",
+        introduced_in="5.1.0",
     ),
     _journal_row(
-        event_type="PlanCompleted", family="project",
+        event_type="PlanCompleted",
+        family="project",
         model="spec_kitty_events.project_lifecycle.PlanCompletedPayload",
-        schema="plan_completed_payload.schema.json", introduced_in="5.1.0",
+        schema="plan_completed_payload.schema.json",
+        introduced_in="5.1.0",
     ),
     _journal_row(
-        event_type="TasksStarted", family="project",
+        event_type="TasksStarted",
+        family="project",
         model="spec_kitty_events.project_lifecycle.TasksStartedPayload",
-        schema="tasks_started_payload.schema.json", introduced_in="5.1.0",
+        schema="tasks_started_payload.schema.json",
+        introduced_in="5.1.0",
     ),
     _journal_row(
-        event_type="TasksCompleted", family="project",
+        event_type="TasksCompleted",
+        family="project",
         model="spec_kitty_events.project_lifecycle.TasksCompletedPayload",
-        schema="tasks_completed_payload.schema.json", introduced_in="5.1.0",
+        schema="tasks_completed_payload.schema.json",
+        introduced_in="5.1.0",
     ),
     # Mission-run runtime family (mission_next), volatile since E2: run-scoped
     # execution moments broadcast with the rest of the ephemeral vocabulary.
     # ``NextStepPlanned`` has no row — its payload contract is reserved.
     _volatile_row(
-        event_type=MISSION_RUN_STARTED, family="mission_run",
+        event_type=MISSION_RUN_STARTED,
+        family="mission_run",
         model="spec_kitty_events.mission_next.MissionRunStartedPayload",
-        schema="mission_run_started_payload.schema.json", introduced_in="2.3.0",
+        schema="mission_run_started_payload.schema.json",
+        introduced_in="2.3.0",
         strict_since=_E2_STRICT_SINCE,
     ),
     _volatile_row(
-        event_type=NEXT_STEP_ISSUED, family="mission_run",
+        event_type=NEXT_STEP_ISSUED,
+        family="mission_run",
         model="spec_kitty_events.mission_next.NextStepIssuedPayload",
-        schema="next_step_issued_payload.schema.json", introduced_in="2.3.0",
+        schema="next_step_issued_payload.schema.json",
+        introduced_in="2.3.0",
         strict_since=_E2_STRICT_SINCE,
     ),
     _volatile_row(
-        event_type=NEXT_STEP_AUTO_COMPLETED, family="mission_run",
+        event_type=NEXT_STEP_AUTO_COMPLETED,
+        family="mission_run",
         model="spec_kitty_events.mission_next.NextStepAutoCompletedPayload",
-        schema="next_step_auto_completed_payload.schema.json", introduced_in="2.3.0",
+        schema="next_step_auto_completed_payload.schema.json",
+        introduced_in="2.3.0",
         strict_since=_E2_STRICT_SINCE,
     ),
     _volatile_row(
-        event_type=DECISION_INPUT_REQUESTED, family="mission_run",
+        event_type=DECISION_INPUT_REQUESTED,
+        family="mission_run",
         model="spec_kitty_events.mission_next.DecisionInputRequestedPayload",
-        schema="decision_input_requested_payload.schema.json", introduced_in="2.3.0",
+        schema="decision_input_requested_payload.schema.json",
+        introduced_in="2.3.0",
         strict_since=_E2_STRICT_SINCE,
     ),
     _volatile_row(
-        event_type=DECISION_INPUT_ANSWERED, family="mission_run",
+        event_type=DECISION_INPUT_ANSWERED,
+        family="mission_run",
         model="spec_kitty_events.mission_next.DecisionInputAnsweredPayload",
-        schema="decision_input_answered_payload.schema.json", introduced_in="2.3.0",
+        schema="decision_input_answered_payload.schema.json",
+        introduced_in="2.3.0",
         strict_since=_E2_STRICT_SINCE,
     ),
     _volatile_row(
-        event_type=MISSION_RUN_COMPLETED, family="mission_run",
+        event_type=MISSION_RUN_COMPLETED,
+        family="mission_run",
         model="spec_kitty_events.mission_next.MissionRunCompletedPayload",
-        schema="mission_run_completed_payload.schema.json", introduced_in="2.3.0",
+        schema="mission_run_completed_payload.schema.json",
+        introduced_in="2.3.0",
         strict_since=_E2_STRICT_SINCE,
     ),
     *(_observation_row(kind) for kind in ObservationKind),
@@ -509,7 +565,15 @@ def _normalize_iso8601_shape(value: str) -> str:
 
 
 def _parse_iso8601(value: str) -> datetime | None:
-    """Best-effort ISO-8601 parse. Returns None when unparsable."""
+    """Best-effort ISO-8601 parse. Returns None when unparsable.
+
+    A well-formed value has at most one trailing ``Z``. A doubled trailing
+    ``Z`` (e.g. ``...00ZZ``) does not match ``_ISO8601_SHAPE_RE`` (its
+    ``offset`` group consumes at most one), so ``_normalize_iso8601_shape``
+    returns it unchanged and ``fromisoformat`` rejects it on every supported
+    interpreter — it is never laundered into something Python 3.10's laxer
+    ``fromisoformat`` would otherwise accept (spec-kitty-events#55/#107/#115).
+    """
     try:
         return datetime.fromisoformat(_normalize_iso8601_shape(value))
     except ValueError:
@@ -577,8 +641,7 @@ def validate_strict_envelope(record: Any) -> Tuple[ValidationError, ...]:
                 ValidationError(
                     code=ValidationErrorCode.FORBIDDEN_AGGREGATE_NAME,
                     message=(
-                        "aggregate_id uses forbidden legacy aggregate name "
-                        f"'{aggregate_name}'"
+                        f"aggregate_id uses forbidden legacy aggregate name '{aggregate_name}'"
                     ),
                     path=["aggregate_id"],
                     details={"aggregate_name": aggregate_name},

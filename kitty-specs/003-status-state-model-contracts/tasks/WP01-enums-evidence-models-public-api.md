@@ -225,6 +225,7 @@ Create the `src/spec_kitty_events/status.py` module with all foundational data t
        Not raised by the library internally (reducer records anomalies).
        Available for consumers: if not result.valid: raise TransitionError(result.violations)
        """
+
        def __init__(self, violations: Tuple[str, ...]) -> None:
            self.violations = violations
            super().__init__(f"Invalid transition: {'; '.join(violations)}")
@@ -292,19 +293,19 @@ Create the `src/spec_kitty_events/status.py` module with all foundational data t
 2. Extend `__all__` with the WP01 symbols (13 new exports this WP):
    ```python
    # Status state model contracts
-   "Lane",
-   "ExecutionMode",
-   "RepoEvidence",
-   "VerificationEntry",
-   "ReviewVerdict",
-   "DoneEvidence",
-   "ForceMetadata",
-   "StatusTransitionPayload",
-   "TransitionError",
-   "normalize_lane",
-   "TERMINAL_LANES",
-   "LANE_ALIASES",
-   "WP_STATUS_CHANGED",
+   ("Lane",)
+   ("ExecutionMode",)
+   ("RepoEvidence",)
+   ("VerificationEntry",)
+   ("ReviewVerdict",)
+   ("DoneEvidence",)
+   ("ForceMetadata",)
+   ("StatusTransitionPayload",)
+   ("TransitionError",)
+   ("normalize_lane",)
+   ("TERMINAL_LANES",)
+   ("LANE_ALIASES",)
+   ("WP_STATUS_CHANGED",)
    ```
 
 3. Update `__version__` — **do NOT bump yet** (that's WP04). Leave as `"0.2.0-alpha"`.

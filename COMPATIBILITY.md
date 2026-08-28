@@ -1,6 +1,6 @@
 # Compatibility Guide
 
-**Current package version**: `8.2.0`
+**Current package version**: `8.2.1`
 
 The on-wire envelope schema version is `3.0.0` and has been unchanged since
 the cutover. The package version and the envelope schema version move
@@ -19,6 +19,21 @@ This document is the public compatibility policy for consumers of:
 - `spec-kitty-events`
 - `spec-kitty-saas`
 - `spec-kitty`
+
+## Known gap (not yet closed) — `to_zeitgeist_attrs` does not yet reject control characters on encode
+
+`from_zeitgeist_attrs` rejects an attrs value carrying a non-printable
+character on decode (`str.isprintable()`, EXPERIMENTAL-spec-kitty-events#25,
+then widened by #63), but `to_zeitgeist_attrs` does not yet run the same
+check on encode (EXPERIMENTAL-spec-kitty-events#64): a producer can
+successfully encode and broadcast an attrs value carrying a control
+character that a consumer's decode will then reject, silently dropping the
+moment. The fix — both directions sharing one predicate and raising the
+same typed `ZeitgeistAttrsControlCharacterError` — is open as
+EXPERIMENTAL-spec-kitty-events#104 and not yet merged to `main`. This
+section is written ahead of that merge so the documentation gap doesn't
+reopen once it lands; it becomes a normal dated-version entry, and this
+"known gap" framing goes away, when #104 merges.
 
 ## `8.0.0` — Sync, legacy-envelope, and cutover surfaces deleted
 
@@ -52,9 +67,15 @@ outside that allowlist must reproduce the removed gate's checks directly
 instead: `forbidden_keys.find_forbidden_keys(record,
 forbidden=FORBIDDEN_LEGACY_KEYS)` for the recursive legacy-key walk, an
 explicit `record.get("schema_version") == "3.0.0"` check for the envelope
-signal, `record.get("aggregate_id", "").split("/", 1)[0] not in
-strict.FORBIDDEN_LEGACY_AGGREGATE_NAMES` for the forbidden legacy
-aggregate-name prefix, and `record.get("event_type") not in {"FeatureCreated",
+signal, `(not isinstance(aggregate_id := record.get("aggregate_id"), str)) or
+aggregate_id.split("/", 1)[0] not in strict.FORBIDDEN_LEGACY_AGGREGATE_NAMES`
+for the forbidden legacy aggregate-name prefix — the `isinstance` guard
+matters: a wire record can carry `aggregate_id: null` or another
+non-string, and `strict.py`'s own gate (`isinstance(aggregate_id, str)`)
+treats that as not-forbidden rather than raising, so a recipe that instead
+does `record.get("aggregate_id", "").split(...)` raises `AttributeError` on
+exactly that input instead of reproducing the gate — and
+`record.get("event_type") not in {"FeatureCreated",
 "FeatureClosed"}` for the forbidden legacy event names (see `## Forbidden
 Legacy Surfaces` below for that list's source). Unlike the other three
 checks, no package constant survives for the legacy event names — they were

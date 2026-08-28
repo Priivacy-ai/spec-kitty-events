@@ -1,4 +1,5 @@
 """Property-based tests for CRDT laws using Hypothesis."""
+
 import uuid
 from hypothesis import given, strategies as st, settings
 from datetime import datetime, timezone
@@ -83,8 +84,8 @@ class TestGSetLaws:
         # Split into three groups
         third = len(events) // 3
         group_a = events[:third]
-        group_b = events[third:2*third]
-        group_c = events[2*third:]
+        group_b = events[third : 2 * third]
+        group_c = events[2 * third :]
 
         # Merge with different association
         result1 = merge_gset(group_a + group_b).union(merge_gset(group_c))
@@ -134,8 +135,8 @@ class TestCounterLaws:
 
         third = len(events) // 3
         group_a = events[:third]
-        group_b = events[third:2*third]
-        group_c = events[2*third:]
+        group_b = events[third : 2 * third]
+        group_c = events[2 * third :]
 
         # All should equal total merge
         all_merged = merge_counter(events)

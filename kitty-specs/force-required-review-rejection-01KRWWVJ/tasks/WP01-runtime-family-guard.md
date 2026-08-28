@@ -110,17 +110,17 @@ all reference one source of truth.
 2. Immediately below the existing `_ALLOWED_TRANSITIONS` declaration
    (currently at line 480), add:
    ```python
-   _REVIEW_REJECTION_FAMILY: FrozenSet[Tuple[Lane, Lane]] = frozenset({
-       (Lane.IN_PROGRESS, Lane.PLANNED),
-       (Lane.FOR_REVIEW, Lane.PLANNED),
-       (Lane.IN_REVIEW, Lane.PLANNED),
-       (Lane.APPROVED, Lane.PLANNED),
-   })
+   _REVIEW_REJECTION_FAMILY: FrozenSet[Tuple[Lane, Lane]] = frozenset(
+       {
+           (Lane.IN_PROGRESS, Lane.PLANNED),
+           (Lane.FOR_REVIEW, Lane.PLANNED),
+           (Lane.IN_REVIEW, Lane.PLANNED),
+           (Lane.APPROVED, Lane.PLANNED),
+       }
+   )
 
 
-   def _is_review_rejection_pair(
-       from_lane: Optional[Lane], to_lane: Lane
-   ) -> bool:
+   def _is_review_rejection_pair(from_lane: Optional[Lane], to_lane: Lane) -> bool:
        """Return True iff (from_lane, to_lane) is in the review-rejection family.
 
        Bootstrap-planned (``from_lane is None``) is intentionally False so
@@ -157,10 +157,7 @@ them.
    # Explicit review-rejection family guard.
    # Fires regardless of review_ref / reason; isolates `force=True` as the
    # missing element so consumers do not have to infer it.
-   if (
-       not payload.force
-       and _is_review_rejection_pair(payload.from_lane, payload.to_lane)
-   ):
+   if not payload.force and _is_review_rejection_pair(payload.from_lane, payload.to_lane):
        violations.append(
            f"review-rejection rollback {payload.from_lane.value} -> "
            f"{payload.to_lane.value} requires force=True"
@@ -245,8 +242,7 @@ current runtime.
        result = validate_transition(payload)
        assert result.valid is False
        force_violations = [
-           v for v in result.violations
-           if "force=True" in v and "review-rejection" in v
+           v for v in result.violations if "force=True" in v and "review-rejection" in v
        ]
        assert force_violations, (
            f"Expected a violation containing both 'force=True' and "
@@ -280,9 +276,7 @@ current runtime.
        "from_lane",
        [Lane.IN_PROGRESS, Lane.FOR_REVIEW, Lane.IN_REVIEW, Lane.APPROVED],
    )
-   def test_forced_rollback_with_reason_is_accepted(
-       self, from_lane: Lane
-   ) -> None:
+   def test_forced_rollback_with_reason_is_accepted(self, from_lane: Lane) -> None:
        """force=True + non-empty reason is the canonical valid rollback."""
        payload = StatusTransitionPayload(
            mission_slug="m",
@@ -297,6 +291,7 @@ current runtime.
        )
        result = validate_transition(payload)
        assert result.valid is True, result.violations
+
 
    def test_bootstrap_planned_is_not_review_rejection(self) -> None:
        """from_lane=None -> planned, force=True is bootstrap, not a rollback."""
@@ -319,6 +314,7 @@ current runtime.
    ```python
    def test_is_review_rejection_pair_helper(self) -> None:
        from spec_kitty_events.status import _is_review_rejection_pair
+
        assert _is_review_rejection_pair(None, Lane.PLANNED) is False
        assert _is_review_rejection_pair(Lane.IN_REVIEW, Lane.PLANNED) is True
        assert _is_review_rejection_pair(Lane.PLANNED, Lane.CLAIMED) is False

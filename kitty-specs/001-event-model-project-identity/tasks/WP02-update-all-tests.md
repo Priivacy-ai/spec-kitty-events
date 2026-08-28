@@ -113,6 +113,7 @@ Use language identifiers in code blocks: ````python`, ````bash`
                  # project_uuid intentionally omitted
              )
 
+
      def test_event_project_uuid_valid_string(self):
          """Test that project_uuid accepts a valid UUID string."""
          event = Event(
@@ -125,6 +126,7 @@ Use language identifiers in code blocks: ````python`, ````bash`
              project_uuid="550e8400-e29b-41d4-a716-446655440000",
          )
          assert isinstance(event.project_uuid, uuid.UUID)
+
 
      def test_event_project_uuid_invalid_string(self):
          """Test that project_uuid rejects invalid UUID strings."""
@@ -139,6 +141,7 @@ Use language identifiers in code blocks: ````python`, ````bash`
                  project_uuid="not-a-uuid",
              )
 
+
      def test_event_project_uuid_empty_string(self):
          """Test that project_uuid rejects empty string."""
          with pytest.raises(PydanticValidationError):
@@ -152,6 +155,7 @@ Use language identifiers in code blocks: ````python`, ````bash`
                  project_uuid="",
              )
 
+
      def test_event_project_slug_optional(self):
          """Test that project_slug defaults to None."""
          event = Event(
@@ -164,6 +168,7 @@ Use language identifiers in code blocks: ````python`, ````bash`
              project_uuid=TEST_PROJECT_UUID,
          )
          assert event.project_slug is None
+
 
      def test_event_project_slug_with_value(self):
          """Test that project_slug accepts a string value."""
@@ -179,6 +184,7 @@ Use language identifiers in code blocks: ````python`, ````bash`
          )
          assert event.project_slug == "my-project"
 
+
      def test_event_project_uuid_immutable(self):
          """Test that project_uuid cannot be changed after creation."""
          event = Event(
@@ -192,6 +198,7 @@ Use language identifiers in code blocks: ````python`, ````bash`
          )
          with pytest.raises(Exception):
              setattr(event, "project_uuid", uuid.uuid4())
+
 
      def test_event_serialization_with_project_identity(self):
          """Test serialization includes project identity fields."""
@@ -208,6 +215,7 @@ Use language identifiers in code blocks: ````python`, ````bash`
          data = event.to_dict()
          assert data["project_uuid"] == TEST_PROJECT_UUID
          assert data["project_slug"] == "test-project"
+
 
      def test_event_deserialization_with_project_identity(self):
          """Test deserialization restores project identity fields."""

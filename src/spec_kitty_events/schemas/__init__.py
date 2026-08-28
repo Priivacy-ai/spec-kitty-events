@@ -1,4 +1,5 @@
 """JSON Schema artifacts for spec-kitty-events models."""
+
 from __future__ import annotations
 
 import json
@@ -12,9 +13,7 @@ def schema_path(name: str) -> Path:
     """Return filesystem path to a committed schema file."""
     path = _SCHEMA_DIR / f"{name}.schema.json"
     if not path.exists():
-        raise FileNotFoundError(
-            f"No schema found for '{name}'. Available: {list_schemas()}"
-        )
+        raise FileNotFoundError(f"No schema found for '{name}'. Available: {list_schemas()}")
     return path
 
 
@@ -27,6 +26,4 @@ def load_schema(name: str) -> Dict[str, Any]:
 
 def list_schemas() -> List[str]:
     """List all available schema names."""
-    return sorted(
-        p.stem.replace(".schema", "") for p in _SCHEMA_DIR.glob("*.schema.json")
-    )
+    return sorted(p.stem.replace(".schema", "") for p in _SCHEMA_DIR.glob("*.schema.json"))

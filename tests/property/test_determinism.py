@@ -1,4 +1,5 @@
 """Property-based tests for determinism of state-machine merge."""
+
 import uuid
 from hypothesis import given, strategies as st, settings
 from datetime import datetime
@@ -13,7 +14,9 @@ def event_with_state(draw):
     """Generate random event with state value."""
     states = ["done", "for_review", "doing", "planned"]
     return Event(
-        event_id=draw(st.text(min_size=26, max_size=26, alphabet="0123456789ABCDEFGHJKMNPQRSTVWXYZ")),
+        event_id=draw(
+            st.text(min_size=26, max_size=26, alphabet="0123456789ABCDEFGHJKMNPQRSTVWXYZ")
+        ),
         event_type="WPStatusChanged",
         aggregate_id="WP001",  # Same aggregate for all (concurrent)
         timestamp=datetime.now(),

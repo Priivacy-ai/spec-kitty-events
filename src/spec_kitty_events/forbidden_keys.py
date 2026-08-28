@@ -160,14 +160,10 @@ def find_forbidden_keys(
                     path=key_path,
                     details={"key": key},
                 )
-            yield from find_forbidden_keys(
-                value, forbidden=forbidden, _path=key_path
-            )
+            yield from find_forbidden_keys(value, forbidden=forbidden, _path=key_path)
     elif isinstance(data, list):
         for index, element in enumerate(data):
-            yield from find_forbidden_keys(
-                element, forbidden=forbidden, _path=path + [index]
-            )
+            yield from find_forbidden_keys(element, forbidden=forbidden, _path=path + [index])
     # Primitives (str, int, float, bool, None, anything else): no-op.
 
 

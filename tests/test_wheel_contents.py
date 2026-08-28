@@ -67,8 +67,7 @@ def _build_backend_available() -> bool:
 )
 def test_built_wheel_contains_f1_t1_package_data(tmp_path: Path) -> None:
     build_script = (
-        "from setuptools.build_meta import build_wheel\n"
-        f"print(build_wheel({str(tmp_path)!r}))\n"
+        f"from setuptools.build_meta import build_wheel\nprint(build_wheel({str(tmp_path)!r}))\n"
     )
     result = subprocess.run(
         [sys.executable, "-c", build_script],

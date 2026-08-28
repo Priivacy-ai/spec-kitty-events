@@ -111,6 +111,7 @@ See the mission's `data-model.md` §1 and §2.1 for exhaustive field definitions
    ```python
    class ParticipantExternalRefs(BaseModel):
        """Optional cross-channel identity references for a ParticipantIdentity."""
+
        model_config = ConfigDict(frozen=True, extra="forbid")
 
        slack_user_id: Optional[str] = Field(None, min_length=1)

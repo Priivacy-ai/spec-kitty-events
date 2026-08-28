@@ -3,6 +3,7 @@
 Tests: order independence (≥200 examples), idempotent dedup (≥200 examples),
 monotonic event_count (≥200 examples).
 """
+
 from __future__ import annotations
 
 import uuid
@@ -147,6 +148,7 @@ _ORDER_STABLE_POOL = _VALID_EVENT_POOL[:2]  # Requested + Started
 
 # ── Property 1: Order independence ─────────────────────────────────────────────
 
+
 @given(st.permutations(_ORDER_STABLE_POOL))
 @settings(max_examples=200, deadline=None)
 def test_order_independence(perm: list[Event]) -> None:
@@ -162,6 +164,7 @@ def test_order_independence(perm: list[Event]) -> None:
 
 # ── Property 2: Idempotent dedup ───────────────────────────────────────────────
 
+
 @given(st.lists(st.sampled_from(_VALID_EVENT_POOL), min_size=1, max_size=5))
 @settings(max_examples=200, deadline=None)
 def test_idempotent_dedup(original: list[Event]) -> None:
@@ -173,6 +176,7 @@ def test_idempotent_dedup(original: list[Event]) -> None:
 
 
 # ── Property 3: Monotonic event_count ─────────────────────────────────────────
+
 
 @given(st.lists(st.sampled_from(_VALID_EVENT_POOL), min_size=1, max_size=8))
 @settings(max_examples=200, deadline=None)

@@ -119,18 +119,22 @@ See:
        "replay_interview_resolved_other",
    ]
 
+
    @pytest.mark.parametrize("name", V1_GOLDENS)
    def test_v1_golden_replay_byte_identical(name: str) -> None:
        fx = pathlib.Path("tests/fixtures/decisionpoint_golden")
        events_file = fx / f"{name}.jsonl"
        expected_file = fx / f"{name}_output.json"
-       events = [Event.model_validate_json(line)
-                 for line in events_file.read_text().splitlines()
-                 if line.strip()]
+       events = [
+           Event.model_validate_json(line)
+           for line in events_file.read_text().splitlines()
+           if line.strip()
+       ]
        reduced = reduce_decision_point_events(events)
        actual = json.dumps(
            reduced.model_dump(mode="json", by_alias=True),
-           sort_keys=True, indent=2,
+           sort_keys=True,
+           indent=2,
        )
        expected = expected_file.read_text().rstrip()
        assert actual == expected, f"Replay drift in {name}"

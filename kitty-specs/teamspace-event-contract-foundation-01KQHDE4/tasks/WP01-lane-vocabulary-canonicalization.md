@@ -131,14 +131,18 @@ These artifacts must move; the lane is now canonical.
    ```python
    from spec_kitty_events import Lane
 
-   EXPECTED_CANONICAL_LANES = frozenset({
-       # the full set of Lane enum values, including IN_REVIEW
-       # (read the actual enum and pin them here)
-   })
+   EXPECTED_CANONICAL_LANES = frozenset(
+       {
+           # the full set of Lane enum values, including IN_REVIEW
+           # (read the actual enum and pin them here)
+       }
+   )
+
 
    def test_in_review_is_canonical():
        assert Lane.IN_REVIEW.value == "in_review"
        assert Lane.IN_REVIEW in Lane
+
 
    def test_canonical_lane_set_is_pinned():
        """Asserts the canonical lane set has not silently drifted."""
@@ -147,6 +151,7 @@ These artifacts must move; the lane is now canonical.
            f"Lane vocabulary drifted. New: {actual - EXPECTED_CANONICAL_LANES}, "
            f"Removed: {EXPECTED_CANONICAL_LANES - actual}"
        )
+
 
    def test_lane_vocabulary_is_single_source_of_truth():
        """No duplicate lane definition exists elsewhere in the package."""

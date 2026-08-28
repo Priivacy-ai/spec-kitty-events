@@ -138,10 +138,12 @@ from pydantic import BaseModel, ConfigDict, Field
 BUILD_REGISTERED: str = "BuildRegistered"
 BUILD_HEARTBEAT: str = "BuildHeartbeat"
 
-BUILD_LIFECYCLE_EVENT_TYPES: FrozenSet[str] = frozenset({
-    BUILD_REGISTERED,
-    BUILD_HEARTBEAT,
-})
+BUILD_LIFECYCLE_EVENT_TYPES: FrozenSet[str] = frozenset(
+    {
+        BUILD_REGISTERED,
+        BUILD_HEARTBEAT,
+    }
+)
 
 
 class BuildRegisteredPayload(BaseModel):
@@ -174,9 +176,7 @@ class BuildHeartbeatPayload(BaseModel):
 
     model_config = ConfigDict(frozen=True, extra="forbid")
 
-    repo_slug: Optional[str] = Field(
-        None, min_length=1, description="Git repository slug."
-    )
+    repo_slug: Optional[str] = Field(None, min_length=1, description="Git repository slug.")
     git_branch: Optional[str] = Field(
         None, min_length=1, description="Active git branch at heartbeat time."
     )
@@ -189,9 +189,7 @@ class BuildHeartbeatPayload(BaseModel):
     ahead_of_remote: Optional[int] = Field(
         None, ge=0, description="Local commits ahead of the remote."
     )
-    behind_remote: Optional[int] = Field(
-        None, ge=0, description="Local commits behind the remote."
-    )
+    behind_remote: Optional[int] = Field(None, ge=0, description="Local commits behind the remote.")
     recent_commits: Optional[List[str]] = Field(
         None, description="Recent local commit SHAs (most-recent-first)."
     )
@@ -222,13 +220,15 @@ DEPENDENCY_RESOLVED: str = "DependencyResolved"
 Update `WP_LIFECYCLE_EVENT_TYPES`:
 
 ```python
-WP_LIFECYCLE_EVENT_TYPES: FrozenSet[str] = frozenset({
-    WP_CREATED,
-    WP_ASSIGNED,
-    HISTORY_ADDED,
-    ERROR_LOGGED,
-    DEPENDENCY_RESOLVED,
-})
+WP_LIFECYCLE_EVENT_TYPES: FrozenSet[str] = frozenset(
+    {
+        WP_CREATED,
+        WP_ASSIGNED,
+        HISTORY_ADDED,
+        ERROR_LOGGED,
+        DEPENDENCY_RESOLVED,
+    }
+)
 ```
 
 Add the four payload models (place them after `WPCreatedPayload`):
@@ -248,7 +248,9 @@ class WPAssignedPayload(BaseModel):
     wp_id: str = Field(..., min_length=1, description="Work-package identifier.")
     agent_id: str = Field(..., min_length=1, description="Agent that picked up the WP.")
     phase: str = Field(..., min_length=1, description="Phase of work (e.g. 'implement', 'review').")
-    retry_count: int = Field(0, ge=0, description="Number of times the assignment has been retried.")
+    retry_count: int = Field(
+        0, ge=0, description="Number of times the assignment has been retried."
+    )
 
 
 class HistoryAddedPayload(BaseModel):
@@ -262,7 +264,9 @@ class HistoryAddedPayload(BaseModel):
     model_config = ConfigDict(frozen=True, extra="forbid")
 
     wp_id: str = Field(..., min_length=1, description="Work-package the history entry attaches to.")
-    entry_type: str = Field(..., min_length=1, description="Entry type code (e.g. 'note', 'decision').")
+    entry_type: str = Field(
+        ..., min_length=1, description="Entry type code (e.g. 'note', 'decision')."
+    )
     entry_content: str = Field(..., min_length=1, description="Entry body.")
     author: str = Field(..., min_length=1, description="Who authored the entry.")
 
@@ -277,9 +281,13 @@ class ErrorLoggedPayload(BaseModel):
 
     error_type: str = Field(..., min_length=1, description="Error class name or category.")
     error_message: str = Field(..., min_length=1, description="Human-readable error message.")
-    wp_id: Optional[str] = Field(None, min_length=1, description="Work-package context, when known.")
+    wp_id: Optional[str] = Field(
+        None, min_length=1, description="Work-package context, when known."
+    )
     stack_trace: Optional[str] = Field(None, description="Stack trace text.")
-    agent_id: Optional[str] = Field(None, min_length=1, description="Agent that observed the error.")
+    agent_id: Optional[str] = Field(
+        None, min_length=1, description="Agent that observed the error."
+    )
 
 
 class DependencyResolvedPayload(BaseModel):
@@ -293,20 +301,22 @@ class DependencyResolvedPayload(BaseModel):
 
     wp_id: str = Field(..., min_length=1, description="WP whose dependency resolved.")
     dependency_wp_id: str = Field(..., min_length=1, description="The dependency WP that resolved.")
-    resolution_type: str = Field(..., min_length=1, description="How it resolved (e.g. 'merged', 'skipped').")
+    resolution_type: str = Field(
+        ..., min_length=1, description="How it resolved (e.g. 'merged', 'skipped')."
+    )
 ```
 
 Append to `__all__`:
 
 ```python
-"WP_ASSIGNED",
-"HISTORY_ADDED",
-"ERROR_LOGGED",
-"DEPENDENCY_RESOLVED",
-"WPAssignedPayload",
-"HistoryAddedPayload",
-"ErrorLoggedPayload",
-"DependencyResolvedPayload",
+("WP_ASSIGNED",)
+("HISTORY_ADDED",)
+("ERROR_LOGGED",)
+("DEPENDENCY_RESOLVED",)
+("WPAssignedPayload",)
+("HistoryAddedPayload",)
+("ErrorLoggedPayload",)
+("DependencyResolvedPayload",)
 ```
 
 ### T008 — Extend `src/spec_kitty_events/lifecycle.py`
@@ -328,12 +338,20 @@ class MissionOriginBoundPayload(BaseModel):
     model_config = ConfigDict(frozen=True, extra="forbid")
 
     mission_slug: str = Field(..., min_length=1, description="Canonical mission slug.")
-    provider: str = Field(..., min_length=1, description="External tracker provider (e.g. 'github', 'linear').")
-    external_issue_id: str = Field(..., min_length=1, description="Provider-native issue identifier.")
+    provider: str = Field(
+        ..., min_length=1, description="External tracker provider (e.g. 'github', 'linear')."
+    )
+    external_issue_id: str = Field(
+        ..., min_length=1, description="Provider-native issue identifier."
+    )
     external_issue_key: str = Field(..., min_length=1, description="Display key (e.g. 'PROJ-123').")
-    external_issue_url: str = Field(..., min_length=1, description="Browser URL to the external issue.")
+    external_issue_url: str = Field(
+        ..., min_length=1, description="Browser URL to the external issue."
+    )
     title: str = Field(..., min_length=1, description="External issue title.")
-    mission_id: Optional[str] = Field(None, min_length=1, description="Canonical mission ULID (when known).")
+    mission_id: Optional[str] = Field(
+        None, min_length=1, description="Canonical mission ULID (when known)."
+    )
 ```
 
 Add `MISSION_ORIGIN_BOUND` and `MissionOriginBoundPayload` to the module's exports.
@@ -369,6 +387,7 @@ The test imports payload models directly from their source modules (not from `sp
 Covers FR-010 (model classes exist, round-trip, and reject extras).
 Registry and public-surface tests live in WP04's verification step.
 """
+
 from __future__ import annotations
 
 import pytest
@@ -387,13 +406,44 @@ from spec_kitty_events.project_lifecycle import (
 from spec_kitty_events.lifecycle import MissionOriginBoundPayload
 
 _SEVEN = [
-    ("WPAssigned", WPAssignedPayload, {"wp_id": "WP01", "agent_id": "claude", "phase": "implement"}),
-    ("BuildRegistered", BuildRegisteredPayload, {"repo_slug": "org/repo", "git_branch": "main", "head_commit_sha": "abc123"}),
-    ("BuildHeartbeat", BuildHeartbeatPayload, {"repo_slug": "org/repo", "ahead_of_remote": 0, "behind_remote": 0}),
-    ("HistoryAdded", HistoryAddedPayload, {"wp_id": "WP01", "entry_type": "note", "entry_content": "started", "author": "claude"}),
+    (
+        "WPAssigned",
+        WPAssignedPayload,
+        {"wp_id": "WP01", "agent_id": "claude", "phase": "implement"},
+    ),
+    (
+        "BuildRegistered",
+        BuildRegisteredPayload,
+        {"repo_slug": "org/repo", "git_branch": "main", "head_commit_sha": "abc123"},
+    ),
+    (
+        "BuildHeartbeat",
+        BuildHeartbeatPayload,
+        {"repo_slug": "org/repo", "ahead_of_remote": 0, "behind_remote": 0},
+    ),
+    (
+        "HistoryAdded",
+        HistoryAddedPayload,
+        {"wp_id": "WP01", "entry_type": "note", "entry_content": "started", "author": "claude"},
+    ),
     ("ErrorLogged", ErrorLoggedPayload, {"error_type": "ValueError", "error_message": "oops"}),
-    ("DependencyResolved", DependencyResolvedPayload, {"wp_id": "WP02", "dependency_wp_id": "WP01", "resolution_type": "merged"}),
-    ("MissionOriginBound", MissionOriginBoundPayload, {"mission_slug": "demo", "provider": "github", "external_issue_id": "1198", "external_issue_key": "spec-kitty#1198", "external_issue_url": "https://github.com/Priivacy-ai/spec-kitty/issues/1198", "title": "Epic"}),
+    (
+        "DependencyResolved",
+        DependencyResolvedPayload,
+        {"wp_id": "WP02", "dependency_wp_id": "WP01", "resolution_type": "merged"},
+    ),
+    (
+        "MissionOriginBound",
+        MissionOriginBoundPayload,
+        {
+            "mission_slug": "demo",
+            "provider": "github",
+            "external_issue_id": "1198",
+            "external_issue_key": "spec-kitty#1198",
+            "external_issue_url": "https://github.com/Priivacy-ai/spec-kitty/issues/1198",
+            "title": "Epic",
+        },
+    ),
 ]
 
 

@@ -20,6 +20,7 @@ from uuid import UUID
 
 import pytest
 
+from spec_kitty_events import zeitgeist_attrs as zeitgeist_attrs_module
 from spec_kitty_events.conformance import validate_event
 from spec_kitty_events.conformance.loader import FixtureCase, load_fixtures
 from spec_kitty_events.decisionpoint import (
@@ -30,13 +31,16 @@ from spec_kitty_events.decisionpoint import (
 )
 from spec_kitty_events.lifecycle import MissionClosedPayload, MissionStartedPayload
 from spec_kitty_events.models import Event
+from spec_kitty_events.status import StatusTransitionPayload
 from spec_kitty_events.zeitgeist_attrs import (
     PAYLOAD_MODEL_BY_EVENT_TYPE,
+    ZEITGEIST_ATTR_KEY_MAX_CHARS,
     UnencodableFieldValueError,
     UnknownVolatileEventTypeError,
     VolatileMoment,
     ZeitgeistAttrsError,
     ZeitgeistAttrsForbiddenKeyError,
+    ZeitgeistAttrsOverflowError,
     _ALLOWED_KEYS_BY_EVENT_TYPE,
     from_zeitgeist_attrs,
     to_zeitgeist_attrs,
@@ -64,6 +68,7 @@ def _build_payload(event_type: str, fields: dict):
     if factory is not None:
         return factory(**fields)
     return PAYLOAD_MODEL_BY_EVENT_TYPE[event_type](**fields)
+
 
 _ERROR_CLASSES = {
     "UnknownVolatileEventTypeError": UnknownVolatileEventTypeError,
@@ -108,6 +113,27 @@ def test_fixtures_loaded(zeitgeist_attrs_fixtures) -> None:
     assert len([f for f in zeitgeist_attrs_fixtures if not f.expected_valid]) == 8
 
 
+def test_fixture_event_ids_are_unique(zeitgeist_attrs_fixtures) -> None:
+    """No two fixtures may share an envelope/attrs ``event_id``.
+
+    Team Kitty deduplicates moments on ``(team, event_id)``; a fixture-id
+    clash is harmless to load but would silently collapse two distinct
+    moments if this directory were ever replayed through that reducer
+    (issue #73).
+    """
+    seen: dict[str, str] = {}
+    for fixture in zeitgeist_attrs_fixtures:
+        case = fixture.payload
+        event_id = (case.get("envelope") or case.get("attrs") or {}).get("event_id")
+        if event_id is None:
+            continue
+        if event_id in seen:
+            raise AssertionError(
+                f"event_id {event_id!r} used by both {seen[event_id]!r} and {fixture.id!r}"
+            )
+        seen[event_id] = fixture.id
+
+
 def test_every_valid_fixture_covers_one_volatile_event_type(
     zeitgeist_attrs_fixtures,
 ) -> None:
@@ -133,18 +159,14 @@ def test_codec_fixtures_stay_out_of_the_packaged_event_gate() -> None:
     )
 
     manifest_paths = {
-        f["path"]
-        for f in _MANIFEST["fixtures"]
-        if f["path"].startswith("zeitgeist_attrs/")
+        f["path"] for f in _MANIFEST["fixtures"] if f["path"].startswith("zeitgeist_attrs/")
     }
     assert manifest_paths, (
         "zeitgeist_attrs codec fixtures vanished from the manifest; if the "
         "category was renamed on purpose, update this guard with it"
     )
     leaked = sorted(
-        f["path"]
-        for f in _event_fixture_entries()
-        if f["path"].startswith("zeitgeist_attrs/")
+        f["path"] for f in _event_fixture_entries() if f["path"].startswith("zeitgeist_attrs/")
     )
     assert not leaked, (
         "codec fixtures reached the packaged event gate; validating them as "
@@ -163,9 +185,7 @@ def test_packaged_event_gate_fixture_entries_match_manifest_expectations() -> No
     for case in _event_fixture_params():
         result = validate_event(case["payload"], case["event_type"])
         if case["expected_result"] == "valid" and result.model_violations:
-            violations = "; ".join(
-                f"{v.field}: {v.message}" for v in result.model_violations
-            )
+            violations = "; ".join(f"{v.field}: {v.message}" for v in result.model_violations)
             failures.append(f"{case['id']} unexpectedly failed: {violations}")
         elif case["expected_result"] == "invalid" and result.valid:
             failures.append(f"{case['id']} unexpectedly passed")
@@ -283,4 +303,71 @@ def test_encode_rejects_an_unencodable_scalar() -> None:
         },
     )
     with pytest.raises(UnencodableFieldValueError):
+        to_zeitgeist_attrs(payload, envelope)
+
+
+# ── the 64-char key bound (spec-kitty-events#59) ────────────────────────────
+#
+# No field name in today's volatile vocabulary reaches 64 characters (the
+# longest, DecisionPointOpenedAdrPayload.mission_owner_authority_flag, is 28
+# — checked across every PAYLOAD_MODEL_BY_EVENT_TYPE entry), so neither side
+# of ZEITGEIST_ATTR_KEY_MAX_CHARS can be expressed as a committed fixture
+# file: a fixture varies attr *values*, never the Python identifiers that
+# become attr *keys*. The two tests below close the coverage gap #59 raised
+# — this conformance-adjacent suite pinning both sides of the bound, not
+# only the deeper tests/unit/test_zeitgeist_attrs.py — by splicing a
+# boundary-length key onto a real WPStatusChanged encode, the same
+# ``_encode_fields`` override technique the unit suite already uses for the
+# over-bound case.
+
+
+def _wp_status_changed_case() -> tuple[StatusTransitionPayload, Event]:
+    payload = StatusTransitionPayload(
+        mission_slug="demo-mission",
+        wp_id="WP01",
+        to_lane="doing",
+        actor="robert",
+        execution_mode="worktree",
+    )
+    envelope = _fixture_envelope(
+        "WPStatusChanged",
+        {
+            "envelope": {
+                "event_id": "e2e00000-0000-4000-8000-000000000059",
+                "timestamp": "2026-08-25T09:00:00+00:00",
+            }
+        },
+    )
+    return payload, envelope
+
+
+def test_encode_admits_a_key_at_the_64_char_bound(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A key at exactly the bound must still reach the wire."""
+    payload, envelope = _wp_status_changed_case()
+    real_encode = zeitgeist_attrs_module._encode_fields
+    key = "a" * ZEITGEIST_ATTR_KEY_MAX_CHARS
+    monkeypatch.setattr(
+        zeitgeist_attrs_module,
+        "_encode_fields",
+        lambda *a, **k: {**real_encode(*a, **k), key: "v"},
+    )
+    attrs = to_zeitgeist_attrs(payload, envelope)
+    assert attrs[key] == "v"
+
+
+def test_encode_rejects_a_key_over_the_64_char_bound(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """One character past the bound must raise instead of reaching the wire."""
+    payload, envelope = _wp_status_changed_case()
+    real_encode = zeitgeist_attrs_module._encode_fields
+    key = "a" * (ZEITGEIST_ATTR_KEY_MAX_CHARS + 1)
+    monkeypatch.setattr(
+        zeitgeist_attrs_module,
+        "_encode_fields",
+        lambda *a, **k: {**real_encode(*a, **k), key: "v"},
+    )
+    with pytest.raises(ZeitgeistAttrsOverflowError):
         to_zeitgeist_attrs(payload, envelope)

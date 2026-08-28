@@ -192,11 +192,13 @@ wp_code: WP05
                  raise SpecKittyEventsError(
                      f"Event {event.event_id} references unactivated scope '{scope_id}'"
                  )
-             anomalies.append(GlossaryAnomaly(
-                 event_id=event.event_id,
-                 event_type=event.event_type,
-                 reason=f"References unactivated scope '{scope_id}'",
-             ))
+             anomalies.append(
+                 GlossaryAnomaly(
+                     event_id=event.event_id,
+                     event_type=event.event_type,
+                     reason=f"References unactivated scope '{scope_id}'",
+                 )
+             )
      ```
 - **Files**: `src/spec_kitty_events/glossary.py` (Section 5 + helper above reducer).
 - **Parallel?**: No.

@@ -165,19 +165,19 @@ For documentation missions, planning interrogation is lighter than software-dev:
    **Sphinx (Python)**:
    ```python
    # docs/conf.py
-   project = '{project_name}'
-   author = '{author}'
+   project = "{project_name}"
+   author = "{author}"
    extensions = [
-       'sphinx.ext.autodoc',      # Generate from docstrings
-       'sphinx.ext.napoleon',     # Google/NumPy docstring support
-       'sphinx.ext.viewcode',     # Link to source
-       'sphinx.ext.intersphinx',  # Link to other projects
+       "sphinx.ext.autodoc",  # Generate from docstrings
+       "sphinx.ext.napoleon",  # Google/NumPy docstring support
+       "sphinx.ext.viewcode",  # Link to source
+       "sphinx.ext.intersphinx",  # Link to other projects
    ]
-   html_theme = 'sphinx_rtd_theme'
+   html_theme = "sphinx_rtd_theme"
    autodoc_default_options = {
-       'members': True,
-       'undoc-members': False,
-       'show-inheritance': True,
+       "members": True,
+       "undoc-members": False,
+       "show-inheritance": True,
    }
    ```
 

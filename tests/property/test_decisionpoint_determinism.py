@@ -4,6 +4,7 @@ Tests: order independence (>=200 examples), idempotent dedup (>=200 examples),
 monotonic event_count (>=200 examples), and V1 interview-origin determinism
 (>=500 examples each — NFR-001, NFR-005).
 """
+
 from __future__ import annotations
 
 import json
@@ -155,6 +156,7 @@ _ORDER_STABLE_POOL = _VALID_EVENT_POOL[:2]  # Opened + Discussing
 
 # -- Property 1: Order independence -------------------------------------------
 
+
 @given(st.permutations(_ORDER_STABLE_POOL))
 @settings(max_examples=500, deadline=None)
 def test_order_independence(perm: list[Event]) -> None:
@@ -170,6 +172,7 @@ def test_order_independence(perm: list[Event]) -> None:
 
 # -- Property 2: Idempotent dedup ---------------------------------------------
 
+
 @given(st.lists(st.sampled_from(_VALID_EVENT_POOL), min_size=1, max_size=5))
 @settings(max_examples=500, deadline=None)
 def test_idempotent_dedup(original: list[Event]) -> None:
@@ -181,6 +184,7 @@ def test_idempotent_dedup(original: list[Event]) -> None:
 
 
 # -- Property 3: Monotonic event_count ----------------------------------------
+
 
 @given(st.lists(st.sampled_from(_VALID_EVENT_POOL), min_size=1, max_size=8))
 @settings(max_examples=500, deadline=None)
@@ -228,6 +232,7 @@ def _build_event(event_type: str, payload: dict[str, Any], lamport: int) -> Even
 
 # -- V1 Hypothesis strategies --------------------------------------------------
 
+
 def st_origin_flow() -> st.SearchStrategy[OriginFlow]:
     """Strategy producing a random OriginFlow value."""
     return st.sampled_from(list(OriginFlow))
@@ -253,10 +258,21 @@ def st_summary_block(source: Optional[SummarySource] = None) -> st.SearchStrateg
             **({"extracted_at": extracted_at} if extracted_at is not None else {}),
             **({"candidate_answer": candidate_answer} if candidate_answer is not None else {}),
         },
-        text=st.text(min_size=1, max_size=80, alphabet=st.characters(whitelist_categories=("Lu", "Ll", "Nd", "Zs"))),
+        text=st.text(
+            min_size=1,
+            max_size=80,
+            alphabet=st.characters(whitelist_categories=("Lu", "Ll", "Nd", "Zs")),
+        ),
         src=source_st,
         extracted_at=st.one_of(st.none(), st.just("2026-04-01T08:00:00+00:00")),
-        candidate_answer=st.one_of(st.none(), st.text(min_size=1, max_size=40, alphabet=st.characters(whitelist_categories=("Lu", "Ll", "Nd")))),
+        candidate_answer=st.one_of(
+            st.none(),
+            st.text(
+                min_size=1,
+                max_size=40,
+                alphabet=st.characters(whitelist_categories=("Lu", "Ll", "Nd")),
+            ),
+        ),
     )
 
 
@@ -268,13 +284,19 @@ def st_participant_identity() -> st.SearchStrategy[dict[str, Any]]:
             "participant_type": ptype,
             **({"external_refs": ext} if ext is not None else {}),
         },
-        pid=st.text(min_size=1, max_size=30, alphabet=st.characters(whitelist_categories=("Lu", "Ll", "Nd"))),
+        pid=st.text(
+            min_size=1, max_size=30, alphabet=st.characters(whitelist_categories=("Lu", "Ll", "Nd"))
+        ),
         ptype=st.sampled_from(["human", "llm_context"]),
         ext=st.one_of(
             st.none(),
             st.builds(
                 lambda slack_uid: {"slack_user_id": slack_uid},
-                slack_uid=st.text(min_size=1, max_size=20, alphabet=st.characters(whitelist_categories=("Lu", "Ll", "Nd"))),
+                slack_uid=st.text(
+                    min_size=1,
+                    max_size=20,
+                    alphabet=st.characters(whitelist_categories=("Lu", "Ll", "Nd")),
+                ),
             ),
         ),
     )
@@ -302,10 +324,26 @@ def st_interview_opened_payload(decision_point_id: str) -> st.SearchStrategy[dic
             "recorded_at": "2026-04-01T08:00:01+00:00",
         },
         flow=st_origin_flow(),
-        question=st.text(min_size=1, max_size=100, alphabet=st.characters(whitelist_categories=("Lu", "Ll", "Nd", "Zs", "Po"))),
-        opts=st.lists(st.text(min_size=1, max_size=30, alphabet=st.characters(whitelist_categories=("Lu", "Ll", "Nd"))), min_size=0, max_size=4),
-        input_key=st.text(min_size=1, max_size=30, alphabet=st.characters(whitelist_categories=("Lu", "Ll", "Nd"))),
-        step_id=st.text(min_size=1, max_size=30, alphabet=st.characters(whitelist_categories=("Lu", "Ll", "Nd"))),
+        question=st.text(
+            min_size=1,
+            max_size=100,
+            alphabet=st.characters(whitelist_categories=("Lu", "Ll", "Nd", "Zs", "Po")),
+        ),
+        opts=st.lists(
+            st.text(
+                min_size=1,
+                max_size=30,
+                alphabet=st.characters(whitelist_categories=("Lu", "Ll", "Nd")),
+            ),
+            min_size=0,
+            max_size=4,
+        ),
+        input_key=st.text(
+            min_size=1, max_size=30, alphabet=st.characters(whitelist_categories=("Lu", "Ll", "Nd"))
+        ),
+        step_id=st.text(
+            min_size=1, max_size=30, alphabet=st.characters(whitelist_categories=("Lu", "Ll", "Nd"))
+        ),
     )
 
 
@@ -367,7 +405,11 @@ def st_interview_resolved_payload(
                 "state_entered_at": "2026-04-01T08:00:03+00:00",
                 "recorded_at": "2026-04-01T08:00:03+00:00",
             },
-            answer=st.text(min_size=1, max_size=100, alphabet=st.characters(whitelist_categories=("Lu", "Ll", "Nd", "Zs"))),
+            answer=st.text(
+                min_size=1,
+                max_size=100,
+                alphabet=st.characters(whitelist_categories=("Lu", "Ll", "Nd", "Zs")),
+            ),
             other=st.booleans(),
             participants=st.lists(st_participant_identity(), min_size=0, max_size=3),
         )
@@ -390,7 +432,11 @@ def st_interview_resolved_payload(
                 "state_entered_at": "2026-04-01T08:00:03+00:00",
                 "recorded_at": "2026-04-01T08:00:03+00:00",
             },
-            rationale=st.text(min_size=1, max_size=100, alphabet=st.characters(whitelist_categories=("Lu", "Ll", "Nd", "Zs"))),
+            rationale=st.text(
+                min_size=1,
+                max_size=100,
+                alphabet=st.characters(whitelist_categories=("Lu", "Ll", "Nd", "Zs")),
+            ),
             participants=st.lists(st_participant_identity(), min_size=0, max_size=3),
         )
 
@@ -407,6 +453,7 @@ def st_interview_stream(decision_point_id: str) -> st.SearchStrategy[list[Event]
     Terminal outcome is drawn randomly; cross-field constraints are satisfied at
     the strategy level so the reducer always sees schema-valid payloads.
     """
+
     @st.composite
     def _build(draw: Any) -> list[Event]:
         terminal = draw(st_terminal_outcome())
@@ -456,7 +503,9 @@ def st_interview_stream(decision_point_id: str) -> st.SearchStrategy[list[Event]
 
         # pattern == 4: duplicate Widened (idempotency check)
         lamport += 1
-        widened_dup_evt = _build_event(DECISION_POINT_WIDENED, draw(st_widened_payload(decision_point_id)), lamport)
+        widened_dup_evt = _build_event(
+            DECISION_POINT_WIDENED, draw(st_widened_payload(decision_point_id)), lamport
+        )
         lamport += 1
         resolved_evt = _build_event(DECISION_POINT_RESOLVED, resolved_payload, lamport)
         return [opened_evt, widened_evt, widened_dup_evt, resolved_evt]
@@ -465,6 +514,7 @@ def st_interview_stream(decision_point_id: str) -> st.SearchStrategy[list[Event]
 
 
 # -- Helper: JSON-serialize a ReducedDecisionPointState for byte comparison ----
+
 
 def _dump_state(state: ReducedDecisionPointState) -> str:
     """Serialize state to a canonical JSON string for byte-identical comparison."""
@@ -476,6 +526,7 @@ def _dump_state(state: ReducedDecisionPointState) -> str:
 
 
 # -- Property 4: Interview reducer is deterministic across independent runs ----
+
 
 @given(events=st_interview_stream(_PROP_DP_ID))
 @settings(max_examples=500, deadline=None)
@@ -491,6 +542,7 @@ def test_interview_reducer_deterministic_across_runs(events: list[Event]) -> Non
 
 
 # -- Property 5: Any valid terminal_outcome is correctly projected --------------
+
 
 @given(events=st_interview_stream(_PROP_DP_ID))
 @settings(max_examples=500, deadline=None)
@@ -514,6 +566,7 @@ def test_interview_reducer_handles_any_valid_terminal_outcome(events: list[Event
 
 # -- Property 6: Duplicate Widened never double-projects -----------------------
 
+
 def st_widened_interview_stream(decision_point_id: str) -> st.SearchStrategy[list[Event]]:
     """Stream guaranteed to include at least one Widened event (for idempotency tests).
 
@@ -522,6 +575,7 @@ def st_widened_interview_stream(decision_point_id: str) -> st.SearchStrategy[lis
       - [opened, widened, widened_dup, resolved]
       - [opened, widened, discussing, resolved]
     """
+
     @st.composite
     def _build(draw: Any) -> list[Event]:
         terminal = draw(st_terminal_outcome())
@@ -564,7 +618,9 @@ def st_widened_interview_stream(decision_point_id: str) -> st.SearchStrategy[lis
 
         # pattern == 4: duplicate Widened
         lamport += 1
-        widened_dup_evt = _build_event(DECISION_POINT_WIDENED, draw(st_widened_payload(decision_point_id)), lamport)
+        widened_dup_evt = _build_event(
+            DECISION_POINT_WIDENED, draw(st_widened_payload(decision_point_id)), lamport
+        )
         lamport += 1
         resolved_evt = _build_event(DECISION_POINT_RESOLVED, resolved_payload, lamport)
         return [opened_evt, widened_evt, widened_dup_evt, resolved_evt]
@@ -600,12 +656,11 @@ def test_interview_idempotent_widened_never_double_projects(
     # widening is projected exactly once from the first Widened
     assert result.widening is not None
     # No anomaly from duplicate Widened (idempotent absorption)
-    assert result.anomalies == () or all(
-        a.kind != "event_after_terminal" for a in result.anomalies
-    )
+    assert result.anomalies == () or all(a.kind != "event_after_terminal" for a in result.anomalies)
 
 
 # -- Property 7 (T015): Byte-identical replay under any permutation of events --
+
 
 @given(events=st_interview_stream(_PROP_DP_ID))
 @settings(max_examples=500, deadline=None)

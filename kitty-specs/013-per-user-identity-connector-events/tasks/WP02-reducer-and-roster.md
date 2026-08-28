@@ -85,11 +85,16 @@ wp_code: WP02
      if isinstance(payload_user_id, str) and payload_user_id:
          recorded_at_raw = payload_dict.get("recorded_at")
          roster_ts: Optional[datetime] = None
-         if isinstance(payload, (ConnectorHealthCheckedPayload,
-                                  ConnectorDegradedPayload,
-                                  ConnectorRevokedPayload,
-                                  ConnectorReconnectedPayload,
-                                  ConnectorProvisionedPayload)):
+         if isinstance(
+             payload,
+             (
+                 ConnectorHealthCheckedPayload,
+                 ConnectorDegradedPayload,
+                 ConnectorRevokedPayload,
+                 ConnectorReconnectedPayload,
+                 ConnectorProvisionedPayload,
+             ),
+         ):
              roster_ts = payload.recorded_at
          user_roster[payload_user_id] = (target_state, roster_ts)
      ```
@@ -112,16 +117,18 @@ wp_code: WP02
   1. The current reducer loop structure already handles new event types via `_EVENT_TO_STATE` and `_EVENT_TO_PAYLOAD`. However, `UserConnected`/`UserDisconnected` should NOT participate in binding-level state transitions.
   2. Identify user-level event types. Add a constant set after the existing `_ALLOWED_TRANSITIONS`:
      ```python
-     _USER_LEVEL_EVENT_TYPES: FrozenSet[str] = frozenset({
-         USER_CONNECTED,
-         USER_DISCONNECTED,
-     })
+     _USER_LEVEL_EVENT_TYPES: FrozenSet[str] = frozenset(
+         {
+             USER_CONNECTED,
+             USER_DISCONNECTED,
+         }
+     )
      ```
   3. In the reducer fold loop, after payload validation succeeds but BEFORE the binding-level transition check, add a branch:
      ```python
      if event_type in _USER_LEVEL_EVENT_TYPES:
          # User-level events update roster only
-         user_id_val = getattr(payload, 'user_id', None)
+         user_id_val = getattr(payload, "user_id", None)
          if isinstance(user_id_val, str) and user_id_val:
              user_roster[user_id_val] = (target_state, payload.recorded_at)
          continue  # Skip binding-level state transition
@@ -148,18 +155,20 @@ wp_code: WP02
   1. In the user-level event handling branch (from T008), add anomaly detection:
      ```python
      if event_type in _USER_LEVEL_EVENT_TYPES:
-         user_id_val = getattr(payload, 'user_id', None)
+         user_id_val = getattr(payload, "user_id", None)
          if isinstance(user_id_val, str) and user_id_val:
              # Anomaly: UserDisconnected for unknown user
              if event_type == USER_DISCONNECTED and user_id_val not in user_roster:
-                 anomalies.append(ConnectorAnomaly(
-                     kind="invalid_transition",
-                     event_id=event_id,
-                     message=(
-                         f"UserDisconnected for user {user_id_val!r} "
-                         f"who has no prior connection event"
-                     ),
-                 ))
+                 anomalies.append(
+                     ConnectorAnomaly(
+                         kind="invalid_transition",
+                         event_id=event_id,
+                         message=(
+                             f"UserDisconnected for user {user_id_val!r} "
+                             f"who has no prior connection event"
+                         ),
+                     )
+                 )
              user_roster[user_id_val] = (target_state, payload.recorded_at)
          continue
      ```

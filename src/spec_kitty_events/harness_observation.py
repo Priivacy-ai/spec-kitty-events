@@ -69,7 +69,10 @@ class ObservationKind(str, Enum):
 
 
 PAYLOAD_ID_BY_KIND: Mapping[ObservationKind, str] = MappingProxyType(
-    {kind: f"harness.{kind.value}.v{HARNESS_OBSERVATION_CONTRACT_VERSION}" for kind in ObservationKind}
+    {
+        kind: f"harness.{kind.value}.v{HARNESS_OBSERVATION_CONTRACT_VERSION}"
+        for kind in ObservationKind
+    }
 )
 """Total mapping: every :class:`ObservationKind` to exactly one payload ID."""
 
@@ -79,10 +82,31 @@ HARNESS_OBSERVATION_PAYLOAD_IDS: frozenset[str] = frozenset(PAYLOAD_ID_BY_KIND.v
 
 FORBIDDEN_OBSERVATION_KEYS: frozenset[str] = frozenset(
     {
-        "detail", "message", "text", "prose", "body", "command_text", "stdout", "stderr",
-        "user", "user_id", "email", "actor", "team", "team_id", "team_slug",
-        "deployment", "deployment_id",
-        "token", "authorization", "bearer", "password", "secret", "url", "runtime_url", "branch",
+        "detail",
+        "message",
+        "text",
+        "prose",
+        "body",
+        "command_text",
+        "stdout",
+        "stderr",
+        "user",
+        "user_id",
+        "email",
+        "actor",
+        "team",
+        "team_id",
+        "team_slug",
+        "deployment",
+        "deployment_id",
+        "token",
+        "authorization",
+        "bearer",
+        "password",
+        "secret",
+        "url",
+        "runtime_url",
+        "branch",
     }
 )
 """Closed, versioned set of keys that must never appear anywhere inside a
@@ -119,44 +143,68 @@ _KIND_FIELD_RULES: Mapping[ObservationKind, Mapping[str, str]] = MappingProxyTyp
     {
         ObservationKind.PRESENCE: MappingProxyType(
             {
-                "mission_slug": _OPTIONAL, "wp_id": _OPTIONAL, "lane": _FORBIDDEN,
-                "activity": _REQUIRED, "path": _OPTIONAL,
-                "pause_reason": _FORBIDDEN, "ended_reason": _FORBIDDEN,
+                "mission_slug": _OPTIONAL,
+                "wp_id": _OPTIONAL,
+                "lane": _FORBIDDEN,
+                "activity": _REQUIRED,
+                "path": _OPTIONAL,
+                "pause_reason": _FORBIDDEN,
+                "ended_reason": _FORBIDDEN,
             }
         ),
         ObservationKind.LANE_SIGNAL: MappingProxyType(
             {
-                "mission_slug": _REQUIRED, "wp_id": _REQUIRED, "lane": _REQUIRED,
-                "activity": _FORBIDDEN, "path": _FORBIDDEN,
-                "pause_reason": _FORBIDDEN, "ended_reason": _FORBIDDEN,
+                "mission_slug": _REQUIRED,
+                "wp_id": _REQUIRED,
+                "lane": _REQUIRED,
+                "activity": _FORBIDDEN,
+                "path": _FORBIDDEN,
+                "pause_reason": _FORBIDDEN,
+                "ended_reason": _FORBIDDEN,
             }
         ),
         ObservationKind.FOCUS_STARTED: MappingProxyType(
             {
-                "mission_slug": _REQUIRED, "wp_id": _OPTIONAL, "lane": _FORBIDDEN,
-                "activity": _FORBIDDEN, "path": _FORBIDDEN,
-                "pause_reason": _FORBIDDEN, "ended_reason": _FORBIDDEN,
+                "mission_slug": _REQUIRED,
+                "wp_id": _OPTIONAL,
+                "lane": _FORBIDDEN,
+                "activity": _FORBIDDEN,
+                "path": _FORBIDDEN,
+                "pause_reason": _FORBIDDEN,
+                "ended_reason": _FORBIDDEN,
             }
         ),
         ObservationKind.FOCUS_HEARTBEAT: MappingProxyType(
             {
-                "mission_slug": _REQUIRED, "wp_id": _OPTIONAL, "lane": _FORBIDDEN,
-                "activity": _FORBIDDEN, "path": _FORBIDDEN,
-                "pause_reason": _FORBIDDEN, "ended_reason": _FORBIDDEN,
+                "mission_slug": _REQUIRED,
+                "wp_id": _OPTIONAL,
+                "lane": _FORBIDDEN,
+                "activity": _FORBIDDEN,
+                "path": _FORBIDDEN,
+                "pause_reason": _FORBIDDEN,
+                "ended_reason": _FORBIDDEN,
             }
         ),
         ObservationKind.FOCUS_PAUSED: MappingProxyType(
             {
-                "mission_slug": _REQUIRED, "wp_id": _OPTIONAL, "lane": _FORBIDDEN,
-                "activity": _FORBIDDEN, "path": _FORBIDDEN,
-                "pause_reason": _REQUIRED, "ended_reason": _FORBIDDEN,
+                "mission_slug": _REQUIRED,
+                "wp_id": _OPTIONAL,
+                "lane": _FORBIDDEN,
+                "activity": _FORBIDDEN,
+                "path": _FORBIDDEN,
+                "pause_reason": _REQUIRED,
+                "ended_reason": _FORBIDDEN,
             }
         ),
         ObservationKind.FOCUS_ENDED: MappingProxyType(
             {
-                "mission_slug": _REQUIRED, "wp_id": _OPTIONAL, "lane": _FORBIDDEN,
-                "activity": _FORBIDDEN, "path": _FORBIDDEN,
-                "pause_reason": _FORBIDDEN, "ended_reason": _REQUIRED,
+                "mission_slug": _REQUIRED,
+                "wp_id": _OPTIONAL,
+                "lane": _FORBIDDEN,
+                "activity": _FORBIDDEN,
+                "path": _FORBIDDEN,
+                "pause_reason": _FORBIDDEN,
+                "ended_reason": _REQUIRED,
             }
         ),
     }
@@ -180,11 +228,15 @@ class HarnessObservationPayload(BaseModel):
     model_config = ConfigDict(frozen=True, extra="forbid")
 
     kind: ObservationKind
-    harness: str = Field(..., max_length=32, pattern=_IDENT, description="Harness identity, e.g. 'claude', 'codex'.")
+    harness: str = Field(
+        ..., max_length=32, pattern=_IDENT, description="Harness identity, e.g. 'claude', 'codex'."
+    )
     session_id: str = Field(..., max_length=128, pattern=_IDENT)
     agent_id: Optional[str] = Field(None, max_length=64, pattern=_IDENT)
     repo: Optional[str] = Field(
-        None, max_length=120, pattern=_REF,
+        None,
+        max_length=120,
+        pattern=_REF,
         description="Typed repo-identity slot; derivation is owned by Z6.",
     )
     mission_slug: Optional[str] = Field(None, min_length=1, max_length=120, pattern=_REF)
@@ -201,11 +253,7 @@ class HarnessObservationPayload(BaseModel):
         for field_name, rule in rules.items():
             value = getattr(self, field_name)
             if rule == _REQUIRED and value is None:
-                raise ValueError(
-                    f"{field_name!r} is required for kind {self.kind.value!r}"
-                )
+                raise ValueError(f"{field_name!r} is required for kind {self.kind.value!r}")
             if rule == _FORBIDDEN and value is not None:
-                raise ValueError(
-                    f"{field_name!r} must be absent for kind {self.kind.value!r}"
-                )
+                raise ValueError(f"{field_name!r} must be absent for kind {self.kind.value!r}")
         return self

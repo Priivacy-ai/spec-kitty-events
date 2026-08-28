@@ -31,18 +31,20 @@ from spec_kitty_events.diary import Lane as DiaryLane
 # contract in ``contracts/lane-vocabulary.md``. Drift between the enum and this
 # set is treated as a contract violation by ``test_canonical_lane_set_is_pinned``.
 
-EXPECTED_CANONICAL_LANES: FrozenSet[str] = frozenset({
-    "genesis",
-    "planned",
-    "claimed",
-    "in_progress",
-    "for_review",
-    "in_review",
-    "approved",
-    "done",
-    "blocked",
-    "canceled",
-})
+EXPECTED_CANONICAL_LANES: FrozenSet[str] = frozenset(
+    {
+        "genesis",
+        "planned",
+        "claimed",
+        "in_progress",
+        "for_review",
+        "in_review",
+        "approved",
+        "done",
+        "blocked",
+        "canceled",
+    }
+)
 
 
 # ---------------------------------------------------------------------------
@@ -163,7 +165,9 @@ def test_lane_vocabulary_is_single_source_of_truth() -> None:
             stripped = line.lstrip()
             if stripped.startswith(">>>") or stripped.startswith("..."):
                 continue
-            offenders.append(f"{py_file.relative_to(package_root.parent.parent)}:{line_no} -> {match.group(0)}")
+            offenders.append(
+                f"{py_file.relative_to(package_root.parent.parent)}:{line_no} -> {match.group(0)}"
+            )
 
     assert not offenders, (
         "Found canonical lane string literals outside the authoritative "

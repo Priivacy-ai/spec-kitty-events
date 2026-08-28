@@ -20,7 +20,7 @@ payload = {
     "from_lane": "in_review",
     "to_lane": "planned",
     "actor": "user",
-    "force": False,                                 # invalid: review-rejection requires force=True
+    "force": False,  # invalid: review-rejection requires force=True
     "reason": "rejected on review",
     "execution_mode": "worktree",
     "mission_slug": "demo",
@@ -53,7 +53,11 @@ result.valid  # → True
 ## 2. Normalizing a legacy envelope
 
 ```python
-from spec_kitty_events.legacy import LegacyEnvelopeNormalizer, NormalizedEnvelope, UnnormalizableLegacyDiagnostic
+from spec_kitty_events.legacy import (
+    LegacyEnvelopeNormalizer,
+    NormalizedEnvelope,
+    UnnormalizableLegacyDiagnostic,
+)
 from spec_kitty_events.conformance.validators import validate_event
 
 raw = {

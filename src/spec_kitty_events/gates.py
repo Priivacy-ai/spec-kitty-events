@@ -117,6 +117,7 @@ _CONCLUSION_MAP: dict[str, Optional[str]] = {
     "stale": None,
 }
 
+
 def map_check_run_conclusion(
     conclusion: str,
     on_ignored: Optional[Callable[[str, str], None]] = None,
@@ -144,9 +145,7 @@ def map_check_run_conclusion(
     event_type = _CONCLUSION_MAP[conclusion]
 
     if event_type is None:
-        logger.info(
-            "Ignored non-blocking check_run conclusion: %s", conclusion
-        )
+        logger.info("Ignored non-blocking check_run conclusion: %s", conclusion)
         if on_ignored is not None:
             on_ignored(conclusion, "non_blocking")
 

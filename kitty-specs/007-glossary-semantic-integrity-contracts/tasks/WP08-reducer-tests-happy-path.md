@@ -87,6 +87,7 @@ wp_code: WP08
      ) -> Event:
          from spec_kitty_events import Event
          import ulid
+
          return Event(
              event_id=event_id or str(ulid.new()),
              event_type=event_type,
@@ -150,6 +151,7 @@ wp_code: WP08
      ```python
      from hypothesis import given, settings
      from hypothesis import strategies as st
+
 
      @given(data=st.data())
      @settings(max_examples=200)

@@ -135,7 +135,9 @@ Mission requirements covered: FR-006, FR-010, FR-013 (enum part), NFR-002, C-001
      ```
   3. Add a module-level constant tuple:
      ```python
-     RECONCILIATION_REASON_CODES: Tuple[str, ...] = tuple(code.value for code in ReconciliationReasonCode)
+     RECONCILIATION_REASON_CODES: Tuple[str, ...] = tuple(
+         code.value for code in ReconciliationReasonCode
+     )
      ```
   4. Ensure imports at the top of the file include `from enum import Enum` and `from typing import Tuple` if not already present.
 - **Files**: `src/spec_kitty_events/status.py`
@@ -161,7 +163,9 @@ Mission requirements covered: FR-006, FR-010, FR-013 (enum part), NFR-002, C-001
 
          mission_slug: str = Field(..., min_length=1, description="Mission identifier")
          wp_id: str = Field(..., min_length=1, description="Work-package identifier")
-         event_id: str = Field(..., min_length=1, description="event_id of the offending WPStatusChanged event")
+         event_id: str = Field(
+             ..., min_length=1, description="event_id of the offending WPStatusChanged event"
+         )
          expected_from_lane: Optional[Lane] = Field(
              None,
              description="from_lane on the offending event (None permitted for bootstrap edge cases)",

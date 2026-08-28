@@ -1,4 +1,5 @@
 """Conflict detection using Lamport clocks."""
+
 from typing import Tuple
 from spec_kitty_events.models import Event
 

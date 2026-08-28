@@ -79,9 +79,7 @@ class AcceptanceSummary:
     @property
     def all_done(self) -> bool:
         return not (
-            self.lanes.get("planned")
-            or self.lanes.get("doing")
-            or self.lanes.get("for_review")
+            self.lanes.get("planned") or self.lanes.get("doing") or self.lanes.get("for_review")
         )
 
     @property
@@ -253,10 +251,9 @@ def detect_feature_slug(
         return env["SPECIFY_FEATURE"].strip()
 
     try:
-        branch = (
-            run_git(["rev-parse", "--abbrev-ref", "HEAD"], cwd=repo_root, check=True)
-            .stdout.strip()
-        )
+        branch = run_git(
+            ["rev-parse", "--abbrev-ref", "HEAD"], cwd=repo_root, check=True
+        ).stdout.strip()
         if branch and branch != "HEAD" and re.match(r"^\d{3}-", branch):
             return branch
     except TaskCliError:
@@ -334,18 +331,18 @@ def normalize_feature_encoding(repo_root: Path, feature: str) -> List[Path]:
     """
     # Map Unicode characters to ASCII equivalents
     NORMALIZE_MAP = {
-        '\u2018': "'",    # Left single quotation mark → apostrophe
-        '\u2019': "'",    # Right single quotation mark → apostrophe
-        '\u201A': "'",    # Single low-9 quotation mark → apostrophe
-        '\u201C': '"',    # Left double quotation mark → straight quote
-        '\u201D': '"',    # Right double quotation mark → straight quote
-        '\u201E': '"',    # Double low-9 quotation mark → straight quote
-        '\u2014': '--',   # Em dash → double hyphen
-        '\u2013': '-',    # En dash → hyphen
-        '\u2026': '...',  # Horizontal ellipsis → three dots
-        '\u00A0': ' ',    # Non-breaking space → regular space
-        '\u2022': '*',    # Bullet → asterisk
-        '\u00B7': '*',    # Middle dot → asterisk
+        "\u2018": "'",  # Left single quotation mark → apostrophe
+        "\u2019": "'",  # Right single quotation mark → apostrophe
+        "\u201a": "'",  # Single low-9 quotation mark → apostrophe
+        "\u201c": '"',  # Left double quotation mark → straight quote
+        "\u201d": '"',  # Right double quotation mark → straight quote
+        "\u201e": '"',  # Double low-9 quotation mark → straight quote
+        "\u2014": "--",  # Em dash → double hyphen
+        "\u2013": "-",  # En dash → hyphen
+        "\u2026": "...",  # Horizontal ellipsis → three dots
+        "\u00a0": " ",  # Non-breaking space → regular space
+        "\u2022": "*",  # Bullet → asterisk
+        "\u00b7": "*",  # Middle dot → asterisk
     }
 
     feature_dir = repo_root / "kitty-specs" / feature
@@ -391,7 +388,7 @@ def normalize_feature_encoding(repo_root: Path, feature: str) -> List[Path]:
             text = data.decode("utf-8", errors="replace")
 
         # Strip UTF-8 BOM if present in the text
-        text = text.lstrip('\ufeff')
+        text = text.lstrip("\ufeff")
 
         # Normalize Unicode characters to ASCII equivalents
         for unicode_char, ascii_replacement in NORMALIZE_MAP.items():
@@ -416,10 +413,9 @@ def collect_feature_summary(
 
     branch: Optional[str] = None
     try:
-        branch_value = (
-            run_git(["rev-parse", "--abbrev-ref", "HEAD"], cwd=repo_root, check=True)
-            .stdout.strip()
-        )
+        branch_value = run_git(
+            ["rev-parse", "--abbrev-ref", "HEAD"], cwd=repo_root, check=True
+        ).stdout.strip()
         if branch_value and branch_value != "HEAD":
             branch = branch_value
     except TaskCliError:
@@ -427,16 +423,14 @@ def collect_feature_summary(
 
     try:
         worktree_root = Path(
-            run_git(["rev-parse", "--show-toplevel"], cwd=repo_root, check=True)
-            .stdout.strip()
+            run_git(["rev-parse", "--show-toplevel"], cwd=repo_root, check=True).stdout.strip()
         ).resolve()
     except TaskCliError:
         worktree_root = repo_root
 
     try:
         git_common_dir = Path(
-            run_git(["rev-parse", "--git-common-dir"], cwd=repo_root, check=True)
-            .stdout.strip()
+            run_git(["rev-parse", "--git-common-dir"], cwd=repo_root, check=True).stdout.strip()
         ).resolve()
         primary_repo_root = git_common_dir.parent
     except TaskCliError:
@@ -549,9 +543,7 @@ def choose_mode(preference: Optional[str], repo_root: Path) -> AcceptanceMode:
     if preference in {"pr", "local", "checklist"}:
         return preference
     try:
-        remotes = (
-            run_git(["remote"], cwd=repo_root, check=False).stdout.strip().splitlines()
-        )
+        remotes = run_git(["remote"], cwd=repo_root, check=False).stdout.strip().splitlines()
         if remotes:
             return "pr"
     except TaskCliError:
@@ -568,9 +560,7 @@ def perform_acceptance(
     auto_commit: bool = True,
 ) -> AcceptanceResult:
     if mode != "checklist" and not summary.ok:
-        raise AcceptanceError(
-            "Acceptance checks failed; run verify to see outstanding issues."
-        )
+        raise AcceptanceError("Acceptance checks failed; run verify to see outstanding issues.")
 
     actor_name = (actor or os.getenv("USER") or os.getenv("USERNAME") or "system").strip()
     timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -581,8 +571,7 @@ def perform_acceptance(
     if auto_commit and mode != "checklist":
         try:
             parent_commit = (
-                run_git(["rev-parse", "HEAD"], cwd=summary.repo_root, check=False)
-                .stdout.strip()
+                run_git(["rev-parse", "HEAD"], cwd=summary.repo_root, check=False).stdout.strip()
                 or None
             )
         except TaskCliError:
@@ -630,10 +619,9 @@ def perform_acceptance(
             run_git(["commit", "-m", commit_msg], cwd=summary.repo_root, check=True)
             commit_created = True
             try:
-                accept_commit = (
-                    run_git(["rev-parse", "HEAD"], cwd=summary.repo_root, check=True)
-                    .stdout.strip()
-                )
+                accept_commit = run_git(
+                    ["rev-parse", "HEAD"], cwd=summary.repo_root, check=True
+                ).stdout.strip()
             except TaskCliError:
                 accept_commit = None
         else:
@@ -663,9 +651,7 @@ def perform_acceptance(
             ]
         )
     else:  # checklist
-        instructions.append(
-            "All checks passed. Proceed with your manual acceptance workflow."
-        )
+        instructions.append("All checks passed. Proceed with your manual acceptance workflow.")
 
     if summary.worktree_root != summary.primary_repo_root:
         cleanup_instructions.append(

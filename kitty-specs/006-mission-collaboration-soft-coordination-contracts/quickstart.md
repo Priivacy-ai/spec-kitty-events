@@ -14,14 +14,16 @@ pip install spec-kitty-events>=2.1.0,<3.0.0
 
 ```python
 from spec_kitty_events import (
-    Event, ParticipantIdentity, ParticipantJoinedPayload,
+    Event,
+    ParticipantIdentity,
+    ParticipantJoinedPayload,
     PARTICIPANT_JOINED,
 )
 from ulid import ULID
 from datetime import datetime, timezone
 
 identity = ParticipantIdentity(
-    participant_id="p-abc123",        # SaaS-minted, mission-scoped
+    participant_id="p-abc123",  # SaaS-minted, mission-scoped
     participant_type="human",
     display_name="Alice",
     session_id="sess-001",
@@ -37,13 +39,13 @@ payload = ParticipantJoinedPayload(
 event = Event(
     event_id=str(ULID()),
     event_type=PARTICIPANT_JOINED,
-    aggregate_id="mission/M042",          # Canonical: "mission/" + mission_id (type-prefixed)
+    aggregate_id="mission/M042",  # Canonical: "mission/" + mission_id (type-prefixed)
     payload=payload.model_dump(),
     timestamp=datetime.now(timezone.utc),
     node_id="saas-node-1",
     lamport_clock=1,
     project_uuid=project_uuid,
-    correlation_id=str(ULID()),           # Canonical: ULID-26 mission_run_id (must be exactly 26 chars)
+    correlation_id=str(ULID()),  # Canonical: ULID-26 mission_run_id (must be exactly 26 chars)
 )
 ```
 
@@ -51,8 +53,11 @@ event = Event(
 
 ```python
 from spec_kitty_events import (
-    DriveIntentSetPayload, FocusChangedPayload, FocusTarget,
-    DRIVE_INTENT_SET, FOCUS_CHANGED,
+    DriveIntentSetPayload,
+    FocusChangedPayload,
+    FocusTarget,
+    DRIVE_INTENT_SET,
+    FOCUS_CHANGED,
 )
 
 # Declare active drive intent (mission-scoped)
@@ -74,7 +79,8 @@ focus_payload = FocusChangedPayload(
 
 ```python
 from spec_kitty_events import (
-    WarningAcknowledgedPayload, WARNING_ACKNOWLEDGED,
+    WarningAcknowledgedPayload,
+    WARNING_ACKNOWLEDGED,
 )
 
 ack_payload = WarningAcknowledgedPayload(
@@ -104,16 +110,21 @@ except UnknownParticipantError as e:
 
 ```python
 from spec_kitty_events import (
-    reduce_collaboration_events, ParticipantIdentity, UnknownParticipantError,
+    reduce_collaboration_events,
+    ParticipantIdentity,
+    UnknownParticipantError,
 )
 
 # Option 2: Partial event window — seed known participants from external state
 known_roster = {
     "p-abc123": ParticipantIdentity(
-        participant_id="p-abc123", participant_type="human", display_name="Alice",
+        participant_id="p-abc123",
+        participant_type="human",
+        display_name="Alice",
     ),
     "p-def456": ParticipantIdentity(
-        participant_id="p-def456", participant_type="llm_context",
+        participant_id="p-def456",
+        participant_type="llm_context",
     ),
 }
 
@@ -144,6 +155,7 @@ for pid, target in state.focus_by_participant.items():
 
 # Reverse lookup: who's on WP03?
 from spec_kitty_events import FocusTarget
+
 wp03 = FocusTarget(target_type="wp", target_id="WP03")
 participants_on_wp03 = state.participants_by_focus.get(wp03, frozenset())
 

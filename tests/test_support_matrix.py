@@ -119,9 +119,16 @@ def test_support_matrix_has_exactly_30_rows() -> None:
 def test_ephemeral_vocabulary_is_volatile() -> None:
     """E2: the mission/WP moment vocabulary broadcasts, it does not sync."""
     expected_volatile = {
-        "WPStatusChanged", "MissionCreated", "MissionClosed", "PhaseEntered",
-        "MissionRunStarted", "NextStepIssued", "NextStepAutoCompleted",
-        "DecisionInputRequested", "DecisionInputAnswered", "MissionRunCompleted",
+        "WPStatusChanged",
+        "MissionCreated",
+        "MissionClosed",
+        "PhaseEntered",
+        "MissionRunStarted",
+        "NextStepIssued",
+        "NextStepAutoCompleted",
+        "DecisionInputRequested",
+        "DecisionInputAnswered",
+        "MissionRunCompleted",
     }
     durability = {row.event_type: row.durability for row in SUPPORT_MATRIX}
     for event_type in expected_volatile:
@@ -352,6 +359,23 @@ def test_e2_fixture_min_versions_match_mission_run_support_rows() -> None:
         assert entry["min_version"] == min_consumer_by_event_type[event_type]
 
     assert checked == E2_MISSION_RUN_EVENT_TYPES
+
+
+def test_phase_entered_ref_derivation_fixtures_share_one_min_version() -> None:
+    """``phase_entered_optional_absent`` and ``phase_entered_mission_slug_absent``
+    both pin the same ref-derivation fix (issue #18: ``PhaseEntered``'s frame
+    ``ref`` comes from the required ``mission_id``, never the optional
+    ``mission_slug`` back-compat field) and must therefore publish one
+    floor. They drifted to two different, both-stale, floors (``8.0.0`` and
+    ``8.1.0``) while the behaviour they describe did not actually ship until
+    ``8.2.0`` (issue #72) — a consumer on either released version emitted
+    the pre-fix ``ref`` and could not satisfy either fixture."""
+    manifest = json.loads(_FIXTURE_MANIFEST_PATH.read_text(encoding="utf-8"))
+    by_id = {entry["id"]: entry for entry in manifest["fixtures"]}
+    ref_derivation_ids = {"phase_entered_optional_absent", "phase_entered_mission_slug_absent"}
+    assert ref_derivation_ids <= by_id.keys()
+    min_versions = {by_id[fixture_id]["min_version"] for fixture_id in ref_derivation_ids}
+    assert min_versions == {"8.2.0"}
 
 
 # ---------------------------------------------------------------------------

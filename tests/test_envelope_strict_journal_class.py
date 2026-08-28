@@ -89,6 +89,13 @@ def test_covers_at_least_one_row_per_represented_criterion_word() -> None:
     """Coverage gate: at least one fixture id starts with each of the F1
     draft §4 criterion-word prefixes this class was built to represent."""
     ids = {entry["_path"] for entry in _ENTRIES}
-    represented_prefixes = ("valid_", "skew_", "unknown_", "envelope_extra_", "timestamp_", "local_appender_")
+    represented_prefixes = (
+        "valid_",
+        "skew_",
+        "unknown_",
+        "envelope_extra_",
+        "timestamp_",
+        "local_appender_",
+    )
     for prefix in represented_prefixes:
         assert any(fid.startswith(prefix) for fid in ids), prefix

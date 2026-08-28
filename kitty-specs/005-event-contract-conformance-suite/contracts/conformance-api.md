@@ -36,11 +36,11 @@ def validate_event(
 ```python
 @dataclass(frozen=True)
 class ConformanceResult:
-    valid: bool                              # True only when all required layers pass
+    valid: bool  # True only when all required layers pass
     model_violations: tuple[ModelViolation, ...]  # Pydantic validation failures
     schema_violations: tuple[SchemaViolation, ...]  # JSON Schema validation failures
-    schema_check_skipped: bool               # True if jsonschema not installed and strict=False
-    event_type: str                          # The event type that was validated
+    schema_check_skipped: bool  # True if jsonschema not installed and strict=False
+    event_type: str  # The event type that was validated
 ```
 
 ### ModelViolation
@@ -48,10 +48,10 @@ class ConformanceResult:
 ```python
 @dataclass(frozen=True)
 class ModelViolation:
-    field: str              # Field path (dot-separated, e.g., "evidence.repos")
-    message: str            # Human-readable description
-    violation_type: str     # Pydantic error type (e.g., "missing", "string_type")
-    input_value: object     # The actual value that failed
+    field: str  # Field path (dot-separated, e.g., "evidence.repos")
+    message: str  # Human-readable description
+    violation_type: str  # Pydantic error type (e.g., "missing", "string_type")
+    input_value: object  # The actual value that failed
 ```
 
 ### SchemaViolation
@@ -59,10 +59,10 @@ class ModelViolation:
 ```python
 @dataclass(frozen=True)
 class SchemaViolation:
-    json_path: str                      # e.g., "$.lamport_clock"
-    message: str                        # Human-readable description
-    validator: str                      # JSON Schema keyword (e.g., "minimum")
-    validator_value: object             # The schema constraint value
+    json_path: str  # e.g., "$.lamport_clock"
+    message: str  # Human-readable description
+    validator: str  # JSON Schema keyword (e.g., "minimum")
+    validator_value: object  # The schema constraint value
     schema_path: tuple[str | int, ...]  # Path within schema to failing keyword
 ```
 
@@ -113,12 +113,12 @@ def load_fixtures(category: str) -> list[FixtureCase]:
 ```python
 @dataclass(frozen=True)
 class FixtureCase:
-    id: str                  # Unique fixture identifier
+    id: str  # Unique fixture identifier
     payload: dict[str, Any]  # The test payload
-    expected_valid: bool     # Whether validation should pass
-    event_type: str          # Event type for this fixture
-    notes: str               # Description of what this fixture tests
-    min_version: str         # Minimum package version
+    expected_valid: bool  # Whether validation should pass
+    event_type: str  # Event type for this fixture
+    notes: str  # Description of what this fixture tests
+    min_version: str  # Minimum package version
 ```
 
 ## Consumer CI Integration

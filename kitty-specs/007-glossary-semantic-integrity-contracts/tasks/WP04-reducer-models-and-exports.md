@@ -92,12 +92,8 @@ wp_code: WP04
 
          model_config = ConfigDict(frozen=True)
 
-         request_event_id: str = Field(
-             ..., description="Event ID of the clarification request"
-         )
-         semantic_check_event_id: str = Field(
-             ..., description="Burst-window grouping key"
-         )
+         request_event_id: str = Field(..., description="Event ID of the clarification request")
+         semantic_check_event_id: str = Field(..., description="Burst-window grouping key")
          term: str = Field(..., description="The ambiguous term")
          resolved: bool = Field(default=False, description="Whether resolution received")
          resolution_event_id: Optional[str] = Field(
@@ -206,6 +202,7 @@ wp_code: WP04
 - **Notes**: The import of `Event` in the stub function signature needs a string annotation or a `TYPE_CHECKING` import to avoid circular imports. Use `from __future__ import annotations` (already present) and import `Event` at TYPE_CHECKING time:
   ```python
   from typing import TYPE_CHECKING
+
   if TYPE_CHECKING:
       from spec_kitty_events.models import Event
   ```

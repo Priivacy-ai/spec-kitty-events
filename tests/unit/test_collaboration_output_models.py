@@ -426,12 +426,8 @@ class TestReducedCollaborationState:
             },
         )
         assert state.participants_by_focus["wp:WP03"] == frozenset({"p-001"})
-        assert state.participants_by_focus["step:step-5"] == frozenset(
-            {"p-002", "p-003"}
-        )
-        assert state.participants_by_focus["file:src/main.py"] == frozenset(
-            {"p-004"}
-        )
+        assert state.participants_by_focus["step:step-5"] == frozenset({"p-002", "p-003"})
+        assert state.participants_by_focus["file:src/main.py"] == frozenset({"p-004"})
 
     def test_active_drivers_is_frozenset(self) -> None:
         state = ReducedCollaborationState(

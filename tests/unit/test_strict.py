@@ -84,7 +84,9 @@ def _presence_envelope(**overrides: object) -> dict:
         "session_id": "sess-1",
         "activity": "file_edit",
     }
-    return _valid_envelope("HarnessObservation", payload, aggregate_id="session/sess-1", **overrides)
+    return _valid_envelope(
+        "HarnessObservation", payload, aggregate_id="session/sess-1", **overrides
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -103,10 +105,20 @@ def test_strict_timestamp_rules() -> None:
 def test_strict_envelope_keys_are_exactly_the_14_event_fields() -> None:
     assert STRICT_ENVELOPE_KEYS == frozenset(
         {
-            "event_id", "event_type", "aggregate_id", "payload", "timestamp",
-            "build_id", "node_id", "lamport_clock", "causation_id",
-            "project_uuid", "project_slug", "correlation_id",
-            "schema_version", "data_tier",
+            "event_id",
+            "event_type",
+            "aggregate_id",
+            "payload",
+            "timestamp",
+            "build_id",
+            "node_id",
+            "lamport_clock",
+            "causation_id",
+            "project_uuid",
+            "project_slug",
+            "correlation_id",
+            "schema_version",
+            "data_tier",
         }
     )
 
@@ -115,15 +127,31 @@ def test_strict_event_types_has_exactly_25_members() -> None:
     assert len(STRICT_EVENT_TYPES) == 25
     assert STRICT_EVENT_TYPES == frozenset(
         {
-            "MissionCreated", "MissionClosed", "MissionStarted", "MissionCompleted",
-            "MissionCancelled", "PhaseEntered", "ReviewRollback", "MissionReopened",
+            "MissionCreated",
+            "MissionClosed",
+            "MissionStarted",
+            "MissionCompleted",
+            "MissionCancelled",
+            "PhaseEntered",
+            "ReviewRollback",
+            "MissionReopened",
             "FollowUpRecorded",
             # mission-run family, admitted by E2 (volatile vocabulary)
-            "MissionRunStarted", "NextStepIssued", "NextStepAutoCompleted",
-            "DecisionInputRequested", "DecisionInputAnswered", "MissionRunCompleted",
+            "MissionRunStarted",
+            "NextStepIssued",
+            "NextStepAutoCompleted",
+            "DecisionInputRequested",
+            "DecisionInputAnswered",
+            "MissionRunCompleted",
             "WPStatusChanged",
-            "WPCreated", "ProjectInitialized", "SpecifyStarted", "SpecifyCompleted",
-            "PlanStarted", "PlanCompleted", "TasksStarted", "TasksCompleted",
+            "WPCreated",
+            "ProjectInitialized",
+            "SpecifyStarted",
+            "SpecifyCompleted",
+            "PlanStarted",
+            "PlanCompleted",
+            "TasksStarted",
+            "TasksCompleted",
             "HarnessObservation",
         }
     )
@@ -136,9 +164,16 @@ def test_strict_event_types_exclude_reserved_mission_next_type() -> None:
 
 def test_excluded_names_not_admitted() -> None:
     excluded = {
-        "WPAssigned", "HistoryAdded", "ErrorLogged", "DependencyResolved",
-        "GatePassed", "GateFailed", "MissionOriginBound",
-        "BuildRegistered", "BuildHeartbeat", "ReviewerSelfApproval",
+        "WPAssigned",
+        "HistoryAdded",
+        "ErrorLogged",
+        "DependencyResolved",
+        "GatePassed",
+        "GateFailed",
+        "MissionOriginBound",
+        "BuildRegistered",
+        "BuildHeartbeat",
+        "ReviewerSelfApproval",
     }
     assert excluded.isdisjoint(STRICT_EVENT_TYPES)
 
@@ -244,14 +279,22 @@ def test_u5_reviewer_self_approval_unadmitted() -> None:
 def test_x1_envelope_extra_team_slug_rejected() -> None:
     envelope = _mission_started_envelope(team_slug="acme")
     errors = validate_strict_envelope(envelope)
-    extra_err = next(e for e in errors if e.code == ValidationErrorCode.ENVELOPE_SHAPE_INVALID and "extra" in e.details)
+    extra_err = next(
+        e
+        for e in errors
+        if e.code == ValidationErrorCode.ENVELOPE_SHAPE_INVALID and "extra" in e.details
+    )
     assert extra_err.details["extra"] == ["team_slug"]
 
 
 def test_x2_envelope_extra_aggregate_type_rejected() -> None:
     envelope = _mission_started_envelope(aggregate_type="Mission")
     errors = validate_strict_envelope(envelope)
-    extra_err = next(e for e in errors if e.code == ValidationErrorCode.ENVELOPE_SHAPE_INVALID and "extra" in e.details)
+    extra_err = next(
+        e
+        for e in errors
+        if e.code == ValidationErrorCode.ENVELOPE_SHAPE_INVALID and "extra" in e.details
+    )
     assert extra_err.details["extra"] == ["aggregate_type"]
 
 
@@ -539,6 +582,28 @@ def test_parse_iso8601_still_rejects_doubled_z_at_reduced_precision() -> None:
         assert _parse_iso8601(value) is None
 
 
+def test_t5c_timestamp_doubled_trailing_z_rejected_end_to_end() -> None:
+    """A doubled trailing "Z" must be rejected on every interpreter version,
+    through the full ``validate_strict_envelope`` path (not just at the
+    ``_parse_iso8601``/``_normalize_iso8601_shape`` unit level above).
+
+    Stripping only the final "Z" and appending "+00:00" would otherwise turn
+    this into "...00Z+00:00", which Python 3.10's laxer ``fromisoformat``
+    accepts even though it is not a valid ISO-8601 timestamp
+    (spec-kitty-events#55/#107/#115).
+    """
+    envelope = _mission_started_envelope(timestamp="2026-01-01T00:00:00ZZ")
+    errors = validate_strict_envelope(envelope)
+    unparsable = [
+        e
+        for e in errors
+        if e.code == ValidationErrorCode.ENVELOPE_SHAPE_INVALID
+        and e.path == ["timestamp"]
+        and e.details.get("reason") == "unparsable"
+    ]
+    assert len(unparsable) == 1
+
+
 def test_t6_observation_payload_carries_ts_field_rejected() -> None:
     envelope = _presence_envelope()
     envelope["payload"]["ts"] = 1767225600
@@ -647,9 +712,7 @@ def test_wrapper_not_an_object_rejected() -> None:
 
 
 def test_forbidden_legacy_aggregate_names_constant() -> None:
-    assert FORBIDDEN_LEGACY_AGGREGATE_NAMES == frozenset(
-        {"feature", "feature_catalog"}
-    )
+    assert FORBIDDEN_LEGACY_AGGREGATE_NAMES == frozenset({"feature", "feature_catalog"})
 
 
 @pytest.mark.parametrize("aggregate_id", ["feature/123", "feature/WP01", "feature_catalog/7"])
@@ -684,9 +747,7 @@ def test_legacy_prefix_error_does_not_suppress_model_layers() -> None:
     Mirrors step 4's forbidden-key behaviour: neither sets the
     envelope/type failure flags that skip steps 9-10.
     """
-    envelope = _mission_started_envelope(
-        aggregate_id="feature/123", timestamp="not-a-timestamp"
-    )
+    envelope = _mission_started_envelope(aggregate_id="feature/123", timestamp="not-a-timestamp")
     codes = [e.code for e in validate_strict_envelope(envelope)]
     assert ValidationErrorCode.FORBIDDEN_AGGREGATE_NAME in codes
     assert ValidationErrorCode.ENVELOPE_SHAPE_INVALID in codes

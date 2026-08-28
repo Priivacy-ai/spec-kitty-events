@@ -1,7 +1,7 @@
 {
   "event_type": "PhaseEntered",
   "envelope": {
-    "event_id": "e2e00000-0000-4000-8000-000000000015",
+    "event_id": "e2e00000-0000-4000-8000-000000000016",
     "timestamp": "2026-08-25T09:00:00+00:00"
   },
   "payload": {
@@ -12,7 +12,7 @@
     "mission_slug": null
   },
   "expected_attrs": {
-    "event_id": "e2e00000-0000-4000-8000-000000000015",
+    "event_id": "e2e00000-0000-4000-8000-000000000016",
     "occurred_at": "2026-08-25T09:00:00+00:00",
     "mission_id": "mission-demo",
     "phase_name": "build",

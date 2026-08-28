@@ -8,6 +8,7 @@ models directly from their source modules so this file can run before WP01
 adds the seven entries to `_EVENT_TYPE_TO_MODEL` and before WP04 adds the
 package-root re-exports.
 """
+
 from __future__ import annotations
 
 from typing import Any, Dict, Tuple, Type
@@ -89,7 +90,9 @@ _IDS = [t[0] for t in _SEVEN]
 
 
 @pytest.mark.parametrize(("event_type", "model_cls", "fields"), _SEVEN, ids=_IDS)
-def test_payload_round_trip(event_type: str, model_cls: Type[BaseModel], fields: Dict[str, Any]) -> None:
+def test_payload_round_trip(
+    event_type: str, model_cls: Type[BaseModel], fields: Dict[str, Any]
+) -> None:
     """FR-010: each model round-trips through model_dump(mode='json')."""
     model = model_cls(**fields)
     data = model.model_dump(mode="json")

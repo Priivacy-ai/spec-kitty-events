@@ -655,18 +655,14 @@ def test_r1_harness_observations_do_not_affect_reduced_lifecycle_state() -> None
     surrounding lamport clocks, including one before the first mission
     event and one after the last.
     """
-    raw_events = load_replay_stream(
-        "harness-observation-replay-lifecycle-with-observations"
-    )
+    raw_events = load_replay_stream("harness-observation-replay-lifecycle-with-observations")
     interleaved = [Event.model_validate(e) for e in raw_events]
     assert any(e.event_type == "HarnessObservation" for e in interleaved)
 
     clean = [e for e in interleaved if e.event_type != "HarnessObservation"]
     assert 0 < len(clean) < len(interleaved)
 
-    reduced_interleaved = _strip_bookkeeping_fields(
-        reduce_lifecycle_events(interleaved)
-    )
+    reduced_interleaved = _strip_bookkeeping_fields(reduce_lifecycle_events(interleaved))
     reduced_clean = _strip_bookkeeping_fields(reduce_lifecycle_events(clean))
 
     assert reduced_interleaved == reduced_clean, (

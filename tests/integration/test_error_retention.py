@@ -1,4 +1,5 @@
 """Integration tests for error retention policy."""
+
 from datetime import datetime, timedelta
 from spec_kitty_events.error_log import ErrorLog
 from spec_kitty_events.storage import InMemoryErrorStorage
@@ -16,11 +17,13 @@ class TestErrorRetentionPolicy:
 
         # Log 10 errors
         for i in range(10):
-            error_log.log_error(ErrorEntry(
-                timestamp=datetime.now() + timedelta(seconds=i),
-                action_attempted=f"Action {i}",
-                error_message=f"Error {i}"
-            ))
+            error_log.log_error(
+                ErrorEntry(
+                    timestamp=datetime.now() + timedelta(seconds=i),
+                    action_attempted=f"Action {i}",
+                    error_message=f"Error {i}",
+                )
+            )
 
         # Only last 5 should be retained
         errors = error_log.get_recent_errors(limit=10)
@@ -37,11 +40,11 @@ class TestErrorRetentionPolicy:
 
         # Log exactly 5 errors
         for i in range(5):
-            error_log.log_error(ErrorEntry(
-                timestamp=datetime.now(),
-                action_attempted=f"Action {i}",
-                error_message="Error"
-            ))
+            error_log.log_error(
+                ErrorEntry(
+                    timestamp=datetime.now(), action_attempted=f"Action {i}", error_message="Error"
+                )
+            )
 
         errors = error_log.get_recent_errors(limit=10)
         assert len(errors) == 5  # All retained
@@ -53,11 +56,11 @@ class TestErrorRetentionPolicy:
 
         # Log 4 errors (1 over limit)
         for i in range(4):
-            error_log.log_error(ErrorEntry(
-                timestamp=datetime.now(),
-                action_attempted=f"Action {i}",
-                error_message="Error"
-            ))
+            error_log.log_error(
+                ErrorEntry(
+                    timestamp=datetime.now(), action_attempted=f"Action {i}", error_message="Error"
+                )
+            )
 
         errors = error_log.get_recent_errors(limit=10)
         # Only last 3 retained (Action 0 evicted)
@@ -72,11 +75,11 @@ class TestErrorRetentionPolicy:
 
         # Log 5 errors sequentially
         for i in range(5):
-            error_log.log_error(ErrorEntry(
-                timestamp=datetime.now(),
-                action_attempted=f"Action {i}",
-                error_message="Error"
-            ))
+            error_log.log_error(
+                ErrorEntry(
+                    timestamp=datetime.now(), action_attempted=f"Action {i}", error_message="Error"
+                )
+            )
 
         # Only last 2 retained
         errors = error_log.get_recent_errors(limit=10)
@@ -91,11 +94,11 @@ class TestErrorRetentionPolicy:
 
         # Log 150 errors
         for i in range(150):
-            error_log.log_error(ErrorEntry(
-                timestamp=datetime.now(),
-                action_attempted=f"Action {i}",
-                error_message="Error"
-            ))
+            error_log.log_error(
+                ErrorEntry(
+                    timestamp=datetime.now(), action_attempted=f"Action {i}", error_message="Error"
+                )
+            )
 
         # Only last 100 retained
         errors = error_log.get_recent_errors(limit=200)

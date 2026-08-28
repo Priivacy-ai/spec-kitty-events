@@ -1,4 +1,5 @@
 """Conformance tests for analytics event contracts."""
+
 from __future__ import annotations
 
 import pytest
@@ -33,9 +34,7 @@ def test_invalid_analytics_fixture_fails_conformance(case: object) -> None:
 
     assert isinstance(case, FixtureCase)
     result = validate_event(case.payload, case.event_type, strict=True)
-    assert not result.valid, (
-        f"Fixture {case.id} should be invalid but passed validation"
-    )
+    assert not result.valid, f"Fixture {case.id} should be invalid but passed validation"
     assert len(result.model_violations) >= 1, (
         f"Fixture {case.id} is invalid but no model_violations were reported"
     )

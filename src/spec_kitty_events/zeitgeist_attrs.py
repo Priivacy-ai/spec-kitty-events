@@ -260,9 +260,20 @@ ZEITGEIST_FORBIDDEN_KEYS_VERSION: int = 1
 #: module docstring for why this is a mirror, not an import).
 ZEITGEIST_FORBIDDEN_KEYS_V1: frozenset[str] = frozenset(
     {
-        "token", "authorization", "bearer", "password", "detail", "team",
-        "team_id", "deployment", "deployment_id", "membership", "role",
-        "user_id", "url", "runtime_url",
+        "token",
+        "authorization",
+        "bearer",
+        "password",
+        "detail",
+        "team",
+        "team_id",
+        "deployment",
+        "deployment_id",
+        "membership",
+        "role",
+        "user_id",
+        "url",
+        "runtime_url",
     }
 )
 
@@ -279,11 +290,15 @@ class VolatileMoment:
     render from this; nobody re-parses raw attr strings outside this
     module's vocabulary.
 
-    ``ref`` is ``None`` only when the family's ref field is itself
-    ``Optional`` and was absent from the encode (today, only
-    ``PhaseEntered``'s back-compat ``mission_slug``) — :func:`from_zeitgeist_attrs`
-    requires the ref key whenever the family's payload guarantees it, so a
-    family with a required ref field never decodes to ``ref=None``.
+    Every event type in today's vocabulary declares its ref field
+    (:data:`REF_FIELD_BY_EVENT_TYPE`) as one of the payload's required,
+    non-``Optional`` fields (pinned by
+    ``test_every_current_family_guarantees_its_ref_field``), so ``ref`` is
+    currently always a non-empty string on both :func:`from_zeitgeist_attrs`
+    and :func:`zeitgeist_ref_for`. The ``None`` arm of the type is reserved
+    for a hypothetical future family whose ref field is itself ``Optional``
+    and can be absent from the encode — no family in
+    :data:`PAYLOAD_MODEL_BY_EVENT_TYPE` today produces ``ref=None``.
     """
 
     kind: str
@@ -371,7 +386,10 @@ PAYLOAD_MODEL_BY_EVENT_TYPE: Mapping[str, type[BaseModel] | tuple[type[BaseModel
     DECISION_INPUT_ANSWERED: DecisionInputAnsweredPayload,
     MISSION_RUN_COMPLETED: MissionRunCompletedPayload,
     DECISION_POINT_OPENED: (DecisionPointOpenedAdrPayload, DecisionPointOpenedInterviewPayload),
-    DECISION_POINT_RESOLVED: (DecisionPointResolvedAdrPayload, DecisionPointResolvedInterviewPayload),
+    DECISION_POINT_RESOLVED: (
+        DecisionPointResolvedAdrPayload,
+        DecisionPointResolvedInterviewPayload,
+    ),
     SPECIFY_STARTED: SpecifyStartedPayload,
     SPECIFY_COMPLETED: SpecifyCompletedPayload,
     PLAN_STARTED: PlanStartedPayload,
@@ -410,7 +428,14 @@ UNBROADCAST_FIELDS: Mapping[str, frozenset[str]] = {
     DECISION_INPUT_REQUESTED: frozenset({"options", "question"}),
     DECISION_INPUT_ANSWERED: frozenset({"answer"}),
     DECISION_POINT_OPENED: frozenset(
-        {"question", "options", "rationale", "alternatives_considered", "evidence_refs", "recorded_at"}
+        {
+            "question",
+            "options",
+            "rationale",
+            "alternatives_considered",
+            "evidence_refs",
+            "recorded_at",
+        }
     ),
     DECISION_POINT_RESOLVED: frozenset(
         {
@@ -522,7 +547,9 @@ def _truncate_utf8(value: str, max_bytes: int) -> str:
     return encoded[:budget].decode("utf-8", errors="ignore") + marker
 
 
-def _bounded_summary(clauses: Sequence[str], max_bytes: int = ZEITGEIST_ATTRS_MAX_BYTES) -> str | None:
+def _bounded_summary(
+    clauses: Sequence[str], max_bytes: int = ZEITGEIST_ATTRS_MAX_BYTES
+) -> str | None:
     """Join non-empty clauses with ``"; "`` into one bounded one-line summary.
 
     Returns ``None`` (attr omitted) when every clause is empty/absent —
@@ -611,8 +638,7 @@ def _encode_scalar(field: str, value: Any) -> str:
         encoded = str(value)
     else:
         raise UnencodableFieldValueError(
-            f"field {field!r} of type {type(value).__name__} has no "
-            "bounded flat-string encoding"
+            f"field {field!r} of type {type(value).__name__} has no bounded flat-string encoding"
         )
     return encoded
 
@@ -696,18 +722,23 @@ def _reject_control_characters(subject: str, value: str) -> None:
 
 
 def _forbidden_key_hits(keys: Sequence[str]) -> list[str]:
-    """Keys forbidden either as an exact match or by their trailing dot-segment.
+    """Keys forbidden by any dot-separated segment, in any position.
 
     A one-level nested projection (``<field>.<sub>``, see :func:`_encode_fields`)
-    can carry a forbidden name under its trailing segment (e.g. ``actor.token``)
-    without the full dotted string itself ever being added to
-    :data:`FORBIDDEN_ATTR_KEYS` — the exact-match check alone would miss it
-    (EXPERIMENTAL-spec-kitty-events#21).
+    can carry a forbidden name under either segment (e.g. ``actor.token`` or
+    ``token.sub``) without the full dotted string itself ever being added to
+    :data:`FORBIDDEN_ATTR_KEYS` — an exact-match-or-trailing-segment check
+    would miss the prefix position (EXPERIMENTAL-spec-kitty-events#21,
+    widened by EXPERIMENTAL-spec-kitty-events#133). Attr-key segments
+    originate from pydantic field names, which are Python identifiers and
+    can never contain a literal ``.``, so scanning every segment carries no
+    false-positive risk: a key with no dot splits to itself, subsuming the
+    exact-match case.
     """
     return sorted(
         key
         for key in keys
-        if key in FORBIDDEN_ATTR_KEYS or key.rsplit(".", 1)[-1] in FORBIDDEN_ATTR_KEYS
+        if any(segment in FORBIDDEN_ATTR_KEYS for segment in key.split("."))
     )
 
 
@@ -744,6 +775,8 @@ def to_zeitgeist_attrs(payload: BaseModel, envelope: Event) -> dict[str, str]:
             payload model.
         ZeitgeistAttrsError: *envelope* declares a different event type.
         UnencodableFieldValueError: a carried field has no string encoding.
+        ZeitgeistAttrsControlCharacterError: a value carries a non-printable
+            character (``not str.isprintable()``).
         ZeitgeistAttrsForbiddenKeyError: an emitted key is forbidden.
         ZeitgeistAttrsOverflowError: the projection exceeds the key-count,
             key-length, or value-length bounds. No truncation is ever
@@ -788,18 +821,16 @@ def to_zeitgeist_attrs(payload: BaseModel, envelope: Event) -> dict[str, str]:
         if summary is not None:
             attrs["summary"] = summary
 
+    for key, value in attrs.items():
+        _reject_control_characters(f"attr {key!r} value", value)
+
     bad_keys = _forbidden_key_hits(list(attrs))
     if bad_keys:
-        raise ZeitgeistAttrsForbiddenKeyError(
-            f"refusing to emit forbidden attr keys: {bad_keys}"
-        )
-    oversized_keys = sorted(
-        key for key in attrs if len(key) > ZEITGEIST_ATTR_KEY_MAX_CHARS
-    )
+        raise ZeitgeistAttrsForbiddenKeyError(f"refusing to emit forbidden attr keys: {bad_keys}")
+    oversized_keys = sorted(key for key in attrs if len(key) > ZEITGEIST_ATTR_KEY_MAX_CHARS)
     if oversized_keys:
         raise ZeitgeistAttrsOverflowError(
-            f"attr keys exceed the {ZEITGEIST_ATTR_KEY_MAX_CHARS}-char bound: "
-            f"{oversized_keys}"
+            f"attr keys exceed the {ZEITGEIST_ATTR_KEY_MAX_CHARS}-char bound: {oversized_keys}"
         )
     oversized_values = sorted(
         key
@@ -808,13 +839,11 @@ def to_zeitgeist_attrs(payload: BaseModel, envelope: Event) -> dict[str, str]:
     )
     if oversized_values:
         raise ZeitgeistAttrsOverflowError(
-            f"attr values exceed the {ZEITGEIST_ATTRS_MAX_BYTES}-byte bound: "
-            f"{oversized_values}"
+            f"attr values exceed the {ZEITGEIST_ATTRS_MAX_BYTES}-byte bound: {oversized_values}"
         )
     if len(attrs) > ZEITGEIST_ATTRS_MAX_KEYS:
         raise ZeitgeistAttrsOverflowError(
-            f"projection has {len(attrs)} attrs; the bound is "
-            f"{ZEITGEIST_ATTRS_MAX_KEYS}"
+            f"projection has {len(attrs)} attrs; the bound is {ZEITGEIST_ATTRS_MAX_KEYS}"
         )
     return attrs
 
@@ -852,6 +881,11 @@ REF_FIELD_BY_EVENT_TYPE: Mapping[str, str] = {
 def zeitgeist_ref_for(event_type: str, payload: BaseModel) -> str | None:
     """Return the frame ``ref`` for a volatile payload, or ``None``.
 
+    No family in :data:`PAYLOAD_MODEL_BY_EVENT_TYPE` today declares its ref
+    field ``Optional``, so the ``None`` return is unreachable for every
+    current type (see :class:`VolatileMoment`'s docstring) — it is kept
+    for a hypothetical future family whose ref field can be absent.
+
     Raises:
         UnknownVolatileEventTypeError: *event_type* is unknown or *payload*
             is not that event type's payload model.
@@ -859,14 +893,16 @@ def zeitgeist_ref_for(event_type: str, payload: BaseModel) -> str | None:
             :data:`ZEITGEIST_ATTRS_MAX_BYTES` (the frame's ``ref`` carries
             the same bound as an attrs entry; see the module docstring).
     """
-    if event_type not in PAYLOAD_MODEL_BY_EVENT_TYPE or type(payload) not in _payload_types(event_type):
+    if event_type not in PAYLOAD_MODEL_BY_EVENT_TYPE or type(payload) not in _payload_types(
+        event_type
+    ):
         raise UnknownVolatileEventTypeError(
             f"{type(payload).__name__} is not the payload of volatile event "
             f"type {event_type!r}; known: {sorted(PAYLOAD_MODEL_BY_EVENT_TYPE)}"
         )
     value = getattr(payload, REF_FIELD_BY_EVENT_TYPE[event_type], None)
     if value is None:
-        return None
+        return None  # unreachable today; see docstring
     ref = str(value)
     if _utf8_size(f"{event_type} ref", ref) > ZEITGEIST_ATTRS_MAX_BYTES:
         raise ZeitgeistAttrsOverflowError(
@@ -991,7 +1027,9 @@ def _required_schema_keys(event_type: str) -> frozenset[str]:
     omission when the source is empty), even on kinds where a valid payload
     happens to always produce one today.
     """
-    variants = [_required_schema_keys_for_model(event_type, model) for model in _payload_types(event_type)]
+    variants = [
+        _required_schema_keys_for_model(event_type, model) for model in _payload_types(event_type)
+    ]
     keys = variants[0]
     for other in variants[1:]:
         keys &= other
@@ -1004,9 +1042,7 @@ _REQUIRED_KEYS_BY_EVENT_TYPE: Mapping[str, frozenset[str]] = {
 }
 
 
-def from_zeitgeist_attrs(
-    event_type: str, attrs: Mapping[str, str]
-) -> VolatileMoment:
+def from_zeitgeist_attrs(event_type: str, attrs: Mapping[str, str]) -> VolatileMoment:
     """Validate inbound attrs against the kind's closed key vocabulary.
 
     The attrs are opaque on the wire; this function is the only place that
@@ -1018,12 +1054,16 @@ def from_zeitgeist_attrs(
     ``occurred_at``) actually present — and wraps the result, with the
     frame's identity, in a :class:`VolatileMoment` for rendering.
 
-    This validates presence and shape, not value correctness: beyond being
-    ``str``-typed and within the byte bound, a present value's format is
-    opaque — an int-typed field's string need not parse as an int, an
-    enum-typed field's string need not be one of its members — because
-    values are not reparsed here, only rendered later by a consumer that
-    knows the kind. An inbound mapping missing an *optional* payload key
+    This validates presence and shape, not payload value correctness: beyond
+    being ``str``-typed and within the byte bound, a present *payload*
+    value's format is opaque — an int-typed field's string need not parse as
+    an int, an enum-typed field's string need not be one of its members —
+    because payload values are not reparsed here, only rendered later by a
+    consumer that knows the kind. The two envelope-sourced attrs are the
+    exception: ``event_id`` is reparsed and canonicalized via
+    :func:`~spec_kitty_events.models.normalize_event_id`, and ``occurred_at``
+    is reparsed via :func:`datetime.fromisoformat` and rejected if
+    timezone-naive. An inbound mapping missing an *optional* payload key
     (one whose annotation admits ``None``) decodes with that key absent,
     since rebuilding the journal payload remains impossible by design
     ("Projection, not reconstruction").
@@ -1033,12 +1073,12 @@ def from_zeitgeist_attrs(
             vocabulary.
         ZeitgeistAttrsError: a value is not ``str``, a key is outside the
             kind's closed key set, a key the kind's payload always carries
-            on encode is missing, or an ``event_id``/``occurred_at`` attr is
-            present but malformed — ``event_id`` does not match one of the
-            three shapes :func:`~spec_kitty_events.models.normalize_event_id`
-            accepts (26-char Crockford-base32 ULID, 36-char hyphenated UUID,
-            32-char bare hex UUID), or ``occurred_at`` does not parse as
-            ISO-8601 or parses but is timezone-naive.
+            on encode is missing, or ``event_id``/``occurred_at`` is
+            malformed — ``event_id`` does not match one of the three shapes
+            :func:`~spec_kitty_events.models.normalize_event_id` accepts
+            (26-char Crockford-base32 ULID, 36-char hyphenated UUID, 32-char
+            bare hex UUID), or ``occurred_at`` does not parse as ISO-8601 or
+            parses but is timezone-naive.
         ZeitgeistAttrsControlCharacterError: a value carries a non-printable
             character (``not str.isprintable()``).
         ZeitgeistAttrsForbiddenKeyError: a forbidden key is present.
@@ -1058,21 +1098,16 @@ def from_zeitgeist_attrs(
     allowed = _ALLOWED_KEYS_BY_EVENT_TYPE[event_type]
     unknown = sorted(attrs.keys() - allowed)
     if unknown:
-        raise ZeitgeistAttrsError(
-            f"attrs carry keys outside the {event_type} schema: {unknown}"
-        )
+        raise ZeitgeistAttrsError(f"attrs carry keys outside the {event_type} schema: {unknown}")
 
     bad_keys = _forbidden_key_hits(list(attrs))
     if bad_keys:
         raise ZeitgeistAttrsForbiddenKeyError(f"forbidden attr keys: {bad_keys}")
 
-    oversized_keys = sorted(
-        key for key in attrs if len(key) > ZEITGEIST_ATTR_KEY_MAX_CHARS
-    )
+    oversized_keys = sorted(key for key in attrs if len(key) > ZEITGEIST_ATTR_KEY_MAX_CHARS)
     if oversized_keys:
         raise ZeitgeistAttrsOverflowError(
-            f"attr keys exceed the {ZEITGEIST_ATTR_KEY_MAX_CHARS}-char bound: "
-            f"{oversized_keys}"
+            f"attr keys exceed the {ZEITGEIST_ATTR_KEY_MAX_CHARS}-char bound: {oversized_keys}"
         )
     # UTF-8 byte counts, matching the relay's `maxUtf8Bytes` clause — the
     # actually-binding one, since byte count >= char count means satisfying
@@ -1088,8 +1123,7 @@ def from_zeitgeist_attrs(
     )
     if oversized_values:
         raise ZeitgeistAttrsOverflowError(
-            f"attr values exceed the {ZEITGEIST_ATTRS_MAX_BYTES}-byte bound: "
-            f"{oversized_values}"
+            f"attr values exceed the {ZEITGEIST_ATTRS_MAX_BYTES}-byte bound: {oversized_values}"
         )
     if len(attrs) > ZEITGEIST_ATTRS_MAX_KEYS:
         raise ZeitgeistAttrsOverflowError(
@@ -1099,56 +1133,49 @@ def from_zeitgeist_attrs(
     missing = sorted(_REQUIRED_KEYS_BY_EVENT_TYPE[event_type] - attrs.keys())
     if missing:
         raise ZeitgeistAttrsError(
-            f"attrs are missing keys the {event_type} schema always carries "
-            f"on encode: {missing}"
+            f"attrs are missing keys the {event_type} schema always carries on encode: {missing}"
         )
 
     decoded_attrs = dict(attrs)
 
-    event_id = attrs.get("event_id")
-    if event_id is not None:
-        try:
-            decoded_attrs["event_id"] = normalize_event_id(event_id)
-        except ValueError as exc:
-            raise ZeitgeistAttrsError(
-                f"attr 'event_id' is malformed: {exc}"
-            ) from exc
-    occurred_at = attrs.get("occurred_at")
-    if occurred_at is not None:
-        # datetime.fromisoformat() only accepts the "Z" UTC designator from
-        # Python 3.11 on; this repo's declared floor is 3.10 (pyproject.toml),
-        # so a textbook Z-suffixed timestamp would otherwise be wrongly
-        # rejected on 3.10 while passing on 3.11+ for the exact same wire
-        # bytes (spec-kitty-events#55). Normalize before parsing so the
-        # accept/reject outcome doesn't depend on the interpreter's minor
-        # version. A well-formed value has at most this one trailing "Z"; if
-        # another "Z" remains after stripping it, the input was already
-        # malformed and must not be laundered into something 3.10's laxer
-        # fromisoformat() would accept (e.g. a doubled "...00ZZ"). The
-        # residual check is case-insensitive: a mixed-case doubled
-        # designator (e.g. "...00zZ") is just as malformed, and Python
-        # 3.11+'s fromisoformat is itself case-insensitive on "Z", so a
-        # case-sensitive guard here would let it through on some
-        # interpreters and not others — the exact split this fix removes.
-        if occurred_at.endswith("Z"):
-            candidate = occurred_at[:-1]
-            if "z" in candidate.lower():
-                raise ZeitgeistAttrsError(
-                    f"attr 'occurred_at' is not ISO-8601: {occurred_at!r}"
-                )
-            candidate += "+00:00"
-        else:
-            candidate = occurred_at
-        try:
-            parsed_occurred_at = datetime.fromisoformat(candidate)
-        except ValueError as exc:
-            raise ZeitgeistAttrsError(
-                f"attr 'occurred_at' is not ISO-8601: {occurred_at!r}"
-            ) from exc
-        if parsed_occurred_at.tzinfo is None:
-            raise ZeitgeistAttrsError(
-                f"attr 'occurred_at' must be timezone-aware: {occurred_at!r}"
-            )
+    # event_id/occurred_at are in ENVELOPE_ATTR_KEYS, unioned into every
+    # kind's required keys above, so the missing-keys check already raised
+    # if either were absent — no `is not None` guard needed here.
+    event_id = attrs["event_id"]
+    try:
+        decoded_attrs["event_id"] = normalize_event_id(event_id)
+    except ValueError as exc:
+        raise ZeitgeistAttrsError(f"attr 'event_id' is malformed: {exc}") from exc
+
+    occurred_at = attrs["occurred_at"]
+    # datetime.fromisoformat() only accepts the "Z" UTC designator from
+    # Python 3.11 on; this repo's declared floor is 3.10 (pyproject.toml),
+    # so a textbook Z-suffixed timestamp would otherwise be wrongly
+    # rejected on 3.10 while passing on 3.11+ for the exact same wire
+    # bytes (spec-kitty-events#55). Normalize before parsing so the
+    # accept/reject outcome doesn't depend on the interpreter's minor
+    # version. A well-formed value has at most this one trailing "Z"; if
+    # another "Z" remains after stripping it, the input was already
+    # malformed and must not be laundered into something 3.10's laxer
+    # fromisoformat() would accept (e.g. a doubled "...00ZZ"). The
+    # residual check is case-insensitive: a mixed-case doubled
+    # designator (e.g. "...00zZ") is just as malformed, and Python
+    # 3.11+'s fromisoformat is itself case-insensitive on "Z", so a
+    # case-sensitive guard here would let it through on some
+    # interpreters and not others — the exact split this fix removes.
+    if occurred_at.endswith("Z"):
+        candidate = occurred_at[:-1]
+        if "z" in candidate.lower():
+            raise ZeitgeistAttrsError(f"attr 'occurred_at' is not ISO-8601: {occurred_at!r}")
+        candidate += "+00:00"
+    else:
+        candidate = occurred_at
+    try:
+        parsed_occurred_at = datetime.fromisoformat(candidate)
+    except ValueError as exc:
+        raise ZeitgeistAttrsError(f"attr 'occurred_at' is not ISO-8601: {occurred_at!r}") from exc
+    if parsed_occurred_at.tzinfo is None:
+        raise ZeitgeistAttrsError(f"attr 'occurred_at' must be timezone-aware: {occurred_at!r}")
 
     return VolatileMoment(
         kind=event_type,

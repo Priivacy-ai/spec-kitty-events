@@ -1,6 +1,6 @@
 [project]
 name = "spec-kitty-events"
-version = "8.2.0"
+version = "8.2.1"
 description = "Event log library with Lamport clocks and systematic error tracking"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -104,6 +104,11 @@ addopts = "--cov=src/spec_kitty_events --cov-report=term-missing --cov-report=ht
 [tool.ruff]
 line-length = 100
 target-version = "py310"
+# .agents/skills/ holds symlinks into a local skills library (absolute paths,
+# not resolvable off their origin machine); `ruff format` walks Markdown for
+# embedded code fences by default and errors trying to read the dangling
+# links. Not part of this repo's own source or docs.
+extend-exclude = [".agents/"]
 
 [tool.ruff.lint]
 # Small, deliberate start (issue #12): syntax errors, pyflakes, and the

@@ -65,6 +65,7 @@ Run this schema generation script (in the worktree):
 ```python
 #!/usr/bin/env python3.11
 """Generate JSON schema files for mission-audit payload models."""
+
 import json
 from pathlib import Path
 from pydantic import TypeAdapter
@@ -148,11 +149,18 @@ Add 5 entries to `_EVENT_TYPE_TO_SCHEMA` dict (after the dossier entries):
 Change the `_VALID_CATEGORIES` frozenset to include `"mission_audit"`:
 
 ```python
-_VALID_CATEGORIES = frozenset({
-    "events", "lane_mapping", "edge_cases",
-    "collaboration", "glossary", "mission_next",
-    "dossier", "mission_audit",
-})
+_VALID_CATEGORIES = frozenset(
+    {
+        "events",
+        "lane_mapping",
+        "edge_cases",
+        "collaboration",
+        "glossary",
+        "mission_next",
+        "dossier",
+        "mission_audit",
+    }
+)
 ```
 
 Also update the docstring of `load_fixtures()` to mention `"mission_audit"` in the list of valid categories.
@@ -411,6 +419,7 @@ Requested (lc=1) → Started (lc=2) → DecisionRequested (lc=3) → Completed (
 ```python
 #!/usr/bin/env python3.11
 """Generate golden reducer output files for mission-audit replay streams."""
+
 import json
 from pathlib import Path
 from spec_kitty_events.conformance.loader import load_replay_stream

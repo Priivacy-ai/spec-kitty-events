@@ -68,6 +68,7 @@ Covers:
 - Replay stream validation + golden reducer output comparison (3 streams)
 - Schema drift checks (5 payload models)
 """
+
 from __future__ import annotations
 
 import json
@@ -99,7 +100,9 @@ _AUDIT_CASES = load_fixtures("mission_audit")
 _VALID_CASES = [c for c in _AUDIT_CASES if c.expected_valid]
 _INVALID_CASES = [c for c in _AUDIT_CASES if not c.expected_valid]
 
-_FIXTURES_DIR = Path(__file__).parent.parent / "src" / "spec_kitty_events" / "conformance" / "fixtures"
+_FIXTURES_DIR = (
+    Path(__file__).parent.parent / "src" / "spec_kitty_events" / "conformance" / "fixtures"
+)
 ```
 
 **Tests to include**:
@@ -110,6 +113,7 @@ _FIXTURES_DIR = Path(__file__).parent.parent / "src" / "spec_kitty_events" / "co
 def test_valid_fixture_passes_conformance(case):
     """All valid mission-audit fixtures must pass dual-layer conformance validation."""
     from spec_kitty_events.conformance.loader import FixtureCase
+
     assert isinstance(case, FixtureCase)
     result = validate_event(case.payload, case.event_type, strict=True)
     assert result.valid, (
@@ -125,11 +129,10 @@ def test_valid_fixture_passes_conformance(case):
 def test_invalid_fixture_fails_conformance(case):
     """All invalid mission-audit fixtures must produce at least one model_violation."""
     from spec_kitty_events.conformance.loader import FixtureCase
+
     assert isinstance(case, FixtureCase)
     result = validate_event(case.payload, case.event_type, strict=True)
-    assert not result.valid, (
-        f"Fixture {case.id} should be invalid but passed validation"
-    )
+    assert not result.valid, f"Fixture {case.id} should be invalid but passed validation"
     assert len(result.model_violations) >= 1, (
         f"Fixture {case.id} is invalid but no model_violations were reported"
     )
@@ -141,9 +144,11 @@ def test_mission_audit_fixture_count():
     """load_fixtures('mission_audit') must return exactly 11 cases (7 valid + 4 invalid)."""
     assert len(_AUDIT_CASES) == 11
 
+
 def test_mission_audit_valid_case_count():
     """Must have exactly 7 valid mission-audit fixture cases."""
     assert len(_VALID_CASES) == 7
+
 
 def test_mission_audit_invalid_case_count():
     """Must have exactly 4 invalid mission-audit fixture cases."""
@@ -152,11 +157,17 @@ def test_mission_audit_invalid_case_count():
 
 **Section 4 — Replay stream validation + golden comparison**:
 ```python
-@pytest.mark.parametrize("stream_id,output_id", [
-    ("mission-audit-replay-pass", "mission-audit-replay-pass-output"),
-    ("mission-audit-replay-fail", "mission-audit-replay-fail-output"),
-    ("mission-audit-replay-decision-checkpoint", "mission-audit-replay-decision-checkpoint-output"),
-])
+@pytest.mark.parametrize(
+    "stream_id,output_id",
+    [
+        ("mission-audit-replay-pass", "mission-audit-replay-pass-output"),
+        ("mission-audit-replay-fail", "mission-audit-replay-fail-output"),
+        (
+            "mission-audit-replay-decision-checkpoint",
+            "mission-audit-replay-decision-checkpoint-output",
+        ),
+    ],
+)
 def test_replay_stream_validates_and_matches_golden(stream_id, output_id):
     """Each JSONL line validates; reducer output matches committed golden file."""
     raw = load_replay_stream(stream_id)
@@ -176,10 +187,9 @@ def test_replay_stream_validates_and_matches_golden(stream_id, output_id):
     # Load golden file from manifest
     from spec_kitty_events.conformance.loader import _MANIFEST_PATH, _FIXTURES_DIR as FIXTURES_DIR
     import json as _json
+
     manifest = _json.loads(_MANIFEST_PATH.read_text())
-    golden_entry = next(
-        (e for e in manifest["fixtures"] if e["id"] == output_id), None
-    )
+    golden_entry = next((e for e in manifest["fixtures"] if e["id"] == output_id), None)
     assert golden_entry is not None, f"Golden manifest entry not found: {output_id}"
     golden_path = FIXTURES_DIR / golden_entry["path"]
     assert golden_path.exists(), f"Golden file not found: {golden_path}"
@@ -193,24 +203,29 @@ def test_replay_stream_validates_and_matches_golden(stream_id, output_id):
 
 **Section 5 — Schema drift checks (5 payload models)**:
 ```python
-@pytest.mark.parametrize("model_class,schema_name", [
-    (MissionAuditRequestedPayload, "mission_audit_requested_payload"),
-    (MissionAuditStartedPayload, "mission_audit_started_payload"),
-    (MissionAuditDecisionRequestedPayload, "mission_audit_decision_requested_payload"),
-    (MissionAuditCompletedPayload, "mission_audit_completed_payload"),
-    (MissionAuditFailedPayload, "mission_audit_failed_payload"),
-], ids=["requested", "started", "decision_requested", "completed", "failed"])
+@pytest.mark.parametrize(
+    "model_class,schema_name",
+    [
+        (MissionAuditRequestedPayload, "mission_audit_requested_payload"),
+        (MissionAuditStartedPayload, "mission_audit_started_payload"),
+        (MissionAuditDecisionRequestedPayload, "mission_audit_decision_requested_payload"),
+        (MissionAuditCompletedPayload, "mission_audit_completed_payload"),
+        (MissionAuditFailedPayload, "mission_audit_failed_payload"),
+    ],
+    ids=["requested", "started", "decision_requested", "completed", "failed"],
+)
 def test_schema_drift(model_class, schema_name):
     """Generated schema must match the committed JSON schema file (no drift)."""
     from pydantic import TypeAdapter
     from spec_kitty_events.schemas import load_schema
+
     generated = TypeAdapter(model_class).json_schema()
     committed = load_schema(schema_name)
     assert generated == committed, (
         f"Schema drift detected for {schema_name}!\n"
-        f"Re-run schema generation: python3.11 -c \"from pydantic import TypeAdapter; "
+        f'Re-run schema generation: python3.11 -c "from pydantic import TypeAdapter; '
         f"import json; from spec_kitty_events.mission_audit import {model_class.__name__}; "
-        f"print(json.dumps(TypeAdapter({model_class.__name__}).json_schema(), sort_keys=True, indent=2))\"\n"
+        f'print(json.dumps(TypeAdapter({model_class.__name__}).json_schema(), sort_keys=True, indent=2))"\n'
         f"Diff (generated vs committed):\n"
         f"Generated keys: {sorted(generated.keys())}\n"
         f"Committed keys: {sorted(committed.keys())}"
@@ -253,28 +268,28 @@ from spec_kitty_events.mission_audit import (
 Also add these 21 names to `__all__` (after the dossier entries in the list):
 
 ```python
-    # Mission Audit Lifecycle Contracts (2.5.0)
-    "AUDIT_SCHEMA_VERSION",
-    "MISSION_AUDIT_REQUESTED",
-    "MISSION_AUDIT_STARTED",
-    "MISSION_AUDIT_DECISION_REQUESTED",
-    "MISSION_AUDIT_COMPLETED",
-    "MISSION_AUDIT_FAILED",
-    "MISSION_AUDIT_EVENT_TYPES",
-    "TERMINAL_AUDIT_STATUSES",
-    "AuditVerdict",
-    "AuditSeverity",
-    "AuditStatus",
-    "AuditArtifactRef",
-    "PendingDecision",
-    "MissionAuditAnomaly",
-    "MissionAuditRequestedPayload",
-    "MissionAuditStartedPayload",
-    "MissionAuditDecisionRequestedPayload",
-    "MissionAuditCompletedPayload",
-    "MissionAuditFailedPayload",
-    "ReducedMissionAuditState",
-    "reduce_mission_audit_events",
+# Mission Audit Lifecycle Contracts (2.5.0)
+("AUDIT_SCHEMA_VERSION",)
+("MISSION_AUDIT_REQUESTED",)
+("MISSION_AUDIT_STARTED",)
+("MISSION_AUDIT_DECISION_REQUESTED",)
+("MISSION_AUDIT_COMPLETED",)
+("MISSION_AUDIT_FAILED",)
+("MISSION_AUDIT_EVENT_TYPES",)
+("TERMINAL_AUDIT_STATUSES",)
+("AuditVerdict",)
+("AuditSeverity",)
+("AuditStatus",)
+("AuditArtifactRef",)
+("PendingDecision",)
+("MissionAuditAnomaly",)
+("MissionAuditRequestedPayload",)
+("MissionAuditStartedPayload",)
+("MissionAuditDecisionRequestedPayload",)
+("MissionAuditCompletedPayload",)
+("MissionAuditFailedPayload",)
+("ReducedMissionAuditState",)
+("reduce_mission_audit_events",)
 ```
 
 Count confirms: 5 event type constants + MISSION_AUDIT_EVENT_TYPES + 3 enums + 2 value objects (AuditArtifactRef, PendingDecision) + MissionAuditAnomaly + 5 payload models + ReducedMissionAuditState + reduce_mission_audit_events + AUDIT_SCHEMA_VERSION + TERMINAL_AUDIT_STATUSES = 21 names. Export all of the above.

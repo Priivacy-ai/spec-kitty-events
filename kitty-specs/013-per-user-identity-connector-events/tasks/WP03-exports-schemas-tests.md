@@ -85,11 +85,11 @@ wp_code: WP03
      ```
   3. Add the new symbols to `__all__` list. Find the connector section in `__all__` and append:
      ```python
-     "USER_CONNECTED",
-     "USER_DISCONNECTED",
-     "UserConnectedPayload",
-     "UserDisconnectedPayload",
-     "UserConnectionStatus",
+     ("USER_CONNECTED",)
+     ("USER_DISCONNECTED",)
+     ("UserConnectedPayload",)
+     ("UserDisconnectedPayload",)
+     ("UserConnectionStatus",)
      ```
   4. Update the docstring at the top of the file. Add a new version notes block after the 2.7.0 section:
      ```
@@ -160,10 +160,12 @@ wp_code: WP03
      def test_schema_version(self) -> None:
          assert CONNECTOR_SCHEMA_VERSION == "2.8.0"
 
+
      def test_event_types_frozenset(self) -> None:
          assert len(CONNECTOR_EVENT_TYPES) == 7
          assert USER_CONNECTED in CONNECTOR_EVENT_TYPES
          assert USER_DISCONNECTED in CONNECTOR_EVENT_TYPES
+
 
      def test_user_event_type_values(self) -> None:
          assert USER_CONNECTED == "UserConnected"
@@ -174,23 +176,33 @@ wp_code: WP03
      class TestExistingPayloadsUserIdField:
          def test_provisioned_user_id_default_none(self) -> None:
              payload = ConnectorProvisionedPayload(
-                 connector_id="c1", connector_type="jira", provider="jira",
-                 mission_id="m1", project_uuid=uuid.uuid4(),
-                 actor_id="system", actor_type="system",
+                 connector_id="c1",
+                 connector_type="jira",
+                 provider="jira",
+                 mission_id="m1",
+                 project_uuid=uuid.uuid4(),
+                 actor_id="system",
+                 actor_type="system",
                  endpoint_url="https://example.com",
                  recorded_at=datetime.now(timezone.utc),
-                 credentials_ref="ref1", config_hash="hash1",
+                 credentials_ref="ref1",
+                 config_hash="hash1",
              )
              assert payload.user_id is None
 
          def test_provisioned_user_id_set(self) -> None:
              payload = ConnectorProvisionedPayload(
-                 connector_id="c1", connector_type="jira", provider="jira",
-                 mission_id="m1", project_uuid=uuid.uuid4(),
-                 actor_id="system", actor_type="system",
+                 connector_id="c1",
+                 connector_type="jira",
+                 provider="jira",
+                 mission_id="m1",
+                 project_uuid=uuid.uuid4(),
+                 actor_id="system",
+                 actor_type="system",
                  endpoint_url="https://example.com",
                  recorded_at=datetime.now(timezone.utc),
-                 credentials_ref="ref1", config_hash="hash1",
+                 credentials_ref="ref1",
+                 config_hash="hash1",
                  user_id="user-123",
              )
              assert payload.user_id == "user-123"
@@ -202,9 +214,13 @@ wp_code: WP03
      class TestUserConnectedPayload:
          def test_valid_payload(self) -> None:
              payload = UserConnectedPayload(
-                 connector_id="c1", connector_type="jira", provider="jira",
-                 mission_id="m1", project_uuid=uuid.uuid4(),
-                 actor_id="user-123", actor_type="human",
+                 connector_id="c1",
+                 connector_type="jira",
+                 provider="jira",
+                 mission_id="m1",
+                 project_uuid=uuid.uuid4(),
+                 actor_id="user-123",
+                 actor_type="human",
                  endpoint_url="https://example.com",
                  recorded_at=datetime.now(timezone.utc),
                  user_id="user-123",
@@ -214,9 +230,13 @@ wp_code: WP03
          def test_user_id_required(self) -> None:
              with pytest.raises(ValidationError):
                  UserConnectedPayload(
-                     connector_id="c1", connector_type="jira", provider="jira",
-                     mission_id="m1", project_uuid=uuid.uuid4(),
-                     actor_id="user-123", actor_type="human",
+                     connector_id="c1",
+                     connector_type="jira",
+                     provider="jira",
+                     mission_id="m1",
+                     project_uuid=uuid.uuid4(),
+                     actor_id="user-123",
+                     actor_type="human",
                      endpoint_url="https://example.com",
                      recorded_at=datetime.now(timezone.utc),
                      # user_id missing

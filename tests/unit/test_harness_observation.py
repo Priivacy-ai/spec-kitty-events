@@ -73,10 +73,31 @@ def test_forbidden_observation_keys_membership() -> None:
     from spec_kitty_events.harness_observation import FORBIDDEN_OBSERVATION_KEYS
 
     expected = {
-        "detail", "message", "text", "prose", "body", "command_text", "stdout", "stderr",
-        "user", "user_id", "email", "actor", "team", "team_id", "team_slug",
-        "deployment", "deployment_id",
-        "token", "authorization", "bearer", "password", "secret", "url", "runtime_url", "branch",
+        "detail",
+        "message",
+        "text",
+        "prose",
+        "body",
+        "command_text",
+        "stdout",
+        "stderr",
+        "user",
+        "user_id",
+        "email",
+        "actor",
+        "team",
+        "team_id",
+        "team_slug",
+        "deployment",
+        "deployment_id",
+        "token",
+        "authorization",
+        "bearer",
+        "password",
+        "secret",
+        "url",
+        "runtime_url",
+        "branch",
     }
     assert FORBIDDEN_OBSERVATION_KEYS == frozenset(expected)
 
@@ -123,28 +144,58 @@ def test_forbidden_observation_keys_value_shaped_like_a_key_is_accepted() -> Non
 # R = required, O = optional, F = must be absent (forbidden for this kind).
 _MATRIX: dict[str, dict[str, str]] = {
     "presence": {
-        "mission_slug": "O", "wp_id": "O", "lane": "F", "activity": "R",
-        "path": "O", "pause_reason": "F", "ended_reason": "F",
+        "mission_slug": "O",
+        "wp_id": "O",
+        "lane": "F",
+        "activity": "R",
+        "path": "O",
+        "pause_reason": "F",
+        "ended_reason": "F",
     },
     "lane_signal": {
-        "mission_slug": "R", "wp_id": "R", "lane": "R", "activity": "F",
-        "path": "F", "pause_reason": "F", "ended_reason": "F",
+        "mission_slug": "R",
+        "wp_id": "R",
+        "lane": "R",
+        "activity": "F",
+        "path": "F",
+        "pause_reason": "F",
+        "ended_reason": "F",
     },
     "focus_started": {
-        "mission_slug": "R", "wp_id": "O", "lane": "F", "activity": "F",
-        "path": "F", "pause_reason": "F", "ended_reason": "F",
+        "mission_slug": "R",
+        "wp_id": "O",
+        "lane": "F",
+        "activity": "F",
+        "path": "F",
+        "pause_reason": "F",
+        "ended_reason": "F",
     },
     "focus_heartbeat": {
-        "mission_slug": "R", "wp_id": "O", "lane": "F", "activity": "F",
-        "path": "F", "pause_reason": "F", "ended_reason": "F",
+        "mission_slug": "R",
+        "wp_id": "O",
+        "lane": "F",
+        "activity": "F",
+        "path": "F",
+        "pause_reason": "F",
+        "ended_reason": "F",
     },
     "focus_paused": {
-        "mission_slug": "R", "wp_id": "O", "lane": "F", "activity": "F",
-        "path": "F", "pause_reason": "R", "ended_reason": "F",
+        "mission_slug": "R",
+        "wp_id": "O",
+        "lane": "F",
+        "activity": "F",
+        "path": "F",
+        "pause_reason": "R",
+        "ended_reason": "F",
     },
     "focus_ended": {
-        "mission_slug": "R", "wp_id": "O", "lane": "F", "activity": "F",
-        "path": "F", "pause_reason": "F", "ended_reason": "R",
+        "mission_slug": "R",
+        "wp_id": "O",
+        "lane": "F",
+        "activity": "F",
+        "path": "F",
+        "pause_reason": "F",
+        "ended_reason": "R",
     },
 }
 
@@ -181,7 +232,12 @@ def test_minimal_valid_construction_per_kind(kind: str) -> None:
 
 @pytest.mark.parametrize(
     "kind,field",
-    [(kind, field) for kind, fields in _MATRIX.items() for field, rule in fields.items() if rule == "R"],
+    [
+        (kind, field)
+        for kind, fields in _MATRIX.items()
+        for field, rule in fields.items()
+        if rule == "R"
+    ],
 )
 def test_required_field_missing_rejected(kind: str, field: str) -> None:
     from spec_kitty_events.harness_observation import HarnessObservationPayload
@@ -194,7 +250,12 @@ def test_required_field_missing_rejected(kind: str, field: str) -> None:
 
 @pytest.mark.parametrize(
     "kind,field",
-    [(kind, field) for kind, fields in _MATRIX.items() for field, rule in fields.items() if rule == "F"],
+    [
+        (kind, field)
+        for kind, fields in _MATRIX.items()
+        for field, rule in fields.items()
+        if rule == "F"
+    ],
 )
 def test_forbidden_field_present_rejected(kind: str, field: str) -> None:
     """X5: a field legal for another kind but forbidden for this one."""
@@ -208,7 +269,12 @@ def test_forbidden_field_present_rejected(kind: str, field: str) -> None:
 
 @pytest.mark.parametrize(
     "kind,field",
-    [(kind, field) for kind, fields in _MATRIX.items() for field, rule in fields.items() if rule == "O"],
+    [
+        (kind, field)
+        for kind, fields in _MATRIX.items()
+        for field, rule in fields.items()
+        if rule == "O"
+    ],
 )
 def test_optional_field_may_be_present_or_absent(kind: str, field: str) -> None:
     from spec_kitty_events.harness_observation import HarnessObservationPayload
@@ -224,7 +290,15 @@ def test_optional_field_may_be_present_or_absent(kind: str, field: str) -> None:
 def test_every_kind_and_field_in_matrix_is_covered() -> None:
     """Sanity: the matrix names every conditional field for every kind (no
     accidental gaps that would make the exhaustiveness claim false)."""
-    conditional_fields = {"mission_slug", "wp_id", "lane", "activity", "path", "pause_reason", "ended_reason"}
+    conditional_fields = {
+        "mission_slug",
+        "wp_id",
+        "lane",
+        "activity",
+        "path",
+        "pause_reason",
+        "ended_reason",
+    }
     for kind, fields in _MATRIX.items():
         assert set(fields) == conditional_fields, kind
 

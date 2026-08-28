@@ -57,6 +57,7 @@ Per the conformance-api contract and research (R3, R4):
 
    Run: pytest --pyargs spec_kitty_events.conformance
    """
+
    from spec_kitty_events.conformance.validators import (
        ConformanceResult,
        ModelViolation,
@@ -95,6 +96,7 @@ from typing import Any, Tuple
 @dataclass(frozen=True)
 class ModelViolation:
     """A single Pydantic model validation failure."""
+
     field: str
     message: str
     violation_type: str
@@ -104,6 +106,7 @@ class ModelViolation:
 @dataclass(frozen=True)
 class SchemaViolation:
     """A single JSON Schema validation failure."""
+
     json_path: str
     message: str
     validator: str
@@ -114,6 +117,7 @@ class SchemaViolation:
 @dataclass(frozen=True)
 class ConformanceResult:
     """Result of validating an event payload against the canonical contract."""
+
     valid: bool
     model_violations: Tuple[ModelViolation, ...]
     schema_violations: Tuple[SchemaViolation, ...]
@@ -140,8 +144,10 @@ class ConformanceResult:
    from spec_kitty_events.status import StatusTransitionPayload
    from spec_kitty_events.gates import GatePassedPayload, GateFailedPayload
    from spec_kitty_events.lifecycle import (
-       MissionStartedPayload, MissionCompletedPayload,
-       MissionCancelledPayload, PhaseEnteredPayload,
+       MissionStartedPayload,
+       MissionCompletedPayload,
+       MissionCancelledPayload,
+       PhaseEnteredPayload,
        ReviewRollbackPayload,
    )
 
@@ -195,12 +201,14 @@ class ConformanceResult:
            violations: list[ModelViolation] = []
            for error in exc.errors():
                field_path = ".".join(str(loc) for loc in error["loc"])
-               violations.append(ModelViolation(
-                   field=field_path,
-                   message=error["msg"],
-                   violation_type=error["type"],
-                   input_value=error.get("input", None),
-               ))
+               violations.append(
+                   ModelViolation(
+                       field=field_path,
+                       message=error["msg"],
+                       violation_type=error["type"],
+                       input_value=error.get("input", None),
+                   )
+               )
            return tuple(violations)
    ```
 2. Import `ValidationError as PydanticValidationError` from `pydantic` (not from `spec_kitty_events.models`).
@@ -235,18 +243,21 @@ class ConformanceResult:
            return (), True  # skipped
 
        from spec_kitty_events.schemas import load_schema
+
        schema = load_schema(schema_name)
        validator = Draft202012Validator(schema)
 
        violations: list[SchemaViolation] = []
        for error in validator.iter_errors(payload):
-           violations.append(SchemaViolation(
-               json_path=error.json_path,
-               message=error.message,
-               validator=error.validator,
-               validator_value=error.validator_value,
-               schema_path=tuple(error.absolute_schema_path),
-           ))
+           violations.append(
+               SchemaViolation(
+                   json_path=error.json_path,
+                   message=error.message,
+                   validator=error.validator,
+                   validator_value=error.validator_value,
+                   schema_path=tuple(error.absolute_schema_path),
+               )
+           )
        violations.sort(key=lambda v: v.json_path)
        return tuple(violations), False
    ```
@@ -273,8 +284,7 @@ class ConformanceResult:
        """Validate an event payload against the canonical contract."""
        if event_type not in _EVENT_TYPE_TO_MODEL:
            raise ValueError(
-               f"Unknown event type: {event_type!r}. "
-               f"Known types: {sorted(_EVENT_TYPE_TO_MODEL)}"
+               f"Unknown event type: {event_type!r}. Known types: {sorted(_EVENT_TYPE_TO_MODEL)}"
            )
 
        model_class = _EVENT_TYPE_TO_MODEL[event_type]
@@ -283,15 +293,14 @@ class ConformanceResult:
        schema_name = _EVENT_TYPE_TO_SCHEMA.get(event_type)
        if schema_name is not None:
            schema_violations, skipped = _validate_with_schema(
-               payload, schema_name, strict=strict,
+               payload,
+               schema_name,
+               strict=strict,
            )
        else:
            schema_violations, skipped = (), True
 
-       valid = (
-           len(model_violations) == 0
-           and (len(schema_violations) == 0 or skipped)
-       )
+       valid = len(model_violations) == 0 and (len(schema_violations) == 0 or skipped)
 
        return ConformanceResult(
            valid=valid,

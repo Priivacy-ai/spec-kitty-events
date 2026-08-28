@@ -2,6 +2,7 @@
 
 Run: pytest --pyargs spec_kitty_events.conformance
 """
+
 from __future__ import annotations
 
 import json
@@ -37,15 +38,17 @@ _MANIFEST: Dict[str, Any] = json.loads(
 # extract input before calling validate_event; otherwise the wrapper keys
 # (class, expected, notes, ...) appear as extras on the model and cause false
 # failures.
-_WRAPPER_KEYS = frozenset({
-    "class",
-    "expected",
-    "input",
-    "notes",
-    "expected_error_code",
-    "expected_reason",
-    "legacy_shape",
-})
+_WRAPPER_KEYS = frozenset(
+    {
+        "class",
+        "expected",
+        "input",
+        "notes",
+        "expected_error_code",
+        "expected_reason",
+        "legacy_shape",
+    }
+)
 
 
 def _is_wrapper_shape(obj: Any) -> bool:
@@ -88,6 +91,7 @@ def _event_fixture_entries() -> List[Dict[str, Any]]:
       tests/test_zeitgeist_attrs_conformance.py via
       load_fixtures("zeitgeist_attrs").
     """
+
     def _included(f: dict[str, Any]) -> bool:
         if f["event_type"] == "LaneMapping":
             return False
@@ -135,9 +139,7 @@ def test_zeitgeist_attrs_codec_fixtures_stay_out_of_the_event_gate() -> None:
     collected here.
     """
     manifest_paths = {
-        f["path"]
-        for f in _MANIFEST["fixtures"]
-        if f["path"].startswith("zeitgeist_attrs/")
+        f["path"] for f in _MANIFEST["fixtures"] if f["path"].startswith("zeitgeist_attrs/")
     }
     assert manifest_paths, (
         "zeitgeist_attrs codec fixtures vanished from the manifest; if the "
@@ -197,10 +199,7 @@ def test_fixture_conformance(case: Dict[str, Any]) -> None:
     if case["expected_result"] == "valid":
         # Pydantic model layer must accept the payload
         if result.model_violations:
-            violations = [
-                f"  Model: {v.field} \u2014 {v.message}"
-                for v in result.model_violations
-            ]
+            violations = [f"  Model: {v.field} \u2014 {v.message}" for v in result.model_violations]
             raise AssertionError(
                 f"Payload for {case['event_type']!r} (fixture {case['id']}) "
                 f"failed model conformance:\n" + "\n".join(violations)
@@ -217,15 +216,11 @@ def test_fixture_conformance(case: Dict[str, Any]) -> None:
 # --- Lane mapping fixture conformance tests ---
 
 
-@pytest.mark.parametrize(
-    "case", _lane_mapping_fixture_params(), ids=_lane_mapping_fixture_ids()
-)
+@pytest.mark.parametrize("case", _lane_mapping_fixture_params(), ids=_lane_mapping_fixture_ids())
 def test_lane_mapping_fixture_conformance(case: Dict[str, Any]) -> None:
     """Validate lane mapping fixtures against expected results."""
     mappings: Any = case["payload"]
-    assert isinstance(mappings, list), (
-        f"Lane mapping fixture {case['id']} payload must be a list"
-    )
+    assert isinstance(mappings, list), f"Lane mapping fixture {case['id']} payload must be a list"
     if case["expected_result"] == "valid":
         for mapping in mappings:
             assert_lane_mapping(mapping["canonical"], mapping["expected_sync"])
@@ -372,11 +367,7 @@ def test_cutover_boundary_rejected_by_strict_profile(entry: dict[str, Any]) -> N
 
 @pytest.mark.parametrize(
     "entry",
-    [
-        e
-        for e in _MANIFEST["classes"]["entries"]
-        if e["path"].startswith(_FORBIDDEN_KEY_CLASS_DIR)
-    ],
+    [e for e in _MANIFEST["classes"]["entries"] if e["path"].startswith(_FORBIDDEN_KEY_CLASS_DIR)],
     ids=[
         e["id"]
         for e in _MANIFEST["classes"]["entries"]

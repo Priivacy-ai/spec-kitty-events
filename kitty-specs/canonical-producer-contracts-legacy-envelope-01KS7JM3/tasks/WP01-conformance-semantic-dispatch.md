@@ -99,7 +99,7 @@ WP01 is the sole owner of `validators.py`. WP02 (model classes) must land first;
     "from_lane": "in_review",
     "to_lane": "planned",
     "actor": "user",
-    "force": False,                           # invalid: review-rejection requires force=True
+    "force": False,  # invalid: review-rejection requires force=True
     "reason": "rejected on review",
     "execution_mode": "worktree",
     "mission_slug": "demo",
@@ -212,6 +212,7 @@ The existing `valid = len(model_violations) == 0 and ...` line below already rec
 Covers FR-001..FR-005, the regression for force-with-empty-reason, and
 the substring-routing contract that downstream consumers rely on.
 """
+
 from __future__ import annotations
 
 import pytest
@@ -329,8 +330,7 @@ def test_validate_event_violation_field_and_type_are_documented() -> None:
     payload = _unforced_payload("for_review", "planned")
     result = validate_event(payload, "WPStatusChanged")
     transition_violations = [
-        v for v in result.model_violations
-        if v.violation_type == "transition_rule"
+        v for v in result.model_violations if v.violation_type == "transition_rule"
     ]
     assert transition_violations
     for v in transition_violations:

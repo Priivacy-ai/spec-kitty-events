@@ -39,7 +39,7 @@ class ParticipantIdentity(BaseModel):
     participant_type: Literal["human", "llm_context"] = Field(...)
     display_name: Optional[str] = None
     session_id: Optional[str] = None
-    external_refs: Optional[ParticipantExternalRefs] = None   # NEW
+    external_refs: Optional[ParticipantExternalRefs] = None  # NEW
 ```
 
 Compatibility: existing 3.x consumers that do not set `external_refs` keep validating. Existing payloads that embed `ParticipantIdentity` (`ParticipantInvitedPayload`, `ParticipantJoinedPayload`, collaboration state) transparently gain the new optional field.
@@ -162,11 +162,13 @@ class DecisionPointOpenedInterviewPayload(BaseModel):
 
     origin_flow: OriginFlow = Field(...)
     question: str = Field(..., min_length=1)
-    options: Tuple[str, ...] = Field(..., min_length=0)   # options MAY be empty (free-form only)
+    options: Tuple[str, ...] = Field(..., min_length=0)  # options MAY be empty (free-form only)
     input_key: str = Field(..., min_length=1)
     step_id: str = Field(..., min_length=1)
 
-    actor_id: str = Field(..., min_length=1)              # who asked (usually the CLI process / mission owner session)
+    actor_id: str = Field(
+        ..., min_length=1
+    )  # who asked (usually the CLI process / mission owner session)
     actor_type: Literal["human", "llm", "service"] = Field(...)
 
     state_entered_at: datetime
@@ -204,7 +206,9 @@ class DecisionPointWidenedPayload(BaseModel):
     thread_ref: ThreadRef
     invited_participants: Tuple[ParticipantIdentity, ...] = Field(..., min_length=0)
 
-    widened_by: str = Field(..., min_length=1)            # participant_id of mission owner who confirmed widening
+    widened_by: str = Field(
+        ..., min_length=1
+    )  # participant_id of mission owner who confirmed widening
     widened_at: datetime
     recorded_at: datetime
 ```
@@ -258,8 +262,10 @@ class DecisionPointDiscussingInterviewPayload(BaseModel):
     mission_type: str = Field(..., min_length=1)
 
     snapshot_kind: DiscussingSnapshotKind
-    contributions: Tuple[str, ...] = Field(default_factory=tuple)   # synthesized summary lines, not raw Slack messages
-    actor_id: str = Field(..., min_length=1)                        # who authored the snapshot (usually SaaS)
+    contributions: Tuple[str, ...] = Field(
+        default_factory=tuple
+    )  # synthesized summary lines, not raw Slack messages
+    actor_id: str = Field(..., min_length=1)  # who authored the snapshot (usually SaaS)
     actor_type: Literal["human", "llm", "service"] = Field(...)
 
     state_entered_at: datetime
@@ -321,13 +327,17 @@ class DecisionPointResolvedInterviewPayload(BaseModel):
     mission_type: str = Field(..., min_length=1)
 
     terminal_outcome: TerminalOutcome = Field(...)
-    final_answer: Optional[str] = None                    # REQUIRED when terminal_outcome=resolved; FORBIDDEN otherwise
-    other_answer: bool = False                            # True when final_answer is free-text (Other path)
-    rationale: Optional[str] = None                       # REQUIRED when terminal_outcome in {deferred, canceled}
-    summary: Optional[SummaryBlock] = None                # REQUIRED when a prior DecisionPointWidened exists (enforced by reducer + fixture)
+    final_answer: Optional[str] = (
+        None  # REQUIRED when terminal_outcome=resolved; FORBIDDEN otherwise
+    )
+    other_answer: bool = False  # True when final_answer is free-text (Other path)
+    rationale: Optional[str] = None  # REQUIRED when terminal_outcome in {deferred, canceled}
+    summary: Optional[SummaryBlock] = (
+        None  # REQUIRED when a prior DecisionPointWidened exists (enforced by reducer + fixture)
+    )
     actual_participants: Tuple[ParticipantIdentity, ...] = Field(default_factory=tuple)
 
-    resolved_by: str = Field(..., min_length=1)           # participant_id of mission owner
+    resolved_by: str = Field(..., min_length=1)  # participant_id of mission owner
     closed_locally_while_widened: bool = False
     closure_message: Optional[ClosureMessageRef] = None
 
@@ -369,7 +379,7 @@ class DecisionPointOverriddenPayload(BaseModel):
 
     # (existing 3.x fields unchanged)
 
-    origin_surface: Optional[OriginSurface] = None        # NEW (optional; for replay context)
+    origin_surface: Optional[OriginSurface] = None  # NEW (optional; for replay context)
     # ... rest unchanged
 ```
 
@@ -377,11 +387,11 @@ class DecisionPointOverriddenPayload(BaseModel):
 
 ```python
 _EVENT_TO_PAYLOAD: dict[str, Any] = {
-    DECISION_POINT_OPENED:      DecisionPointOpenedPayload,      # discriminated union
-    DECISION_POINT_WIDENED:     DecisionPointWidenedPayload,     # NEW, single model
-    DECISION_POINT_DISCUSSING:  DecisionPointDiscussingPayload,  # discriminated union
-    DECISION_POINT_RESOLVED:    DecisionPointResolvedPayload,    # discriminated union
-    DECISION_POINT_OVERRIDDEN:  DecisionPointOverriddenPayload,
+    DECISION_POINT_OPENED: DecisionPointOpenedPayload,  # discriminated union
+    DECISION_POINT_WIDENED: DecisionPointWidenedPayload,  # NEW, single model
+    DECISION_POINT_DISCUSSING: DecisionPointDiscussingPayload,  # discriminated union
+    DECISION_POINT_RESOLVED: DecisionPointResolvedPayload,  # discriminated union
+    DECISION_POINT_OVERRIDDEN: DecisionPointOverriddenPayload,
 }
 ```
 
@@ -435,7 +445,7 @@ class ReducedDecisionPointState(BaseModel):
     model_config = ConfigDict(frozen=True)
 
     # 3.x fields (preserved, unchanged semantics)
-    state: Optional[DecisionPointState] = None            # enum extended with WIDENED below
+    state: Optional[DecisionPointState] = None  # enum extended with WIDENED below
     decision_point_id: Optional[str] = None
     mission_id: Optional[str] = None
     run_id: Optional[str] = None
@@ -460,7 +470,7 @@ class ReducedDecisionPointState(BaseModel):
     input_key: Optional[str] = None
     step_id: Optional[str] = None
 
-    widening: Optional[WideningProjection] = None         # populated on Widened
+    widening: Optional[WideningProjection] = None  # populated on Widened
     terminal_outcome: Optional[TerminalOutcome] = None
     final_answer: Optional[str] = None
     other_answer: bool = False
@@ -473,7 +483,7 @@ class ReducedDecisionPointState(BaseModel):
 
 class DecisionPointState(str, Enum):
     OPEN = "open"
-    WIDENED = "widened"        # NEW
+    WIDENED = "widened"  # NEW
     DISCUSSING = "discussing"
     RESOLVED = "resolved"
     OVERRIDDEN = "overridden"

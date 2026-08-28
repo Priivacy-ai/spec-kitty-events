@@ -3,6 +3,7 @@
 Covers WP02 subtask T009: comprehensive tests for RetrospectiveCompletedPayload,
 RetrospectiveSkippedPayload, module-level constants, and C-008 (no reducer).
 """
+
 from __future__ import annotations
 
 import inspect
@@ -284,21 +285,25 @@ class TestRetrospectiveSkippedPayload:
 
 class TestModuleLevel:
     def test_event_types_frozenset(self) -> None:
-        assert RETROSPECTIVE_EVENT_NAMES == frozenset({
-            "retrospective.requested",
-            "retrospective.started",
-            "retrospective.completed",
-            "retrospective.skipped",
-            "retrospective.failed",
-            "retrospective.proposal.generated",
-            "retrospective.proposal.applied",
-            "retrospective.proposal.rejected",
-        })
-        assert RETROSPECTIVE_EVENT_TYPES == frozenset({
-            "RetrospectiveCompleted",
-            "RetrospectiveSkipped",
-            *RETROSPECTIVE_EVENT_NAMES,
-        })
+        assert RETROSPECTIVE_EVENT_NAMES == frozenset(
+            {
+                "retrospective.requested",
+                "retrospective.started",
+                "retrospective.completed",
+                "retrospective.skipped",
+                "retrospective.failed",
+                "retrospective.proposal.generated",
+                "retrospective.proposal.applied",
+                "retrospective.proposal.rejected",
+            }
+        )
+        assert RETROSPECTIVE_EVENT_TYPES == frozenset(
+            {
+                "RetrospectiveCompleted",
+                "RetrospectiveSkipped",
+                *RETROSPECTIVE_EVENT_NAMES,
+            }
+        )
         assert len(RETROSPECTIVE_EVENT_TYPES) == 10
 
     def test_schema_version(self) -> None:
@@ -307,6 +312,7 @@ class TestModuleLevel:
     def test_no_reducer_exists(self) -> None:
         """C-008: Retrospective is terminal signals only — no reducer."""
         import spec_kitty_events.retrospective as mod
+
         members = inspect.getmembers(mod, inspect.isfunction)
         reducer_names = [name for name, _ in members if name.startswith("reduce_")]
         assert reducer_names == [], f"Unexpected reducer functions: {reducer_names}"

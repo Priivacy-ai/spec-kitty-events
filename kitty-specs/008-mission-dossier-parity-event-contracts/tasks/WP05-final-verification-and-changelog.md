@@ -135,6 +135,7 @@ spec-kitty implement WP05 --base WP04
      To reduce a dossier event stream:
      ```python
      from spec_kitty_events import reduce_mission_dossier, NamespaceMixedStreamError
+
      try:
          state = reduce_mission_dossier(events)
      except NamespaceMixedStreamError:

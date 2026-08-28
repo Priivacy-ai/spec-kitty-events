@@ -19,6 +19,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   ISO-8601 format parse identically on Python 3.10 and 3.11+ instead of
   splitting by interpreter (EXPERIMENTAL-spec-kitty-events#135, the mirror
   of #122's rejection-split fix at these three sibling call sites).
+- `COMPATIBILITY.md`'s `8.0.0` migration recipe for callers outside
+  `strict.STRICT_EVENT_TYPES` no longer crashes on a present-but-null (or
+  otherwise non-string) `aggregate_id`. The third check used
+  `record.get("aggregate_id", "").split("/", 1)[0]`, whose default only
+  applies when the key is *absent* — a wire record carrying
+  `aggregate_id: null` still raised `AttributeError` instead of mirroring
+  `strict.py`'s own `isinstance(aggregate_id, str)` guard, which treats a
+  non-string as not-forbidden rather than raising
+  (EXPERIMENTAL-spec-kitty-events#93, MINOR from PR #84 pass 2).
+- `from_zeitgeist_attrs`'s docstring no longer claims "values are not
+  reparsed here" as a blanket statement — `event_id` and `occurred_at` are
+  reparsed (via `normalize_event_id` and `datetime.fromisoformat`
+  respectively); the opacity claim now scopes to payload values only, with
+  the two envelope-sourced exceptions stated. Also dropped the two
+  unreachable-false `is not None` presence guards around that reparsing:
+  `event_id`/`occurred_at` are unconditionally required for every event
+  type (`ENVELOPE_ATTR_KEYS` is unioned into every kind's required keys),
+  so the earlier missing-keys check always raises first when either is
+  absent (EXPERIMENTAL-spec-kitty-events#67, consolidating the same defect
+  class as #61).
 - `from_zeitgeist_attrs` now enforces the same `event_id`/`occurred_at`
   contract the envelope itself guarantees, instead of the weaker
   emptiness/parses-at-all checks closing #28 left behind
@@ -30,6 +50,45 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   ISO-8601 *and* be timezone-aware, since the encoder only ever emits an
   aware `datetime`'s `isoformat()` and every downstream comparison (the
   72-hour feed window, the staleness guard) is against an aware "now".
+- **Known gap, not yet closed**: `to_zeitgeist_attrs` does not yet reject a
+  value carrying a non-printable character (`not str.isprintable()`) on
+  encode, even though `from_zeitgeist_attrs` already rejects one on decode
+  (EXPERIMENTAL-spec-kitty-events#64). Until this closes, a producer whose
+  `actor`/`review_ref`/id field carries a stray control character can
+  broadcast successfully while a consumer's decode raises, silently
+  dropping the moment. The fix — encode failing closed with the same
+  `ZeitgeistAttrsControlCharacterError` decode already raises, before that
+  attrs dict reaches the relay — is open as
+  EXPERIMENTAL-spec-kitty-events#104 and not yet merged to `main`; this
+  bullet moves under a dated release heading, in past tense, once #104
+  lands.
+
+## [8.2.1] - 2026-08-27
+
+### Changed
+
+- Bumped the patch version only — no source-code change. `8.2.0` had been
+  declared at two distinct trees on `main`: the commit three consumers had
+  already adopted (`c93dbfbf`, pinned by `EXPERIMENTAL-spec-kitty`,
+  `-saas`, and `-zeitgeist`), and a later repo-wide `ruff format` pass
+  (`b67b7e0`) that also carried a real behaviour change to
+  `from_zeitgeist_attrs`'s `event_id` handling — validated against the
+  three `normalize_event_id` shapes and rewritten in the decoded output,
+  instead of only rejected when empty and passed through verbatim. Per
+  `PROGRAM.md` §2 ("a shared package's version number is spent once"),
+  `8.2.0` keeps its single adopted meaning at `c93dbfbf`; every tree from
+  `b67b7e0` onward is `8.2.1` (EXPERIMENTAL-spec-kitty-events#170).
+
+### Known issues
+
+- **Not yet closed**: `to_zeitgeist_attrs` does not reject a value
+  carrying a non-printable character (`not str.isprintable()`) on encode,
+  even though `from_zeitgeist_attrs` already rejects one on decode
+  (EXPERIMENTAL-spec-kitty-events#64). Until this closes, a producer whose
+  `actor`/`review_ref`/id field carries a stray control character can
+  broadcast successfully while a consumer's decode raises, silently
+  dropping the moment. This bullet moves to `### Fixed`, in past tense,
+  once #64's encode-side check lands.
 
 ## [8.2.0] - 2026-08-27
 
@@ -670,7 +729,9 @@ To emit dossier events:
 ```python
 from spec_kitty_events import (
     MissionDossierArtifactIndexedPayload,
-    LocalNamespaceTuple, ArtifactIdentity, ContentHashRef,
+    LocalNamespaceTuple,
+    ArtifactIdentity,
+    ContentHashRef,
     MISSION_DOSSIER_ARTIFACT_INDEXED,
 )
 ```
@@ -682,6 +743,7 @@ To reduce a dossier event stream:
 
 ```python
 from spec_kitty_events import reduce_mission_dossier, NamespaceMixedStreamError
+
 try:
     state = reduce_mission_dossier(events)
 except NamespaceMixedStreamError:
@@ -874,6 +936,7 @@ partition by namespace before calling `reduce_mission_dossier()`.
        PLANNED = "planned"
        DOING = "doing"
        ...
+
 
    # After:
    from spec_kitty_events import SyncLaneV1

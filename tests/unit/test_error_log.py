@@ -1,4 +1,5 @@
 """Unit tests for ErrorLog class."""
+
 import pytest
 from datetime import datetime
 from spec_kitty_events.error_log import ErrorLog
@@ -17,7 +18,7 @@ class TestErrorLog:
         entry = ErrorEntry(
             timestamp=datetime.now(),
             action_attempted="Run pytest",
-            error_message="AssertionError: test failed"
+            error_message="AssertionError: test failed",
         )
         error_log.log_error(entry)
 
@@ -33,17 +34,17 @@ class TestErrorLog:
         e1 = ErrorEntry(
             timestamp=datetime(2026, 1, 26, 10, 0, 0),
             action_attempted="Action 1",
-            error_message="Error 1"
+            error_message="Error 1",
         )
         e2 = ErrorEntry(
             timestamp=datetime(2026, 1, 26, 11, 0, 0),
             action_attempted="Action 2",
-            error_message="Error 2"
+            error_message="Error 2",
         )
         e3 = ErrorEntry(
             timestamp=datetime(2026, 1, 26, 12, 0, 0),
             action_attempted="Action 3",
-            error_message="Error 3"
+            error_message="Error 3",
         )
 
         error_log.log_error(e1)
@@ -63,11 +64,11 @@ class TestErrorLog:
         error_log = ErrorLog(storage)
 
         for i in range(10):
-            error_log.log_error(ErrorEntry(
-                timestamp=datetime.now(),
-                action_attempted=f"Action {i}",
-                error_message="Error"
-            ))
+            error_log.log_error(
+                ErrorEntry(
+                    timestamp=datetime.now(), action_attempted=f"Action {i}", error_message="Error"
+                )
+            )
 
         errors = error_log.get_recent_errors(limit=3)
         assert len(errors) == 3
@@ -94,9 +95,7 @@ class TestErrorLog:
         error_log = ErrorLog(storage)
 
         entry = ErrorEntry(
-            timestamp=datetime.now(),
-            action_attempted="Action",
-            error_message="Error"
+            timestamp=datetime.now(), action_attempted="Action", error_message="Error"
         )
         error_log.log_error(entry)
 

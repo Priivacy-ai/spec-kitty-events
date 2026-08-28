@@ -15,6 +15,7 @@
        load_fixtures,
    )
 
+
    def test_consumer_preserves_producer_occurrence_time():
        # Load a committed "old producer, recent receipt" fixture.
        fixture = load_fixtures(kind="timestamp_semantics").get_valid("old_producer_recent_receipt")

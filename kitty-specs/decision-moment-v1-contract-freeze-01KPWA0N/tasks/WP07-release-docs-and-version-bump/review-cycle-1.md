@@ -17,7 +17,9 @@ WP07's own deliverables (version bump, re-exports, CHANGELOG, COMPATIBILITY, tes
 **What to fix:** In `src/spec_kitty_events/decisionpoint.py`, inside the `elif isinstance(payload, DecisionPointResolvedInterviewPayload):` branch (currently around line 898), add after the `last_state_entered_at` line:
 
 ```python
-last_rationale = payload.rationale  # may be None for terminal=resolved; required for deferred/canceled
+last_rationale = (
+    payload.rationale
+)  # may be None for terminal=resolved; required for deferred/canceled
 ```
 
 This is exactly what lane-f (WP06) has at line 906. Verify with:

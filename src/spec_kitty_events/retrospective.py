@@ -7,6 +7,7 @@ The original 4.0.0 public surface exposed two UpperCamelCase terminal
 signals. The 4.1.0 surface keeps those symbols for compatibility and adds
 the dot-name lifecycle/proposal events emitted by the Spec Kitty runtime.
 """
+
 from __future__ import annotations
 
 import re
@@ -35,21 +36,28 @@ RETROSPECTIVE_PROPOSAL_GENERATED_EVENT: str = "retrospective.proposal.generated"
 RETROSPECTIVE_PROPOSAL_APPLIED_EVENT: str = "retrospective.proposal.applied"
 RETROSPECTIVE_PROPOSAL_REJECTED_EVENT: str = "retrospective.proposal.rejected"
 
-RETROSPECTIVE_EVENT_NAMES: FrozenSet[str] = frozenset({
-    RETROSPECTIVE_REQUESTED_EVENT,
-    RETROSPECTIVE_STARTED_EVENT,
-    RETROSPECTIVE_COMPLETED_EVENT,
-    RETROSPECTIVE_SKIPPED_EVENT,
-    RETROSPECTIVE_FAILED_EVENT,
-    RETROSPECTIVE_PROPOSAL_GENERATED_EVENT,
-    RETROSPECTIVE_PROPOSAL_APPLIED_EVENT,
-    RETROSPECTIVE_PROPOSAL_REJECTED_EVENT,
-})
+RETROSPECTIVE_EVENT_NAMES: FrozenSet[str] = frozenset(
+    {
+        RETROSPECTIVE_REQUESTED_EVENT,
+        RETROSPECTIVE_STARTED_EVENT,
+        RETROSPECTIVE_COMPLETED_EVENT,
+        RETROSPECTIVE_SKIPPED_EVENT,
+        RETROSPECTIVE_FAILED_EVENT,
+        RETROSPECTIVE_PROPOSAL_GENERATED_EVENT,
+        RETROSPECTIVE_PROPOSAL_APPLIED_EVENT,
+        RETROSPECTIVE_PROPOSAL_REJECTED_EVENT,
+    }
+)
 
-RETROSPECTIVE_EVENT_TYPES: FrozenSet[str] = frozenset({
-    RETROSPECTIVE_COMPLETED,
-    RETROSPECTIVE_SKIPPED,
-}) | RETROSPECTIVE_EVENT_NAMES
+RETROSPECTIVE_EVENT_TYPES: FrozenSet[str] = (
+    frozenset(
+        {
+            RETROSPECTIVE_COMPLETED,
+            RETROSPECTIVE_SKIPPED,
+        }
+    )
+    | RETROSPECTIVE_EVENT_NAMES
+)
 
 # ── Section 3: Type Aliases ──────────────────────────────────────────────────
 
@@ -164,15 +172,11 @@ class RetrospectiveCompletedPayload(BaseModel):
 
     mission_id: str = Field(..., min_length=1, description="Mission identifier")
     actor: str = Field(..., min_length=1, description="Actor who triggered the retrospective")
-    trigger_source: TriggerSourceT = Field(
-        ..., description="What initiated the retrospective"
-    )
+    trigger_source: TriggerSourceT = Field(..., description="What initiated the retrospective")
     artifact_ref: Optional[ProvenanceRef] = Field(
         None, description="Reference to retro artifact if one was produced"
     )
-    completed_at: str = Field(
-        ..., min_length=1, description="ISO 8601 completion timestamp"
-    )
+    completed_at: str = Field(..., min_length=1, description="ISO 8601 completion timestamp")
 
     @field_validator("completed_at", mode="before")
     @classmethod
@@ -193,12 +197,8 @@ class RetrospectiveSkippedPayload(BaseModel):
     trigger_source: TriggerSourceT = Field(
         ..., description="What would have initiated the retrospective"
     )
-    skip_reason: str = Field(
-        ..., min_length=1, description="Why the retrospective was skipped"
-    )
-    skipped_at: str = Field(
-        ..., min_length=1, description="ISO 8601 skip decision timestamp"
-    )
+    skip_reason: str = Field(..., min_length=1, description="Why the retrospective was skipped")
+    skipped_at: str = Field(..., min_length=1, description="ISO 8601 skip decision timestamp")
 
     @field_validator("skipped_at", mode="before")
     @classmethod
