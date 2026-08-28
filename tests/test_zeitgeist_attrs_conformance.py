@@ -23,8 +23,11 @@ stay in-repo only.
 
 from __future__ import annotations
 
+import ast
 import importlib
+import re
 from datetime import datetime
+from pathlib import Path
 from uuid import UUID
 
 import pytest
@@ -92,6 +95,24 @@ _ERROR_CLASSES = {
 _FIXTURE_BUILD_ID = "build-zeitgeist-attrs-conformance"
 _FIXTURE_NODE_ID = "node-conformance"
 _FIXTURE_PROJECT_UUID = UUID("550e8400-e29b-41d4-a716-446655440000")
+_EVENT_ID_RE = re.compile(r"^e2e00000-0000-4000-8000-[0-9]{12}$")
+
+
+def test_local_event_ids_use_the_reserved_block() -> None:
+    """Keep test-only envelopes out of the committed fixture ID sequence."""
+    tree = ast.parse(Path(__file__).read_text(encoding="utf-8"))
+    event_ids = {
+        node.value
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Constant)
+        and isinstance(node.value, str)
+        and _EVENT_ID_RE.fullmatch(node.value)
+    }
+
+    assert event_ids, "expected at least one test-local event_id"
+    assert all(event_id.rsplit("-", 1)[-1].startswith("9") for event_id in event_ids), (
+        f"test-local event_ids must use the reserved 9xxxxxxxxxxx block: {sorted(event_ids)}"
+    )
 
 
 def _fixture_envelope(event_type: str, case: dict) -> Event:
@@ -306,7 +327,7 @@ def test_encode_rejects_an_unencodable_scalar() -> None:
         "MissionClosed",
         {
             "envelope": {
-                "event_id": "e2e00000-0000-4000-8000-000000000118",
+                "event_id": "e2e00000-0000-4000-8000-900000000001",
                 "timestamp": "2026-08-25T09:00:00+00:00",
             }
         },
@@ -342,7 +363,7 @@ def _wp_status_changed_case() -> tuple[StatusTransitionPayload, Event]:
         "WPStatusChanged",
         {
             "envelope": {
-                "event_id": "e2e00000-0000-4000-8000-000000000059",
+                "event_id": "e2e00000-0000-4000-8000-900000000002",
                 "timestamp": "2026-08-25T09:00:00+00:00",
             }
         },
