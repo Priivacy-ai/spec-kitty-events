@@ -722,18 +722,23 @@ def _reject_control_characters(subject: str, value: str) -> None:
 
 
 def _forbidden_key_hits(keys: Sequence[str]) -> list[str]:
-    """Keys forbidden either as an exact match or by their trailing dot-segment.
+    """Keys forbidden by any dot-separated segment, in any position.
 
     A one-level nested projection (``<field>.<sub>``, see :func:`_encode_fields`)
-    can carry a forbidden name under its trailing segment (e.g. ``actor.token``)
-    without the full dotted string itself ever being added to
-    :data:`FORBIDDEN_ATTR_KEYS` — the exact-match check alone would miss it
-    (EXPERIMENTAL-spec-kitty-events#21).
+    can carry a forbidden name under either segment (e.g. ``actor.token`` or
+    ``token.sub``) without the full dotted string itself ever being added to
+    :data:`FORBIDDEN_ATTR_KEYS` — an exact-match-or-trailing-segment check
+    would miss the prefix position (EXPERIMENTAL-spec-kitty-events#21,
+    widened by EXPERIMENTAL-spec-kitty-events#133). Attr-key segments
+    originate from pydantic field names, which are Python identifiers and
+    can never contain a literal ``.``, so scanning every segment carries no
+    false-positive risk: a key with no dot splits to itself, subsuming the
+    exact-match case.
     """
     return sorted(
         key
         for key in keys
-        if key in FORBIDDEN_ATTR_KEYS or key.rsplit(".", 1)[-1] in FORBIDDEN_ATTR_KEYS
+        if any(segment in FORBIDDEN_ATTR_KEYS for segment in key.split("."))
     )
 
 
