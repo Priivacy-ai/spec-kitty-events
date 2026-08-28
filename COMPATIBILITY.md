@@ -69,18 +69,19 @@ forbidden=FORBIDDEN_LEGACY_KEYS)` for the recursive legacy-key walk, an
 explicit `record.get("schema_version") == "3.0.0"` check for the envelope
 signal, `(not isinstance(aggregate_id := record.get("aggregate_id"), str)) or
 aggregate_id.split("/", 1)[0] not in strict.FORBIDDEN_LEGACY_AGGREGATE_NAMES`
-for the forbidden legacy aggregate-name prefix — the `isinstance` guard
-matters: a wire record can carry `aggregate_id: null` or another
-non-string, and `strict.py`'s own gate (`isinstance(aggregate_id, str)`)
-treats that as not-forbidden rather than raising, so a recipe that instead
-does `record.get("aggregate_id", "").split(...)` raises `AttributeError` on
-exactly that input instead of reproducing the gate — and
+for the forbidden legacy aggregate-name prefix, and
 `record.get("event_type") not in {"FeatureCreated",
 "FeatureClosed"}` for the forbidden legacy event names (see `## Forbidden
-Legacy Surfaces` below for that list's source). Unlike the other three
-checks, no package constant survives for the legacy event names — they were
-deleted outright in `8.0.0` and not re-homed — so this document is the only
-place a caller outside the strict profile can find them.
+Legacy Surfaces` below for that list's source). The `isinstance` guard on
+the aggregate-name check matters: a wire record can carry `aggregate_id:
+null` or another non-string, and `strict.py`'s own gate
+(`isinstance(aggregate_id, str)`) treats that as not-forbidden rather than
+raising, so a recipe that instead does `record.get("aggregate_id",
+"").split(...)` raises `AttributeError` on exactly that input instead of
+reproducing the gate. Unlike the other three checks, no package constant
+survives for the legacy event names — they were deleted outright in
+`8.0.0` and not re-homed — so this document is the only place a caller
+outside the strict profile can find them.
 
 Migration: pin `>=8.0.0`; delete or re-home any import of the three
 modules. There are no aliases. See `CHANGELOG.md` (`### Breaking`) for the
