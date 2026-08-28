@@ -9,6 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- `COMPATIBILITY.md`'s `8.0.0` migration recipe for callers outside
+  `strict.STRICT_EVENT_TYPES` no longer crashes on a present-but-null (or
+  otherwise non-string) `aggregate_id`. The third check used
+  `record.get("aggregate_id", "").split("/", 1)[0]`, whose default only
+  applies when the key is *absent* — a wire record carrying
+  `aggregate_id: null` still raised `AttributeError` instead of mirroring
+  `strict.py`'s own `isinstance(aggregate_id, str)` guard, which treats a
+  non-string as not-forbidden rather than raising
+  (EXPERIMENTAL-spec-kitty-events#93, MINOR from PR #84 pass 2).
 - `from_zeitgeist_attrs`'s docstring no longer claims "values are not
   reparsed here" as a blanket statement — `event_id` and `occurred_at` are
   reparsed (via `normalize_event_id` and `datetime.fromisoformat`

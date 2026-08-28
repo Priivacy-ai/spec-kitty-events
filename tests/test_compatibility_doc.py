@@ -167,7 +167,11 @@ def _admitted_by_documented_recipe(record: dict[str, Any]) -> bool:
         return False
     if record.get("schema_version") != "3.0.0":
         return False
-    if record.get("aggregate_id", "").split("/", 1)[0] in strict.FORBIDDEN_LEGACY_AGGREGATE_NAMES:
+    aggregate_id = record.get("aggregate_id")
+    if (
+        isinstance(aggregate_id, str)
+        and aggregate_id.split("/", 1)[0] in strict.FORBIDDEN_LEGACY_AGGREGATE_NAMES
+    ):
         return False
     if record.get("event_type") in _FORBIDDEN_LEGACY_EVENT_NAMES:
         return False
@@ -207,3 +211,21 @@ def test_documented_recipe_rejects_cutover_boundary_fixtures(
         f"update _admitted_by_documented_recipe (and the doc, if the doc is "
         f"wrong) to match."
     )
+
+
+@pytest.mark.parametrize("aggregate_id", [None, 42, ["feature", "123"]])
+def test_documented_recipe_does_not_raise_on_non_string_aggregate_id(
+    aggregate_id: Any,
+) -> None:
+    """A wire record with a present-but-non-string `aggregate_id` must not raise.
+
+    planning#93 / EXPERIMENTAL-spec-kitty-events#93 (MINOR from PR #84 pass 2):
+    the recipe previously used `record.get("aggregate_id", "").split(...)`,
+    whose default only applies when the key is *absent* -- a record carrying
+    `aggregate_id: null` (or any other non-string) still returns that stored
+    value, so `.split` raised `AttributeError` instead of mirroring
+    `strict.py`'s own `isinstance(aggregate_id, str)` guard, which treats a
+    non-string as not-forbidden rather than raising.
+    """
+    record = {"schema_version": "3.0.0", "aggregate_id": aggregate_id}
+    assert _admitted_by_documented_recipe(record) is True
