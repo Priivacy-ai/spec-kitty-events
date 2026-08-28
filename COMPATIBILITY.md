@@ -136,8 +136,11 @@ lifecycle/WP/project/harness allowlist) — `validate_strict_envelope()`
 rejects every other event type with `UNKNOWN_EVENT_TYPE` regardless of
 whether the envelope is otherwise well-formed. Callers whose event type is
 outside that allowlist must reproduce the removed gate's checks directly
-instead: `forbidden_keys.find_forbidden_keys(record,
-forbidden=FORBIDDEN_LEGACY_KEYS)` for the recursive legacy-key walk, an
+instead: `forbidden_keys.validate_no_forbidden_keys(record,
+forbidden=FORBIDDEN_LEGACY_KEYS) is None` for the recursive legacy-key walk
+(callers needing every error rather than just the first can use
+`list(forbidden_keys.find_forbidden_keys(record,
+forbidden=FORBIDDEN_LEGACY_KEYS))` instead), an
 explicit `record.get("schema_version") == "3.0.0"` check for the envelope
 signal, `(not isinstance(aggregate_id := record.get("aggregate_id"), str)) or
 aggregate_id.split("/", 1)[0] not in strict.FORBIDDEN_LEGACY_AGGREGATE_NAMES`
