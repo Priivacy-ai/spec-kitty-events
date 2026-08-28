@@ -2215,6 +2215,30 @@
       "min_version": "8.2.0"
     },
     {
+      "id": "wp_status_changed_mission_id_present",
+      "path": "zeitgeist_attrs/valid/wp_status_changed_mission_id_present.json",
+      "expected_result": "valid",
+      "event_type": "WPStatusChanged",
+      "notes": "mission_id present alongside mission_slug: the family's ref field stays mission_slug (REF_FIELD_BY_EVENT_TYPE is unchanged), but mission_id now rides in attrs so a consumer can join this moment against PhaseEntered for the same mission aggregate (spec-kitty-events#69).",
+      "min_version": "8.3.0"
+    },
+    {
+      "id": "mission_closed_mission_id_present",
+      "path": "zeitgeist_attrs/valid/mission_closed_mission_id_present.json",
+      "expected_result": "valid",
+      "event_type": "MissionClosed",
+      "notes": "mission_id present alongside mission_slug: the family's ref field stays mission_slug (REF_FIELD_BY_EVENT_TYPE is unchanged), but mission_id now rides in attrs so a consumer can join this moment against PhaseEntered for the same mission aggregate (spec-kitty-events#69).",
+      "min_version": "8.3.0"
+    },
+    {
+      "id": "mission_created_mission_id_present",
+      "path": "zeitgeist_attrs/valid/mission_created_mission_id_present.json",
+      "expected_result": "valid",
+      "event_type": "MissionCreated",
+      "notes": "mission_id present alongside mission_slug: the family's ref field stays mission_slug (REF_FIELD_BY_EVENT_TYPE is unchanged), but mission_id now rides in attrs so a consumer can join this moment against PhaseEntered for the same mission aggregate (spec-kitty-events#69). MissionCreatedPayload already declared mission_id before this issue; this fixture is the first to exercise it with a non-null value.",
+      "min_version": "8.3.0"
+    },
+    {
       "id": "decision_point_opened_value_over_bound",
       "path": "zeitgeist_attrs/invalid/decision_point_opened_value_over_bound.json",
       "expected_result": "invalid",

@@ -53,6 +53,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   bullet moves under a dated release heading, in past tense, once #104
   lands.
 
+## [8.3.0] - 2026-08-28
+
+### Added
+
+- `StatusTransitionPayload` (`WPStatusChanged`) and `MissionClosedPayload`
+  (`MissionClosed`) now declare an optional `mission_id` field (default
+  `None`), matching the field `MissionCreatedPayload` already carried. When
+  a producer populates it, `mission_id` rides alongside `mission_slug` in
+  the `to_zeitgeist_attrs` projection for all three families, so a consumer
+  can join one of their moments against a `PhaseEntered` moment (whose
+  frame ref is `mission_id`) for the same mission aggregate.
+  `REF_FIELD_BY_EVENT_TYPE` is unchanged: `PhaseEntered` keeps `mission_id`
+  as its ref and the other three keep `mission_slug` as theirs — only the
+  attrs widen. Purely additive and wire-compatible; omitted `mission_id`
+  is absent from attrs exactly as before
+  (EXPERIMENTAL-spec-kitty-events#69, resolving
+  EXPERIMENTAL-spec-kitty-planning#1012).
+
 ## [8.2.1] - 2026-08-27
 
 ### Changed

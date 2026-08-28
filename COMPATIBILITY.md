@@ -1,6 +1,6 @@
 # Compatibility Guide
 
-**Current package version**: `8.2.1`
+**Current package version**: `8.3.0`
 
 The on-wire envelope schema version is `3.0.0` and has been unchanged since
 the cutover. The package version and the envelope schema version move
@@ -19,6 +19,31 @@ This document is the public compatibility policy for consumers of:
 - `spec-kitty-events`
 - `spec-kitty-saas`
 - `spec-kitty`
+
+## `8.3.0` — `mission_id` widened onto `WPStatusChanged`/`MissionCreated`/`MissionClosed` for cross-family join
+
+`8.3.0` is **additive and wire-compatible**. `PhaseEnteredPayload` has always
+used `mission_id` (required) as its `REF_FIELD_BY_EVENT_TYPE` frame ref,
+while the other three mission-scoped volatile families —
+`WPStatusChangedPayload` (`StatusTransitionPayload`), `MissionCreatedPayload`,
+and `MissionClosedPayload` — use `mission_slug` as their ref and, until this
+release, did not carry `mission_id` in their broadcast attrs at all. A
+consumer therefore had no shared key to join a `WPStatusChanged`,
+`MissionCreated`, or `MissionClosed` moment against a `PhaseEntered` moment
+for the same mission aggregate.
+
+This release adds an optional `mission_id` field (default `None`) to
+`StatusTransitionPayload` and `MissionClosedPayload` (`MissionCreatedPayload`
+already declared the field); when a producer populates it, `mission_id`
+rides alongside `mission_slug` in the encoded `to_zeitgeist_attrs` projection
+for all three families. Per
+[`EXPERIMENTAL-spec-kitty-planning`#1012](https://github.com/spec-kitty/EXPERIMENTAL-spec-kitty-planning/issues/1012),
+this is Option 2: `REF_FIELD_BY_EVENT_TYPE` itself is unchanged —
+`PhaseEntered`'s ref stays `mission_id` and the other three keep
+`mission_slug` as their ref — only the attrs widen. Producers that do not
+populate `mission_id` are unaffected: the field is optional and omitted from
+attrs when absent, so pre-`8.3.0` consumers continue to decode these three
+families unmodified (EXPERIMENTAL-spec-kitty-events#69).
 
 ## Known gap (not yet closed) — `to_zeitgeist_attrs` does not yet reject control characters on encode
 

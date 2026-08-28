@@ -855,7 +855,11 @@ def to_zeitgeist_attrs(payload: BaseModel, envelope: Event) -> dict[str, str]:
 #: ``mission_slug`` (optional display/back-compat; see the field's own
 #: description) — that field alone can be absent on an otherwise-valid
 #: payload, which would otherwise make identity loss the normal producer
-#: outcome rather than an edge case.
+#: outcome rather than an edge case. ``WPStatusChanged``/``MissionCreated``/
+#: ``MissionClosed`` keep ``mission_slug`` as their *ref* here, but each also
+#: carries an optional ``mission_id`` attr (not the ref) so a consumer can
+#: still join one of their moments against a ``PhaseEntered`` moment for the
+#: same mission aggregate (spec-kitty-events#69).
 REF_FIELD_BY_EVENT_TYPE: Mapping[str, str] = {
     WP_STATUS_CHANGED: "mission_slug",
     MISSION_CREATED: "mission_slug",
