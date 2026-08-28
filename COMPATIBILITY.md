@@ -7,8 +7,11 @@ the cutover. The package version and the envelope schema version move
 independently — see
 [`contracts/versioning-and-compatibility.md`](contracts/versioning-and-compatibility.md).
 
-`spec-kitty-events` is a fail-closed contract package. Sections below are
-ordered newest-first by the release that introduced them.
+`spec-kitty-events` is a fail-closed contract package. Released sections
+below are ordered newest-first by the release that introduced them. An
+unreleased `## Known gap (not yet closed)` section documents a gap no
+release has closed yet; it carries no version number and precedes every
+released section, regardless of when the gap it describes will close.
 
 > The single declaration above is the only place this document states the
 > package version; `tests/test_compatibility_doc.py` pins it to
