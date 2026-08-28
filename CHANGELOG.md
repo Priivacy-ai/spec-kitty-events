@@ -53,23 +53,64 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   bullet moves under a dated release heading, in past tense, once #104
   lands.
 
-## [8.3.0] - 2026-08-28
+## [9.0.0] - 2026-08-28
+
+### Breaking
+
+- **`StatusTransitionPayload` (`WPStatusChanged`) and `MissionClosedPayload`
+  (`MissionClosed`) now accept a `mission_id` key in their `zeitgeist_attrs`
+  projection that every `<9.0.0` decode of these two families rejected as
+  unknown.** `from_zeitgeist_attrs`'s closed key vocabulary for a kind is
+  derived from its payload model's fields (`_schema_keys_for_model`); before
+  this release neither model declared `mission_id`, so a `<9.0.0` consumer's
+  decode of an attrs frame carrying that key raised
+  `ZeitgeistAttrsError("attrs carry keys outside the ... schema")` instead of
+  decoding it. This is exactly the "previously-rejected envelope now
+  accepted" case `contracts/versioning-and-compatibility.md` classifies as
+  major, regardless of the change being additive at the Pydantic-model
+  level — the accept/reject *boundary* moved, and consumers pinned to the
+  previous major fail closed on the new key the moment a producer emits it.
+  `MissionCreatedPayload` is unaffected by this classification: it already
+  declared `mission_id` before this release (prior, unrelated work), so its
+  decode boundary already admitted the key — this bump only widens
+  `StatusTransitionPayload`/`MissionClosedPayload`.
+  `REF_FIELD_BY_EVENT_TYPE` itself is unchanged — `PhaseEntered` keeps
+  `mission_id` as its ref and the other three keep `mission_slug` as
+  theirs; only the attrs vocabulary widens
+  (EXPERIMENTAL-spec-kitty-events#69, resolving
+  EXPERIMENTAL-spec-kitty-planning#1012, squad MAJOR on PR #196).
 
 ### Added
 
 - `StatusTransitionPayload` (`WPStatusChanged`) and `MissionClosedPayload`
   (`MissionClosed`) now declare an optional `mission_id` field (default
-  `None`), matching the field `MissionCreatedPayload` already carried. When
-  a producer populates it, `mission_id` rides alongside `mission_slug` in
-  the `to_zeitgeist_attrs` projection for all three families, so a consumer
-  can join one of their moments against a `PhaseEntered` moment (whose
-  frame ref is `mission_id`) for the same mission aggregate.
-  `REF_FIELD_BY_EVENT_TYPE` is unchanged: `PhaseEntered` keeps `mission_id`
-  as its ref and the other three keep `mission_slug` as theirs — only the
-  attrs widen. Purely additive and wire-compatible; omitted `mission_id`
-  is absent from attrs exactly as before
-  (EXPERIMENTAL-spec-kitty-events#69, resolving
-  EXPERIMENTAL-spec-kitty-planning#1012).
+  `None`). When a producer populates it, `mission_id` rides alongside
+  `mission_slug` in the `to_zeitgeist_attrs` projection for all three
+  mission-scoped families, so a consumer can join one of their moments
+  against a `PhaseEntered` moment (whose frame ref is `mission_id`) for the
+  same mission aggregate.
+- `tests/unit/test_zeitgeist_attrs.py::test_head_encode_rejected_by_previous_major_decode_boundary`
+  pins the breaking boundary directly: it encodes `mission_id` onto both
+  families with this release's models, then decodes the identical attrs
+  against a reconstructed `<9.0.0` closed key set and asserts the decode
+  raises — a durable regression guard against re-additivizing this change.
+
+### Required consumer action
+
+Producers (`spec-kitty`, `spec-kitty-saas`) MUST capability-gate rollout of
+populating `mission_id` on `WPStatusChanged`/`MissionClosed` exactly like the
+`6.0.0` `genesis`-lane precedent: do not populate the field for a broadcast
+until every consumer that will read it has upgraded its
+`spec-kitty-events` pin to `>=9.0.0`. A producer that populates `mission_id`
+while any live consumer is still pinned `<9.0.0` causes that consumer's
+`from_zeitgeist_attrs` to raise on decode, silently dropping the moment
+(mirrors `contracts/lane-vocabulary.md`'s "Consumers cannot be assumed to be
+typed" rollout risk). Bump the `spec-kitty-events` constraint to `>=9.0.0`
+before relying on the new key; omitting `mission_id` remains fully
+compatible with every prior major.
+
+Per `PROGRAM.md` §2: bump the pinned rev/version in every consumer that adopts
+`9.0.0` and name each one in that PR's Blast radius section.
 
 ## [8.2.1] - 2026-08-27
 

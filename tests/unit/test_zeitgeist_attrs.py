@@ -735,6 +735,61 @@ def test_mission_id_absent_from_attrs_when_not_supplied() -> None:
     assert "mission_id" not in mission_closed_attrs
 
 
+def test_head_encode_rejected_by_previous_major_decode_boundary(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Pins the breaking boundary behind the 9.0.0 bump (squad MAJOR on PR
+    #196, spec-kitty-events#69): before this release, `mission_id` was
+    outside `WPStatusChanged`/`MissionClosed`'s closed attrs vocabulary, so
+    a <9.0.0 `from_zeitgeist_attrs` rejected it as an unknown key. A head
+    producer that populates `mission_id` on these two families therefore
+    breaks any consumer still pinned to the previous major.
+
+    Reconstruct that previous-major decode boundary by removing
+    `mission_id` from the current, schema-derived allowed-key sets (the
+    same technique `test_decode_rejects_a_key_over_the_64_char_bound` uses)
+    and confirm the exact attrs a head `to_zeitgeist_attrs` call produces —
+    with `mission_id` populated — are rejected against it. This is the
+    durable regression guard: it fails if `mission_id` is ever silently
+    re-additivized off this boundary without a fresh major bump.
+    """
+    shared_mission_id = "mission-demo"
+
+    wp_attrs = to_zeitgeist_attrs(
+        _transition(mission_id=shared_mission_id), _envelope("WPStatusChanged")
+    )
+    assert wp_attrs["mission_id"] == shared_mission_id
+
+    mission_closed_attrs = to_zeitgeist_attrs(
+        MissionClosedPayload(
+            mission_id=shared_mission_id,
+            mission_slug="demo-mission",
+            mission_number=12,
+            mission_type="software-dev",
+        ),
+        _envelope("MissionClosed"),
+    )
+    assert mission_closed_attrs["mission_id"] == shared_mission_id
+
+    monkeypatch.setattr(
+        zeitgeist_attrs,
+        "_ALLOWED_KEYS_BY_EVENT_TYPE",
+        dict(zeitgeist_attrs._ALLOWED_KEYS_BY_EVENT_TYPE),
+    )
+    for event_type in ("WPStatusChanged", "MissionClosed"):
+        monkeypatch.setitem(
+            zeitgeist_attrs._ALLOWED_KEYS_BY_EVENT_TYPE,
+            event_type,
+            zeitgeist_attrs._ALLOWED_KEYS_BY_EVENT_TYPE[event_type] - {"mission_id"},
+        )
+
+    with pytest.raises(ZeitgeistAttrsError, match="mission_id"):
+        from_zeitgeist_attrs("WPStatusChanged", wp_attrs)
+
+    with pytest.raises(ZeitgeistAttrsError, match="mission_id"):
+        from_zeitgeist_attrs("MissionClosed", mission_closed_attrs)
+
+
 def test_ref_over_bound_raises_rather_than_emitting_unbounded() -> None:
     """The module documents the frame ref as carrying the same ≤240-byte
     bound as an attrs entry independently of attrs; zeitgeist_ref_for must
