@@ -69,6 +69,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `8.2.0` keeps its single adopted meaning at `c93dbfbf`; every tree from
   `b67b7e0` onward is `8.2.1` (EXPERIMENTAL-spec-kitty-events#170).
 
+### Known issues
+
+- **Not yet closed**: `to_zeitgeist_attrs` does not reject a value
+  carrying a non-printable character (`not str.isprintable()`) on encode,
+  even though `from_zeitgeist_attrs` already rejects one on decode
+  (EXPERIMENTAL-spec-kitty-events#64). Until this closes, a producer whose
+  `actor`/`review_ref`/id field carries a stray control character can
+  broadcast successfully while a consumer's decode raises, silently
+  dropping the moment. This bullet moves to `### Fixed`, in past tense,
+  once #64's encode-side check lands.
+
 ## [8.2.0] - 2026-08-27
 
 ### Added
