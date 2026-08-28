@@ -15,4 +15,8 @@ the next free id, and update this file in the same PR:
 grep -rho --include='*.json' 'e2e00000-0000-4000-8000-[0-9]\{12\}' . | sort -u | tail -1
 ```
 
+Test-local synthetic envelopes must use the reserved
+`e2e00000-0000-4000-8000-9000000000NN` block, never this fixture-allocation
+sequence. That keeps the JSON-only grep authoritative by construction.
+
 **Next free id: `e2e00000-0000-4000-8000-000000000118`**

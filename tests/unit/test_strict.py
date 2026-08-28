@@ -463,6 +463,26 @@ def test_t5_timestamp_with_offset_accepted() -> None:
     assert validate_strict_envelope(envelope) == ()
 
 
+def test_t5b_timestamp_doubled_trailing_z_rejected() -> None:
+    """A doubled trailing "Z" must be rejected on every interpreter version.
+
+    Stripping only the final "Z" and appending "+00:00" would otherwise turn
+    this into "...00Z+00:00", which Python 3.10's laxer ``fromisoformat``
+    accepts even though it is not a valid ISO-8601 timestamp
+    (spec-kitty-events#55/#107/#115).
+    """
+    envelope = _mission_started_envelope(timestamp="2026-01-01T00:00:00ZZ")
+    errors = validate_strict_envelope(envelope)
+    unparsable = [
+        e
+        for e in errors
+        if e.code == ValidationErrorCode.ENVELOPE_SHAPE_INVALID
+        and e.path == ["timestamp"]
+        and e.details.get("reason") == "unparsable"
+    ]
+    assert len(unparsable) == 1
+
+
 def test_t6_observation_payload_carries_ts_field_rejected() -> None:
     envelope = _presence_envelope()
     envelope["payload"]["ts"] = 1767225600

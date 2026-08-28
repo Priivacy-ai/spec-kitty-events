@@ -609,6 +609,27 @@ class TestAnnotationFolding:
         assert state.work_packages["WP01"]["force_count"] == 1
 
 
+class TestAnnotationSameTimestampTiebreak:
+    def test_distinct_same_at_annotations_are_order_independent(self) -> None:
+        """Two distinct annotations for one WP sharing `at` still fold deterministically.
+
+        The annotation-pass sort key is ``(at, event_id)``, not ``at`` alone:
+        without the ``event_id`` tiebreak, a stable sort would apply same-``at``
+        annotations in *list* order, so the fold would depend on the order rows
+        happen to appear in ``status.events.jsonl`` rather than on the events
+        themselves (#2684 determinism).
+        """
+        first = _annotation(_ulid(1), delta={"role": "implementer"})
+        second = _annotation(_ulid(2), delta={"role": "reviewer"})
+        assert first["at"] == second["at"]  # concurrent: the tiebreak is what matters
+
+        forward = reduce([first, second])
+        reversed_order = reduce([second, first])
+
+        assert forward.to_dict() == reversed_order.to_dict()
+        assert forward.work_packages["WP01"]["role"] == "reviewer"
+
+
 # ── Mission slug safety ────────────────────────────────────────────────────────
 
 

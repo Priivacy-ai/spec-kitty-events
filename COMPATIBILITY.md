@@ -1,14 +1,17 @@
 # Compatibility Guide
 
-**Current package version**: `8.2.0`
+**Current package version**: `9.0.0`
 
 The on-wire envelope schema version is `3.0.0` and has been unchanged since
 the cutover. The package version and the envelope schema version move
 independently — see
 [`contracts/versioning-and-compatibility.md`](contracts/versioning-and-compatibility.md).
 
-`spec-kitty-events` is a fail-closed contract package. Sections below are
-ordered newest-first by the release that introduced them.
+`spec-kitty-events` is a fail-closed contract package. Released sections
+below are ordered newest-first by the release that introduced them. An
+unreleased `## Known gap (not yet closed)` section documents a gap no
+release has closed yet; it carries no version number and precedes every
+released section, regardless of when the gap it describes will close.
 
 > The single declaration above is the only place this document states the
 > package version; `tests/test_compatibility_doc.py` pins it to
@@ -19,6 +22,90 @@ This document is the public compatibility policy for consumers of:
 - `spec-kitty-events`
 - `spec-kitty-saas`
 - `spec-kitty`
+
+## `9.0.0` — `mission_id` widened onto `WPStatusChanged`/`MissionCreated`/`MissionClosed` for cross-family join (breaking)
+
+`9.0.0` is a **breaking accept/decode-boundary change**, not additive,
+despite the Pydantic-model diff itself being a new optional field.
+`PhaseEnteredPayload` has always used `mission_id` (required) as its
+`REF_FIELD_BY_EVENT_TYPE` frame ref, while the other three mission-scoped
+volatile families — `WPStatusChangedPayload` (`StatusTransitionPayload`),
+`MissionCreatedPayload`, and `MissionClosedPayload` — use `mission_slug` as
+their ref. Until this release, `StatusTransitionPayload` and
+`MissionClosedPayload` did not declare `mission_id` at all, so
+`from_zeitgeist_attrs`'s closed, schema-derived key vocabulary
+(`_schema_keys_for_model`) never admitted it for either family: an attrs
+frame carrying `mission_id` for a `WPStatusChanged` or `MissionClosed`
+moment raised `ZeitgeistAttrsError` on decode. A consumer therefore had no
+shared key to join one of their moments against a `PhaseEntered` moment for
+the same mission aggregate — and, symmetrically, no way to receive one
+without it being rejected.
+
+This release adds an optional `mission_id` field (default `None`) to
+`StatusTransitionPayload` and `MissionClosedPayload`; when a producer
+populates it, `mission_id` rides alongside `mission_slug` in the encoded
+`to_zeitgeist_attrs` projection for all three families. Per
+[`EXPERIMENTAL-spec-kitty-planning`#1012](https://github.com/spec-kitty/EXPERIMENTAL-spec-kitty-planning/issues/1012),
+this is Option 2: `REF_FIELD_BY_EVENT_TYPE` itself is unchanged —
+`PhaseEntered`'s ref stays `mission_id` and the other three keep
+`mission_slug` as their ref — only the attrs widen.
+
+**Why this is major, not minor.** Per
+[`contracts/versioning-and-compatibility.md`](contracts/versioning-and-compatibility.md),
+"any change to an existing event contract that makes a previously-rejected
+envelope accepted" is major. A producer that starts populating `mission_id`
+on `WPStatusChanged`/`MissionClosed` moves those two families' encoded
+attrs from a shape every `<9.0.0` decode rejected to one every `>=9.0.0`
+decode accepts — the accept/reject boundary moved, which is exactly the
+"new capability that widens an existing family's contract" case the
+`6.1.0` new-event-type precedent does *not* cover (a whole new event type
+is additive because no existing contract's boundary moves; this is the
+opposite: an existing family's own boundary moves). `MissionCreatedPayload`
+is excluded from this classification — it already declared `mission_id`
+before this release (prior, unrelated work), so its decode boundary
+already admitted the key and this bump changes nothing about its
+compatibility story.
+
+**Producers that omit `mission_id` are unaffected**: the field stays
+optional and is omitted from attrs when absent, so a producer that never
+populates it is wire-compatible with every `<9.0.0` consumer, exactly as
+before. The breaking surface is scoped entirely to producers that *do*
+populate the field.
+
+**Required migration.**
+
+- Consumers (`spec-kitty-saas`, `spec-kitty`, any other reader of
+  `WPStatusChanged`/`MissionClosed` zeitgeist attrs) must bump their
+  `spec-kitty-events` pin to `>=9.0.0` before a producer in their path
+  starts populating `mission_id` on these two families.
+- Producers MUST capability-gate the rollout exactly like the `6.0.0`
+  `genesis`-lane precedent (see
+  [`contracts/lane-vocabulary.md`](contracts/lane-vocabulary.md)'s
+  "Versioning" section): do not populate `mission_id` on
+  `WPStatusChanged`/`MissionClosed` for a given broadcast until every
+  consumer that will read it is known to be on `>=9.0.0`. Populating it
+  while any live consumer is still pinned `<9.0.0` causes that consumer's
+  `from_zeitgeist_attrs` call to raise on decode, silently dropping the
+  moment.
+- `EXPERIMENTAL-spec-kitty-events#69` closes with this artifact set;
+  `EXPERIMENTAL-spec-kitty-events#197`/`#198` track the two MINOR
+  documentation/conformance-coverage follow-ups the squad also filed
+  against the originating PR.
+
+## Known gap (not yet closed) — `to_zeitgeist_attrs` does not yet reject control characters on encode
+
+`from_zeitgeist_attrs` rejects an attrs value carrying a non-printable
+character on decode (`str.isprintable()`, EXPERIMENTAL-spec-kitty-events#25,
+then widened by #63), but `to_zeitgeist_attrs` does not yet run the same
+check on encode (EXPERIMENTAL-spec-kitty-events#64): a producer can
+successfully encode and broadcast an attrs value carrying a control
+character that a consumer's decode will then reject, silently dropping the
+moment. The fix — both directions sharing one predicate and raising the
+same typed `ZeitgeistAttrsControlCharacterError` — is open as
+EXPERIMENTAL-spec-kitty-events#104 and not yet merged to `main`. This
+section is written ahead of that merge so the documentation gap doesn't
+reopen once it lands; it becomes a normal dated-version entry, and this
+"known gap" framing goes away, when #104 merges.
 
 ## `8.0.0` — Sync, legacy-envelope, and cutover surfaces deleted
 
@@ -49,12 +136,21 @@ lifecycle/WP/project/harness allowlist) — `validate_strict_envelope()`
 rejects every other event type with `UNKNOWN_EVENT_TYPE` regardless of
 whether the envelope is otherwise well-formed. Callers whose event type is
 outside that allowlist must reproduce the removed gate's checks directly
-instead: `forbidden_keys.find_forbidden_keys(record,
-forbidden=FORBIDDEN_LEGACY_KEYS)` for the recursive legacy-key walk, an
+instead: `forbidden_keys.validate_no_forbidden_keys(record,
+forbidden=FORBIDDEN_LEGACY_KEYS) is None` for the recursive legacy-key walk
+(callers needing every error rather than just the first can use
+`list(forbidden_keys.find_forbidden_keys(record,
+forbidden=FORBIDDEN_LEGACY_KEYS))` instead), an
 explicit `record.get("schema_version") == "3.0.0"` check for the envelope
-signal, `record.get("aggregate_id", "").split("/", 1)[0] not in
-strict.FORBIDDEN_LEGACY_AGGREGATE_NAMES` for the forbidden legacy
-aggregate-name prefix, and `record.get("event_type") not in {"FeatureCreated",
+signal, `(not isinstance(aggregate_id := record.get("aggregate_id"), str)) or
+aggregate_id.split("/", 1)[0] not in strict.FORBIDDEN_LEGACY_AGGREGATE_NAMES`
+for the forbidden legacy aggregate-name prefix — the `isinstance` guard
+matters: a wire record can carry `aggregate_id: null` or another
+non-string, and `strict.py`'s own gate (`isinstance(aggregate_id, str)`)
+treats that as not-forbidden rather than raising, so a recipe that instead
+does `record.get("aggregate_id", "").split(...)` raises `AttributeError` on
+exactly that input instead of reproducing the gate — and
+`record.get("event_type") not in {"FeatureCreated",
 "FeatureClosed"}` for the forbidden legacy event names (see `## Forbidden
 Legacy Surfaces` below for that list's source). Unlike the other three
 checks, no package constant survives for the legacy event names — they were

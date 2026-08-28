@@ -10,16 +10,29 @@ bytes: ``to`` projects the payload onto the exact golden attrs, and ``from``
 validates those same attrs back into a :class:`VolatileMoment`. Each
 *invalid* fixture pins one rejection with its exception class named in the
 fixture document (``direction`` says which side of the codec it exercises).
+
+The same fixture-driven both-directions/rejections runs are also packaged
+in ``spec_kitty_events.conformance.test_zeitgeist_attrs_codec`` (collected
+by ``pytest --pyargs spec_kitty_events.conformance``), so downstream
+consumers exercise these fixtures too, not only this in-repo suite
+(spec-kitty-events#145). This module additionally covers unit-style
+regressions (monkeypatched forbidden-key ingest, an unencodable scalar
+forced past the frozen model) that have no fixture representation and so
+stay in-repo only.
 """
 
 from __future__ import annotations
 
+import ast
 import importlib
+import re
 from datetime import datetime
+from pathlib import Path
 from uuid import UUID
 
 import pytest
 
+from spec_kitty_events import zeitgeist_attrs as zeitgeist_attrs_module
 from spec_kitty_events.conformance import validate_event
 from spec_kitty_events.conformance.loader import FixtureCase, load_fixtures
 from spec_kitty_events.decisionpoint import (
@@ -30,13 +43,16 @@ from spec_kitty_events.decisionpoint import (
 )
 from spec_kitty_events.lifecycle import MissionClosedPayload, MissionStartedPayload
 from spec_kitty_events.models import Event
+from spec_kitty_events.status import StatusTransitionPayload
 from spec_kitty_events.zeitgeist_attrs import (
     PAYLOAD_MODEL_BY_EVENT_TYPE,
+    ZEITGEIST_ATTR_KEY_MAX_CHARS,
     UnencodableFieldValueError,
     UnknownVolatileEventTypeError,
     VolatileMoment,
     ZeitgeistAttrsError,
     ZeitgeistAttrsForbiddenKeyError,
+    ZeitgeistAttrsOverflowError,
     _ALLOWED_KEYS_BY_EVENT_TYPE,
     from_zeitgeist_attrs,
     to_zeitgeist_attrs,
@@ -79,6 +95,24 @@ _ERROR_CLASSES = {
 _FIXTURE_BUILD_ID = "build-zeitgeist-attrs-conformance"
 _FIXTURE_NODE_ID = "node-conformance"
 _FIXTURE_PROJECT_UUID = UUID("550e8400-e29b-41d4-a716-446655440000")
+_EVENT_ID_RE = re.compile(r"^e2e00000-0000-4000-8000-[0-9]{12}$")
+
+
+def test_local_event_ids_use_the_reserved_block() -> None:
+    """Keep test-only envelopes out of the committed fixture ID sequence."""
+    tree = ast.parse(Path(__file__).read_text(encoding="utf-8"))
+    event_ids = {
+        node.value
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Constant)
+        and isinstance(node.value, str)
+        and _EVENT_ID_RE.fullmatch(node.value)
+    }
+
+    assert event_ids, "expected at least one test-local event_id"
+    assert all(event_id.rsplit("-", 1)[-1].startswith("9") for event_id in event_ids), (
+        f"test-local event_ids must use the reserved 9xxxxxxxxxxx block: {sorted(event_ids)}"
+    )
 
 
 def _fixture_envelope(event_type: str, case: dict) -> Event:
@@ -103,9 +137,9 @@ def zeitgeist_attrs_fixtures():
 
 
 def test_fixtures_loaded(zeitgeist_attrs_fixtures) -> None:
-    """28 valid + 8 invalid fixtures are on disk and manifest-registered."""
-    assert len(zeitgeist_attrs_fixtures) == 36
-    assert len([f for f in zeitgeist_attrs_fixtures if f.expected_valid]) == 28
+    """31 valid + 8 invalid fixtures are on disk and manifest-registered."""
+    assert len(zeitgeist_attrs_fixtures) == 39
+    assert len([f for f in zeitgeist_attrs_fixtures if f.expected_valid]) == 31
     assert len([f for f in zeitgeist_attrs_fixtures if not f.expected_valid]) == 8
 
 
@@ -293,10 +327,77 @@ def test_encode_rejects_an_unencodable_scalar() -> None:
         "MissionClosed",
         {
             "envelope": {
-                "event_id": "e2e00000-0000-4000-8000-000000000118",
+                "event_id": "e2e00000-0000-4000-8000-900000000001",
                 "timestamp": "2026-08-25T09:00:00+00:00",
             }
         },
     )
     with pytest.raises(UnencodableFieldValueError):
+        to_zeitgeist_attrs(payload, envelope)
+
+
+# ── the 64-char key bound (spec-kitty-events#59) ────────────────────────────
+#
+# No field name in today's volatile vocabulary reaches 64 characters (the
+# longest, DecisionPointOpenedAdrPayload.mission_owner_authority_flag, is 28
+# — checked across every PAYLOAD_MODEL_BY_EVENT_TYPE entry), so neither side
+# of ZEITGEIST_ATTR_KEY_MAX_CHARS can be expressed as a committed fixture
+# file: a fixture varies attr *values*, never the Python identifiers that
+# become attr *keys*. The two tests below close the coverage gap #59 raised
+# — this conformance-adjacent suite pinning both sides of the bound, not
+# only the deeper tests/unit/test_zeitgeist_attrs.py — by splicing a
+# boundary-length key onto a real WPStatusChanged encode, the same
+# ``_encode_fields`` override technique the unit suite already uses for the
+# over-bound case.
+
+
+def _wp_status_changed_case() -> tuple[StatusTransitionPayload, Event]:
+    payload = StatusTransitionPayload(
+        mission_slug="demo-mission",
+        wp_id="WP01",
+        to_lane="doing",
+        actor="robert",
+        execution_mode="worktree",
+    )
+    envelope = _fixture_envelope(
+        "WPStatusChanged",
+        {
+            "envelope": {
+                "event_id": "e2e00000-0000-4000-8000-900000000002",
+                "timestamp": "2026-08-25T09:00:00+00:00",
+            }
+        },
+    )
+    return payload, envelope
+
+
+def test_encode_admits_a_key_at_the_64_char_bound(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A key at exactly the bound must still reach the wire."""
+    payload, envelope = _wp_status_changed_case()
+    real_encode = zeitgeist_attrs_module._encode_fields
+    key = "a" * ZEITGEIST_ATTR_KEY_MAX_CHARS
+    monkeypatch.setattr(
+        zeitgeist_attrs_module,
+        "_encode_fields",
+        lambda *a, **k: {**real_encode(*a, **k), key: "v"},
+    )
+    attrs = to_zeitgeist_attrs(payload, envelope)
+    assert attrs[key] == "v"
+
+
+def test_encode_rejects_a_key_over_the_64_char_bound(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """One character past the bound must raise instead of reaching the wire."""
+    payload, envelope = _wp_status_changed_case()
+    real_encode = zeitgeist_attrs_module._encode_fields
+    key = "a" * (ZEITGEIST_ATTR_KEY_MAX_CHARS + 1)
+    monkeypatch.setattr(
+        zeitgeist_attrs_module,
+        "_encode_fields",
+        lambda *a, **k: {**real_encode(*a, **k), key: "v"},
+    )
+    with pytest.raises(ZeitgeistAttrsOverflowError):
         to_zeitgeist_attrs(payload, envelope)

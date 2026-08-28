@@ -414,6 +414,16 @@ class StatusTransitionPayload(BaseModel):
     model_config = ConfigDict(frozen=True, extra="forbid")
 
     mission_slug: str = Field(..., min_length=1, description="Mission identifier")
+    mission_id: Optional[str] = Field(
+        None,
+        min_length=1,
+        description=(
+            "Canonical machine-facing mission identity (ULID); optional, rides "
+            "alongside mission_slug so a consumer can join this moment against "
+            "PhaseEntered (whose frame ref is mission_id) for the same mission "
+            "aggregate (spec-kitty-events#69)"
+        ),
+    )
     wp_id: str = Field(..., min_length=1, description="Work-package identifier")
     from_lane: Optional[Lane] = Field(
         None, description="Lane the WP is transitioning from (None for initial)"
