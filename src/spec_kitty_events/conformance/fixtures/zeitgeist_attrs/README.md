@@ -8,8 +8,8 @@ merged (events#73, events#147: each PR's own blast-radius run only sees its
 own fixtures, so two PRs allocating the same id in parallel both pass CI and
 only collide on `main`).
 
-Before adding a fixture, find the highest allocated id, increment it to choose
-the next free id, and update this file in the same PR:
+Before adding a fixture, find the next free id and update this file in the
+same PR:
 
 ```
 grep -rho --include='*.json' 'e2e00000-0000-4000-8000-[0-9]\{12\}' . | sort -u | tail -1

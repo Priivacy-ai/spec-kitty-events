@@ -741,9 +741,7 @@ def _forbidden_key_hits(keys: Sequence[str]) -> list[str]:
     exact-match case.
     """
     return sorted(
-        key
-        for key in keys
-        if any(segment in FORBIDDEN_ATTR_KEYS for segment in key.split("."))
+        key for key in keys if any(segment in FORBIDDEN_ATTR_KEYS for segment in key.split("."))
     )
 
 
