@@ -183,12 +183,23 @@ def test_helper_accepts_timestamp_shapes_that_split_by_python_version(
     through this test's ``_parse_iso`` — that local helper only replaces a
     trailing ``Z`` and never reshapes basic format, so it cannot itself
     parse a basic reduced-precision value on any interpreter, independent
-    of the fix under test."""
+    of the fix under test.
+
+    ``persisted`` is built from ``reshaped``, not the raw ``timestamp``
+    (controller-qa finding, 2026-08-28): this test's own ``_parse_iso``
+    only replaces a trailing ``Z``, so feeding it the raw 9-digit-fraction
+    or basic-format shapes directly would raise on Python 3.10 (the shapes
+    this test exists to prove *don't* raise there once passed through the
+    real fix) — that would make the test itself interpreter-dependent,
+    independent of whether ``_normalize_iso8601_shape`` is correct.
+    ``reshaped`` is already the one spelling ``fromisoformat`` accepts
+    identically everywhere, asserted equal to the real helper's output on
+    the line above."""
     from spec_kitty_events.conformance.timestamp_semantics import _normalize_iso8601_shape
 
     assert _normalize_iso8601_shape(timestamp) == reshaped
     envelope = {"timestamp": timestamp}
-    persisted = _parse_iso(timestamp)
+    persisted = datetime.fromisoformat(reshaped)
     assert_producer_occurrence_preserved(envelope, persisted)
 
 
@@ -228,15 +239,52 @@ def test_helper_normalizes_basic_format_reduced_precision_shapes(
 def test_helper_still_rejects_doubled_z_at_reduced_precision() -> None:
     """Guards the incidental gain the squad flagged as worth keeping (pass 2,
     2026-08-27): closing the reduced-precision gap above must not resurrect
-    acceptance of a doubled trailing ``Z`` at any precision."""
+    acceptance of a doubled trailing ``Z`` at any precision.
+    ``_normalize_iso8601_shape``'s case-folded residual guard (mirrors
+    #132's ``_normalize_occurred_at``, controller-qa finding 2026-08-28)
+    now raises directly on a doubled/mixed-case trailing designator,
+    before the reshape regex ever runs."""
     from spec_kitty_events.conformance.timestamp_semantics import _normalize_iso8601_shape
 
     for value in (
         "2026-01-01T00:00:00ZZ",
         "2026-01-01T00:00ZZ",
         "2026-01-01T00ZZ",
+        "2026-01-01T00:00:00zZ",
     ):
-        assert _normalize_iso8601_shape(value) == value
+        with pytest.raises(ValueError):
+            _normalize_iso8601_shape(value)
+
+
+@pytest.mark.parametrize(
+    "timestamp,reshaped",
+    [
+        pytest.param(
+            "2026-01-01t00:00:00Z",
+            "2026-01-01t00:00:00+00:00",
+            id="lowercase-t-separator",
+        ),
+        pytest.param(
+            "2026-01-01T00:00:00 Z",
+            "2026-01-01T00:00:00 +00:00",
+            id="space-before-z",
+        ),
+    ],
+)
+def test_helper_does_not_newly_split_shapes_the_regex_does_not_match(
+    timestamp: str, reshaped: str
+) -> None:
+    """Controller-qa finding, 2026-08-28: a shape the reshape regex
+    doesn't match (lowercase ``t`` separator, stray space before ``Z``)
+    must still go through the unconditional ``Z``-strip that runs before
+    the regex, exactly as ``main`` always did — never worse off than
+    before this PR's regex-based reshape existed."""
+    from spec_kitty_events.conformance.timestamp_semantics import _normalize_iso8601_shape
+
+    assert _normalize_iso8601_shape(timestamp) == reshaped
+    envelope = {"timestamp": timestamp}
+    persisted = datetime.fromisoformat(reshaped)
+    assert_producer_occurrence_preserved(envelope, persisted)
 
 
 def test_helper_raises_on_one_second_drift() -> None:

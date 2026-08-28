@@ -218,17 +218,51 @@ class TestRetrospectiveCompletedPayload:
         """Guards the incidental gain the squad flagged as worth keeping
         (pass 2, 2026-08-27): closing the reduced-precision gap above must
         not resurrect acceptance of a doubled trailing ``Z`` at any
-        precision."""
+        precision. ``_normalize_iso8601_shape``'s case-folded residual
+        guard (mirrors #132's ``_normalize_occurred_at``, controller-qa
+        finding 2026-08-28) now raises directly on a doubled/mixed-case
+        trailing designator, before the reshape regex ever runs."""
         from spec_kitty_events.retrospective import _normalize_iso8601_shape
 
         for value in (
             "2026-04-13T10:00:00ZZ",
             "2026-04-13T10:00ZZ",
             "2026-04-13T10ZZ",
+            "2026-04-13T10:00:00zZ",
         ):
-            assert _normalize_iso8601_shape(value) == value
+            with pytest.raises(ValueError):
+                _normalize_iso8601_shape(value)
             with pytest.raises(ValidationError):
                 _make_completed(completed_at=value)
+
+    @pytest.mark.parametrize(
+        "completed_at,reshaped",
+        [
+            pytest.param(
+                "2026-04-13t10:00:00Z",
+                "2026-04-13t10:00:00+00:00",
+                id="lowercase-t-separator",
+            ),
+            pytest.param(
+                "2026-04-13T10:00:00 Z",
+                "2026-04-13T10:00:00 +00:00",
+                id="space-before-z",
+            ),
+        ],
+    )
+    def test_completed_timestamp_does_not_newly_split_shapes_the_regex_does_not_match(
+        self, completed_at: str, reshaped: str
+    ) -> None:
+        """Controller-qa finding, 2026-08-28: a shape the reshape regex
+        doesn't match (lowercase ``t`` separator, stray space before
+        ``Z``) must still go through the unconditional ``Z``-strip that
+        runs before the regex, exactly as ``main`` always did — never
+        worse off than before this PR's regex-based reshape existed."""
+        from spec_kitty_events.retrospective import _normalize_iso8601_shape
+
+        assert _normalize_iso8601_shape(completed_at) == reshaped
+        payload = _make_completed(completed_at=completed_at)
+        assert payload.completed_at == completed_at
 
 
 # ── RetrospectiveSkippedPayload tests ─────────────────────────────────────────

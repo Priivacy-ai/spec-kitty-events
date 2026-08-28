@@ -567,19 +567,63 @@ def test_parse_iso8601_rejects_malformed_value() -> None:
 def test_parse_iso8601_still_rejects_doubled_z_at_reduced_precision() -> None:
     """Guards the incidental gain the squad flagged as worth keeping
     (pass 2, 2026-08-27): closing the reduced-precision gap above must not
-    resurrect acceptance of a doubled trailing ``Z`` — the shape regex stays
-    fully anchored, so an unmatched value (extra trailing ``Z``) still
-    reaches ``fromisoformat`` unchanged and still raises, at every
-    precision, not only at second precision."""
+    resurrect acceptance of a doubled trailing ``Z``, at every precision,
+    not only at second precision. ``_normalize_iso8601_shape``'s
+    case-folded residual guard (mirrors #132's ``_normalize_occurred_at``,
+    controller-qa finding 2026-08-28) now raises directly on a
+    doubled/mixed-case trailing designator, before the reshape regex ever
+    runs, rather than relying on the regex failing to match — a fully
+    anchored offset group that only accepts a single ``Z`` would otherwise
+    let a value like ``"...00zZ"`` fall through unchanged to
+    ``fromisoformat``, which 3.11+ accepts and 3.10 rejects."""
     from spec_kitty_events.strict import _normalize_iso8601_shape, _parse_iso8601
 
     for value in (
         "2026-01-01T00:00:00ZZ",
         "2026-01-01T00:00ZZ",
         "2026-01-01T00ZZ",
+        "2026-01-01T00:00:00zZ",
     ):
-        assert _normalize_iso8601_shape(value) == value
+        with pytest.raises(ValueError):
+            _normalize_iso8601_shape(value)
         assert _parse_iso8601(value) is None
+
+
+@pytest.mark.parametrize(
+    "value,reshaped",
+    [
+        pytest.param(
+            "2026-01-01t00:00:00Z",
+            "2026-01-01t00:00:00+00:00",
+            id="lowercase-t-separator",
+        ),
+        pytest.param(
+            "2026-01-01T00:00:00 Z",
+            "2026-01-01T00:00:00 +00:00",
+            id="space-before-z",
+        ),
+    ],
+)
+def test_parse_iso8601_does_not_newly_split_shapes_the_regex_does_not_match(
+    value: str, reshaped: str
+) -> None:
+    """Controller-qa finding, 2026-08-28: the regex-based reshape must not
+    make a shape it doesn't match *worse off* than it was on ``main``
+    before this PR's reshape existed. A lowercase ``t`` date/time separator
+    and a stray space before the ``Z`` designator both fail to match
+    ``_ISO8601_SHAPE_RE`` (whose separator group is ``[T ]`` and whose
+    offset group has no leading whitespace), so they must still go through
+    the unconditional ``Z``-strip that runs before the regex — exactly as
+    ``main`` always did for every shape, not only the ones this PR's regex
+    happens to match. Verified on real Python 3.10.14 and 3.13.1
+    (2026-08-28): ``fromisoformat`` accepts both reshaped strings
+    identically on both interpreters (3.10's separator/leniency rules
+    already tolerate any single stray character here, once the ``Z`` is
+    already rewritten to ``+00:00``)."""
+    from spec_kitty_events.strict import _normalize_iso8601_shape, _parse_iso8601
+
+    assert _normalize_iso8601_shape(value) == reshaped
+    assert _parse_iso8601(value) is not None
 
 
 def test_t5c_timestamp_doubled_trailing_z_rejected_end_to_end() -> None:
