@@ -1,0 +1,31 @@
+{
+  "event_type": "OpsInvocationStarted",
+  "envelope": {
+    "event_id": "e2e00000-0000-4000-8000-000000000201",
+    "timestamp": "2026-08-25T09:00:00+00:00"
+  },
+  "payload": {
+    "invocation_id": "inv-02",
+    "action": "relay.restart",
+    "actor": {
+      "actor_id": "actor-02",
+      "actor_type": "human"
+    },
+    "scope": "scope-02",
+    "request_summary": "Restarting the relay after a config push."
+  },
+  "expected_attrs": {
+    "event_id": "e2e00000-0000-4000-8000-000000000201",
+    "occurred_at": "2026-08-25T09:00:00+00:00",
+    "invocation_id": "inv-02",
+    "action": "relay.restart",
+    "actor": "actor-02",
+    "scope": "scope-02",
+    "attempt": "1",
+    "contract_version": "1",
+    "summary": "Restarting the relay after a config push.",
+    "detail_ref": "OpsInvocationStarted:e2e00000-0000-4000-8000-000000000201"
+  },
+  "expected_ref": "inv-02",
+  "notes": "request_summary is unbroadcast raw (UNBROADCAST_FIELDS) and instead folds into the derived, bounded summary attr, mirroring the artifact-lifecycle *Completed kinds."
+}

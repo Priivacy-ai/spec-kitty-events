@@ -7,6 +7,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [9.1.0] - 2026-08-30
+
+### Added
+
+- Ops/Invocations bounded moment contracts: `OpsInvocationStarted` and
+  `OpsInvocationCompleted` join the volatile vocabulary so operations can
+  share the Team Kitty timeline with missions without reusing mission event
+  kinds (EXPERIMENTAL-spec-kitty-events#78). Each payload carries a stable
+  `invocation_id`, `action`, a projected `actor` label, a bounded `scope`,
+  an `attempt` counter for retry correlation, an explicit `contract_version`
+  (default `1`), and an optional unbroadcast `request_summary` /
+  `result_summary` that folds into the derived, bounded `summary` attr;
+  `OpsInvocationCompleted` additionally carries a required `outcome`
+  (`success`/`failure`). Both kinds derive an opaque `detail_ref` attr
+  (`"<event_type>:<event_id>"`) via the new `DETAIL_REF_SOURCE_EVENT_TYPES`
+  mechanism, first implementing the previously-reserved `DETAIL_REF_SYNTAX`.
+  `invocation_id` + `attempt` together express start/completion/retry
+  correlation and idempotency: a stable `invocation_id` ties every attempt
+  of the same logical invocation together, while `attempt` disambiguates
+  retries of the same invocation.
+- `from_zeitgeist_attrs` now validates a decoded kind's `contract_version`
+  attr against a new `KNOWN_CONTRACT_VERSIONS_BY_EVENT_TYPE` table (via the
+  new, generic `CONTRACT_VERSIONED_EVENT_TYPES` opt-in mechanism) and raises
+  the new `UnknownContractVersionError` on a version this package does not
+  know how to interpret, rather than silently misinterpreting a future
+  payload-shape revision's attrs. Currently opted in by the two Ops
+  Invocation kinds only; existing kinds are unaffected.
+- Nine new golden `zeitgeist_attrs` conformance fixtures cover the Ops
+  Invocation kinds: minimal/with-summary/retry-attempt Started, success/
+  failure-with-summary Completed, a multibyte 240-byte truncation boundary,
+  an over-bound raw field, an unknown `contract_version`, and a missing
+  required `outcome` key.
+
+This is explicitly post-MVP scope only: the CLI emitter, SaaS view, and
+detail-read service that would resolve a `detail_ref` are not implemented
+here.
+
 ## [9.0.2] - 2026-08-29
 
 ### Fixed
