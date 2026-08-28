@@ -192,49 +192,38 @@ def test_forbidden_keys_union_the_zeitgeist_mirror_and_legacy_set() -> None:
     assert FORBIDDEN_ATTR_KEYS == ZEITGEIST_FORBIDDEN_KEYS_V1 | FORBIDDEN_LEGACY_KEYS
 
 
-def _reachable_nested_models(event_type: str, model: type[BaseModel]):
-    """Every nested ``BaseModel`` *model*'s top-level fields actually walk
-    into, mirroring :func:`zeitgeist_attrs._schema_keys_for_model` exactly: a
-    field the kind's ``UNBROADCAST_FIELDS`` skips, or that
-    ``PROJECTED_FIELD_BY_EVENT_TYPE`` redirects to a scalar attribute
-    (e.g. ``actor`` -> ``actor_label``), is never walked into by encode or
-    decode either, so it contributes no reachable nested model here. One
-    level: a second level of nesting is not a silent-leak risk because
-    :func:`zeitgeist_attrs._encode_fields` hard-raises on it rather than
-    emitting anything (EXPERIMENTAL-spec-kitty-events#21).
-    """
-    skip = UNBROADCAST_FIELDS.get(event_type, frozenset())
-    projected = PROJECTED_FIELD_BY_EVENT_TYPE.get(event_type, {})
-    for name, field in model.model_fields.items():
-        if name in skip or name in projected:
-            continue
-        annotation = zeitgeist_attrs._unwrap_optional(field.annotation)
-        if isinstance(annotation, type) and issubclass(annotation, BaseModel):
-            yield annotation
-
-
 def test_no_declared_field_name_is_forbidden() -> None:
-    """Structural guarantee behind "never emit forbidden keys", extended to
-    every nested-model subfield encode/decode actually walk into — not just
-    a payload's top-level fields. A top-level-only walk stays green even if
-    a future *reachable* nested field collides with a forbidden name
-    (EXPERIMENTAL-spec-kitty-events#21). Today's vocabulary cannot collide;
-    if a future field does, this fails first."""
-    for event_type in PAYLOAD_MODEL_BY_EVENT_TYPE:
-        for model in zeitgeist_attrs._payload_types(event_type):
-            for name in model.model_fields:
-                assert name not in FORBIDDEN_ATTR_KEYS, (model.__name__, name)
-            for nested in _reachable_nested_models(event_type, model):
-                for name in nested.model_fields:
-                    assert name not in FORBIDDEN_ATTR_KEYS, (nested.__name__, name)
+    """Structural guarantee behind "never emit forbidden keys", asserted over
+    :data:`zeitgeist_attrs._ALLOWED_KEYS_BY_EVENT_TYPE` — the production
+    derivation's own output — rather than a second, hand-written copy of its
+    skip / projected / nested walk. A prior version of this guard
+    (EXPERIMENTAL-spec-kitty-events#21, then EXPERIMENTAL-spec-kitty-events#87)
+    re-implemented that walk to reach nested-model fields, which is the exact
+    hazard #21 was about one level up: the guard could go stale the moment
+    the real walk changed (a new union spelling, a second nesting level, a
+    projection target that is not a scalar) while the copy kept passing
+    (EXPERIMENTAL-spec-kitty-events#134). Splitting every key on ``.`` rather
+    than checking only the trailing segment also covers a forbidden name in
+    a non-trailing position (EXPERIMENTAL-spec-kitty-events#133)."""
+    for event_type, keys in zeitgeist_attrs._ALLOWED_KEYS_BY_EVENT_TYPE.items():
+        for key in keys:
+            for segment in key.split("."):
+                assert segment not in FORBIDDEN_ATTR_KEYS, (event_type, key, segment)
 
 
 def _forbidden_collisions(event_type: str, model: type[BaseModel]) -> list[str]:
+    """Forbidden-name segments of one model's schema keys, consuming
+    :func:`zeitgeist_attrs._schema_keys_for_model`'s own dotted-key output
+    rather than re-walking the model — kept as the mechanism pin for
+    :func:`test_reachable_nested_model_collision_fails_the_structural_guard`,
+    which needs a synthetic event type/model not present in the real
+    vocabulary and so cannot go through the precomputed
+    ``_ALLOWED_KEYS_BY_EVENT_TYPE`` table."""
     return [
-        name
-        for nested in _reachable_nested_models(event_type, model)
-        for name in nested.model_fields
-        if name in FORBIDDEN_ATTR_KEYS
+        segment
+        for key in zeitgeist_attrs._schema_keys_for_model(event_type, model)
+        for segment in key.split(".")
+        if segment in FORBIDDEN_ATTR_KEYS
     ]
 
 
