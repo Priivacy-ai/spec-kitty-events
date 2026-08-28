@@ -10,6 +10,15 @@ bytes: ``to`` projects the payload onto the exact golden attrs, and ``from``
 validates those same attrs back into a :class:`VolatileMoment`. Each
 *invalid* fixture pins one rejection with its exception class named in the
 fixture document (``direction`` says which side of the codec it exercises).
+
+The same fixture-driven both-directions/rejections runs are also packaged
+in ``spec_kitty_events.conformance.test_zeitgeist_attrs_codec`` (collected
+by ``pytest --pyargs spec_kitty_events.conformance``), so downstream
+consumers exercise these fixtures too, not only this in-repo suite
+(spec-kitty-events#145). This module additionally covers unit-style
+regressions (monkeypatched forbidden-key ingest, an unencodable scalar
+forced past the frozen model) that have no fixture representation and so
+stay in-repo only.
 """
 
 from __future__ import annotations
