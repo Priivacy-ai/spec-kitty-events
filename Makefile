@@ -25,11 +25,12 @@ TIMESTAMP_PARSING_TESTS := \
 	tests/test_zeitgeist_attrs_conformance.py
 
 test-full-310: ## Run the timestamp-parsing tests on Python 3.10, the declared floor
-	uv run --isolated --python 3.10 pytest --no-cov -q $(TIMESTAMP_PARSING_TESTS)
+	uv run --isolated --python 3.10.21 pytest --no-cov -q $(TIMESTAMP_PARSING_TESTS)
 
-test-full: test-full-310 ## Run the whole suite with the configured coverage report — what the CI agent runs
+test-full: test-full-310 lint ## Run the whole suite with the configured coverage report — what the CI agent runs
 	uv run pytest $(ARGS)
 
-lint: ## Run the pinned ruff check gate plus the formatter check (see pyproject.toml [tool.ruff])
+lint: ## Run the pinned ruff check gate, the formatter check, and the version-amendment guard
 	uv run ruff check .
 	uv run ruff format --check .
+	uv run python scripts/check_version_not_amended.py

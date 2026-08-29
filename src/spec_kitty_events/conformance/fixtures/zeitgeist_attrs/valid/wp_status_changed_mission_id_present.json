@@ -1,0 +1,33 @@
+{
+  "event_type": "WPStatusChanged",
+  "envelope": {
+    "event_id": "e2e00000-0000-4000-8000-000000000119",
+    "timestamp": "2026-08-25T09:00:00+00:00"
+  },
+  "payload": {
+    "mission_slug": "demo-mission",
+    "mission_id": "01J9Z8Q4K7X3M2N5P6R7S8T9V0",
+    "wp_id": "WP01",
+    "from_lane": null,
+    "to_lane": "planned",
+    "actor": "robert",
+    "force": false,
+    "reason": null,
+    "execution_mode": "worktree",
+    "review_ref": null,
+    "evidence": null
+  },
+  "expected_attrs": {
+    "event_id": "e2e00000-0000-4000-8000-000000000119",
+    "occurred_at": "2026-08-25T09:00:00+00:00",
+    "mission_slug": "demo-mission",
+    "mission_id": "01J9Z8Q4K7X3M2N5P6R7S8T9V0",
+    "wp_id": "WP01",
+    "to_lane": "planned",
+    "actor": "robert",
+    "force": "false",
+    "execution_mode": "worktree"
+  },
+  "expected_ref": "demo-mission",
+  "notes": "mission_id present alongside mission_slug: the family's ref field stays mission_slug (REF_FIELD_BY_EVENT_TYPE is unchanged), but mission_id now rides in attrs so a consumer can join this moment against a PhaseEntered moment for the same mission aggregate (spec-kitty-events#69)."
+}

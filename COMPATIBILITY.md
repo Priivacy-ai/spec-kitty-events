@@ -1,14 +1,17 @@
 # Compatibility Guide
 
-**Current package version**: `8.2.0`
+**Current package version**: `9.0.0`
 
 The on-wire envelope schema version is `3.0.0` and has been unchanged since
 the cutover. The package version and the envelope schema version move
 independently — see
 [`contracts/versioning-and-compatibility.md`](contracts/versioning-and-compatibility.md).
 
-`spec-kitty-events` is a fail-closed contract package. Sections below are
-ordered newest-first by the release that introduced them.
+`spec-kitty-events` is a fail-closed contract package. Released sections
+below are ordered newest-first by the release that introduced them. An
+unreleased `## Known gap (not yet closed)` section documents a gap no
+release has closed yet; it carries no version number and precedes every
+released section, regardless of when the gap it describes will close.
 
 > The single declaration above is the only place this document states the
 > package version; `tests/test_compatibility_doc.py` pins it to
@@ -19,6 +22,110 @@ This document is the public compatibility policy for consumers of:
 - `spec-kitty-events`
 - `spec-kitty-saas`
 - `spec-kitty`
+
+## `9.0.0` — `mission_id` widened onto `WPStatusChanged`/`MissionCreated`/`MissionClosed` for cross-family join (breaking)
+
+`9.0.0` is a **breaking accept/decode-boundary change**, not additive,
+despite the Pydantic-model diff itself being a new optional field.
+`PhaseEnteredPayload` has always used `mission_id` (required) as its
+`REF_FIELD_BY_EVENT_TYPE` frame ref, while the other three mission-scoped
+volatile families — `WPStatusChangedPayload` (`StatusTransitionPayload`),
+`MissionCreatedPayload`, and `MissionClosedPayload` — use `mission_slug` as
+their ref. Until this release, `StatusTransitionPayload` and
+`MissionClosedPayload` did not declare `mission_id` at all, so
+`from_zeitgeist_attrs`'s closed, schema-derived key vocabulary
+(`_schema_keys_for_model`) never admitted it for either family: an attrs
+frame carrying `mission_id` for a `WPStatusChanged` or `MissionClosed`
+moment raised `ZeitgeistAttrsError` on decode. A consumer therefore had no
+shared key to join one of their moments against a `PhaseEntered` moment for
+the same mission aggregate — and, symmetrically, no way to receive one
+without it being rejected.
+
+This release adds an optional `mission_id` field (default `None`) to
+`StatusTransitionPayload` and `MissionClosedPayload`; when a producer
+populates it, `mission_id` rides alongside `mission_slug` in the encoded
+`to_zeitgeist_attrs` projection for all three families. Per
+[`EXPERIMENTAL-spec-kitty-planning`#1012](https://github.com/spec-kitty/EXPERIMENTAL-spec-kitty-planning/issues/1012),
+this is Option 2: `REF_FIELD_BY_EVENT_TYPE` itself is unchanged —
+`PhaseEntered`'s ref stays `mission_id` and the other three keep
+`mission_slug` as their ref — only the attrs widen.
+
+**Why this is major, not minor.** Per
+[`contracts/versioning-and-compatibility.md`](contracts/versioning-and-compatibility.md),
+"any change to an existing event contract that makes a previously-rejected
+envelope accepted" is major. A producer that starts populating `mission_id`
+on `WPStatusChanged`/`MissionClosed` moves those two families' encoded
+attrs from a shape every `<9.0.0` decode rejected to one every `>=9.0.0`
+decode accepts — the accept/reject boundary moved, which is exactly the
+"new capability that widens an existing family's contract" case the
+`6.1.0` new-event-type precedent does *not* cover (a whole new event type
+is additive because no existing contract's boundary moves; this is the
+opposite: an existing family's own boundary moves). `MissionCreatedPayload`
+is excluded from this classification — it already declared `mission_id`
+before this release (prior, unrelated work), so its decode boundary
+already admitted the key and this bump changes nothing about its
+compatibility story.
+
+**Producers that omit `mission_id` are unaffected**: the field stays
+optional and is omitted from attrs when absent, so a producer that never
+populates it is wire-compatible with every `<9.0.0` consumer, exactly as
+before. The breaking surface is scoped entirely to producers that *do*
+populate the field.
+
+**Required migration.**
+
+- Consumers (`spec-kitty-saas`, `spec-kitty`, any other reader of
+  `WPStatusChanged`/`MissionClosed` zeitgeist attrs) must bump their
+  `spec-kitty-events` pin to `>=9.0.0` before a producer in their path
+  starts populating `mission_id` on these two families.
+- Producers MUST capability-gate the rollout exactly like the `6.0.0`
+  `genesis`-lane precedent (see
+  [`contracts/lane-vocabulary.md`](contracts/lane-vocabulary.md)'s
+  "Versioning" section): do not populate `mission_id` on
+  `WPStatusChanged`/`MissionClosed` for a given broadcast until every
+  consumer that will read it is known to be on `>=9.0.0`. Populating it
+  while any live consumer is still pinned `<9.0.0` causes that consumer's
+  `from_zeitgeist_attrs` call to raise on decode, silently dropping the
+  moment.
+- `EXPERIMENTAL-spec-kitty-events#69` closes with this artifact set;
+  `EXPERIMENTAL-spec-kitty-events#197`/`#198` track the two MINOR
+  documentation/conformance-coverage follow-ups the squad also filed
+  against the originating PR.
+
+## `8.2.1` — forbidden attrs rejected in every dot segment (breaking boundary shipped without a major bump)
+
+PR
+[`EXPERIMENTAL-spec-kitty-events#139`](https://github.com/spec-kitty/EXPERIMENTAL-spec-kitty-events/pull/139)
+widened `_forbidden_key_hits` on both `to_zeitgeist_attrs` encode and
+`from_zeitgeist_attrs` decode. The old predicate rejected an exact forbidden
+key and a forbidden trailing segment, but missed the same name in a prefix or
+middle segment. Consequently `token.sub`, `url.href`, `team.name`, and
+`a.token.b` previously passed; starting at implementation commit `d18a67a`
+(merge commit `1e21a29`) each is rejected because at least one dot-separated
+segment belongs to `FORBIDDEN_ATTR_KEYS`.
+
+This is a **breaking reject-boundary widening**, not an additive validation
+improvement. `contracts/versioning-and-compatibility.md` explicitly classifies
+"adding to the forbidden-key set, or widening where it is enforced" as major:
+a producer or consumer can move from accepting an identical attrs frame to
+raising the existing forbidden-key error solely by updating this package.
+The behavior is intentional and security-motivated; forbidden names include
+`token`, `authorization`, `bearer`, `password`, `url`, and team/deployment
+identifiers that must not leak into broadcast attrs.
+
+**Historical version boundary.** The package declared `8.2.1` at `1e21a29`.
+That version number had already been used at earlier trees, so `8.2.1` alone
+cannot identify whether this rule is present: exact git pins before `1e21a29`
+lack it, while pins at or after that merge contain it. The later `9.0.0`
+release records a separate `mission_id` accept-boundary widening; it does not
+retroactively make PR #139 a correctly-versioned 9.0.0 change. This section
+documents the shipped boundary rather than rewriting package history.
+
+**Required migration.** Before moving a consumer or producer pin across
+`1e21a29`, inspect every emitted and stored zeitgeist attrs key. Rename or
+remove a key when any dot-separated segment matches `FORBIDDEN_ATTR_KEYS`;
+do not bypass or weaken the guard. Consumers already pinned to current
+`9.0.0` have this rejection behavior.
 
 ## Known gap (not yet closed) — `to_zeitgeist_attrs` does not yet reject control characters on encode
 
@@ -64,12 +171,21 @@ lifecycle/WP/project/harness allowlist) — `validate_strict_envelope()`
 rejects every other event type with `UNKNOWN_EVENT_TYPE` regardless of
 whether the envelope is otherwise well-formed. Callers whose event type is
 outside that allowlist must reproduce the removed gate's checks directly
-instead: `forbidden_keys.find_forbidden_keys(record,
-forbidden=FORBIDDEN_LEGACY_KEYS)` for the recursive legacy-key walk, an
+instead: `forbidden_keys.validate_no_forbidden_keys(record,
+forbidden=FORBIDDEN_LEGACY_KEYS) is None` for the recursive legacy-key walk
+(callers needing every error rather than just the first can use
+`list(forbidden_keys.find_forbidden_keys(record,
+forbidden=FORBIDDEN_LEGACY_KEYS))` instead), an
 explicit `record.get("schema_version") == "3.0.0"` check for the envelope
-signal, `record.get("aggregate_id", "").split("/", 1)[0] not in
-strict.FORBIDDEN_LEGACY_AGGREGATE_NAMES` for the forbidden legacy
-aggregate-name prefix, and `record.get("event_type") not in {"FeatureCreated",
+signal, `(not isinstance(aggregate_id := record.get("aggregate_id"), str)) or
+aggregate_id.split("/", 1)[0] not in strict.FORBIDDEN_LEGACY_AGGREGATE_NAMES`
+for the forbidden legacy aggregate-name prefix — the `isinstance` guard
+matters: a wire record can carry `aggregate_id: null` or another
+non-string, and `strict.py`'s own gate (`isinstance(aggregate_id, str)`)
+treats that as not-forbidden rather than raising, so a recipe that instead
+does `record.get("aggregate_id", "").split(...)` raises `AttributeError` on
+exactly that input instead of reproducing the gate — and
+`record.get("event_type") not in {"FeatureCreated",
 "FeatureClosed"}` for the forbidden legacy event names (see `## Forbidden
 Legacy Surfaces` below for that list's source). Unlike the other three
 checks, no package constant survives for the legacy event names — they were
