@@ -1,6 +1,6 @@
 # Compatibility Guide
 
-**Current package version**: `9.0.0`
+**Current package version**: `9.0.1`
 
 The on-wire envelope schema version is `3.0.0` and has been unchanged since
 the cutover. The package version and the envelope schema version move
@@ -22,6 +22,21 @@ This document is the public compatibility policy for consumers of:
 - `spec-kitty-events`
 - `spec-kitty-saas`
 - `spec-kitty`
+
+## Known gap (not yet closed) — `to_zeitgeist_attrs` does not yet reject control characters on encode
+
+`from_zeitgeist_attrs` rejects an attrs value carrying a non-printable
+character on decode (`str.isprintable()`, EXPERIMENTAL-spec-kitty-events#25,
+then widened by #63), but `to_zeitgeist_attrs` does not yet run the same
+check on encode (EXPERIMENTAL-spec-kitty-events#64): a producer can
+successfully encode and broadcast an attrs value carrying a control
+character that a consumer's decode will then reject, silently dropping the
+moment. The fix — both directions sharing one predicate and raising the
+same typed `ZeitgeistAttrsControlCharacterError` — is open as
+EXPERIMENTAL-spec-kitty-events#104 and not yet merged to `main`. This
+section is written ahead of that merge so the documentation gap doesn't
+reopen once it lands; it becomes a normal dated-version entry, and this
+"known gap" framing goes away, when #104 merges.
 
 ## `9.0.0` — `mission_id` widened onto `WPStatusChanged`/`MissionCreated`/`MissionClosed` for cross-family join (breaking)
 
@@ -126,21 +141,6 @@ documents the shipped boundary rather than rewriting package history.
 remove a key when any dot-separated segment matches `FORBIDDEN_ATTR_KEYS`;
 do not bypass or weaken the guard. Consumers already pinned to current
 `9.0.0` have this rejection behavior.
-
-## Known gap (not yet closed) — `to_zeitgeist_attrs` does not yet reject control characters on encode
-
-`from_zeitgeist_attrs` rejects an attrs value carrying a non-printable
-character on decode (`str.isprintable()`, EXPERIMENTAL-spec-kitty-events#25,
-then widened by #63), but `to_zeitgeist_attrs` does not yet run the same
-check on encode (EXPERIMENTAL-spec-kitty-events#64): a producer can
-successfully encode and broadcast an attrs value carrying a control
-character that a consumer's decode will then reject, silently dropping the
-moment. The fix — both directions sharing one predicate and raising the
-same typed `ZeitgeistAttrsControlCharacterError` — is open as
-EXPERIMENTAL-spec-kitty-events#104 and not yet merged to `main`. This
-section is written ahead of that merge so the documentation gap doesn't
-reopen once it lands; it becomes a normal dated-version entry, and this
-"known gap" framing goes away, when #104 merges.
 
 ## `8.0.0` — Sync, legacy-envelope, and cutover surfaces deleted
 
@@ -539,4 +539,3 @@ patch.
 ### No grace period
 
 4.x validators fail closed on missing `terminal_outcome` or missing `origin_surface`. There is no temporary permissive path. Downstream consumers must migrate deliberately against this contract boundary.
-

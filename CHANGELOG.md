@@ -53,6 +53,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   bullet moves under a dated release heading, in past tense, once #104
   lands.
 
+## [9.0.1] - 2026-08-29
+
+### Fixed
+
+- Corrected the `zeitgeist_attrs` fixture README's next-free id from 118 to
+  122 after the `9.0.0` fixtures allocated ids 119–121. The packaged metadata
+  now matches the fixture bytes guarded by
+  `tests/test_zeitgeist_attrs_readme.py`.
+
+### Changed
+
+- Bumped the patch version because the corrected fixture README is packaged
+  under `src/`; per PROGRAM.md §2, the already-adopted `9.0.0` cannot be
+  amended in place.
+
 ## [9.0.0] - 2026-08-28
 
 ### Breaking
