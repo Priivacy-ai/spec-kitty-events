@@ -84,12 +84,22 @@ def _assert_iso8601_timestamp(value: object) -> object:
 
     Python 3.10's ``datetime.fromisoformat`` rejects a trailing ``Z`` even
     though the fixtures and contract use the RFC 3339 UTC form. Normalize that
-    case to ``+00:00`` before parsing.
+    case to ``+00:00`` before parsing. A well-formed value has at most one
+    trailing ``Z``; if another ``Z`` remains after stripping it, the input
+    was already malformed and must not be laundered into something 3.10's
+    laxer ``fromisoformat`` would accept (e.g. a doubled ``...00ZZ``)
+    (spec-kitty-events#107).
     """
 
     if isinstance(value, str):
-        normalized = f"{value[:-1]}+00:00" if value.endswith("Z") else value
-        datetime.fromisoformat(normalized)
+        if value.endswith("Z"):
+            candidate = value[:-1]
+            if "Z" in candidate:
+                raise ValueError(f"not ISO-8601: {value!r}")
+            candidate += "+00:00"
+        else:
+            candidate = value
+        datetime.fromisoformat(candidate)
     return value
 
 

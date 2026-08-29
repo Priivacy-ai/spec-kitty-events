@@ -143,6 +143,17 @@ class TestRetrospectiveCompletedPayload:
         payload = _make_completed(completed_at="2026-04-13")
         assert payload.completed_at == "2026-04-13"
 
+    def test_completed_rejects_a_doubled_trailing_z_timestamp(self) -> None:
+        """A doubled trailing "Z" must be rejected on every interpreter version.
+
+        Stripping only the final "Z" and appending "+00:00" would otherwise
+        turn this into "...00Z+00:00", which Python 3.10's laxer
+        ``fromisoformat`` accepts even though it is not a valid ISO-8601
+        timestamp (spec-kitty-events#55/#107).
+        """
+        with pytest.raises(ValidationError):
+            _make_completed(completed_at="2026-04-13T10:00:00ZZ")
+
 
 # ── RetrospectiveSkippedPayload tests ─────────────────────────────────────────
 
