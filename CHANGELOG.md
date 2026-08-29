@@ -114,9 +114,33 @@ Per `PROGRAM.md` §2: bump the pinned rev/version in every consumer that adopts
 
 ## [8.2.1] - 2026-08-27
 
+### Breaking
+
+- **Attrs keys are rejected when any dot-separated segment is forbidden, on
+  both encode and decode.** Before PR #139, `_forbidden_key_hits` checked only
+  an exact key or its trailing segment, so a key such as `token.sub`,
+  `url.href`, `team.name`, or `a.token.b` passed even though it contained a
+  member of `FORBIDDEN_ATTR_KEYS`. Starting at implementation commit
+  `d18a67a` (merged as `1e21a29`), every segment is scanned and those shapes
+  raise the existing forbidden-key error instead. This security fix is a
+  breaking accept/reject-boundary widening under
+  `contracts/versioning-and-compatibility.md`: envelopes that previously
+  encoded and decoded successfully are now rejected
+  (EXPERIMENTAL-spec-kitty-events#133; documentation follow-up #208).
+
+  The package still declared `8.2.1` when this took effect. That version had
+  already been declared at earlier trees, so the exact pin is the only
+  unambiguous historical boundary; the later `9.0.0` bump belongs to the
+  unrelated `mission_id` widening and must not be read as this fix's original
+  release. Consumers moving an exact git pin across `1e21a29` must remove or
+  rename attrs whose dot segments match `FORBIDDEN_ATTR_KEYS` before rollout.
+
 ### Changed
 
-- Bumped the patch version only — no source-code change. `8.2.0` had been
+- At the original version-declaration commit, bumped the patch version only —
+  no source-code change. PR #139 later changed behavior while the package
+  still declared `8.2.1`; the `### Breaking` entry above records that distinct
+  exact-commit boundary. `8.2.0` had been
   declared at two distinct trees on `main`: the commit three consumers had
   already adopted (`c93dbfbf`, pinned by `EXPERIMENTAL-spec-kitty`,
   `-saas`, and `-zeitgeist`), and a later repo-wide `ruff format` pass

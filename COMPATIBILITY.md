@@ -92,6 +92,41 @@ populate the field.
   documentation/conformance-coverage follow-ups the squad also filed
   against the originating PR.
 
+## `8.2.1` — forbidden attrs rejected in every dot segment (breaking boundary shipped without a major bump)
+
+PR
+[`EXPERIMENTAL-spec-kitty-events#139`](https://github.com/spec-kitty/EXPERIMENTAL-spec-kitty-events/pull/139)
+widened `_forbidden_key_hits` on both `to_zeitgeist_attrs` encode and
+`from_zeitgeist_attrs` decode. The old predicate rejected an exact forbidden
+key and a forbidden trailing segment, but missed the same name in a prefix or
+middle segment. Consequently `token.sub`, `url.href`, `team.name`, and
+`a.token.b` previously passed; starting at implementation commit `d18a67a`
+(merge commit `1e21a29`) each is rejected because at least one dot-separated
+segment belongs to `FORBIDDEN_ATTR_KEYS`.
+
+This is a **breaking reject-boundary widening**, not an additive validation
+improvement. `contracts/versioning-and-compatibility.md` explicitly classifies
+"adding to the forbidden-key set, or widening where it is enforced" as major:
+a producer or consumer can move from accepting an identical attrs frame to
+raising the existing forbidden-key error solely by updating this package.
+The behavior is intentional and security-motivated; forbidden names include
+`token`, `authorization`, `bearer`, `password`, `url`, and team/deployment
+identifiers that must not leak into broadcast attrs.
+
+**Historical version boundary.** The package declared `8.2.1` at `1e21a29`.
+That version number had already been used at earlier trees, so `8.2.1` alone
+cannot identify whether this rule is present: exact git pins before `1e21a29`
+lack it, while pins at or after that merge contain it. The later `9.0.0`
+release records a separate `mission_id` accept-boundary widening; it does not
+retroactively make PR #139 a correctly-versioned 9.0.0 change. This section
+documents the shipped boundary rather than rewriting package history.
+
+**Required migration.** Before moving a consumer or producer pin across
+`1e21a29`, inspect every emitted and stored zeitgeist attrs key. Rename or
+remove a key when any dot-separated segment matches `FORBIDDEN_ATTR_KEYS`;
+do not bypass or weaken the guard. Consumers already pinned to current
+`9.0.0` have this rejection behavior.
+
 ## Known gap (not yet closed) — `to_zeitgeist_attrs` does not yet reject control characters on encode
 
 `from_zeitgeist_attrs` rejects an attrs value carrying a non-printable
