@@ -463,7 +463,7 @@ def test_t5_timestamp_with_offset_accepted() -> None:
     assert validate_strict_envelope(envelope) == ()
 
 
-def test_t7_timestamp_doubled_trailing_z_rejected() -> None:
+def test_t5b_timestamp_doubled_trailing_z_rejected() -> None:
     """A doubled trailing "Z" must be rejected on every interpreter version.
     Stripping only the final "Z" and appending "+00:00" would otherwise turn
     this into "...00Z+00:00", which Python 3.10's laxer ``fromisoformat``
@@ -480,7 +480,7 @@ def test_t7_timestamp_doubled_trailing_z_rejected() -> None:
     assert shape_errors[0].code == ValidationErrorCode.ENVELOPE_SHAPE_INVALID
 
 
-def test_t8_timestamp_mixed_case_doubled_z_rejected() -> None:
+def test_t5c_timestamp_mixed_case_doubled_z_rejected() -> None:
     """A doubled UTC designator must be rejected regardless of case: a
     case-sensitive residual check misses a lowercase "z" left behind by a
     mixed-case doubled designator (e.g. "...00zZ"), which would otherwise
