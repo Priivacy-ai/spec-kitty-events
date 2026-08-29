@@ -10,12 +10,24 @@ bytes: ``to`` projects the payload onto the exact golden attrs, and ``from``
 validates those same attrs back into a :class:`VolatileMoment`. Each
 *invalid* fixture pins one rejection with its exception class named in the
 fixture document (``direction`` says which side of the codec it exercises).
+
+The same fixture-driven both-directions/rejections runs are also packaged
+in ``spec_kitty_events.conformance.test_zeitgeist_attrs_codec`` (collected
+by ``pytest --pyargs spec_kitty_events.conformance``), so downstream
+consumers exercise these fixtures too, not only this in-repo suite
+(spec-kitty-events#145). This module additionally covers unit-style
+regressions (monkeypatched forbidden-key ingest, an unencodable scalar
+forced past the frozen model) that have no fixture representation and so
+stay in-repo only.
 """
 
 from __future__ import annotations
 
+import ast
 import importlib
+import re
 from datetime import datetime
+from pathlib import Path
 from uuid import UUID
 
 import pytest
@@ -83,6 +95,24 @@ _ERROR_CLASSES = {
 _FIXTURE_BUILD_ID = "build-zeitgeist-attrs-conformance"
 _FIXTURE_NODE_ID = "node-conformance"
 _FIXTURE_PROJECT_UUID = UUID("550e8400-e29b-41d4-a716-446655440000")
+_EVENT_ID_RE = re.compile(r"^e2e00000-0000-4000-8000-[0-9]{12}$")
+
+
+def test_local_event_ids_use_the_reserved_block() -> None:
+    """Keep test-only envelopes out of the committed fixture ID sequence."""
+    tree = ast.parse(Path(__file__).read_text(encoding="utf-8"))
+    event_ids = {
+        node.value
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Constant)
+        and isinstance(node.value, str)
+        and _EVENT_ID_RE.fullmatch(node.value)
+    }
+
+    assert event_ids, "expected at least one test-local event_id"
+    assert all(event_id.rsplit("-", 1)[-1].startswith("9") for event_id in event_ids), (
+        f"test-local event_ids must use the reserved 9xxxxxxxxxxx block: {sorted(event_ids)}"
+    )
 
 
 def _fixture_envelope(event_type: str, case: dict) -> Event:
@@ -107,9 +137,9 @@ def zeitgeist_attrs_fixtures():
 
 
 def test_fixtures_loaded(zeitgeist_attrs_fixtures) -> None:
-    """28 valid + 8 invalid fixtures are on disk and manifest-registered."""
-    assert len(zeitgeist_attrs_fixtures) == 36
-    assert len([f for f in zeitgeist_attrs_fixtures if f.expected_valid]) == 28
+    """31 valid + 8 invalid fixtures are on disk and manifest-registered."""
+    assert len(zeitgeist_attrs_fixtures) == 39
+    assert len([f for f in zeitgeist_attrs_fixtures if f.expected_valid]) == 31
     assert len([f for f in zeitgeist_attrs_fixtures if not f.expected_valid]) == 8
 
 
@@ -297,7 +327,7 @@ def test_encode_rejects_an_unencodable_scalar() -> None:
         "MissionClosed",
         {
             "envelope": {
-                "event_id": "e2e00000-0000-4000-8000-000000000118",
+                "event_id": "e2e00000-0000-4000-8000-900000000001",
                 "timestamp": "2026-08-25T09:00:00+00:00",
             }
         },
@@ -333,7 +363,7 @@ def _wp_status_changed_case() -> tuple[StatusTransitionPayload, Event]:
         "WPStatusChanged",
         {
             "envelope": {
-                "event_id": "e2e00000-0000-4000-8000-000000000059",
+                "event_id": "e2e00000-0000-4000-8000-900000000002",
                 "timestamp": "2026-08-25T09:00:00+00:00",
             }
         },

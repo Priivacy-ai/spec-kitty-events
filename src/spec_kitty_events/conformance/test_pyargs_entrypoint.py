@@ -88,7 +88,8 @@ def _event_fixture_entries() -> List[Dict[str, Any]]:
       {payload, expected_attrs, envelope?} codec specification, not an
       event envelope — validating the document itself as its named event
       would fail every entry. Both codec directions are exercised by
-      tests/test_zeitgeist_attrs_conformance.py via
+      test_zeitgeist_attrs_codec.py (packaged, alongside this module) and
+      by tests/test_zeitgeist_attrs_conformance.py (in-repo only), both via
       load_fixtures("zeitgeist_attrs").
     """
 
@@ -130,9 +131,10 @@ def test_zeitgeist_attrs_codec_fixtures_stay_out_of_the_event_gate() -> None:
     """Regression guard for the zeitgeist_attrs exclusion above.
 
     The filter is load-bearing for every downstream consumer: if it regresses,
-    the in-repo suite stays green (it reads codec documents through
-    ``load_fixtures("zeitgeist_attrs")`` and never collects this module's
-    event tests against them) while ``pytest --pyargs
+    both the in-repo suite and the packaged
+    ``test_zeitgeist_attrs_codec.py`` runner stay green (they read codec
+    documents through ``load_fixtures("zeitgeist_attrs")`` and never collect
+    this module's event tests against them) while ``pytest --pyargs
     spec_kitty_events.conformance`` fails every codec entry by validating a
     ``{payload, expected_attrs}`` document as an event envelope. Both halves
     are pinned: the category exists in the manifest, and none of it is

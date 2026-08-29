@@ -129,7 +129,14 @@ class MissionCreatedPayload(BaseModel):
     model_config = ConfigDict(frozen=True, extra="forbid")
 
     mission_id: Optional[str] = Field(
-        None, min_length=1, description="Canonical machine-facing mission identity (ULID)"
+        None,
+        min_length=1,
+        description=(
+            "Canonical machine-facing mission identity (ULID); optional, rides "
+            "alongside mission_slug so a consumer can join this moment against "
+            "PhaseEntered (whose frame ref is mission_id) for the same mission "
+            "aggregate (spec-kitty-events#69)"
+        ),
     )
     mission_slug: str = Field(..., min_length=1, description="Canonical mission slug")
     mission_number: Optional[int] = Field(..., ge=1, description="Canonical mission number")
@@ -179,6 +186,16 @@ class MissionClosedPayload(BaseModel):
         description=(
             "Opaque actor identifier of who closed the mission "
             "(broadcast under the moment's ``actor`` key)"
+        ),
+    )
+    mission_id: Optional[str] = Field(
+        None,
+        min_length=1,
+        description=(
+            "Canonical machine-facing mission identity (ULID); optional, rides "
+            "alongside mission_slug so a consumer can join this moment against "
+            "PhaseEntered (whose frame ref is mission_id) for the same mission "
+            "aggregate (spec-kitty-events#69)"
         ),
     )
 
