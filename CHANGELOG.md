@@ -29,13 +29,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   so the earlier missing-keys check always raises first when either is
   absent (EXPERIMENTAL-spec-kitty-events#67, consolidating the same defect
   class as #61).
-- `zeitgeist_ref_for` now rejects a derived `ref` carrying control
-  characters, matching the check the module's decode side
-  (`from_zeitgeist_attrs`) already applies to attrs values
-  (EXPERIMENTAL-spec-kitty-events#106). The frame's `ref` is derived from
-  the same slug/id fields (`mission_slug`, `run_id`, ...) that ride as
-  attrs values, so it was the one field this module emits that a producer
-  could still smuggle a control character through unchecked.
 - `from_zeitgeist_attrs` now enforces the same `event_id`/`occurred_at`
   contract the envelope itself guarantees, instead of the weaker
   emptiness/parses-at-all checks closing #28 left behind
@@ -59,6 +52,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   EXPERIMENTAL-spec-kitty-events#104 and not yet merged to `main`; this
   bullet moves under a dated release heading, in past tense, once #104
   lands.
+
+## [9.0.1] - 2026-08-29
+
+### Fixed
+
+- `zeitgeist_ref_for` now rejects a derived `ref` carrying control
+  characters, matching the check the module's decode side
+  (`from_zeitgeist_attrs`) already applies to attrs values
+  (EXPERIMENTAL-spec-kitty-events#106). The frame's `ref` is derived from
+  the same slug/id fields (`mission_slug`, `run_id`, ...) that ride as
+  attrs values, so it was the one field this module emits that a producer
+  could still smuggle a control character through unchecked.
 
 ## [9.0.0] - 2026-08-28
 
