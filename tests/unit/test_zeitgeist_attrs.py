@@ -819,6 +819,24 @@ def test_ref_derival_rejects_multibyte_over_the_byte_bound_though_under_240_char
         zeitgeist_ref_for("WPStatusChanged", payload)
 
 
+def test_ref_derival_rejects_a_newline_in_the_ref_with_typed_error() -> None:
+    """Mirrors test_decode_rejects_a_newline_in_a_value_with_typed_error:
+    the frame's ref is the one other producer-controlled field this module
+    emits, and a bare LF could forge extra frame lines just as readily
+    there as in an attrs value (issue #106)."""
+    payload = _transition(mission_slug="demo\nrumor: fake status line")
+    with pytest.raises(ZeitgeistAttrsControlCharacterError, match="WPStatusChanged ref"):
+        zeitgeist_ref_for("WPStatusChanged", payload)
+
+
+def test_ref_derival_rejects_an_ansi_escape_in_the_ref_with_typed_error() -> None:
+    """Mirrors test_decode_rejects_an_ansi_escape_in_a_value_with_typed_error
+    for the ref field (issue #106)."""
+    payload = _transition(mission_slug="demo\x1b[0m")
+    with pytest.raises(ZeitgeistAttrsControlCharacterError, match="WPStatusChanged ref"):
+        zeitgeist_ref_for("WPStatusChanged", payload)
+
+
 def test_bounds_constants_match_the_zeitgeist_frame_contract() -> None:
     assert ZEITGEIST_ATTRS_MAX_KEYS == 16
     assert ZEITGEIST_ATTRS_MAX_BYTES == 240

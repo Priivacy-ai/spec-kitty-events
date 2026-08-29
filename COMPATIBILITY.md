@@ -1,6 +1,6 @@
 # Compatibility Guide
 
-**Current package version**: `9.0.0`
+**Current package version**: `9.0.1`
 
 The on-wire envelope schema version is `3.0.0` and has been unchanged since
 the cutover. The package version and the envelope schema version move
@@ -22,6 +22,17 @@ This document is the public compatibility policy for consumers of:
 - `spec-kitty-events`
 - `spec-kitty-saas`
 - `spec-kitty`
+
+## `9.0.1` — `zeitgeist_ref_for` rejects control characters in the derived ref
+
+`9.0.1` tightens the producer-side reject boundary for volatile moments.
+`zeitgeist_ref_for` now applies the same `str.isprintable()` check as attrs
+values to its derived `ref`, so a control or formatting character in a ref
+source such as `mission_slug`, `mission_id`, `run_id`, or
+`decision_point_id` raises `ZeitgeistAttrsControlCharacterError` instead of
+reaching the relay. Producers with printable refs are unaffected; producers
+that previously relied on non-printable ref values must clean or reject those
+values before calling the codec.
 
 ## `9.0.0` — `mission_id` widened onto `WPStatusChanged`/`MissionCreated`/`MissionClosed` for cross-family join (breaking)
 

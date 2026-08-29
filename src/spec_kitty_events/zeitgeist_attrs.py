@@ -741,9 +741,7 @@ def _forbidden_key_hits(keys: Sequence[str]) -> list[str]:
     exact-match case.
     """
     return sorted(
-        key
-        for key in keys
-        if any(segment in FORBIDDEN_ATTR_KEYS for segment in key.split("."))
+        key for key in keys if any(segment in FORBIDDEN_ATTR_KEYS for segment in key.split("."))
     )
 
 
@@ -902,6 +900,8 @@ def zeitgeist_ref_for(event_type: str, payload: BaseModel) -> str | None:
     Raises:
         UnknownVolatileEventTypeError: *event_type* is unknown or *payload*
             is not that event type's payload model.
+        ZeitgeistAttrsControlCharacterError: the ref carries a non-printable
+            character (``not str.isprintable()``).
         ZeitgeistAttrsOverflowError: the ref exceeds
             :data:`ZEITGEIST_ATTRS_MAX_BYTES` (the frame's ``ref`` carries
             the same bound as an attrs entry; see the module docstring).
@@ -917,6 +917,7 @@ def zeitgeist_ref_for(event_type: str, payload: BaseModel) -> str | None:
     if value is None:
         return None  # unreachable for a validated payload; see docstring
     ref = str(value)
+    _reject_control_characters(f"{event_type} ref", ref)
     if _utf8_size(f"{event_type} ref", ref) > ZEITGEIST_ATTRS_MAX_BYTES:
         raise ZeitgeistAttrsOverflowError(
             f"{event_type} ref exceeds the {ZEITGEIST_ATTRS_MAX_BYTES}-byte bound"
