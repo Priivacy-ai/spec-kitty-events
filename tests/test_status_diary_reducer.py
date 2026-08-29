@@ -629,6 +629,31 @@ class TestAnnotationSameTimestampTiebreak:
         assert forward.to_dict() == reversed_order.to_dict()
         assert forward.work_packages["WP01"]["role"] == "reviewer"
 
+    def test_later_at_annotation_wins_even_with_earlier_event_id(self) -> None:
+        """The annotation-pass sort key's `at` component is pinned, not just `event_id`.
+
+        The key is ``(at, event_id)``: `at` is the primary component. Pick an
+        `event_id` order that *disagrees* with the `at` order -- the earlier
+        ULID carries the later timestamp -- so that dropping `at` from the key
+        (sorting by `event_id` alone) would flip the fold winner. Sorting by
+        `at` correctly, the later-timestamp annotation applies last and wins,
+        regardless of which order the rows are given in (#166).
+        """
+        earlier_ulid_later_at = _annotation(
+            _ulid(1), at="2026-02-08T13:00:00+00:00", delta={"role": "LATER-at"}
+        )
+        later_ulid_earlier_at = _annotation(
+            _ulid(2),
+            at="2026-02-08T12:00:00+00:00",
+            delta={"role": "earlier-at-but-later-ulid"},
+        )
+
+        forward = reduce([earlier_ulid_later_at, later_ulid_earlier_at])
+        reversed_order = reduce([later_ulid_earlier_at, earlier_ulid_later_at])
+
+        assert forward.to_dict() == reversed_order.to_dict()
+        assert forward.work_packages["WP01"]["role"] == "LATER-at"
+
 
 # ── Mission slug safety ────────────────────────────────────────────────────────
 
