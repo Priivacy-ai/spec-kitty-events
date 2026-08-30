@@ -54,7 +54,9 @@ wiring). It exists because this contract is explicitly expected to evolve
 post-MVP (the emitter and SaaS view this issue defers): a decoder that has
 not yet learned a newer shape gets a named, typed rejection on an unknown
 version instead of silently misinterpreting attrs from a future revision.
-Today there is exactly one known version, ``1``.
+Encode and decode both check the same known-version table, so this package
+cannot emit a frame that its own current decoder rejects. Today there is
+exactly one known version, ``1``.
 """
 
 from __future__ import annotations

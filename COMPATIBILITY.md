@@ -1,6 +1,6 @@
 # Compatibility Guide
 
-**Current package version**: `9.1.2`
+**Current package version**: `9.1.3`
 
 The on-wire envelope schema version is `3.0.0` and has been unchanged since
 the cutover. The package version and the envelope schema version move
@@ -37,6 +37,16 @@ EXPERIMENTAL-spec-kitty-events#104 and not yet merged to `main`. This
 section is written ahead of that merge so the documentation gap doesn't
 reopen once it lands; it becomes a normal dated-version entry, and this
 "known gap" framing goes away, when #104 merges.
+
+## `9.1.3` — encode rejects unknown Ops Invocation contract versions
+
+`9.1.3` tightens `to_zeitgeist_attrs` for every contract-versioned event
+type. Before encoding, it checks the payload's `contract_version` against
+the same `KNOWN_CONTRACT_VERSIONS_BY_EVENT_TYPE` table used by
+`from_zeitgeist_attrs`. A producer that mis-stamps version `1` payloads with
+an unknown version now fails locally with `UnknownContractVersionError`
+rather than emitting a frame this same package version discards on decode.
+Known-version frames are unaffected.
 
 ## `9.1.2` — derived `detail_ref` attrs must resolve to their own moment
 

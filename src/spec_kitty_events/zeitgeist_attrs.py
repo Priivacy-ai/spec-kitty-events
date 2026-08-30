@@ -348,8 +348,8 @@ class ZeitgeistAttrsControlCharacterError(ZeitgeistAttrsError):
 
 
 class UnknownContractVersionError(ZeitgeistAttrsError):
-    """A ``contract_version`` attr does not name a version this decoder
-    knows how to interpret (see :data:`CONTRACT_VERSIONED_EVENT_TYPES`)."""
+    """A ``contract_version`` value does not name a version this codec knows
+    how to interpret (see :data:`CONTRACT_VERSIONED_EVENT_TYPES`)."""
 
 
 #: The event families the Ephemeral Team Status design moves to ``volatile``
@@ -562,12 +562,21 @@ CONTRACT_VERSIONED_EVENT_TYPES: frozenset[str] = frozenset(
     }
 )
 
-#: Per-type set of ``contract_version`` string values decode currently
+#: Per-type set of ``contract_version`` string values the codec currently
 #: accepts for a :data:`CONTRACT_VERSIONED_EVENT_TYPES` kind.
 KNOWN_CONTRACT_VERSIONS_BY_EVENT_TYPE: Mapping[str, frozenset[str]] = {
     OPS_INVOCATION_STARTED: frozenset({"1"}),
     OPS_INVOCATION_COMPLETED: frozenset({"1"}),
 }
+
+
+def _assert_known_contract_version(event_type: str, version: str) -> None:
+    known = KNOWN_CONTRACT_VERSIONS_BY_EVENT_TYPE[event_type]
+    if version not in known:
+        raise UnknownContractVersionError(
+            f"{event_type} contract_version {version!r} is not a version this "
+            f"package knows how to interpret; known: {sorted(known)}"
+        )
 
 
 # ── bounded moment summaries ────────────────────────────────────────────────
@@ -861,6 +870,8 @@ def to_zeitgeist_attrs(payload: BaseModel, envelope: Event) -> dict[str, str]:
         ZeitgeistAttrsOverflowError: the projection exceeds the key-count,
             key-length, or value-length bounds. No truncation is ever
             applied.
+        UnknownContractVersionError: a contract-versioned payload names a
+            version this package does not know how to encode.
     """
     event_type = next(
         (k for k in PAYLOAD_MODEL_BY_EVENT_TYPE if type(payload) in _payload_types(k)),
@@ -875,6 +886,11 @@ def to_zeitgeist_attrs(payload: BaseModel, envelope: Event) -> dict[str, str]:
         raise ZeitgeistAttrsError(
             f"envelope declares event_type {envelope.event_type!r} but the "
             f"payload is a {event_type} payload"
+        )
+    if event_type in CONTRACT_VERSIONED_EVENT_TYPES:
+        _assert_known_contract_version(
+            event_type,
+            str(getattr(payload, "contract_version")),
         )
 
     # Envelope identity first, so the projection order is stable across
@@ -1294,13 +1310,7 @@ def from_zeitgeist_attrs(event_type: str, attrs: Mapping[str, str]) -> VolatileM
         # contract_version is in _REQUIRED_KEYS_BY_EVENT_TYPE for every
         # CONTRACT_VERSIONED_EVENT_TYPES kind (a non-Optional payload field),
         # so the missing-keys check above already raised if it were absent.
-        version = attrs["contract_version"]
-        known = KNOWN_CONTRACT_VERSIONS_BY_EVENT_TYPE[event_type]
-        if version not in known:
-            raise UnknownContractVersionError(
-                f"{event_type} contract_version {version!r} is not a version this "
-                f"package knows how to interpret; known: {sorted(known)}"
-            )
+        _assert_known_contract_version(event_type, attrs["contract_version"])
 
     return VolatileMoment(
         kind=event_type,

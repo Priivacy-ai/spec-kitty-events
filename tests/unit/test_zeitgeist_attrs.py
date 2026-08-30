@@ -28,6 +28,10 @@ from spec_kitty_events.mission_next import (
     RuntimeActorIdentity,
 )
 from spec_kitty_events.models import Event
+from spec_kitty_events.ops_invocation import (
+    OpsInvocationCompletedPayload,
+    OpsInvocationStartedPayload,
+)
 from spec_kitty_events.status import StatusTransitionPayload
 from spec_kitty_events.zeitgeist_attrs import (
     FORBIDDEN_ATTR_KEYS,
@@ -41,6 +45,7 @@ from spec_kitty_events.zeitgeist_attrs import (
     ZEITGEIST_ATTR_KEY_MAX_CHARS,
     ZEITGEIST_FORBIDDEN_KEYS_V1,
     UnencodableFieldValueError,
+    UnknownContractVersionError,
     UnknownVolatileEventTypeError,
     VolatileMoment,
     ZeitgeistAttrsControlCharacterError,
@@ -331,6 +336,41 @@ def test_encode_canonicalises_a_naive_timestamp_to_utc() -> None:
 def test_envelope_event_type_must_match_the_payload_family() -> None:
     with pytest.raises(ZeitgeistAttrsError):
         to_zeitgeist_attrs(_transition(), _envelope("MissionCreated"))
+
+
+@pytest.mark.parametrize(
+    ("payload", "event_type"),
+    [
+        (
+            OpsInvocationStartedPayload(
+                invocation_id="inv-01",
+                action="team.provision",
+                actor=_identity(),
+                scope="team-01",
+                contract_version=99,
+            ),
+            "OpsInvocationStarted",
+        ),
+        (
+            OpsInvocationCompletedPayload(
+                invocation_id="inv-01",
+                action="team.provision",
+                actor=_identity(),
+                scope="team-01",
+                outcome="success",
+                contract_version=99,
+            ),
+            "OpsInvocationCompleted",
+        ),
+    ],
+    ids=["started", "completed"],
+)
+def test_encode_rejects_unknown_contract_versions(payload, event_type) -> None:
+    with pytest.raises(
+        UnknownContractVersionError,
+        match="contract_version '99' is not a version this package knows how to interpret",
+    ):
+        to_zeitgeist_attrs(payload, _envelope(event_type))
 
 
 def test_absent_optionals_emit_no_key() -> None:
