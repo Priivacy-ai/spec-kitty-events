@@ -23,6 +23,21 @@ This document is the public compatibility policy for consumers of:
 - `spec-kitty-saas`
 - `spec-kitty`
 
+## Known gap (not yet closed) — `to_zeitgeist_attrs` does not yet reject control characters on encode
+
+`from_zeitgeist_attrs` rejects an attrs value carrying a non-printable
+character on decode (`str.isprintable()`, EXPERIMENTAL-spec-kitty-events#25,
+then widened by #63), but `to_zeitgeist_attrs` does not yet run the same
+check on encode (EXPERIMENTAL-spec-kitty-events#64): a producer can
+successfully encode and broadcast an attrs value carrying a control
+character that a consumer's decode will then reject, silently dropping the
+moment. The fix — both directions sharing one predicate and raising the
+same typed `ZeitgeistAttrsControlCharacterError` — is open as
+EXPERIMENTAL-spec-kitty-events#104 and not yet merged to `main`. This
+section is written ahead of that merge so the documentation gap doesn't
+reopen once it lands; it becomes a normal dated-version entry, and this
+"known gap" framing goes away, when #104 merges.
+
 ## `9.1.1` — timestamp parsing normalized across supported Python versions
 
 `9.1.1` is a parser bug fix, not a new event family or payload field. The
@@ -156,21 +171,6 @@ documents the shipped boundary rather than rewriting package history.
 remove a key when any dot-separated segment matches `FORBIDDEN_ATTR_KEYS`;
 do not bypass or weaken the guard. Consumers already pinned to current
 `9.0.0` have this rejection behavior.
-
-## Known gap (not yet closed) — `to_zeitgeist_attrs` does not yet reject control characters on encode
-
-`from_zeitgeist_attrs` rejects an attrs value carrying a non-printable
-character on decode (`str.isprintable()`, EXPERIMENTAL-spec-kitty-events#25,
-then widened by #63), but `to_zeitgeist_attrs` does not yet run the same
-check on encode (EXPERIMENTAL-spec-kitty-events#64): a producer can
-successfully encode and broadcast an attrs value carrying a control
-character that a consumer's decode will then reject, silently dropping the
-moment. The fix — both directions sharing one predicate and raising the
-same typed `ZeitgeistAttrsControlCharacterError` — is open as
-EXPERIMENTAL-spec-kitty-events#104 and not yet merged to `main`. This
-section is written ahead of that merge so the documentation gap doesn't
-reopen once it lands; it becomes a normal dated-version entry, and this
-"known gap" framing goes away, when #104 merges.
 
 ## `8.0.0` — Sync, legacy-envelope, and cutover surfaces deleted
 
@@ -436,40 +436,7 @@ or lane filters from every `Lane` member. Use `DISPLAY_LANES` for ordered
 display/summary surfaces and `NON_DISPLAY_LANES` for explicit exclusions;
 `Lane.GENESIS` is canonical for validation/replay but is not displayable.
 
-## Decision Moment V1 (4.0.0)
-
-### Scope
-
-- **Breaking for DecisionPoint.** The `DecisionPoint*` event family (excluding `DecisionPointOverridden`) now carries `origin_surface` and supports discriminated-union payloads. `DecisionPointResolved` (interview variant) requires `terminal_outcome`.
-- **Compatible for DecisionInput.** `DecisionInputRequested` and `DecisionInputAnswered` payloads are unchanged. 3.x consumers continue to validate.
-
-### Producer migration
-
-| Producer                | 3.x action                         | 4.0.0 action                                                   |
-|-------------------------|------------------------------------|----------------------------------------------------------------|
-| ADR DecisionPoint       | Emit 3.x payload                   | Add `origin_surface: "adr"` to every payload                    |
-| Interview DecisionPoint | (n/a — didn't exist)               | Use `origin_surface: "planning_interview"` + V1 fields          |
-| DecisionInput* events   | Emit as-is                         | No change                                                       |
-
-### Consumer migration
-
-| Consumer                              | 3.x action                                       | 4.0.0 action                                                                 |
-|---------------------------------------|--------------------------------------------------|------------------------------------------------------------------------------|
-| DecisionPoint replay / reducer        | Reduce 3.x ADR payloads                          | Reduce ADR + V1 interview events via the single reducer (discriminated by `origin_surface`) |
-| DecisionInput* consumers              | Consume as-is                                    | No change                                                                    |
-| Slack orchestrator                    | (n/a)                                            | Subscribe to `DecisionPointWidened`; post closure message on `DecisionPointResolved` |
-| Teamspace projection                  | (n/a)                                            | Project V1 fields from `DecisionPointResolved` interview variant             |
-
-### Terminal outcome / write-back rules
-
-- `DecisionInputAnswered` is emitted ONLY when `DecisionPointResolved.terminal_outcome == "resolved"` AND `final_answer` is populated. Deferred and canceled outcomes do NOT emit a `DecisionInputAnswered` (no answer exists).
-- `DecisionPointResolved.closed_locally_while_widened=true` is legal only when a prior `DecisionPointWidened` exists for the same `decision_point_id`. Reducers raise an anomaly (`kind="invalid_transition"`) and project the field as `false` if the precondition is not met.
-
-### No grace period
-
-4.x validators fail closed on missing `terminal_outcome` or missing `origin_surface`. There is no temporary permissive path. Downstream consumers must migrate deliberately against this contract boundary.
-
-## Local-CLI compatibility vs TeamSpace ingress validity (added 2026-05-01)
+## Local-CLI compatibility vs TeamSpace ingress validity (5.0.0)
 
 The `5.0.0` major release sharpens a distinction that has always been implicit in
 `spec-kitty-events`: there are two distinct validity domains, and a row that is
@@ -570,3 +537,36 @@ justifies a major:
 These three changes compound: any one of them is a contract change for at
 least one role, and together they require a major bump rather than a minor or
 patch.
+
+## Decision Moment V1 (4.0.0)
+
+### Scope
+
+- **Breaking for DecisionPoint.** The `DecisionPoint*` event family (excluding `DecisionPointOverridden`) now carries `origin_surface` and supports discriminated-union payloads. `DecisionPointResolved` (interview variant) requires `terminal_outcome`.
+- **Compatible for DecisionInput.** `DecisionInputRequested` and `DecisionInputAnswered` payloads are unchanged. 3.x consumers continue to validate.
+
+### Producer migration
+
+| Producer                | 3.x action                         | 4.0.0 action                                                   |
+|-------------------------|------------------------------------|----------------------------------------------------------------|
+| ADR DecisionPoint       | Emit 3.x payload                   | Add `origin_surface: "adr"` to every payload                    |
+| Interview DecisionPoint | (n/a — didn't exist)               | Use `origin_surface: "planning_interview"` + V1 fields          |
+| DecisionInput* events   | Emit as-is                         | No change                                                       |
+
+### Consumer migration
+
+| Consumer                              | 3.x action                                       | 4.0.0 action                                                                 |
+|---------------------------------------|--------------------------------------------------|------------------------------------------------------------------------------|
+| DecisionPoint replay / reducer        | Reduce 3.x ADR payloads                          | Reduce ADR + V1 interview events via the single reducer (discriminated by `origin_surface`) |
+| DecisionInput* consumers              | Consume as-is                                    | No change                                                                    |
+| Slack orchestrator                    | (n/a)                                            | Subscribe to `DecisionPointWidened`; post closure message on `DecisionPointResolved` |
+| Teamspace projection                  | (n/a)                                            | Project V1 fields from `DecisionPointResolved` interview variant             |
+
+### Terminal outcome / write-back rules
+
+- `DecisionInputAnswered` is emitted ONLY when `DecisionPointResolved.terminal_outcome == "resolved"` AND `final_answer` is populated. Deferred and canceled outcomes do NOT emit a `DecisionInputAnswered` (no answer exists).
+- `DecisionPointResolved.closed_locally_while_widened=true` is legal only when a prior `DecisionPointWidened` exists for the same `decision_point_id`. Reducers raise an anomaly (`kind="invalid_transition"`) and project the field as `false` if the precondition is not met.
+
+### No grace period
+
+4.x validators fail closed on missing `terminal_outcome` or missing `origin_surface`. There is no temporary permissive path. Downstream consumers must migrate deliberately against this contract boundary.
