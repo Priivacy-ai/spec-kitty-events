@@ -48,6 +48,7 @@ from spec_kitty_events.zeitgeist_attrs import (
     PAYLOAD_MODEL_BY_EVENT_TYPE,
     ZEITGEIST_ATTR_KEY_MAX_CHARS,
     UnencodableFieldValueError,
+    UnknownContractVersionError,
     UnknownVolatileEventTypeError,
     VolatileMoment,
     ZeitgeistAttrsError,
@@ -83,6 +84,7 @@ def _build_payload(event_type: str, fields: dict):
 
 
 _ERROR_CLASSES = {
+    "UnknownContractVersionError": UnknownContractVersionError,
     "UnknownVolatileEventTypeError": UnknownVolatileEventTypeError,
     "ZeitgeistAttrsError": ZeitgeistAttrsError,
     "ZeitgeistAttrsOverflowError": importlib.import_module(
@@ -137,10 +139,10 @@ def zeitgeist_attrs_fixtures():
 
 
 def test_fixtures_loaded(zeitgeist_attrs_fixtures) -> None:
-    """31 valid + 8 invalid fixtures are on disk and manifest-registered."""
-    assert len(zeitgeist_attrs_fixtures) == 39
-    assert len([f for f in zeitgeist_attrs_fixtures if f.expected_valid]) == 31
-    assert len([f for f in zeitgeist_attrs_fixtures if not f.expected_valid]) == 8
+    """37 valid + 11 invalid fixtures are on disk and manifest-registered."""
+    assert len(zeitgeist_attrs_fixtures) == 48
+    assert len([f for f in zeitgeist_attrs_fixtures if f.expected_valid]) == 37
+    assert len([f for f in zeitgeist_attrs_fixtures if not f.expected_valid]) == 11
 
 
 def test_fixture_event_ids_are_unique(zeitgeist_attrs_fixtures) -> None:
