@@ -1,6 +1,6 @@
 # Compatibility Guide
 
-**Current package version**: `9.0.1`
+**Current package version**: `9.1.1`
 
 The on-wire envelope schema version is `3.0.0` and has been unchanged since
 the cutover. The package version and the envelope schema version move
@@ -37,6 +37,36 @@ EXPERIMENTAL-spec-kitty-events#104 and not yet merged to `main`. This
 section is written ahead of that merge so the documentation gap doesn't
 reopen once it lands; it becomes a normal dated-version entry, and this
 "known gap" framing goes away, when #104 merges.
+
+## `9.1.1` — timestamp parsing normalized across supported Python versions
+
+`9.1.1` is a parser bug fix, not a new event family or payload field. The
+strict envelope validator, retrospective timestamp validation, and packaged
+timestamp conformance helper now normalize supported ISO-8601 spellings
+before calling `datetime.fromisoformat`, so Python 3.10 accepts the same
+fractional-second precision, basic format, reduced precision, and numeric
+offset spellings that Python 3.11+ already accepted. No producer or consumer
+migration is required.
+
+## `9.0.2` — mixed-case doubled `Z` UTC designators are rejected
+
+`9.0.2` tightens timestamp validation at three normalization sites:
+`strict.validate_strict_envelope`, the retrospective payload validators, and
+the packaged conformance timestamp helper. A malformed value ending in `zZ`
+is now rejected instead of being normalized to a lowercase-`z` form that some
+supported Python interpreters accept. Producers already sending one valid UTC
+designator are unaffected.
+
+## `9.0.1` — `zeitgeist_ref_for` rejects control characters in the derived ref
+
+`9.0.1` tightens the producer-side reject boundary for volatile moments.
+`zeitgeist_ref_for` now applies the same `str.isprintable()` check as attrs
+values to its derived `ref`, so a control or formatting character in a ref
+source such as `mission_slug`, `mission_id`, `run_id`, or
+`decision_point_id` raises `ZeitgeistAttrsControlCharacterError` instead of
+reaching the relay. Producers with printable refs are unaffected; producers
+that previously relied on non-printable ref values must clean or reject those
+values before calling the codec.
 
 ## `9.0.0` — `mission_id` widened onto `WPStatusChanged`/`MissionCreated`/`MissionClosed` for cross-family join (breaking)
 
@@ -179,18 +209,19 @@ forbidden=FORBIDDEN_LEGACY_KEYS))` instead), an
 explicit `record.get("schema_version") == "3.0.0"` check for the envelope
 signal, `(not isinstance(aggregate_id := record.get("aggregate_id"), str)) or
 aggregate_id.split("/", 1)[0] not in strict.FORBIDDEN_LEGACY_AGGREGATE_NAMES`
-for the forbidden legacy aggregate-name prefix — the `isinstance` guard
-matters: a wire record can carry `aggregate_id: null` or another
-non-string, and `strict.py`'s own gate (`isinstance(aggregate_id, str)`)
-treats that as not-forbidden rather than raising, so a recipe that instead
-does `record.get("aggregate_id", "").split(...)` raises `AttributeError` on
-exactly that input instead of reproducing the gate — and
+for the forbidden legacy aggregate-name prefix, and
 `record.get("event_type") not in {"FeatureCreated",
 "FeatureClosed"}` for the forbidden legacy event names (see `## Forbidden
-Legacy Surfaces` below for that list's source). Unlike the other three
-checks, no package constant survives for the legacy event names — they were
-deleted outright in `8.0.0` and not re-homed — so this document is the only
-place a caller outside the strict profile can find them.
+Legacy Surfaces` below for that list's source). The `isinstance` guard on
+the aggregate-name check matters: a wire record can carry `aggregate_id:
+null` or another non-string, and `strict.py`'s own gate
+(`isinstance(aggregate_id, str)`) treats that as not-forbidden rather than
+raising, so a recipe that instead does `record.get("aggregate_id",
+"").split(...)` raises `AttributeError` on exactly that input instead of
+reproducing the gate. Unlike the other three checks, no package constant
+survives for the legacy event names — they were deleted outright in
+`8.0.0` and not re-homed — so this document is the only place a caller
+outside the strict profile can find them.
 
 Migration: pin `>=8.0.0`; delete or re-home any import of the three
 modules. There are no aliases. See `CHANGELOG.md` (`### Breaking`) for the

@@ -191,6 +191,12 @@ from spec_kitty_events.mission_next import (
     NextStepIssuedPayload,
 )
 from spec_kitty_events.models import Event, normalize_event_id
+from spec_kitty_events.ops_invocation import (
+    OPS_INVOCATION_COMPLETED,
+    OPS_INVOCATION_STARTED,
+    OpsInvocationCompletedPayload,
+    OpsInvocationStartedPayload,
+)
 from spec_kitty_events.project_lifecycle import (
     PLAN_COMPLETED,
     PLAN_STARTED,
@@ -208,8 +214,11 @@ from spec_kitty_events.project_lifecycle import (
 from spec_kitty_events.status import WP_STATUS_CHANGED, StatusTransitionPayload
 
 __all__ = [
+    "CONTRACT_VERSIONED_EVENT_TYPES",
+    "DETAIL_REF_SOURCE_EVENT_TYPES",
     "DETAIL_REF_SYNTAX",
     "FORBIDDEN_ATTR_KEYS",
+    "KNOWN_CONTRACT_VERSIONS_BY_EVENT_TYPE",
     "PAYLOAD_MODEL_BY_EVENT_TYPE",
     "PROJECTED_FIELD_BY_EVENT_TYPE",
     "REF_FIELD_BY_EVENT_TYPE",
@@ -222,6 +231,7 @@ __all__ = [
     "ZEITGEIST_FORBIDDEN_KEYS_V1",
     "ZEITGEIST_FORBIDDEN_KEYS_VERSION",
     "UnencodableFieldValueError",
+    "UnknownContractVersionError",
     "UnknownVolatileEventTypeError",
     "VolatileMoment",
     "ZeitgeistAttrsControlCharacterError",
@@ -337,6 +347,11 @@ class ZeitgeistAttrsControlCharacterError(ZeitgeistAttrsError):
     zero-width formatting character)."""
 
 
+class UnknownContractVersionError(ZeitgeistAttrsError):
+    """A ``contract_version`` attr does not name a version this decoder
+    knows how to interpret (see :data:`CONTRACT_VERSIONED_EVENT_TYPES`)."""
+
+
 #: The event families the Ephemeral Team Status design moves to ``volatile``
 #: (design page "The vocabulary"; epic E2). Mirrored by the support matrix.
 #:
@@ -346,7 +361,10 @@ class ZeitgeistAttrsControlCharacterError(ZeitgeistAttrsError):
 #: vocabulary in 8.2.0. ``DecisionPointWidened``/``Discussing``/``Overridden``
 #: are deliberately absent: the MVP moment vocabulary is Opened/Resolved only
 #: (planning#235's "Decisions as moments" bullet); the Slack-widening states
-#: are a separate, not-yet-scoped concern.
+#: are a separate, not-yet-scoped concern. ``OpsInvocationStarted``/
+#: ``OpsInvocationCompleted`` (Ops/Invocation moments;
+#: EXPERIMENTAL-spec-kitty-events#78) joined the vocabulary in 8.3.0 — their
+#: own family, so Ops shares this timeline without reusing a mission kind.
 VOLATILE_EVENT_TYPES: frozenset[str] = frozenset(
     {
         WP_STATUS_CHANGED,
@@ -367,6 +385,8 @@ VOLATILE_EVENT_TYPES: frozenset[str] = frozenset(
         PLAN_COMPLETED,
         TASKS_STARTED,
         TASKS_COMPLETED,
+        OPS_INVOCATION_STARTED,
+        OPS_INVOCATION_COMPLETED,
     }
 )
 
@@ -401,6 +421,8 @@ PAYLOAD_MODEL_BY_EVENT_TYPE: Mapping[str, type[BaseModel] | tuple[type[BaseModel
     PLAN_COMPLETED: PlanCompletedPayload,
     TASKS_STARTED: TasksStartedPayload,
     TASKS_COMPLETED: TasksCompletedPayload,
+    OPS_INVOCATION_STARTED: OpsInvocationStartedPayload,
+    OPS_INVOCATION_COMPLETED: OpsInvocationCompletedPayload,
 }
 
 
@@ -457,6 +479,8 @@ UNBROADCAST_FIELDS: Mapping[str, frozenset[str]] = {
     SPECIFY_COMPLETED: frozenset({"summary"}),
     PLAN_COMPLETED: frozenset({"summary"}),
     TASKS_COMPLETED: frozenset({"summary"}),
+    OPS_INVOCATION_STARTED: frozenset({"request_summary"}),
+    OPS_INVOCATION_COMPLETED: frozenset({"result_summary"}),
 }
 
 #: Per-type field projections: attr key -> canonical attribute carried under
@@ -470,6 +494,8 @@ PROJECTED_FIELD_BY_EVENT_TYPE: Mapping[str, Mapping[str, str]] = {
     DECISION_INPUT_REQUESTED: {"actor": "actor_label"},
     DECISION_INPUT_ANSWERED: {"actor": "actor_label"},
     MISSION_RUN_COMPLETED: {"actor": "actor_label"},
+    OPS_INVOCATION_STARTED: {"actor": "actor_label"},
+    OPS_INVOCATION_COMPLETED: {"actor": "actor_label"},
 }
 
 #: Envelope-sourced attrs every kind carries alongside its payload fields:
@@ -493,20 +519,55 @@ SUMMARY_SOURCE_EVENT_TYPES: frozenset[str] = frozenset(
         SPECIFY_COMPLETED,
         PLAN_COMPLETED,
         TASKS_COMPLETED,
+        OPS_INVOCATION_STARTED,
+        OPS_INVOCATION_COMPLETED,
     }
 )
 
-#: Reserved (not yet implemented) syntax for an opaque ``detail_ref`` attr:
-#: a future moment could carry this alongside ``summary`` so a post-MVP read
-#: service can resolve the full local detail behind a bounded projection
-#: (planning#235 lists that service as post-MVP). No payload in this
-#: package's vocabulary emits it yet — reserving the syntax now means a
-#: future producer/consumer pair does not have to invent one under time
-#: pressure. Syntax: ``"<event_type>:<event_id>"`` — the pair a consumer
+#: Syntax for an opaque ``detail_ref`` attr: a moment can carry this
+#: alongside ``summary`` so a post-MVP read service can resolve the full
+#: local detail behind a bounded projection (planning#235 lists that service
+#: as post-MVP). Syntax: ``"<event_type>:<event_id>"`` — the pair a consumer
 #: already has on every decoded :class:`VolatileMoment` (``kind`` and
 #: ``attrs["event_id"]``), so no new identifier scheme is needed; a future
 #: read service resolves it by looking up that event in the local journal.
+#: First consumed by :data:`DETAIL_REF_SOURCE_EVENT_TYPES` (events#78); no
+#: other kind emits it yet.
 DETAIL_REF_SYNTAX: str = "<event_type>:<event_id>"
+
+#: Event types whose projection carries a derived ``detail_ref`` attr,
+#: always present on a successful encode: it is mechanically derived from
+#: the moment's own ``event_type``/``event_id`` (see :data:`DETAIL_REF_SYNTAX`),
+#: never producer-supplied, so unlike ``summary`` it is never omitted.
+#: "Optional" in this contract's sense is *per kind*, not per instance: only
+#: kinds registered here carry the pointer at all.
+DETAIL_REF_SOURCE_EVENT_TYPES: frozenset[str] = frozenset(
+    {
+        OPS_INVOCATION_STARTED,
+        OPS_INVOCATION_COMPLETED,
+    }
+)
+
+#: Event types whose projection carries an explicit ``contract_version``
+#: attr — a version of the *payload shape*, distinct from the envelope's
+#: fixed ``schema_version`` (see :mod:`spec_kitty_events.ops_invocation`'s
+#: "Contract versioning" section). :func:`from_zeitgeist_attrs` rejects a
+#: ``contract_version`` outside :data:`KNOWN_CONTRACT_VERSIONS_BY_EVENT_TYPE`
+#: with :class:`UnknownContractVersionError` instead of silently decoding a
+#: future revision's attrs under today's assumptions.
+CONTRACT_VERSIONED_EVENT_TYPES: frozenset[str] = frozenset(
+    {
+        OPS_INVOCATION_STARTED,
+        OPS_INVOCATION_COMPLETED,
+    }
+)
+
+#: Per-type set of ``contract_version`` string values decode currently
+#: accepts for a :data:`CONTRACT_VERSIONED_EVENT_TYPES` kind.
+KNOWN_CONTRACT_VERSIONS_BY_EVENT_TYPE: Mapping[str, frozenset[str]] = {
+    OPS_INVOCATION_STARTED: frozenset({"1"}),
+    OPS_INVOCATION_COMPLETED: frozenset({"1"}),
+}
 
 
 # ── bounded moment summaries ────────────────────────────────────────────────
@@ -614,6 +675,20 @@ def _artifact_completed_summary(payload: BaseModel) -> str | None:
     return _bounded_summary([payload.summary or ""])
 
 
+def _ops_invocation_started_summary(payload: BaseModel) -> str | None:
+    """Derive ``OpsInvocationStarted``'s bounded ``summary`` from its own
+    optional ``request_summary: str | None`` field — absent when the
+    producer supplied none (deterministic omission)."""
+    return _bounded_summary([payload.request_summary or ""])
+
+
+def _ops_invocation_completed_summary(payload: BaseModel) -> str | None:
+    """Derive ``OpsInvocationCompleted``'s bounded ``summary`` from its own
+    optional ``result_summary: str | None`` field — absent when the
+    producer supplied none (deterministic omission)."""
+    return _bounded_summary([payload.result_summary or ""])
+
+
 #: Per-type summary builder, keyed the same as :data:`SUMMARY_SOURCE_EVENT_TYPES`.
 _SUMMARY_BUILDER_BY_EVENT_TYPE: Mapping[str, Any] = {
     MISSION_CREATED: _mission_created_summary,
@@ -622,6 +697,8 @@ _SUMMARY_BUILDER_BY_EVENT_TYPE: Mapping[str, Any] = {
     SPECIFY_COMPLETED: _artifact_completed_summary,
     PLAN_COMPLETED: _artifact_completed_summary,
     TASKS_COMPLETED: _artifact_completed_summary,
+    OPS_INVOCATION_STARTED: _ops_invocation_started_summary,
+    OPS_INVOCATION_COMPLETED: _ops_invocation_completed_summary,
 }
 
 
@@ -824,6 +901,9 @@ def to_zeitgeist_attrs(payload: BaseModel, envelope: Event) -> dict[str, str]:
         if summary is not None:
             attrs["summary"] = summary
 
+    if event_type in DETAIL_REF_SOURCE_EVENT_TYPES:
+        attrs["detail_ref"] = f"{event_type}:{attrs['event_id']}"
+
     for key, value in attrs.items():
         _reject_control_characters(f"attr {key!r} value", value)
 
@@ -882,6 +962,8 @@ REF_FIELD_BY_EVENT_TYPE: Mapping[str, str] = {
     PLAN_COMPLETED: "mission_slug",
     TASKS_STARTED: "mission_slug",
     TASKS_COMPLETED: "mission_slug",
+    OPS_INVOCATION_STARTED: "invocation_id",
+    OPS_INVOCATION_COMPLETED: "invocation_id",
 }
 
 
@@ -900,6 +982,8 @@ def zeitgeist_ref_for(event_type: str, payload: BaseModel) -> str | None:
     Raises:
         UnknownVolatileEventTypeError: *event_type* is unknown or *payload*
             is not that event type's payload model.
+        ZeitgeistAttrsControlCharacterError: the ref carries a non-printable
+            character (``not str.isprintable()``).
         ZeitgeistAttrsOverflowError: the ref exceeds
             :data:`ZEITGEIST_ATTRS_MAX_BYTES` (the frame's ``ref`` carries
             the same bound as an attrs entry; see the module docstring).
@@ -915,6 +999,7 @@ def zeitgeist_ref_for(event_type: str, payload: BaseModel) -> str | None:
     if value is None:
         return None  # unreachable for a validated payload; see docstring
     ref = str(value)
+    _reject_control_characters(f"{event_type} ref", ref)
     if _utf8_size(f"{event_type} ref", ref) > ZEITGEIST_ATTRS_MAX_BYTES:
         raise ZeitgeistAttrsOverflowError(
             f"{event_type} ref exceeds the {ZEITGEIST_ATTRS_MAX_BYTES}-byte bound"
@@ -975,14 +1060,17 @@ def _schema_keys(event_type: str) -> frozenset[str]:
     cannot know which variant produced a given frame, so the allowed set is
     the *union* across every variant — a key any one variant can carry is
     schema-legal. The derived ``summary`` attr
-    (:data:`SUMMARY_SOURCE_EVENT_TYPES`) is not a model field at all, so it
-    is added explicitly.
+    (:data:`SUMMARY_SOURCE_EVENT_TYPES`) and the derived ``detail_ref`` attr
+    (:data:`DETAIL_REF_SOURCE_EVENT_TYPES`) are not model fields at all, so
+    they are added explicitly.
     """
     keys: set[str] = set()
     for model in _payload_types(event_type):
         keys |= _schema_keys_for_model(event_type, model)
     if event_type in SUMMARY_SOURCE_EVENT_TYPES:
         keys.add("summary")
+    if event_type in DETAIL_REF_SOURCE_EVENT_TYPES:
+        keys.add("detail_ref")
     return frozenset(keys)
 
 
@@ -1036,7 +1124,10 @@ def _required_schema_keys(event_type: str) -> frozenset[str]:
     across variants. The derived ``summary`` attr is never required: it is
     always omittable prose by this contract's own design (deterministic
     omission when the source is empty), even on kinds where a valid payload
-    happens to always produce one today.
+    happens to always produce one today. The derived ``detail_ref`` attr is
+    the opposite: :func:`to_zeitgeist_attrs` always emits it for a
+    :data:`DETAIL_REF_SOURCE_EVENT_TYPES` kind (it is mechanically derived,
+    never producer-supplied and never absent), so it is required here.
     """
     variants = [
         _required_schema_keys_for_model(event_type, model) for model in _payload_types(event_type)
@@ -1044,6 +1135,8 @@ def _required_schema_keys(event_type: str) -> frozenset[str]:
     keys = variants[0]
     for other in variants[1:]:
         keys &= other
+    if event_type in DETAIL_REF_SOURCE_EVENT_TYPES:
+        keys = keys | {"detail_ref"}
     return keys
 
 
@@ -1187,6 +1280,18 @@ def from_zeitgeist_attrs(event_type: str, attrs: Mapping[str, str]) -> VolatileM
         raise ZeitgeistAttrsError(f"attr 'occurred_at' is not ISO-8601: {occurred_at!r}") from exc
     if parsed_occurred_at.tzinfo is None:
         raise ZeitgeistAttrsError(f"attr 'occurred_at' must be timezone-aware: {occurred_at!r}")
+
+    if event_type in CONTRACT_VERSIONED_EVENT_TYPES:
+        # contract_version is in _REQUIRED_KEYS_BY_EVENT_TYPE for every
+        # CONTRACT_VERSIONED_EVENT_TYPES kind (a non-Optional payload field),
+        # so the missing-keys check above already raised if it were absent.
+        version = attrs["contract_version"]
+        known = KNOWN_CONTRACT_VERSIONS_BY_EVENT_TYPE[event_type]
+        if version not in known:
+            raise UnknownContractVersionError(
+                f"{event_type} contract_version {version!r} is not a version this "
+                f"package knows how to interpret; known: {sorted(known)}"
+            )
 
     return VolatileMoment(
         kind=event_type,

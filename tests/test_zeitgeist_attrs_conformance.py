@@ -48,6 +48,7 @@ from spec_kitty_events.zeitgeist_attrs import (
     PAYLOAD_MODEL_BY_EVENT_TYPE,
     ZEITGEIST_ATTR_KEY_MAX_CHARS,
     UnencodableFieldValueError,
+    UnknownContractVersionError,
     UnknownVolatileEventTypeError,
     VolatileMoment,
     ZeitgeistAttrsError,
@@ -83,6 +84,7 @@ def _build_payload(event_type: str, fields: dict):
 
 
 _ERROR_CLASSES = {
+    "UnknownContractVersionError": UnknownContractVersionError,
     "UnknownVolatileEventTypeError": UnknownVolatileEventTypeError,
     "ZeitgeistAttrsError": ZeitgeistAttrsError,
     "ZeitgeistAttrsOverflowError": importlib.import_module(
@@ -137,10 +139,10 @@ def zeitgeist_attrs_fixtures():
 
 
 def test_fixtures_loaded(zeitgeist_attrs_fixtures) -> None:
-    """31 valid + 8 invalid fixtures are on disk and manifest-registered."""
-    assert len(zeitgeist_attrs_fixtures) == 39
-    assert len([f for f in zeitgeist_attrs_fixtures if f.expected_valid]) == 31
-    assert len([f for f in zeitgeist_attrs_fixtures if not f.expected_valid]) == 8
+    """37 valid + 11 invalid fixtures are on disk and manifest-registered."""
+    assert len(zeitgeist_attrs_fixtures) == 48
+    assert len([f for f in zeitgeist_attrs_fixtures if f.expected_valid]) == 37
+    assert len([f for f in zeitgeist_attrs_fixtures if not f.expected_valid]) == 11
 
 
 def test_fixture_event_ids_are_unique(zeitgeist_attrs_fixtures) -> None:
@@ -169,6 +171,36 @@ def test_every_valid_fixture_covers_one_volatile_event_type(
 ) -> None:
     valid_types = {f.event_type for f in zeitgeist_attrs_fixtures if f.expected_valid}
     assert valid_types == set(PAYLOAD_MODEL_BY_EVENT_TYPE)
+
+
+def test_fixtures_sharing_a_mission_slug_share_their_mission_id(
+    zeitgeist_attrs_fixtures,
+) -> None:
+    """A ``mission_slug`` maps to exactly one ``mission_id`` corpus-wide.
+
+    The corpus demonstrates the cross-family join planning#1012 authorised
+    (``mission_slug``-keyed families joined to ``mission_id``-keyed families
+    for one mission aggregate). Two fixtures pairing the same
+    ``mission_slug`` with two different ``mission_id`` values would show a
+    consumer reading the fixtures a false split identity for one mission,
+    exactly what #69's fixture table was written to demonstrate does *not*
+    happen (events#199).
+    """
+    slug_to_id: dict[str, tuple[str, str]] = {}
+    for fixture in zeitgeist_attrs_fixtures:
+        case = fixture.payload
+        fields = case.get("payload") or case.get("expected_attrs") or case.get("attrs") or {}
+        slug = fields.get("mission_slug")
+        mission_id = fields.get("mission_id")
+        if slug is None or mission_id is None:
+            continue
+        if slug in slug_to_id and slug_to_id[slug][0] != mission_id:
+            other_id, other_fixture_id = slug_to_id[slug]
+            raise AssertionError(
+                f"mission_slug {slug!r} pairs with mission_id {mission_id!r} in "
+                f"{fixture.id!r} but with {other_id!r} in {other_fixture_id!r}"
+            )
+        slug_to_id.setdefault(slug, (mission_id, fixture.id))
 
 
 def test_codec_fixtures_stay_out_of_the_packaged_event_gate() -> None:

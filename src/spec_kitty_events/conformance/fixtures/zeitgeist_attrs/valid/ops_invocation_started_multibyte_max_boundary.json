@@ -1,0 +1,31 @@
+{
+  "event_type": "OpsInvocationStarted",
+  "envelope": {
+    "event_id": "e2e00000-0000-4000-8000-000000000205",
+    "timestamp": "2026-08-25T09:00:00+00:00"
+  },
+  "payload": {
+    "invocation_id": "inv-mb",
+    "action": "team.provision",
+    "actor": {
+      "actor_id": "actor-01",
+      "actor_type": "service"
+    },
+    "scope": "scope-01",
+    "request_summary": "日本語の要約文です。日本語の要約文です。日本語の要約文です。日本語の要約文です。日本語の要約文です。日本語の要約文です。日本語の要約文です。日本語の要約文です。日本語の要約文です。日本語の要約文です。日本語の要約文です。日本語の要約文です。日本語の要約文です。日本語の要約文です。日本語の要約文です。日本語の要約文です。日本語の要約文です。日本語の要約文です。日本語の要約文です。日本語の要約文です。"
+  },
+  "expected_attrs": {
+    "event_id": "e2e00000-0000-4000-8000-000000000205",
+    "occurred_at": "2026-08-25T09:00:00+00:00",
+    "invocation_id": "inv-mb",
+    "action": "team.provision",
+    "actor": "actor-01",
+    "scope": "scope-01",
+    "attempt": "1",
+    "contract_version": "1",
+    "summary": "日本語の要約文です。日本語の要約文です。日本語の要約文です。日本語の要約文です。日本語の要約文です。日本語の要約文です。日本語の要約文です。日本語の要約文です…",
+    "detail_ref": "OpsInvocationStarted:e2e00000-0000-4000-8000-000000000205"
+  },
+  "expected_ref": "inv-mb",
+  "notes": "Multibyte, over-length request_summary forces the bounded summary to its 240-byte max: deterministic UTF-8-safe truncation with a single trailing ellipsis marker, never splitting a multibyte codepoint or raising, mirroring decision_point_opened_multibyte_max_boundary.json."
+}

@@ -1,0 +1,33 @@
+{
+  "event_type": "OpsInvocationCompleted",
+  "envelope": {
+    "event_id": "e2e00000-0000-4000-8000-000000000204",
+    "timestamp": "2026-08-25T09:07:00+00:00"
+  },
+  "payload": {
+    "invocation_id": "inv-02",
+    "action": "relay.restart",
+    "actor": {
+      "actor_id": "actor-02",
+      "actor_type": "human"
+    },
+    "scope": "scope-02",
+    "outcome": "failure",
+    "result_summary": "Relay failed health check after restart."
+  },
+  "expected_attrs": {
+    "event_id": "e2e00000-0000-4000-8000-000000000204",
+    "occurred_at": "2026-08-25T09:07:00+00:00",
+    "invocation_id": "inv-02",
+    "action": "relay.restart",
+    "actor": "actor-02",
+    "scope": "scope-02",
+    "outcome": "failure",
+    "attempt": "1",
+    "contract_version": "1",
+    "summary": "Relay failed health check after restart.",
+    "detail_ref": "OpsInvocationCompleted:e2e00000-0000-4000-8000-000000000204"
+  },
+  "expected_ref": "inv-02",
+  "notes": "result_summary is unbroadcast raw and folds into the derived, bounded summary attr, mirroring request_summary on the Started side."
+}

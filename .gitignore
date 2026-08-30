@@ -33,6 +33,7 @@ dmypy.json
 
 # Environments
 .venv/
+.venv-floor/
 venv/
 ENV/
 env/

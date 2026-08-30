@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 from datetime import datetime
 from typing import Any, Literal, Mapping, Optional, Tuple
 
@@ -496,22 +497,105 @@ def _envelope_shape_error(**details: object) -> ValidationError:
     )
 
 
+#: Matches an ISO-8601/RFC-3339 timestamp in either extended
+#: (``2026-08-25T09:00:00.123456+00:00``) or basic (``20260825T090000Z``)
+#: format, with an optional fractional-second part of *any* digit count and
+#: an optional numeric offset. Used only to reshape a match into the one
+#: extended-with-6-digit-fraction spelling ``fromisoformat`` accepts
+#: identically on every supported interpreter (see
+#: ``_normalize_iso8601_shape``); a non-match is passed through unchanged so
+#: a genuinely malformed string still reaches ``fromisoformat``'s own error.
+#: The trailing-``Z`` designator is handled separately, unconditionally,
+#: before this regex ever runs — see ``_normalize_iso8601_shape`` — so this
+#: pattern's offset alternative only needs to cover a *numeric* offset.
+_ISO8601_SHAPE_RE = re.compile(
+    r"^(?P<date>\d{4}-\d{2}-\d{2}|\d{8})"
+    r"[T ]"
+    r"(?P<time>\d{2}:\d{2}:\d{2}|\d{2}:\d{2}|\d{6}|\d{4}|\d{2})"
+    r"(?P<frac>[.,]\d+)?"
+    r"(?P<offset>[+-]\d{2}:?\d{2})?$"
+)
+
+
+def _normalize_iso8601_shape(value: str) -> str:
+    """Reshape *value* so ``datetime.fromisoformat`` parses it identically
+    on Python 3.10 and 3.11+.
+
+    3.10's ``fromisoformat`` has three gaps 3.11+ closed: it does not
+    recognize the ``Z`` UTC designator at all, it only accepts a
+    fractional-second part of exactly 0, 3, or 6 digits (rejecting, e.g.,
+    Go's ``time.RFC3339Nano`` 9-digit output), and it only accepts the
+    ``-``/``:``-separated "extended" format (rejecting basic format like
+    ``20260825T090000Z``). All three gaps let the same wire bytes decode on
+    one interpreter and raise on the other (spec-kitty-events#122, #135).
+
+    The ``Z`` gap is closed first, unconditionally, exactly as it was
+    before the fractional/basic-format reshape below existed: a trailing
+    ``Z`` is stripped and replaced with ``+00:00`` so it parses the same way
+    on every interpreter. A well-formed value has at most this one trailing
+    ``Z``; if another ``z``/``Z`` remains after stripping it, the input was
+    already malformed and must not be laundered into something 3.11+'s
+    single-stray-character leniency around a trailing ``Z`` would otherwise
+    accept (e.g. a doubled ``"...00ZZ"`` or mixed-case ``"...00zZ"``) while
+    3.10 rejects it outright — so that case raises instead of being
+    reshaped. Doing this *before and independently of* the regex below
+    means a shape the regex does not match (a different separator, reduced
+    precision, ...) is never worse off than it was before the regex-based
+    reshape existed — e.g. a lowercase ``t`` date/time separator or a space
+    before the ``Z`` both parse identically on 3.10 and 3.11+ once the ``Z``
+    has already been rewritten, exactly as on this repo's pre-#122/#135
+    ``main``.
+
+    The regex then truncates/pads any fractional part to 6 digits — the
+    precision ``datetime`` itself stores — inserts the extended-format
+    separators when given basic format, pads a reduced-precision time (bare
+    hour, or hour:minute with no seconds, in either format) out to
+    hour:minute:second, and inserts a colon into a colon-less numeric
+    offset. A value that does not match the expected timestamp shape at all
+    (already malformed, or a format this repo does not need to handle) is
+    returned unchanged, so it still fails ``fromisoformat`` with its
+    ordinary ``ValueError``.
+    """
+    if value.endswith("Z"):
+        candidate = value[:-1]
+        if "z" in candidate.lower():
+            raise ValueError(f"doubled UTC designator in timestamp: {value!r}")
+        value = f"{candidate}+00:00"
+    match = _ISO8601_SHAPE_RE.match(value)
+    if match is None:
+        return value
+    date, time, frac, offset = match.group("date", "time", "frac", "offset")
+    if len(date) == 8:
+        date = f"{date[0:4]}-{date[4:6]}-{date[6:8]}"
+    if ":" in time:
+        if time.count(":") == 1:
+            time = f"{time}:00"
+    elif len(time) == 2:
+        time = f"{time}:00:00"
+    elif len(time) == 4:
+        time = f"{time[0:2]}:{time[2:4]}:00"
+    else:
+        time = f"{time[0:2]}:{time[2:4]}:{time[4:6]}"
+    fraction = f".{frac[1:][:6].ljust(6, '0')}" if frac else ""
+    if offset is None:
+        offset = ""
+    elif ":" not in offset:
+        offset = f"{offset[:3]}:{offset[3:]}"
+    return f"{date}T{time}{fraction}{offset}"
+
+
 def _parse_iso8601(value: str) -> datetime | None:
     """Best-effort ISO-8601 parse. Returns None when unparsable.
 
-    A well-formed value has at most one trailing ``Z``; if another ``Z``
-    remains after stripping it, the input was already malformed and must not
-    be laundered into something Python 3.10's laxer ``fromisoformat`` would
-    accept (e.g. a doubled ``...00ZZ``) (spec-kitty-events#55/#107/#115).
+    A well-formed value has at most one trailing ``Z``; a doubled/mixed-case
+    trailing designator (e.g. ``...00ZZ``/``...00zZ``) is rejected by
+    ``_normalize_iso8601_shape``'s case-folded residual guard before the
+    reshape regex ever runs, so it is never laundered into something Python
+    3.11+'s laxer ``fromisoformat`` would otherwise accept while 3.10 rejects
+    it (spec-kitty-events#55/#107/#115/#122/#135).
     """
-    text = value
-    if text.endswith("Z"):
-        text = text[:-1]
-        if "Z" in text:
-            return None
-        text += "+00:00"
     try:
-        return datetime.fromisoformat(text)
+        return datetime.fromisoformat(_normalize_iso8601_shape(value))
     except ValueError:
         return None
 

@@ -463,8 +463,173 @@ def test_t5_timestamp_with_offset_accepted() -> None:
     assert validate_strict_envelope(envelope) == ()
 
 
-def test_t5b_timestamp_doubled_trailing_z_rejected() -> None:
-    """A doubled trailing "Z" must be rejected on every interpreter version.
+def test_t5b_timestamp_nanosecond_fraction_that_splits_by_python_version_accepted() -> None:
+    """spec-kitty-events#135: ``datetime.fromisoformat`` on 3.10 rejects a
+    fractional-second part outside 0/3/6 digits (e.g. Go's
+    ``time.RFC3339Nano`` 9-digit output), accepted on 3.11+ for the same
+    wire bytes. ``validate_strict_envelope``'s step 8 (``_parse_iso8601``)
+    must accept this identically regardless of the interpreter running it.
+    (The basic-format half of this split is covered directly against
+    ``_parse_iso8601`` below: ``Event.model_validate`` — step 9, a
+    separate, pydantic-core-level parser that is not Python-version-
+    dependent — always rejects basic format on every interpreter, so it
+    is out of #135's scope and cannot round-trip through the full
+    envelope validator.)
+
+    Also asserts ``_normalize_iso8601_shape`` actually reshaped the value
+    (squad finding on this PR, 2026-08-27): asserting acceptance alone
+    passes identically whether or not the reshape ran, on any interpreter
+    that already tolerates 9-digit fractions (3.11+, which is what this
+    repo's own test runner uses) — so this fails on every interpreter if
+    the reshape is missing or broken, not only on 3.10."""
+    from spec_kitty_events.strict import _normalize_iso8601_shape
+
+    assert (
+        _normalize_iso8601_shape("2026-01-01T00:00:00.123456789Z")
+        == "2026-01-01T00:00:00.123456+00:00"
+    )
+    envelope = _mission_started_envelope(timestamp="2026-01-01T00:00:00.123456789Z")
+    assert validate_strict_envelope(envelope) == ()
+
+
+@pytest.mark.parametrize(
+    "value,reshaped",
+    [
+        pytest.param(
+            "2026-01-01T00:00:00.123456789Z",
+            "2026-01-01T00:00:00.123456+00:00",
+            id="z-suffix-nanosecond-fraction",
+        ),
+        pytest.param(
+            "20260101T000000Z",
+            "2026-01-01T00:00:00+00:00",
+            id="basic-format-z-suffix",
+        ),
+        pytest.param(
+            "20260101T020000+0200",
+            "2026-01-01T02:00:00+02:00",
+            id="basic-format-numeric-offset",
+        ),
+        pytest.param(
+            "2026-01-01T00:00Z",
+            "2026-01-01T00:00:00+00:00",
+            id="extended-minute-precision-z-suffix",
+        ),
+        pytest.param(
+            "2026-01-01T00Z",
+            "2026-01-01T00:00:00+00:00",
+            id="extended-hour-precision-z-suffix",
+        ),
+        pytest.param(
+            "20260101T0000Z",
+            "2026-01-01T00:00:00+00:00",
+            id="basic-format-minute-precision-z-suffix",
+        ),
+        pytest.param(
+            "20260101T00Z",
+            "2026-01-01T00:00:00+00:00",
+            id="basic-format-hour-precision-z-suffix",
+        ),
+    ],
+)
+def test_parse_iso8601_accepts_shapes_that_split_by_python_version(
+    value: str, reshaped: str
+) -> None:
+    """Unit-level check on ``_parse_iso8601`` itself (spec-kitty-events#135),
+    isolated from ``Event.model_validate``'s separate, stricter parser
+    (see the docstring above).
+
+    Asserts ``_normalize_iso8601_shape``'s exact output, not just that
+    ``_parse_iso8601`` accepted the value (squad finding, 2026-08-27):
+    the acceptance-only assertion passes identically with the reshape
+    code deleted entirely on any interpreter that natively tolerates
+    these shapes, so it never actually exercised the fix.
+
+    The four reduced-precision cases (squad pass 2 MAJOR, 2026-08-27) guard
+    against the seconds component being mandatory in ``_ISO8601_SHAPE_RE``:
+    that made the trailing-``Z`` rewrite conditional on a full match, so a
+    minute- or hour-precision ``Z``-suffixed value that did not match fell
+    through to ``fromisoformat`` with a literal ``Z`` still attached — which
+    only 3.11+ accepts, reintroducing on 3.10 exactly the interpreter split
+    this PR exists to remove."""
+    from spec_kitty_events.strict import _normalize_iso8601_shape, _parse_iso8601
+
+    assert _normalize_iso8601_shape(value) == reshaped
+    assert _parse_iso8601(value) is not None
+
+
+def test_parse_iso8601_rejects_malformed_value() -> None:
+    from spec_kitty_events.strict import _parse_iso8601
+
+    assert _parse_iso8601("not a timestamp") is None
+
+
+def test_parse_iso8601_still_rejects_doubled_z_at_reduced_precision() -> None:
+    """Guards the incidental gain the squad flagged as worth keeping
+    (pass 2, 2026-08-27): closing the reduced-precision gap above must not
+    resurrect acceptance of a doubled trailing ``Z``, at every precision,
+    not only at second precision. ``_normalize_iso8601_shape``'s
+    case-folded residual guard (mirrors #132's ``_normalize_occurred_at``,
+    controller-qa finding 2026-08-28) now raises directly on a
+    doubled/mixed-case trailing designator, before the reshape regex ever
+    runs, rather than relying on the regex failing to match — a fully
+    anchored offset group that only accepts a single ``Z`` would otherwise
+    let a value like ``"...00zZ"`` fall through unchanged to
+    ``fromisoformat``, which 3.11+ accepts and 3.10 rejects."""
+    from spec_kitty_events.strict import _normalize_iso8601_shape, _parse_iso8601
+
+    for value in (
+        "2026-01-01T00:00:00ZZ",
+        "2026-01-01T00:00ZZ",
+        "2026-01-01T00ZZ",
+        "2026-01-01T00:00:00zZ",
+    ):
+        with pytest.raises(ValueError):
+            _normalize_iso8601_shape(value)
+        assert _parse_iso8601(value) is None
+
+
+@pytest.mark.parametrize(
+    "value,reshaped",
+    [
+        pytest.param(
+            "2026-01-01t00:00:00Z",
+            "2026-01-01t00:00:00+00:00",
+            id="lowercase-t-separator",
+        ),
+        pytest.param(
+            "2026-01-01T00:00:00 Z",
+            "2026-01-01T00:00:00 +00:00",
+            id="space-before-z",
+        ),
+    ],
+)
+def test_parse_iso8601_does_not_newly_split_shapes_the_regex_does_not_match(
+    value: str, reshaped: str
+) -> None:
+    """Controller-qa finding, 2026-08-28: the regex-based reshape must not
+    make a shape it doesn't match *worse off* than it was on ``main``
+    before this PR's reshape existed. A lowercase ``t`` date/time separator
+    and a stray space before the ``Z`` designator both fail to match
+    ``_ISO8601_SHAPE_RE`` (whose separator group is ``[T ]`` and whose
+    offset group has no leading whitespace), so they must still go through
+    the unconditional ``Z``-strip that runs before the regex — exactly as
+    ``main`` always did for every shape, not only the ones this PR's regex
+    happens to match. Verified on real Python 3.10.14 and 3.13.1
+    (2026-08-28): ``fromisoformat`` accepts both reshaped strings
+    identically on both interpreters (3.10's separator/leniency rules
+    already tolerate any single stray character here, once the ``Z`` is
+    already rewritten to ``+00:00``)."""
+    from spec_kitty_events.strict import _normalize_iso8601_shape, _parse_iso8601
+
+    assert _normalize_iso8601_shape(value) == reshaped
+    assert _parse_iso8601(value) is not None
+
+
+def test_t5c_timestamp_doubled_trailing_z_rejected_end_to_end() -> None:
+    """A doubled trailing "Z" must be rejected on every interpreter version,
+    through the full ``validate_strict_envelope`` path (not just at the
+    ``_parse_iso8601``/``_normalize_iso8601_shape`` unit level above).
 
     Stripping only the final "Z" and appending "+00:00" would otherwise turn
     this into "...00Z+00:00", which Python 3.10's laxer ``fromisoformat``
@@ -481,6 +646,36 @@ def test_t5b_timestamp_doubled_trailing_z_rejected() -> None:
         and e.details.get("reason") == "unparsable"
     ]
     assert len(unparsable) == 1
+
+
+def test_t5b_timestamp_doubled_trailing_z_rejected() -> None:
+    """A doubled trailing "Z" must be rejected on every interpreter version.
+    Stripping only the final "Z" and appending "+00:00" would otherwise turn
+    this into "...00Z+00:00", which Python 3.10's laxer ``fromisoformat``
+    accepts even though it is not a valid ISO-8601 timestamp
+    (spec-kitty-events#124). Also fails step 9's ``Event.model_validate``
+    (that model rejects the same malformed string independently), so both
+    show up as separate ``timestamp``-path errors.
+    """
+    envelope = _mission_started_envelope(timestamp="2026-01-01T00:00:00ZZ")
+    errors = validate_strict_envelope(envelope)
+    assert {e.path[0] for e in errors} == {"timestamp"}
+    shape_errors = [e for e in errors if e.details.get("reason") == "unparsable"]
+    assert len(shape_errors) == 1
+    assert shape_errors[0].code == ValidationErrorCode.ENVELOPE_SHAPE_INVALID
+
+
+def test_t5c_timestamp_mixed_case_doubled_z_rejected() -> None:
+    """A doubled UTC designator must be rejected regardless of case: a
+    case-sensitive residual check misses a lowercase "z" left behind by a
+    mixed-case doubled designator (e.g. "...00zZ"), which would otherwise
+    launder it into "...00z+00:00" (spec-kitty-events#124)."""
+    envelope = _mission_started_envelope(timestamp="2026-01-01T00:00:00zZ")
+    errors = validate_strict_envelope(envelope)
+    assert {e.path[0] for e in errors} == {"timestamp"}
+    shape_errors = [e for e in errors if e.details.get("reason") == "unparsable"]
+    assert len(shape_errors) == 1
+    assert shape_errors[0].code == ValidationErrorCode.ENVELOPE_SHAPE_INVALID
 
 
 def test_t6_observation_payload_carries_ts_field_rejected() -> None:

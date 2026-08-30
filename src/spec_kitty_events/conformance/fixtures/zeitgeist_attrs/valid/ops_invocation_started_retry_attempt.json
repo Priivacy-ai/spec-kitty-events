@@ -1,0 +1,30 @@
+{
+  "event_type": "OpsInvocationStarted",
+  "envelope": {
+    "event_id": "e2e00000-0000-4000-8000-000000000202",
+    "timestamp": "2026-08-25T09:05:00+00:00"
+  },
+  "payload": {
+    "invocation_id": "inv-01",
+    "action": "team.provision",
+    "actor": {
+      "actor_id": "actor-01",
+      "actor_type": "service"
+    },
+    "scope": "scope-01",
+    "attempt": 2
+  },
+  "expected_attrs": {
+    "event_id": "e2e00000-0000-4000-8000-000000000202",
+    "occurred_at": "2026-08-25T09:05:00+00:00",
+    "invocation_id": "inv-01",
+    "action": "team.provision",
+    "actor": "actor-01",
+    "scope": "scope-01",
+    "attempt": "2",
+    "contract_version": "1",
+    "detail_ref": "OpsInvocationStarted:e2e00000-0000-4000-8000-000000000202"
+  },
+  "expected_ref": "inv-01",
+  "notes": "A retry re-emits Started with the SAME invocation_id (inv-01, matching ops_invocation_started_minimal) and attempt incremented to 2, never a new invocation_id (see ops_invocation.py's 'Correlation, idempotency, and retries')."
+}

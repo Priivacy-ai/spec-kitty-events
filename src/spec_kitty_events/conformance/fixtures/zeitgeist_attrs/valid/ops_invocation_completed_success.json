@@ -1,0 +1,31 @@
+{
+  "event_type": "OpsInvocationCompleted",
+  "envelope": {
+    "event_id": "e2e00000-0000-4000-8000-000000000203",
+    "timestamp": "2026-08-25T09:06:00+00:00"
+  },
+  "payload": {
+    "invocation_id": "inv-01",
+    "action": "team.provision",
+    "actor": {
+      "actor_id": "actor-01",
+      "actor_type": "service"
+    },
+    "scope": "scope-01",
+    "outcome": "success"
+  },
+  "expected_attrs": {
+    "event_id": "e2e00000-0000-4000-8000-000000000203",
+    "occurred_at": "2026-08-25T09:06:00+00:00",
+    "invocation_id": "inv-01",
+    "action": "team.provision",
+    "actor": "actor-01",
+    "scope": "scope-01",
+    "outcome": "success",
+    "attempt": "1",
+    "contract_version": "1",
+    "detail_ref": "OpsInvocationCompleted:e2e00000-0000-4000-8000-000000000203"
+  },
+  "expected_ref": "inv-01",
+  "notes": "Concludes the attempt opened by ops_invocation_started_minimal: same invocation_id and attempt, outcome=success, no result_summary means no derived summary attr."
+}
