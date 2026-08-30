@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [9.1.4] - 2026-08-30
+
+### Added
+
+- A packaged `zeitgeist_attrs` conformance fixture now rejects an inbound
+  `OpsInvocationStarted` frame missing its required derived `detail_ref`
+  attr, covering the decode requirement introduced with the Ops Invocation
+  moment contracts (EXPERIMENTAL-spec-kitty-events#192).
+
 ## [9.1.3] - 2026-08-30
 
 ### Fixed

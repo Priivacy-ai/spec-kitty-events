@@ -2,7 +2,7 @@
 
 Canonical event contracts for Spec Kitty mission state, mission runtime, conformance, and replay.
 
-**Package Version**: `9.1.3` | **Envelope Schema Version**: `3.0.0` | **Python**: `>=3.10`
+**Package Version**: `9.1.4` | **Envelope Schema Version**: `3.0.0` | **Python**: `>=3.10`
 
 ## What Changed In 8.0.0
 
