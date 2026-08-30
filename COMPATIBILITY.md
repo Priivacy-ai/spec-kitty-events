@@ -1,6 +1,6 @@
 # Compatibility Guide
 
-**Current package version**: `9.1.0`
+**Current package version**: `9.1.1`
 
 The on-wire envelope schema version is `3.0.0` and has been unchanged since
 the cutover. The package version and the envelope schema version move
@@ -22,6 +22,16 @@ This document is the public compatibility policy for consumers of:
 - `spec-kitty-events`
 - `spec-kitty-saas`
 - `spec-kitty`
+
+## `9.1.1` — timestamp parsing normalized across supported Python versions
+
+`9.1.1` is a parser bug fix, not a new event family or payload field. The
+strict envelope validator, retrospective timestamp validation, and packaged
+timestamp conformance helper now normalize supported ISO-8601 spellings
+before calling `datetime.fromisoformat`, so Python 3.10 accepts the same
+fractional-second precision, basic format, reduced precision, and numeric
+offset spellings that Python 3.11+ already accepted. No producer or consumer
+migration is required.
 
 ## `9.0.2` — mixed-case doubled `Z` UTC designators are rejected
 

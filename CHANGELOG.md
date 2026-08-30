@@ -44,6 +44,20 @@ This is explicitly post-MVP scope only: the CLI emitter, SaaS view, and
 detail-read service that would resolve a `detail_ref` are not implemented
 here.
 
+## [9.1.1] - 2026-08-30
+
+### Fixed
+
+- `_parse_iso8601` (`strict.py`, backing the packaged/exported
+  `validate_strict_envelope`), `_assert_iso8601_timestamp` (`retrospective.py`),
+  and `_extract_envelope_timestamp` (the packaged conformance helper
+  `timestamp_semantics.py`) now reshape a timestamp's fractional-second
+  digit count, basic/extended format, reduced time precision, and numeric
+  offset before calling `datetime.fromisoformat`, so those ISO-8601
+  spellings parse identically on Python 3.10 and 3.11+ instead of
+  splitting by interpreter (EXPERIMENTAL-spec-kitty-events#135, the mirror
+  of #122's rejection-split fix at these three sibling call sites).
+
 ## [9.0.2] - 2026-08-29
 
 ### Fixed
