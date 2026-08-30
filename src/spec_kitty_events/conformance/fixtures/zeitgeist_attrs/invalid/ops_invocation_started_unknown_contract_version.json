@@ -1,0 +1,17 @@
+{
+  "event_type": "OpsInvocationStarted",
+  "attrs": {
+    "event_id": "e2e00000-0000-4000-8000-000000000207",
+    "occurred_at": "2026-08-25T09:00:00+00:00",
+    "invocation_id": "inv-01",
+    "action": "team.provision",
+    "actor": "actor-01",
+    "scope": "scope-01",
+    "attempt": "1",
+    "contract_version": "2",
+    "detail_ref": "OpsInvocationStarted:e2e00000-0000-4000-8000-000000000207"
+  },
+  "direction": "from",
+  "expected_error": "UnknownContractVersionError",
+  "notes": "contract_version 2 names a payload-shape revision this decoder does not know (KNOWN_CONTRACT_VERSIONS_BY_EVENT_TYPE only lists \"1\" today); decode fails closed with a named error rather than silently misinterpreting a future revision's attrs (events#78's 'unknown-version' fixture requirement)."
+}

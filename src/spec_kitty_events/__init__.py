@@ -19,13 +19,18 @@ This release publishes:
   join the volatile vocabulary, and a derived, bounded, truncatable
   ``summary`` attr is added for ``MissionCreated`` and the artifact-lifecycle
   ``*Completed`` kinds.
+- Ops/Invocations bounded moment contracts (``spec_kitty_events.ops_invocation``):
+  ``OpsInvocationStarted``/``OpsInvocationCompleted`` join the volatile
+  vocabulary so operations can share the Team Kitty timeline with missions
+  without reusing mission event kinds. Post-MVP; the CLI emitter, SaaS view,
+  and detail service are not implemented here.
 
 The offline sync/cutover surfaces (``spec_kitty_events.sync``, ``legacy``,
 ``cutover``) were removed in ``8.0.0``; envelope-level fail-closed gating now
 lives in ``spec_kitty_events.strict.validate_strict_envelope``.
 """
 
-__version__ = "8.2.1"
+__version__ = "9.1.0"
 
 # Core data models
 from spec_kitty_events.models import (
@@ -144,6 +149,19 @@ from spec_kitty_events.project_lifecycle import (
     HistoryAddedPayload,
     ErrorLoggedPayload,
     DependencyResolvedPayload,
+)
+
+# Ops/Invocations bounded moment contracts (E-post-MVP, events#78). Shares
+# the Team Kitty volatile-moment vocabulary via zeitgeist_attrs without
+# reusing mission event kinds; no CLI emitter/SaaS view/detail service yet.
+from spec_kitty_events.ops_invocation import (
+    OPS_INVOCATION_STARTED,
+    OPS_INVOCATION_COMPLETED,
+    OPS_INVOCATION_EVENT_TYPES,
+    OPS_INVOCATION_CONTRACT_VERSION,
+    OpsInvocationOutcome,
+    OpsInvocationStartedPayload,
+    OpsInvocationCompletedPayload,
 )
 
 # Build-aggregate event contracts (shipped by mission
@@ -630,6 +648,14 @@ __all__ = [
     "TasksStartedPayload",
     "TasksCompletedPayload",
     "WPCreatedPayload",
+    # Ops/Invocations bounded moment contracts
+    "OPS_INVOCATION_STARTED",
+    "OPS_INVOCATION_COMPLETED",
+    "OPS_INVOCATION_EVENT_TYPES",
+    "OPS_INVOCATION_CONTRACT_VERSION",
+    "OpsInvocationOutcome",
+    "OpsInvocationStartedPayload",
+    "OpsInvocationCompletedPayload",
     # Collaboration event contracts
     "PARTICIPANT_INVITED",
     "PARTICIPANT_JOINED",

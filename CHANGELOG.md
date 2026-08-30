@@ -7,6 +7,53 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [9.1.0] - 2026-08-30
+
+### Added
+
+- Ops/Invocations bounded moment contracts: `OpsInvocationStarted` and
+  `OpsInvocationCompleted` join the volatile vocabulary so operations can
+  share the Team Kitty timeline with missions without reusing mission event
+  kinds (EXPERIMENTAL-spec-kitty-events#78). Each payload carries a stable
+  `invocation_id`, `action`, a projected `actor` label, a bounded `scope`,
+  an `attempt` counter for retry correlation, an explicit `contract_version`
+  (default `1`), and an optional unbroadcast `request_summary` /
+  `result_summary` that folds into the derived, bounded `summary` attr;
+  `OpsInvocationCompleted` additionally carries a required `outcome`
+  (`success`/`failure`). Both kinds derive an opaque `detail_ref` attr
+  (`"<event_type>:<event_id>"`) via the new `DETAIL_REF_SOURCE_EVENT_TYPES`
+  mechanism, first implementing the previously-reserved `DETAIL_REF_SYNTAX`.
+  `invocation_id` + `attempt` together express start/completion/retry
+  correlation and idempotency: a stable `invocation_id` ties every attempt
+  of the same logical invocation together, while `attempt` disambiguates
+  retries of the same invocation.
+- `from_zeitgeist_attrs` now validates a decoded kind's `contract_version`
+  attr against a new `KNOWN_CONTRACT_VERSIONS_BY_EVENT_TYPE` table (via the
+  new, generic `CONTRACT_VERSIONED_EVENT_TYPES` opt-in mechanism) and raises
+  the new `UnknownContractVersionError` on a version this package does not
+  know how to interpret, rather than silently misinterpreting a future
+  payload-shape revision's attrs. Currently opted in by the two Ops
+  Invocation kinds only; existing kinds are unaffected.
+- Nine new golden `zeitgeist_attrs` conformance fixtures cover the Ops
+  Invocation kinds: minimal/with-summary/retry-attempt Started, success/
+  failure-with-summary Completed, a multibyte 240-byte truncation boundary,
+  an over-bound raw field, an unknown `contract_version`, and a missing
+  required `outcome` key.
+
+This is explicitly post-MVP scope only: the CLI emitter, SaaS view, and
+detail-read service that would resolve a `detail_ref` are not implemented
+here.
+
+## [9.0.2] - 2026-08-29
+
+### Fixed
+
+- `strict.validate_strict_envelope`, the retrospective payload validators,
+  and the conformance timestamp helper now reject a doubled trailing `Z`
+  case-insensitively. A malformed mixed-case value such as
+  `...00zZ` can no longer be normalized into a form that some supported
+  interpreters accept (EXPERIMENTAL-spec-kitty-events#124).
+
 ### Fixed
 
 - `COMPATIBILITY.md`'s `8.0.0` migration recipe for callers outside
@@ -74,11 +121,106 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   bullet moves under a dated release heading, in past tense, once #104
   lands.
 
+## [9.0.1] - 2026-08-29
+
+### Fixed
+
+- `zeitgeist_ref_for` now rejects a derived `ref` carrying control
+  characters, matching the check the module's decode side
+  (`from_zeitgeist_attrs`) already applies to attrs values
+  (EXPERIMENTAL-spec-kitty-events#106). The frame's `ref` is derived from
+  the same slug/id fields (`mission_slug`, `run_id`, ...) that ride as
+  attrs values, so it was the one field this module emits that a producer
+  could still smuggle a control character through unchecked.
+
+## [9.0.0] - 2026-08-28
+
+### Breaking
+
+- **`StatusTransitionPayload` (`WPStatusChanged`) and `MissionClosedPayload`
+  (`MissionClosed`) now accept a `mission_id` key in their `zeitgeist_attrs`
+  projection that every `<9.0.0` decode of these two families rejected as
+  unknown.** `from_zeitgeist_attrs`'s closed key vocabulary for a kind is
+  derived from its payload model's fields (`_schema_keys_for_model`); before
+  this release neither model declared `mission_id`, so a `<9.0.0` consumer's
+  decode of an attrs frame carrying that key raised
+  `ZeitgeistAttrsError("attrs carry keys outside the ... schema")` instead of
+  decoding it. This is exactly the "previously-rejected envelope now
+  accepted" case `contracts/versioning-and-compatibility.md` classifies as
+  major, regardless of the change being additive at the Pydantic-model
+  level — the accept/reject *boundary* moved, and consumers pinned to the
+  previous major fail closed on the new key the moment a producer emits it.
+  `MissionCreatedPayload` is unaffected by this classification: it already
+  declared `mission_id` before this release (prior, unrelated work), so its
+  decode boundary already admitted the key — this bump only widens
+  `StatusTransitionPayload`/`MissionClosedPayload`.
+  `REF_FIELD_BY_EVENT_TYPE` itself is unchanged — `PhaseEntered` keeps
+  `mission_id` as its ref and the other three keep `mission_slug` as
+  theirs; only the attrs vocabulary widens
+  (EXPERIMENTAL-spec-kitty-events#69, resolving
+  EXPERIMENTAL-spec-kitty-planning#1012, squad MAJOR on PR #196).
+
+### Added
+
+- `StatusTransitionPayload` (`WPStatusChanged`) and `MissionClosedPayload`
+  (`MissionClosed`) now declare an optional `mission_id` field (default
+  `None`). When a producer populates it, `mission_id` rides alongside
+  `mission_slug` in the `to_zeitgeist_attrs` projection for all three
+  mission-scoped families, so a consumer can join one of their moments
+  against a `PhaseEntered` moment (whose frame ref is `mission_id`) for the
+  same mission aggregate.
+- `tests/unit/test_zeitgeist_attrs.py::test_head_encode_rejected_by_previous_major_decode_boundary`
+  pins the breaking boundary directly: it encodes `mission_id` onto both
+  families with this release's models, then decodes the identical attrs
+  against a reconstructed `<9.0.0` closed key set and asserts the decode
+  raises — a durable regression guard against re-additivizing this change.
+
+### Required consumer action
+
+Producers (`spec-kitty`, `spec-kitty-saas`) MUST capability-gate rollout of
+populating `mission_id` on `WPStatusChanged`/`MissionClosed` exactly like the
+`6.0.0` `genesis`-lane precedent: do not populate the field for a broadcast
+until every consumer that will read it has upgraded its
+`spec-kitty-events` pin to `>=9.0.0`. A producer that populates `mission_id`
+while any live consumer is still pinned `<9.0.0` causes that consumer's
+`from_zeitgeist_attrs` to raise on decode, silently dropping the moment
+(mirrors `contracts/lane-vocabulary.md`'s "Consumers cannot be assumed to be
+typed" rollout risk). Bump the `spec-kitty-events` constraint to `>=9.0.0`
+before relying on the new key; omitting `mission_id` remains fully
+compatible with every prior major.
+
+Per `PROGRAM.md` §2: bump the pinned rev/version in every consumer that adopts
+`9.0.0` and name each one in that PR's Blast radius section.
+
 ## [8.2.1] - 2026-08-27
+
+### Breaking
+
+- **Attrs keys are rejected when any dot-separated segment is forbidden, on
+  both encode and decode.** Before PR #139, `_forbidden_key_hits` checked only
+  an exact key or its trailing segment, so a key such as `token.sub`,
+  `url.href`, `team.name`, or `a.token.b` passed even though it contained a
+  member of `FORBIDDEN_ATTR_KEYS`. Starting at implementation commit
+  `d18a67a` (merged as `1e21a29`), every segment is scanned and those shapes
+  raise the existing forbidden-key error instead. This security fix is a
+  breaking accept/reject-boundary widening under
+  `contracts/versioning-and-compatibility.md`: envelopes that previously
+  encoded and decoded successfully are now rejected
+  (EXPERIMENTAL-spec-kitty-events#133; documentation follow-up #208).
+
+  The package still declared `8.2.1` when this took effect. That version had
+  already been declared at earlier trees, so the exact pin is the only
+  unambiguous historical boundary; the later `9.0.0` bump belongs to the
+  unrelated `mission_id` widening and must not be read as this fix's original
+  release. Consumers moving an exact git pin across `1e21a29` must remove or
+  rename attrs whose dot segments match `FORBIDDEN_ATTR_KEYS` before rollout.
 
 ### Changed
 
-- Bumped the patch version only — no source-code change. `8.2.0` had been
+- At the original version-declaration commit, bumped the patch version only —
+  no source-code change. PR #139 later changed behavior while the package
+  still declared `8.2.1`; the `### Breaking` entry above records that distinct
+  exact-commit boundary. `8.2.0` had been
   declared at two distinct trees on `main`: the commit three consumers had
   already adopted (`c93dbfbf`, pinned by `EXPERIMENTAL-spec-kitty`,
   `-saas`, and `-zeitgeist`), and a later repo-wide `ruff format` pass

@@ -22,11 +22,12 @@ test-fast: ## Run the whole suite without coverage (~16s) — the implementer bl
 # sharing .venv let `uv run --python 3.10` silently downgrade test-full's coverage run to
 # 3.10 as well, dropping default-interpreter coverage entirely (squad finding on PR #130).
 test-floor: ## Run the whole suite on the declared support floor (Python 3.10)
-	UV_PROJECT_ENVIRONMENT=.venv-floor uv run --python 3.10 pytest --no-cov -q $(ARGS)
+	UV_PROJECT_ENVIRONMENT=.venv-floor uv run --python 3.10.21 pytest --no-cov -q $(ARGS)
 
-test-full: test-floor ## Run the whole suite with the configured coverage report — what the CI agent runs
+test-full: test-floor lint ## Run the whole suite with the configured coverage report — what the CI agent runs
 	uv run pytest $(ARGS)
 
-lint: ## Run the pinned ruff check gate plus the formatter check (see pyproject.toml [tool.ruff])
+lint: ## Run the pinned ruff check gate, the formatter check, and the version-amendment guard
 	uv run ruff check .
 	uv run ruff format --check .
+	uv run python scripts/check_version_not_amended.py

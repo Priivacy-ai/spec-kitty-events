@@ -18,6 +18,20 @@
       "description": "Opaque actor identifier of who closed the mission (broadcast under the moment's ``actor`` key)",
       "title": "Actor"
     },
+    "mission_id": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Canonical machine-facing mission identity (ULID); optional, rides alongside mission_slug so a consumer can join this moment against PhaseEntered (whose frame ref is mission_id) for the same mission aggregate (spec-kitty-events#69)",
+      "title": "Mission Id"
+    },
     "mission_number": {
       "description": "Canonical mission number",
       "minimum": 1,

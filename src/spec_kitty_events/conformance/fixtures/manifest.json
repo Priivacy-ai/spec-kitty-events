@@ -2215,6 +2215,30 @@
       "min_version": "8.2.0"
     },
     {
+      "id": "wp_status_changed_mission_id_present",
+      "path": "zeitgeist_attrs/valid/wp_status_changed_mission_id_present.json",
+      "expected_result": "valid",
+      "event_type": "WPStatusChanged",
+      "notes": "mission_id present alongside mission_slug: the family's ref field stays mission_slug (REF_FIELD_BY_EVENT_TYPE is unchanged), but mission_id now rides in attrs so a consumer can join this moment against PhaseEntered for the same mission aggregate (spec-kitty-events#69).",
+      "min_version": "9.0.0"
+    },
+    {
+      "id": "mission_closed_mission_id_present",
+      "path": "zeitgeist_attrs/valid/mission_closed_mission_id_present.json",
+      "expected_result": "valid",
+      "event_type": "MissionClosed",
+      "notes": "mission_id present alongside mission_slug: the family's ref field stays mission_slug (REF_FIELD_BY_EVENT_TYPE is unchanged), but mission_id now rides in attrs so a consumer can join this moment against PhaseEntered for the same mission aggregate (spec-kitty-events#69).",
+      "min_version": "9.0.0"
+    },
+    {
+      "id": "mission_created_mission_id_present",
+      "path": "zeitgeist_attrs/valid/mission_created_mission_id_present.json",
+      "expected_result": "valid",
+      "event_type": "MissionCreated",
+      "notes": "mission_id present alongside mission_slug: the family's ref field stays mission_slug (REF_FIELD_BY_EVENT_TYPE is unchanged), but mission_id now rides in attrs so a consumer can join this moment against PhaseEntered for the same mission aggregate (spec-kitty-events#69). MissionCreatedPayload already declared mission_id before this issue; this fixture is the first to exercise it with a non-null value.",
+      "min_version": "9.0.0"
+    },
+    {
       "id": "decision_point_opened_value_over_bound",
       "path": "zeitgeist_attrs/invalid/decision_point_opened_value_over_bound.json",
       "expected_result": "invalid",
@@ -2245,6 +2269,78 @@
       "event_type": "MissionStarted",
       "notes": "MissionStarted is a journal-only event type with no zeitgeist-attrs codec; encoding a payload outside the volatile vocabulary fails closed instead of silently broadcasting it (events#22).",
       "min_version": "8.2.0"
+    },
+    {
+      "id": "ops_invocation_started_minimal",
+      "path": "zeitgeist_attrs/valid/ops_invocation_started_minimal.json",
+      "expected_result": "valid",
+      "event_type": "OpsInvocationStarted",
+      "notes": "Minimal Ops Invocation Started moment: identity, action, actor, scope, attempt/contract_version defaults, and the derived detail_ref; no request_summary supplied.",
+      "min_version": "8.3.0"
+    },
+    {
+      "id": "ops_invocation_started_with_request_summary",
+      "path": "zeitgeist_attrs/valid/ops_invocation_started_with_request_summary.json",
+      "expected_result": "valid",
+      "event_type": "OpsInvocationStarted",
+      "notes": "request_summary is unbroadcast raw prose that folds into the derived, bounded summary attr rather than being emitted under its own key.",
+      "min_version": "8.3.0"
+    },
+    {
+      "id": "ops_invocation_started_retry_attempt",
+      "path": "zeitgeist_attrs/valid/ops_invocation_started_retry_attempt.json",
+      "expected_result": "valid",
+      "event_type": "OpsInvocationStarted",
+      "notes": "attempt=2 on the same invocation_id demonstrates the retry-correlation semantics: a stable invocation_id ties multiple Started attempts together while attempt disambiguates them.",
+      "min_version": "8.3.0"
+    },
+    {
+      "id": "ops_invocation_completed_success",
+      "path": "zeitgeist_attrs/valid/ops_invocation_completed_success.json",
+      "expected_result": "valid",
+      "event_type": "OpsInvocationCompleted",
+      "notes": "Completed moment for the retried invocation, outcome=success, no result_summary supplied.",
+      "min_version": "8.3.0"
+    },
+    {
+      "id": "ops_invocation_completed_failure_with_result_summary",
+      "path": "zeitgeist_attrs/valid/ops_invocation_completed_failure_with_result_summary.json",
+      "expected_result": "valid",
+      "event_type": "OpsInvocationCompleted",
+      "notes": "result_summary is unbroadcast raw and folds into the derived, bounded summary attr, mirroring request_summary on the Started side.",
+      "min_version": "8.3.0"
+    },
+    {
+      "id": "ops_invocation_started_multibyte_max_boundary",
+      "path": "zeitgeist_attrs/valid/ops_invocation_started_multibyte_max_boundary.json",
+      "expected_result": "valid",
+      "event_type": "OpsInvocationStarted",
+      "notes": "Multibyte, over-length request_summary forces the bounded summary to its 240-byte max: deterministic UTF-8-safe truncation with a single trailing ellipsis marker, never splitting a multibyte codepoint or raising, mirroring decision_point_opened_multibyte_max_boundary.json.",
+      "min_version": "8.3.0"
+    },
+    {
+      "id": "ops_invocation_started_value_over_bound",
+      "path": "zeitgeist_attrs/invalid/ops_invocation_started_value_over_bound.json",
+      "expected_result": "invalid",
+      "event_type": "OpsInvocationStarted",
+      "notes": "A 241-byte scope value exceeds the 240 B bound; encoding raises instead of truncating, so this invocation moment does not broadcast. Only the derived summary attr is ever allowed to truncate.",
+      "min_version": "8.3.0"
+    },
+    {
+      "id": "ops_invocation_started_unknown_contract_version",
+      "path": "zeitgeist_attrs/invalid/ops_invocation_started_unknown_contract_version.json",
+      "expected_result": "invalid",
+      "event_type": "OpsInvocationStarted",
+      "notes": "contract_version 2 names a payload-shape revision this decoder does not know (KNOWN_CONTRACT_VERSIONS_BY_EVENT_TYPE only lists \"1\" today); decode fails closed with a named error rather than silently misinterpreting a future revision's attrs (events#78's 'unknown-version' fixture requirement).",
+      "min_version": "8.3.0"
+    },
+    {
+      "id": "ops_invocation_completed_missing_outcome",
+      "path": "zeitgeist_attrs/invalid/ops_invocation_completed_missing_outcome.json",
+      "expected_result": "invalid",
+      "event_type": "OpsInvocationCompleted",
+      "notes": "outcome is a required, non-Optional field on OpsInvocationCompletedPayload; to_zeitgeist_attrs can never omit it, so decode insists on its presence and fails closed when it is missing.",
+      "min_version": "8.3.0"
     },
     {
       "id": "cutover-boundary-accept-schema-version-missing",

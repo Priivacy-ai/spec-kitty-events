@@ -14,6 +14,7 @@ from spec_kitty_events import zeitgeist_attrs
 from spec_kitty_events.forbidden_keys import FORBIDDEN_LEGACY_KEYS
 from spec_kitty_events.lifecycle import (
     MissionClosedPayload,
+    MissionCreatedPayload,
     MissionStartedPayload,
     PhaseEnteredPayload,
 )
@@ -121,6 +122,8 @@ def test_volatile_vocabulary_is_the_ephemeral_design_set() -> None:
         "PlanCompleted",
         "TasksStarted",
         "TasksCompleted",
+        "OpsInvocationStarted",
+        "OpsInvocationCompleted",
     }
 
 
@@ -673,6 +676,122 @@ def test_phase_entered_ref_ignores_mission_slug_when_present() -> None:
     assert zeitgeist_ref_for("PhaseEntered", payload) == "mission-demo"
 
 
+def test_mission_scoped_families_are_joinable_via_shared_mission_id() -> None:
+    """WPStatusChanged/MissionCreated/MissionClosed keep mission_slug as
+    their frame ref (REF_FIELD_BY_EVENT_TYPE is unchanged), but each also
+    carries mission_id in attrs so a consumer can join one of their moments
+    against a PhaseEntered moment — whose frame ref *is* mission_id — for
+    the same mission aggregate (spec-kitty-events#69,
+    planning#1012 Option 2)."""
+    shared_mission_id = "mission-demo"
+
+    phase_entered = PhaseEnteredPayload(
+        mission_id=shared_mission_id,
+        phase_name="build",
+        actor="robert",
+    )
+    assert zeitgeist_ref_for("PhaseEntered", phase_entered) == shared_mission_id
+
+    wp_status_changed = _transition(mission_id=shared_mission_id)
+    assert zeitgeist_ref_for("WPStatusChanged", wp_status_changed) == "demo-mission"
+    wp_attrs = to_zeitgeist_attrs(wp_status_changed, _envelope("WPStatusChanged"))
+    assert wp_attrs["mission_id"] == shared_mission_id
+
+    mission_created = MissionCreatedPayload(
+        mission_id=shared_mission_id,
+        mission_slug="demo-mission",
+        mission_number=12,
+        mission_type="software-dev",
+        target_branch="main",
+        wp_count=3,
+        friendly_name="Demo mission",
+        purpose_tldr="Demo",
+        purpose_context="Demo context",
+    )
+    assert zeitgeist_ref_for("MissionCreated", mission_created) == "demo-mission"
+    mission_created_attrs = to_zeitgeist_attrs(mission_created, _envelope("MissionCreated"))
+    assert mission_created_attrs["mission_id"] == shared_mission_id
+
+    mission_closed = MissionClosedPayload(
+        mission_id=shared_mission_id,
+        mission_slug="demo-mission",
+        mission_number=12,
+        mission_type="software-dev",
+    )
+    assert zeitgeist_ref_for("MissionClosed", mission_closed) == "demo-mission"
+    mission_closed_attrs = to_zeitgeist_attrs(mission_closed, _envelope("MissionClosed"))
+    assert mission_closed_attrs["mission_id"] == shared_mission_id
+
+
+def test_mission_id_absent_from_attrs_when_not_supplied() -> None:
+    """mission_id is optional on all three families; a producer that omits
+    it must not have a phantom key appear on the wire."""
+    wp_status_changed = _transition()
+    wp_attrs = to_zeitgeist_attrs(wp_status_changed, _envelope("WPStatusChanged"))
+    assert "mission_id" not in wp_attrs
+
+    mission_closed = MissionClosedPayload(
+        mission_slug="demo-mission", mission_number=12, mission_type="software-dev"
+    )
+    mission_closed_attrs = to_zeitgeist_attrs(mission_closed, _envelope("MissionClosed"))
+    assert "mission_id" not in mission_closed_attrs
+
+
+def test_head_encode_rejected_by_previous_major_decode_boundary(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Pins the breaking boundary behind the 9.0.0 bump (squad MAJOR on PR
+    #196, spec-kitty-events#69): before this release, `mission_id` was
+    outside `WPStatusChanged`/`MissionClosed`'s closed attrs vocabulary, so
+    a <9.0.0 `from_zeitgeist_attrs` rejected it as an unknown key. A head
+    producer that populates `mission_id` on these two families therefore
+    breaks any consumer still pinned to the previous major.
+
+    Reconstruct that previous-major decode boundary by removing
+    `mission_id` from the current, schema-derived allowed-key sets (the
+    same technique `test_decode_rejects_a_key_over_the_64_char_bound` uses)
+    and confirm the exact attrs a head `to_zeitgeist_attrs` call produces —
+    with `mission_id` populated — are rejected against it. This is the
+    durable regression guard: it fails if `mission_id` is ever silently
+    re-additivized off this boundary without a fresh major bump.
+    """
+    shared_mission_id = "mission-demo"
+
+    wp_attrs = to_zeitgeist_attrs(
+        _transition(mission_id=shared_mission_id), _envelope("WPStatusChanged")
+    )
+    assert wp_attrs["mission_id"] == shared_mission_id
+
+    mission_closed_attrs = to_zeitgeist_attrs(
+        MissionClosedPayload(
+            mission_id=shared_mission_id,
+            mission_slug="demo-mission",
+            mission_number=12,
+            mission_type="software-dev",
+        ),
+        _envelope("MissionClosed"),
+    )
+    assert mission_closed_attrs["mission_id"] == shared_mission_id
+
+    monkeypatch.setattr(
+        zeitgeist_attrs,
+        "_ALLOWED_KEYS_BY_EVENT_TYPE",
+        dict(zeitgeist_attrs._ALLOWED_KEYS_BY_EVENT_TYPE),
+    )
+    for event_type in ("WPStatusChanged", "MissionClosed"):
+        monkeypatch.setitem(
+            zeitgeist_attrs._ALLOWED_KEYS_BY_EVENT_TYPE,
+            event_type,
+            zeitgeist_attrs._ALLOWED_KEYS_BY_EVENT_TYPE[event_type] - {"mission_id"},
+        )
+
+    with pytest.raises(ZeitgeistAttrsError, match="mission_id"):
+        from_zeitgeist_attrs("WPStatusChanged", wp_attrs)
+
+    with pytest.raises(ZeitgeistAttrsError, match="mission_id"):
+        from_zeitgeist_attrs("MissionClosed", mission_closed_attrs)
+
+
 def test_ref_over_bound_raises_rather_than_emitting_unbounded() -> None:
     """The module documents the frame ref as carrying the same ≤240-byte
     bound as an attrs entry independently of attrs; zeitgeist_ref_for must
@@ -699,6 +818,24 @@ def test_ref_derival_rejects_multibyte_over_the_byte_bound_though_under_240_char
     assert len(value.encode("utf-8")) > ZEITGEIST_ATTRS_MAX_BYTES
     payload = _transition(mission_slug=value)
     with pytest.raises(ZeitgeistAttrsOverflowError):
+        zeitgeist_ref_for("WPStatusChanged", payload)
+
+
+def test_ref_derival_rejects_a_newline_in_the_ref_with_typed_error() -> None:
+    """Mirrors test_decode_rejects_a_newline_in_a_value_with_typed_error:
+    the frame's ref is the one other producer-controlled field this module
+    emits, and a bare LF could forge extra frame lines just as readily
+    there as in an attrs value (issue #106)."""
+    payload = _transition(mission_slug="demo\nrumor: fake status line")
+    with pytest.raises(ZeitgeistAttrsControlCharacterError, match="WPStatusChanged ref"):
+        zeitgeist_ref_for("WPStatusChanged", payload)
+
+
+def test_ref_derival_rejects_an_ansi_escape_in_the_ref_with_typed_error() -> None:
+    """Mirrors test_decode_rejects_an_ansi_escape_in_a_value_with_typed_error
+    for the ref field (issue #106)."""
+    payload = _transition(mission_slug="demo\x1b[0m")
+    with pytest.raises(ZeitgeistAttrsControlCharacterError, match="WPStatusChanged ref"):
         zeitgeist_ref_for("WPStatusChanged", payload)
 
 
@@ -1188,6 +1325,27 @@ def test_every_current_family_guarantees_its_ref_field() -> None:
             f"{event_type}'s ref field {ref_field!r} is not required; "
             "zeitgeist_ref_for/from_zeitgeist_attrs could now decode ref=None"
         )
+
+
+@pytest.mark.parametrize("event_type", sorted(PAYLOAD_MODEL_BY_EVENT_TYPE))
+@pytest.mark.parametrize("omitted", sorted(zeitgeist_attrs.ENVELOPE_ATTR_KEYS))
+def test_every_kind_requires_both_envelope_attrs(event_type: str, omitted: str) -> None:
+    """events#158: PR #110 replaced ``from_zeitgeist_attrs``'s
+    ``attrs.get(...)`` + ``is not None`` envelope guards with direct
+    ``attrs["event_id"]``/``attrs["occurred_at"]`` indexing. That is only
+    safe while ENVELOPE_ATTR_KEYS is required for every kind (today, via the
+    union at ``_REQUIRED_KEYS_BY_EVENT_TYPE``). Pin the static invariant and
+    its decode-level consequence together: omitting either envelope key must
+    raise the documented ``ZeitgeistAttrsError`` from the missing-keys check
+    before the indexing is ever reached, never an undocumented ``KeyError``
+    a future per-kind override could otherwise expose to a consumer that
+    only catches the types this function documents."""
+    required = zeitgeist_attrs._REQUIRED_KEYS_BY_EVENT_TYPE[event_type]
+    assert zeitgeist_attrs.ENVELOPE_ATTR_KEYS <= required
+
+    attrs = {key: "v" for key in required if key != omitted}
+    with pytest.raises(ZeitgeistAttrsError, match="missing keys"):
+        from_zeitgeist_attrs(event_type, attrs)
 
 
 def test_moment_is_frozen() -> None:

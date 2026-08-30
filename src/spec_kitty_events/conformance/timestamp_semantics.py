@@ -93,8 +93,24 @@ def _extract_envelope_timestamp(envelope: Union[Mapping[str, Any], Event]) -> da
         return _to_utc(raw)
     if isinstance(raw, str):
         # datetime.fromisoformat in Python 3.10 does not accept trailing 'Z'.
-        # Normalise to '+00:00' before parsing.
-        parsed = datetime.fromisoformat(raw.replace("Z", "+00:00"))
+        # Normalise to '+00:00' before parsing. A well-formed value has at
+        # most one trailing 'Z'; if another 'Z' remains after stripping it,
+        # the input was already malformed and must not be laundered into
+        # something 3.10's laxer fromisoformat would accept (e.g. a doubled
+        # '...00ZZ'). The residual check is case-insensitive: a mixed-case
+        # doubled designator (e.g. '...00zZ') is just as malformed, and a
+        # case-sensitive guard would let it through on some interpreters and
+        # not others (spec-kitty-events#107/#124).
+        if raw.endswith("Z"):
+            candidate = raw[:-1]
+            if "z" in candidate.lower():
+                raise ValueError(
+                    f"envelope['timestamp'] is not ISO-8601 (doubled UTC designator): {raw!r}"
+                )
+            normalized = candidate + "+00:00"
+        else:
+            normalized = raw
+        parsed = datetime.fromisoformat(normalized)
         return _to_utc(parsed)
     raise TypeError(
         f"envelope['timestamp'] must be a datetime or ISO-8601 string; got {type(raw).__name__}"

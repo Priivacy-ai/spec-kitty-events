@@ -10,12 +10,24 @@ bytes: ``to`` projects the payload onto the exact golden attrs, and ``from``
 validates those same attrs back into a :class:`VolatileMoment`. Each
 *invalid* fixture pins one rejection with its exception class named in the
 fixture document (``direction`` says which side of the codec it exercises).
+
+The same fixture-driven both-directions/rejections runs are also packaged
+in ``spec_kitty_events.conformance.test_zeitgeist_attrs_codec`` (collected
+by ``pytest --pyargs spec_kitty_events.conformance``), so downstream
+consumers exercise these fixtures too, not only this in-repo suite
+(spec-kitty-events#145). This module additionally covers unit-style
+regressions (monkeypatched forbidden-key ingest, an unencodable scalar
+forced past the frozen model) that have no fixture representation and so
+stay in-repo only.
 """
 
 from __future__ import annotations
 
+import ast
 import importlib
+import re
 from datetime import datetime
+from pathlib import Path
 from uuid import UUID
 
 import pytest
@@ -36,6 +48,7 @@ from spec_kitty_events.zeitgeist_attrs import (
     PAYLOAD_MODEL_BY_EVENT_TYPE,
     ZEITGEIST_ATTR_KEY_MAX_CHARS,
     UnencodableFieldValueError,
+    UnknownContractVersionError,
     UnknownVolatileEventTypeError,
     VolatileMoment,
     ZeitgeistAttrsError,
@@ -71,6 +84,7 @@ def _build_payload(event_type: str, fields: dict):
 
 
 _ERROR_CLASSES = {
+    "UnknownContractVersionError": UnknownContractVersionError,
     "UnknownVolatileEventTypeError": UnknownVolatileEventTypeError,
     "ZeitgeistAttrsError": ZeitgeistAttrsError,
     "ZeitgeistAttrsOverflowError": importlib.import_module(
@@ -83,6 +97,24 @@ _ERROR_CLASSES = {
 _FIXTURE_BUILD_ID = "build-zeitgeist-attrs-conformance"
 _FIXTURE_NODE_ID = "node-conformance"
 _FIXTURE_PROJECT_UUID = UUID("550e8400-e29b-41d4-a716-446655440000")
+_EVENT_ID_RE = re.compile(r"^e2e00000-0000-4000-8000-[0-9]{12}$")
+
+
+def test_local_event_ids_use_the_reserved_block() -> None:
+    """Keep test-only envelopes out of the committed fixture ID sequence."""
+    tree = ast.parse(Path(__file__).read_text(encoding="utf-8"))
+    event_ids = {
+        node.value
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Constant)
+        and isinstance(node.value, str)
+        and _EVENT_ID_RE.fullmatch(node.value)
+    }
+
+    assert event_ids, "expected at least one test-local event_id"
+    assert all(event_id.rsplit("-", 1)[-1].startswith("9") for event_id in event_ids), (
+        f"test-local event_ids must use the reserved 9xxxxxxxxxxx block: {sorted(event_ids)}"
+    )
 
 
 def _fixture_envelope(event_type: str, case: dict) -> Event:
@@ -107,10 +139,10 @@ def zeitgeist_attrs_fixtures():
 
 
 def test_fixtures_loaded(zeitgeist_attrs_fixtures) -> None:
-    """28 valid + 8 invalid fixtures are on disk and manifest-registered."""
-    assert len(zeitgeist_attrs_fixtures) == 36
-    assert len([f for f in zeitgeist_attrs_fixtures if f.expected_valid]) == 28
-    assert len([f for f in zeitgeist_attrs_fixtures if not f.expected_valid]) == 8
+    """37 valid + 11 invalid fixtures are on disk and manifest-registered."""
+    assert len(zeitgeist_attrs_fixtures) == 48
+    assert len([f for f in zeitgeist_attrs_fixtures if f.expected_valid]) == 37
+    assert len([f for f in zeitgeist_attrs_fixtures if not f.expected_valid]) == 11
 
 
 def test_fixture_event_ids_are_unique(zeitgeist_attrs_fixtures) -> None:
@@ -139,6 +171,36 @@ def test_every_valid_fixture_covers_one_volatile_event_type(
 ) -> None:
     valid_types = {f.event_type for f in zeitgeist_attrs_fixtures if f.expected_valid}
     assert valid_types == set(PAYLOAD_MODEL_BY_EVENT_TYPE)
+
+
+def test_fixtures_sharing_a_mission_slug_share_their_mission_id(
+    zeitgeist_attrs_fixtures,
+) -> None:
+    """A ``mission_slug`` maps to exactly one ``mission_id`` corpus-wide.
+
+    The corpus demonstrates the cross-family join planning#1012 authorised
+    (``mission_slug``-keyed families joined to ``mission_id``-keyed families
+    for one mission aggregate). Two fixtures pairing the same
+    ``mission_slug`` with two different ``mission_id`` values would show a
+    consumer reading the fixtures a false split identity for one mission,
+    exactly what #69's fixture table was written to demonstrate does *not*
+    happen (events#199).
+    """
+    slug_to_id: dict[str, tuple[str, str]] = {}
+    for fixture in zeitgeist_attrs_fixtures:
+        case = fixture.payload
+        fields = case.get("payload") or case.get("expected_attrs") or case.get("attrs") or {}
+        slug = fields.get("mission_slug")
+        mission_id = fields.get("mission_id")
+        if slug is None or mission_id is None:
+            continue
+        if slug in slug_to_id and slug_to_id[slug][0] != mission_id:
+            other_id, other_fixture_id = slug_to_id[slug]
+            raise AssertionError(
+                f"mission_slug {slug!r} pairs with mission_id {mission_id!r} in "
+                f"{fixture.id!r} but with {other_id!r} in {other_fixture_id!r}"
+            )
+        slug_to_id.setdefault(slug, (mission_id, fixture.id))
 
 
 def test_codec_fixtures_stay_out_of_the_packaged_event_gate() -> None:
@@ -297,7 +359,7 @@ def test_encode_rejects_an_unencodable_scalar() -> None:
         "MissionClosed",
         {
             "envelope": {
-                "event_id": "e2e00000-0000-4000-8000-000000000118",
+                "event_id": "e2e00000-0000-4000-8000-900000000001",
                 "timestamp": "2026-08-25T09:00:00+00:00",
             }
         },
@@ -333,7 +395,7 @@ def _wp_status_changed_case() -> tuple[StatusTransitionPayload, Event]:
         "WPStatusChanged",
         {
             "envelope": {
-                "event_id": "e2e00000-0000-4000-8000-000000000059",
+                "event_id": "e2e00000-0000-4000-8000-900000000002",
                 "timestamp": "2026-08-25T09:00:00+00:00",
             }
         },
