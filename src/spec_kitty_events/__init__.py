@@ -30,7 +30,7 @@ The offline sync/cutover surfaces (``spec_kitty_events.sync``, ``legacy``,
 lives in ``spec_kitty_events.strict.validate_strict_envelope``.
 """
 
-__version__ = "9.1.1"
+__version__ = "9.1.2"
 
 # Core data models
 from spec_kitty_events.models import (

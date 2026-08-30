@@ -2343,6 +2343,14 @@
       "min_version": "8.3.0"
     },
     {
+      "id": "ops_invocation_completed_unrelated_detail_ref",
+      "path": "zeitgeist_attrs/invalid/ops_invocation_completed_unrelated_detail_ref.json",
+      "expected_result": "invalid",
+      "event_type": "OpsInvocationCompleted",
+      "notes": "detail_ref is mechanically derived from the moment's own event type and event_id; decode rejects a wire frame that points it at another event (events#190).",
+      "min_version": "9.1.2"
+    },
+    {
       "id": "cutover-boundary-accept-schema-version-missing",
       "path": "cutover_boundary/accepted_by_validate_event/schema_version_missing.json",
       "expected_result": "valid",
