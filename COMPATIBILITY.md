@@ -1,6 +1,6 @@
 # Compatibility Guide
 
-**Current package version**: `9.1.1`
+**Current package version**: `9.1.2`
 
 The on-wire envelope schema version is `3.0.0` and has been unchanged since
 the cutover. The package version and the envelope schema version move
@@ -37,6 +37,15 @@ EXPERIMENTAL-spec-kitty-events#104 and not yet merged to `main`. This
 section is written ahead of that merge so the documentation gap doesn't
 reopen once it lands; it becomes a normal dated-version entry, and this
 "known gap" framing goes away, when #104 merges.
+
+## `9.1.2` — derived `detail_ref` attrs must resolve to their own moment
+
+`9.1.2` tightens `from_zeitgeist_attrs` for the Ops Invocation event types.
+Their `detail_ref` attr is mechanically derived as
+`"<event_type>:<event_id>"`, so decode now rejects a wire frame whose
+`detail_ref` points at another event or uses an unrelated value. Frames
+produced by this package are unaffected; only malformed inbound frames that
+previously decoded are rejected.
 
 ## `9.1.1` — timestamp parsing normalized across supported Python versions
 

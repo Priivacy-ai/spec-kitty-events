@@ -1181,8 +1181,9 @@ def from_zeitgeist_attrs(event_type: str, attrs: Mapping[str, str]) -> VolatileM
             malformed — ``event_id`` does not match one of the three shapes
             :func:`~spec_kitty_events.models.normalize_event_id` accepts
             (26-char Crockford-base32 ULID, 36-char hyphenated UUID, 32-char
-            bare hex UUID), or ``occurred_at`` does not parse as ISO-8601 or
-            parses but is timezone-naive.
+            bare hex UUID), ``occurred_at`` does not parse as ISO-8601 or
+            parses but is timezone-naive, or a derived ``detail_ref`` does
+            not resolve to the same moment.
         ZeitgeistAttrsControlCharacterError: a value carries a non-printable
             character (``not str.isprintable()``).
         ZeitgeistAttrsForbiddenKeyError: a forbidden key is present.
@@ -1250,6 +1251,14 @@ def from_zeitgeist_attrs(event_type: str, attrs: Mapping[str, str]) -> VolatileM
         decoded_attrs["event_id"] = normalize_event_id(event_id)
     except ValueError as exc:
         raise ZeitgeistAttrsError(f"attr 'event_id' is malformed: {exc}") from exc
+
+    if event_type in DETAIL_REF_SOURCE_EVENT_TYPES:
+        expected_detail_ref = f"{event_type}:{attrs['event_id']}"
+        if attrs["detail_ref"] != expected_detail_ref:
+            raise ZeitgeistAttrsError(
+                "attr 'detail_ref' must resolve to this moment's own event: "
+                f"expected {expected_detail_ref!r}, got {attrs['detail_ref']!r}"
+            )
 
     occurred_at = attrs["occurred_at"]
     # datetime.fromisoformat() only accepts the "Z" UTC designator from
