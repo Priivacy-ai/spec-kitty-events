@@ -287,6 +287,19 @@ def test_helper_does_not_newly_split_shapes_the_regex_does_not_match(
     assert_producer_occurrence_preserved(envelope, persisted)
 
 
+def test_helper_rejects_a_doubled_trailing_z_timestamp() -> None:
+    """A doubled trailing "Z" must be rejected on every interpreter version.
+
+    Stripping only the final "Z" and appending "+00:00" would otherwise turn
+    this into "...00Z+00:00", which Python 3.10's laxer ``fromisoformat``
+    accepts even though it is not a valid ISO-8601 timestamp
+    (spec-kitty-events#55/#107).
+    """
+    envelope = {"timestamp": "2026-01-01T00:00:00ZZ"}
+    with pytest.raises(ValueError, match="not ISO-8601"):
+        assert_producer_occurrence_preserved(envelope, datetime(2026, 1, 1, tzinfo=timezone.utc))
+
+
 def test_helper_raises_on_one_second_drift() -> None:
     """Even a one-second substitution must raise (proves it is exact, not approximate)."""
     envelope = {"timestamp": "2026-01-01T00:00:00+00:00"}
@@ -295,6 +308,16 @@ def test_helper_raises_on_one_second_drift() -> None:
         assert_producer_occurrence_preserved(envelope, drifted, field_name="my_field")
     assert exc_info.value.field_name == "my_field"
     assert exc_info.value.actual == drifted
+
+
+def test_helper_rejects_a_mixed_case_doubled_z_timestamp() -> None:
+    """A doubled UTC designator must be rejected regardless of case: a
+    case-sensitive residual check misses a lowercase "z" left behind by a
+    mixed-case doubled designator (e.g. "...00zZ"), which would otherwise
+    launder it into "...00z+00:00" (spec-kitty-events#124)."""
+    envelope = {"timestamp": "2026-01-01T00:00:00zZ"}
+    with pytest.raises(ValueError, match="timestamp"):
+        assert_producer_occurrence_preserved(envelope, datetime(2026, 1, 1, tzinfo=timezone.utc))
 
 
 def test_error_attributes_round_trip() -> None:

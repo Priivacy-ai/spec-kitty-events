@@ -134,7 +134,9 @@ def _normalize_iso8601_shape(value: str) -> str:
     if value.endswith("Z"):
         candidate = value[:-1]
         if "z" in candidate.lower():
-            raise ValueError(f"doubled UTC designator in timestamp: {value!r}")
+            raise ValueError(
+                f"envelope['timestamp'] is not ISO-8601 (doubled UTC designator): {value!r}"
+            )
         value = f"{candidate}+00:00"
     match = _ISO8601_SHAPE_RE.match(value)
     if match is None:

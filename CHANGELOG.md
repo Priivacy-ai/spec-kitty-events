@@ -7,6 +7,67 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [9.1.0] - 2026-08-30
+
+### Added
+
+- Ops/Invocations bounded moment contracts: `OpsInvocationStarted` and
+  `OpsInvocationCompleted` join the volatile vocabulary so operations can
+  share the Team Kitty timeline with missions without reusing mission event
+  kinds (EXPERIMENTAL-spec-kitty-events#78). Each payload carries a stable
+  `invocation_id`, `action`, a projected `actor` label, a bounded `scope`,
+  an `attempt` counter for retry correlation, an explicit `contract_version`
+  (default `1`), and an optional unbroadcast `request_summary` /
+  `result_summary` that folds into the derived, bounded `summary` attr;
+  `OpsInvocationCompleted` additionally carries a required `outcome`
+  (`success`/`failure`). Both kinds derive an opaque `detail_ref` attr
+  (`"<event_type>:<event_id>"`) via the new `DETAIL_REF_SOURCE_EVENT_TYPES`
+  mechanism, first implementing the previously-reserved `DETAIL_REF_SYNTAX`.
+  `invocation_id` + `attempt` together express start/completion/retry
+  correlation and idempotency: a stable `invocation_id` ties every attempt
+  of the same logical invocation together, while `attempt` disambiguates
+  retries of the same invocation.
+- `from_zeitgeist_attrs` now validates a decoded kind's `contract_version`
+  attr against a new `KNOWN_CONTRACT_VERSIONS_BY_EVENT_TYPE` table (via the
+  new, generic `CONTRACT_VERSIONED_EVENT_TYPES` opt-in mechanism) and raises
+  the new `UnknownContractVersionError` on a version this package does not
+  know how to interpret, rather than silently misinterpreting a future
+  payload-shape revision's attrs. Currently opted in by the two Ops
+  Invocation kinds only; existing kinds are unaffected.
+- Nine new golden `zeitgeist_attrs` conformance fixtures cover the Ops
+  Invocation kinds: minimal/with-summary/retry-attempt Started, success/
+  failure-with-summary Completed, a multibyte 240-byte truncation boundary,
+  an over-bound raw field, an unknown `contract_version`, and a missing
+  required `outcome` key.
+
+This is explicitly post-MVP scope only: the CLI emitter, SaaS view, and
+detail-read service that would resolve a `detail_ref` are not implemented
+here.
+
+## [9.1.1] - 2026-08-30
+
+### Fixed
+
+- `_parse_iso8601` (`strict.py`, backing the packaged/exported
+  `validate_strict_envelope`), `_assert_iso8601_timestamp` (`retrospective.py`),
+  and `_extract_envelope_timestamp` (the packaged conformance helper
+  `timestamp_semantics.py`) now reshape a timestamp's fractional-second
+  digit count, basic/extended format, reduced time precision, and numeric
+  offset before calling `datetime.fromisoformat`, so those ISO-8601
+  spellings parse identically on Python 3.10 and 3.11+ instead of
+  splitting by interpreter (EXPERIMENTAL-spec-kitty-events#135, the mirror
+  of #122's rejection-split fix at these three sibling call sites).
+
+## [9.0.2] - 2026-08-29
+
+### Fixed
+
+- `strict.validate_strict_envelope`, the retrospective payload validators,
+  and the conformance timestamp helper now reject a doubled trailing `Z`
+  case-insensitively. A malformed mixed-case value such as
+  `...00zZ` can no longer be normalized into a form that some supported
+  interpreters accept (EXPERIMENTAL-spec-kitty-events#124).
+
 ### Fixed
 
 - `COMPATIBILITY.md`'s `8.0.0` migration recipe for callers outside
@@ -57,16 +118,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- `_parse_iso8601` (`strict.py`, backing the packaged/exported
-  `validate_strict_envelope`), `_assert_iso8601_timestamp` (`retrospective.py`),
-  and `_extract_envelope_timestamp` (the packaged conformance helper
-  `timestamp_semantics.py`) now reshape a timestamp's fractional-second
-  digit count and basic/extended format before calling
-  `datetime.fromisoformat`, so a fractional-second part of any digit count
-  (e.g. Go's `time.RFC3339Nano` 9-digit output) and basic (no `-`/`:`)
-  ISO-8601 format parse identically on Python 3.10 and 3.11+ instead of
-  splitting by interpreter (EXPERIMENTAL-spec-kitty-events#135, the mirror
-  of #122's rejection-split fix at these three sibling call sites).
+- `zeitgeist_ref_for` now rejects a derived `ref` carrying control
+  characters, matching the check the module's decode side
+  (`from_zeitgeist_attrs`) already applies to attrs values
+  (EXPERIMENTAL-spec-kitty-events#106). The frame's `ref` is derived from
+  the same slug/id fields (`mission_slug`, `run_id`, ...) that ride as
+  attrs values, so it was the one field this module emits that a producer
+  could still smuggle a control character through unchecked.
 
 ## [9.0.0] - 2026-08-28
 

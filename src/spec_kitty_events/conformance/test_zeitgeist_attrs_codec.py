@@ -38,6 +38,7 @@ from spec_kitty_events.lifecycle import MissionStartedPayload
 from spec_kitty_events.models import Event
 from spec_kitty_events.zeitgeist_attrs import (
     PAYLOAD_MODEL_BY_EVENT_TYPE,
+    UnknownContractVersionError,
     UnknownVolatileEventTypeError,
     VolatileMoment,
     ZeitgeistAttrsError,
@@ -72,6 +73,7 @@ def _build_payload(event_type: str, fields: dict[str, Any]) -> Any:
 
 
 _ERROR_CLASSES: dict[str, type[Exception]] = {
+    "UnknownContractVersionError": UnknownContractVersionError,
     "UnknownVolatileEventTypeError": UnknownVolatileEventTypeError,
     "ZeitgeistAttrsError": ZeitgeistAttrsError,
     "ZeitgeistAttrsOverflowError": ZeitgeistAttrsOverflowError,

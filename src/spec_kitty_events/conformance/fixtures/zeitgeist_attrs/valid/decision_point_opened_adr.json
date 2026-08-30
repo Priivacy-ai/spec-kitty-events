@@ -6,7 +6,7 @@
   },
   "payload": {
     "decision_point_id": "dp-adr-01",
-    "mission_id": "mission-01",
+    "mission_id": "mission-demo",
     "run_id": "run-01",
     "mission_slug": "demo-mission",
     "mission_type": "software-dev",
@@ -32,7 +32,7 @@
     "occurred_at": "2026-08-25T09:00:00+00:00",
     "origin_surface": "adr",
     "decision_point_id": "dp-adr-01",
-    "mission_id": "mission-01",
+    "mission_id": "mission-demo",
     "run_id": "run-01",
     "mission_slug": "demo-mission",
     "mission_type": "software-dev",

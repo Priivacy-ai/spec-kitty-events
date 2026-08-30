@@ -1,0 +1,29 @@
+{
+  "event_type": "OpsInvocationStarted",
+  "envelope": {
+    "event_id": "e2e00000-0000-4000-8000-000000000200",
+    "timestamp": "2026-08-25T09:00:00+00:00"
+  },
+  "payload": {
+    "invocation_id": "inv-01",
+    "action": "team.provision",
+    "actor": {
+      "actor_id": "actor-01",
+      "actor_type": "service"
+    },
+    "scope": "scope-01"
+  },
+  "expected_attrs": {
+    "event_id": "e2e00000-0000-4000-8000-000000000200",
+    "occurred_at": "2026-08-25T09:00:00+00:00",
+    "invocation_id": "inv-01",
+    "action": "team.provision",
+    "actor": "actor-01",
+    "scope": "scope-01",
+    "attempt": "1",
+    "contract_version": "1",
+    "detail_ref": "OpsInvocationStarted:e2e00000-0000-4000-8000-000000000200"
+  },
+  "expected_ref": "inv-01",
+  "notes": "The golden minimal Started moment: attempt and contract_version default to 1 and still ride as explicit attrs; no request_summary means no derived summary attr; detail_ref is always derived per DETAIL_REF_SOURCE_EVENT_TYPES (events#78)."
+}

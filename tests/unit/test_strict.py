@@ -648,6 +648,36 @@ def test_t5c_timestamp_doubled_trailing_z_rejected_end_to_end() -> None:
     assert len(unparsable) == 1
 
 
+def test_t5b_timestamp_doubled_trailing_z_rejected() -> None:
+    """A doubled trailing "Z" must be rejected on every interpreter version.
+    Stripping only the final "Z" and appending "+00:00" would otherwise turn
+    this into "...00Z+00:00", which Python 3.10's laxer ``fromisoformat``
+    accepts even though it is not a valid ISO-8601 timestamp
+    (spec-kitty-events#124). Also fails step 9's ``Event.model_validate``
+    (that model rejects the same malformed string independently), so both
+    show up as separate ``timestamp``-path errors.
+    """
+    envelope = _mission_started_envelope(timestamp="2026-01-01T00:00:00ZZ")
+    errors = validate_strict_envelope(envelope)
+    assert {e.path[0] for e in errors} == {"timestamp"}
+    shape_errors = [e for e in errors if e.details.get("reason") == "unparsable"]
+    assert len(shape_errors) == 1
+    assert shape_errors[0].code == ValidationErrorCode.ENVELOPE_SHAPE_INVALID
+
+
+def test_t5c_timestamp_mixed_case_doubled_z_rejected() -> None:
+    """A doubled UTC designator must be rejected regardless of case: a
+    case-sensitive residual check misses a lowercase "z" left behind by a
+    mixed-case doubled designator (e.g. "...00zZ"), which would otherwise
+    launder it into "...00z+00:00" (spec-kitty-events#124)."""
+    envelope = _mission_started_envelope(timestamp="2026-01-01T00:00:00zZ")
+    errors = validate_strict_envelope(envelope)
+    assert {e.path[0] for e in errors} == {"timestamp"}
+    shape_errors = [e for e in errors if e.details.get("reason") == "unparsable"]
+    assert len(shape_errors) == 1
+    assert shape_errors[0].code == ValidationErrorCode.ENVELOPE_SHAPE_INVALID
+
+
 def test_t6_observation_payload_carries_ts_field_rejected() -> None:
     envelope = _presence_envelope()
     envelope["payload"]["ts"] = 1767225600

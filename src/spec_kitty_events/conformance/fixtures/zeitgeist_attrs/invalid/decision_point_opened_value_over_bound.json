@@ -6,7 +6,7 @@
   },
   "payload": {
     "decision_point_id": "ddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
-    "mission_id": "mission-01",
+    "mission_id": "mission-demo",
     "run_id": "run-01",
     "mission_slug": "demo-mission",
     "mission_type": "software-dev",

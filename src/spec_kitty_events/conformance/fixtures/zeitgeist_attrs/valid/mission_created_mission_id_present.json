@@ -5,7 +5,7 @@
     "timestamp": "2026-08-25T09:00:00+00:00"
   },
   "payload": {
-    "mission_id": "01J9Z8Q4K7X3M2N5P6R7S8T9V0",
+    "mission_id": "mission-demo",
     "mission_slug": "demo-mission",
     "mission_number": 12,
     "mission_type": "software-dev",
@@ -21,7 +21,7 @@
     "event_id": "e2e00000-0000-4000-8000-000000000121",
     "occurred_at": "2026-08-25T09:00:00+00:00",
     "mission_slug": "demo-mission",
-    "mission_id": "01J9Z8Q4K7X3M2N5P6R7S8T9V0",
+    "mission_id": "mission-demo",
     "mission_number": "12",
     "mission_type": "software-dev",
     "target_branch": "main",
