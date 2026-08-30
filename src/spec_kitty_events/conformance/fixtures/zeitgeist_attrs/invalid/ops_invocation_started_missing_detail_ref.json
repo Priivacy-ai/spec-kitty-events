@@ -1,0 +1,16 @@
+{
+  "event_type": "OpsInvocationStarted",
+  "attrs": {
+    "event_id": "e2e00000-0000-4000-8000-000000000210",
+    "occurred_at": "2026-08-25T09:00:00+00:00",
+    "invocation_id": "inv-01",
+    "action": "team.provision",
+    "actor": "actor-01",
+    "scope": "scope-01",
+    "attempt": "1",
+    "contract_version": "1"
+  },
+  "direction": "from",
+  "expected_error": "ZeitgeistAttrsError",
+  "notes": "detail_ref is mechanically derived and never omitted for OpsInvocationStarted; decode fails closed when the required attr is missing (events#192)."
+}

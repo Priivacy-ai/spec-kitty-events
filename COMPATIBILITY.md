@@ -1,6 +1,6 @@
 # Compatibility Guide
 
-**Current package version**: `9.1.3`
+**Current package version**: `9.1.4`
 
 The on-wire envelope schema version is `3.0.0` and has been unchanged since
 the cutover. The package version and the envelope schema version move
@@ -37,6 +37,14 @@ EXPERIMENTAL-spec-kitty-events#104 and not yet merged to `main`. This
 section is written ahead of that merge so the documentation gap doesn't
 reopen once it lands; it becomes a normal dated-version entry, and this
 "known gap" framing goes away, when #104 merges.
+
+## `9.1.4` — missing Ops Invocation `detail_ref` rejection is pinned
+
+`9.1.4` adds a packaged conformance fixture for an inbound
+`OpsInvocationStarted` frame that omits the required derived `detail_ref`
+attr. Decode already rejected that frame, so no runtime behavior changes;
+the fixture prevents a future refactor from silently dropping the
+requirement.
 
 ## `9.1.3` — encode rejects unknown Ops Invocation contract versions
 

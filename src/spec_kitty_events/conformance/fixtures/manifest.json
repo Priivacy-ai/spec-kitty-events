@@ -2335,6 +2335,14 @@
       "min_version": "8.3.0"
     },
     {
+      "id": "ops_invocation_started_missing_detail_ref",
+      "path": "zeitgeist_attrs/invalid/ops_invocation_started_missing_detail_ref.json",
+      "expected_result": "invalid",
+      "event_type": "OpsInvocationStarted",
+      "notes": "detail_ref is mechanically derived and never omitted for OpsInvocationStarted; decode fails closed when the required attr is missing (events#192).",
+      "min_version": "8.3.0"
+    },
+    {
       "id": "ops_invocation_completed_missing_outcome",
       "path": "zeitgeist_attrs/invalid/ops_invocation_completed_missing_outcome.json",
       "expected_result": "invalid",
