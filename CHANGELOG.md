@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [9.1.3] - 2026-08-30
+
+### Fixed
+
+- `to_zeitgeist_attrs` now checks a contract-versioned payload's
+  `contract_version` against `KNOWN_CONTRACT_VERSIONS_BY_EVENT_TYPE` before
+  encoding, using the same `UnknownContractVersionError` as decode. A
+  producer on this version can no longer emit an Ops Invocation frame that
+  this same version refuses to decode
+  (EXPERIMENTAL-spec-kitty-events#191).
+
 ## [9.1.0] - 2026-08-30
 
 ### Added
