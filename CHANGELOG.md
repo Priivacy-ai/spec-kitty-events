@@ -76,6 +76,27 @@ here.
   so the earlier missing-keys check always raises first when either is
   absent (EXPERIMENTAL-spec-kitty-events#67, consolidating the same defect
   class as #61).
+- Added a `make test-floor` target (Python 3.10, the version `pyproject.toml`'s
+  `requires-python = ">=3.10"` promises) and wired it into `make test-full`, so
+  version-sensitive regression guards actually run on the declared support
+  floor. GitHub Actions are off programme-wide, so the `.github/workflows/`
+  3.10/3.11/3.12 matrix never runs; without this, a guard that only has teeth
+  on 3.10 (e.g. a trailing-Z `datetime` normalization that 3.12 accepts
+  unaided) could pass on the default interpreter while being dead code on the
+  floor, and a later refactor could delete it with the suite staying green
+  (EXPERIMENTAL-spec-kitty-events#123). This supersedes the narrower
+  `make test-full-310` lane added for #141, which ran only the
+  timestamp-parsing test files on 3.10 — `test-floor` runs the whole suite on
+  3.10, a strict superset, so that lane and its `TIMESTAMP_PARSING_TESTS` list
+  were removed as of this change to avoid running the same tests on 3.10
+  twice.
+- `test-floor` now runs in its own `UV_PROJECT_ENVIRONMENT` (`.venv-floor`)
+  instead of the default `.venv`. `uv run --python 3.10` replaces whatever
+  `.venv` it is pointed at, so with `test-full: test-floor` sharing the
+  default `.venv`, `test-floor` running first silently downgraded
+  `test-full`'s own coverage recipe to 3.10 too — dropping default-interpreter
+  coverage from `test-full` entirely, the opposite of the intended "3.10 as
+  well as the default interpreter" (squad finding on PR #130).
 - `from_zeitgeist_attrs` now enforces the same `event_id`/`occurred_at`
   contract the envelope itself guarantees, instead of the weaker
   emptiness/parses-at-all checks closing #28 left behind
