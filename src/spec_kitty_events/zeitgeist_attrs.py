@@ -1181,9 +1181,11 @@ def from_zeitgeist_attrs(event_type: str, attrs: Mapping[str, str]) -> VolatileM
     because payload values are not reparsed here, only rendered later by a
     consumer that knows the kind. The two envelope-sourced attrs are the
     exception: ``event_id`` is reparsed and canonicalized via
-    :func:`~spec_kitty_events.models.normalize_event_id`, and ``occurred_at``
-    is reparsed via :func:`datetime.fromisoformat` and rejected if
-    timezone-naive. An inbound mapping missing an *optional* payload key
+    :func:`~spec_kitty_events.models.normalize_event_id`, a derived
+    ``detail_ref`` is rewritten to that canonical spelling, and
+    ``occurred_at`` is reparsed via :func:`datetime.fromisoformat` and
+    rejected if timezone-naive. An inbound mapping missing an *optional*
+    payload key
     (one whose annotation admits ``None``) decodes with that key absent,
     since rebuilding the journal payload remains impossible by design
     ("Projection, not reconstruction").
@@ -1275,6 +1277,7 @@ def from_zeitgeist_attrs(event_type: str, attrs: Mapping[str, str]) -> VolatileM
                 "attr 'detail_ref' must resolve to this moment's own event: "
                 f"expected {expected_detail_ref!r}, got {attrs['detail_ref']!r}"
             )
+        decoded_attrs["detail_ref"] = f"{event_type}:{decoded_attrs['event_id']}"
 
     occurred_at = attrs["occurred_at"]
     # datetime.fromisoformat() only accepts the "Z" UTC designator from
