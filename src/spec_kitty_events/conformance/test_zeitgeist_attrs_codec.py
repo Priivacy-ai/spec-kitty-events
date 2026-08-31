@@ -36,6 +36,7 @@ from spec_kitty_events.decisionpoint import (
 )
 from spec_kitty_events.lifecycle import MissionStartedPayload
 from spec_kitty_events.models import Event
+from spec_kitty_events.ops_invocation import OpsInvocationStartedPayload, RuntimeActorIdentity
 from spec_kitty_events.zeitgeist_attrs import (
     PAYLOAD_MODEL_BY_EVENT_TYPE,
     UnknownContractVersionError,
@@ -157,3 +158,31 @@ def test_zeitgeist_attrs_rejections(fixture: FixtureCase) -> None:
         assert case["direction"] == "from"
         with pytest.raises(expected_error):
             from_zeitgeist_attrs(fixture.event_type, case["attrs"])
+
+
+def test_decode_rewrites_derived_detail_ref_to_canonical_event_id() -> None:
+    """A noncanonical but self-consistent wire frame decodes consistently.
+
+    ``event_id`` is canonicalized on decode, so the derived ``detail_ref``
+    must follow it rather than preserving the wire spelling (events#223).
+    """
+    event_id = "E2E00000-0000-4000-8000-900000000022"
+    payload = OpsInvocationStartedPayload(
+        invocation_id="inv-01",
+        action="team.provision",
+        actor=RuntimeActorIdentity(actor_id="svc-1", actor_type="service"),
+        scope="team-01",
+        contract_version=1,
+    )
+    envelope = _fixture_envelope(
+        "OpsInvocationStarted",
+        {"envelope": {"event_id": event_id, "timestamp": "2026-08-25T09:00:00+00:00"}},
+    )
+    attrs = to_zeitgeist_attrs(payload, envelope)
+    attrs["event_id"] = event_id
+    attrs["detail_ref"] = f"OpsInvocationStarted:{event_id}"
+
+    moment = from_zeitgeist_attrs("OpsInvocationStarted", attrs)
+    canonical_event_id = event_id.lower()
+    assert moment.attrs["event_id"] == canonical_event_id
+    assert moment.attrs["detail_ref"] == f"OpsInvocationStarted:{canonical_event_id}"

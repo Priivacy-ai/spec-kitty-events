@@ -1,6 +1,6 @@
 # Compatibility Guide
 
-**Current package version**: `9.1.4`
+**Current package version**: `9.1.5`
 
 The on-wire envelope schema version is `3.0.0` and has been unchanged since
 the cutover. The package version and the envelope schema version move
@@ -37,6 +37,15 @@ EXPERIMENTAL-spec-kitty-events#104 and not yet merged to `main`. This
 section is written ahead of that merge so the documentation gap doesn't
 reopen once it lands; it becomes a normal dated-version entry, and this
 "known gap" framing goes away, when #104 merges.
+
+## `9.1.5` — decoded detail refs follow canonical event IDs
+
+`9.1.5` fixes a follow-up to the `9.1.2` decode guard. A wire frame whose
+`event_id` and derived `detail_ref` use the same noncanonical spelling was
+accepted, but the decoded `VolatileMoment` kept the canonicalized
+`event_id` beside the raw `detail_ref`. Decode now rewrites that derived
+`detail_ref` to the canonical `event_id` spelling as well, keeping the
+decoded attrs self-consistent. Canonical frames are unaffected.
 
 ## `9.1.4` — missing Ops Invocation `detail_ref` rejection is pinned
 
