@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [9.1.5] - 2026-08-31
+
+### Changed
+
+- Factored the ISO-8601/RFC-3339 timestamp shape-normalization helper
+  (previously byte-identical across `strict.py`, `retrospective.py`, and
+  `conformance/timestamp_semantics.py`) out into a private `_iso8601`
+  module. No behavior change: each module re-exports it under its existing
+  local name, so consumer imports are unaffected
+  (EXPERIMENTAL-spec-kitty-events#143).
+
 ## [9.1.4] - 2026-08-30
 
 ### Added
