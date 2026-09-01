@@ -1,4 +1,5 @@
 """Storage adapters for events and errors."""
+
 from abc import ABC, abstractmethod
 from typing import List, Dict
 from spec_kitty_events.models import Event, ErrorEntry

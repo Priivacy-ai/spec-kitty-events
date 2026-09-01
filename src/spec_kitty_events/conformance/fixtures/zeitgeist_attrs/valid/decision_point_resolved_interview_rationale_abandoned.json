@@ -1,0 +1,38 @@
+{
+  "event_type": "DecisionPointResolved",
+  "envelope": {
+    "event_id": "e2e00000-0000-4000-8000-000000000106",
+    "timestamp": "2026-08-25T09:00:00+00:00"
+  },
+  "payload": {
+    "origin_surface": "planning_interview",
+    "decision_point_id": "dp-iv-02",
+    "mission_id": "mission-demo",
+    "run_id": "run-01",
+    "mission_slug": "demo-mission",
+    "mission_type": "software-dev",
+    "terminal_outcome": "canceled",
+    "rationale": "Mission was withdrawn before the interview closed.",
+    "resolved_by": "actor-01",
+    "state_entered_at": "2026-08-25T08:55:00+00:00",
+    "recorded_at": "2026-08-25T09:10:00+00:00"
+  },
+  "expected_attrs": {
+    "event_id": "e2e00000-0000-4000-8000-000000000106",
+    "occurred_at": "2026-08-25T09:00:00+00:00",
+    "origin_surface": "planning_interview",
+    "decision_point_id": "dp-iv-02",
+    "mission_id": "mission-demo",
+    "run_id": "run-01",
+    "mission_slug": "demo-mission",
+    "mission_type": "software-dev",
+    "terminal_outcome": "canceled",
+    "other_answer": "false",
+    "resolved_by": "actor-01",
+    "closed_locally_while_widened": "false",
+    "state_entered_at": "2026-08-25T08:55:00+00:00",
+    "summary": "Mission was withdrawn before the interview closed."
+  },
+  "expected_ref": "dp-iv-02",
+  "notes": "Interview-origin Resolved, terminal_outcome=canceled (no final_answer on a non-resolved outcome): the bounded summary falls back to rationale as its sole clause."
+}

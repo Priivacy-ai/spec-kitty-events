@@ -1,0 +1,7 @@
+{
+  "kind": "presence",
+  "harness": "claude",
+  "session_id": "sess-abc123",
+  "activity": "file_edit",
+  "pause_reason": "user"
+}

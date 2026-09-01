@@ -7,6 +7,7 @@ Covers spec §7.6 conformance categories:
 - Unknown event type silent skip
 - Hypothesis property test for permutation invariance
 """
+
 from __future__ import annotations
 
 import json
@@ -43,13 +44,21 @@ def _events_from_replay(fixture_id: str) -> List[Event]:
 
             for key in ("artifact_id", "expected_identity", "supersedes"):
                 identity = payload.get(key)
-                if isinstance(identity, dict) and "mission_key" in identity and "mission_type" not in identity:
+                if (
+                    isinstance(identity, dict)
+                    and "mission_key" in identity
+                    and "mission_type" not in identity
+                ):
                     identity["mission_type"] = identity.pop("mission_key")
 
             changed = payload.get("artifact_ids_changed")
             if isinstance(changed, list):
                 for identity in changed:
-                    if isinstance(identity, dict) and "mission_key" in identity and "mission_type" not in identity:
+                    if (
+                        isinstance(identity, dict)
+                        and "mission_key" in identity
+                        and "mission_type" not in identity
+                    ):
                         identity["mission_type"] = identity.pop("mission_key")
 
         item.setdefault("build_id", "test-build")
@@ -193,9 +202,7 @@ def test_namespace_mixed_stream_raises() -> None:
     second_ns_event: Dict[str, Any] = json.loads(events[-1].model_dump_json())
     second_ns_event["event_id"] = "01JNRNS2EVENT0000000000001"
     second_ns_event["lamport_clock"] = 999
-    second_ns_event["payload"]["namespace"]["mission_slug"] = (
-        "999-entirely-different-feature"
-    )
+    second_ns_event["payload"]["namespace"]["mission_slug"] = "999-entirely-different-feature"
     different_ns_event = Event(**second_ns_event)
 
     mixed = list(events) + [different_ns_event]
@@ -417,6 +424,7 @@ def _make_bare_dossier_event(
 ) -> Event:
     """Build a minimal dossier Event with a valid namespace but arbitrary payload."""
     from uuid import UUID
+
     return Event(
         event_id=event_id,
         event_type=event_type,

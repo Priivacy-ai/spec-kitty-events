@@ -1,0 +1,28 @@
+{
+  "event_type": "TasksCompleted",
+  "envelope": {
+    "event_id": "e2e00000-0000-4000-8000-000000000113",
+    "timestamp": "2026-08-25T09:00:00+00:00"
+  },
+  "payload": {
+    "mission_slug": "demo-mission",
+    "mission_number": 12,
+    "actor": "actor-01",
+    "at": "2026-08-25T09:05:00+00:00",
+    "artifact_path": "specs/demo-mission/tasks.md",
+    "wp_count": 3,
+    "summary": null
+  },
+  "expected_attrs": {
+    "event_id": "e2e00000-0000-4000-8000-000000000113",
+    "occurred_at": "2026-08-25T09:00:00+00:00",
+    "mission_slug": "demo-mission",
+    "mission_number": "12",
+    "actor": "actor-01",
+    "at": "2026-08-25T09:05:00+00:00",
+    "artifact_path": "specs/demo-mission/tasks.md",
+    "wp_count": "3"
+  },
+  "expected_ref": "demo-mission",
+  "notes": "Artifact-lifecycle Completed with no producer-supplied summary (None): the derived summary attr is omitted entirely rather than emitted empty — deterministic omission when the source prose is absent."
+}

@@ -2,7 +2,39 @@
 
 Canonical event contracts for Spec Kitty mission state, mission runtime, conformance, and replay.
 
-**Package Version**: `5.0.0` | **Cutover Contract**: `3.0.0` | **Python**: `>=3.10`
+**Package Version**: `9.1.6` | **Envelope Schema Version**: `3.0.0` | **Python**: `>=3.10`
+
+## What Changed In 8.0.0
+
+`8.0.0` deletes the offline sync/replay surfaces:
+`spec_kitty_events.sync`, `spec_kitty_events.legacy`
+(`legacy_envelope_v1`), and `spec_kitty_events.cutover`
+(`CUTOVER_ARTIFACT`). Only `.sync` had no consumers left: `.cutover`
+and `.legacy` are still imported by `spec-kitty-saas`'s `apps/sync`
+adapters (inert today only because that repo pins `==6.1.0`;
+`apps/sync` itself is deleted by epic E6) and by `spec-kitty`'s
+consumer-contract test suite — both repos must drop or port those
+imports before pinning `==8.0.0`. One
+behaviour change rides along: `validate_event()` no longer applies the
+envelope-level cutover gate (missing/wrong `schema_version`, forbidden
+legacy names) — fail-closed envelope gating lives in
+`spec_kitty_events.strict.validate_strict_envelope`. Pin `>=8.0.0`; see
+`COMPATIBILITY.md` and `CHANGELOG.md` for the full list.
+
+## What Changed In 7.0.0
+
+`7.0.0` publishes `spec_kitty_events.strict.validate_strict_envelope`, an
+opt-in, deterministic, structured validator (`STRICT_PROFILE_ID =
+"journal/v1"`) layered over the existing envelope and lifecycle/WP
+contracts, plus the new `spec_kitty_events.harness_observation` module: a
+volatile `HarnessObservation` event family with exactly six payload IDs
+(`ObservationKind`: `presence`, `lane_signal`, `focus_started`,
+`focus_heartbeat`, `focus_paused`, `focus_ended`). Five lifecycle payloads
+(`MissionStarted`, `MissionCompleted`, `MissionCancelled`, `PhaseEntered`,
+`ReviewRollback`) are hardened to `extra="forbid"`; `MissionStarted`,
+`MissionCompleted`, and `PhaseEntered` gain an optional `mission_slug`
+field first, so the real spec-kitty producer's current output stays valid.
+See `COMPATIBILITY.md` for the full skew story and migration posture.
 
 ## What Changed In 5.0.0
 
@@ -13,7 +45,7 @@ major version is `5.0.0`; the on-wire envelope schema remains
 - Mission identity fields are canonicalized to `mission_slug`, `mission_number`, and `mission_type`.
 - Event envelopes require `build_id` and use the cutover signal `schema_version="3.0.0"`.
 - Live ingestion is fail-closed. There are no runtime compatibility aliases for legacy mission-domain fields.
-- Legacy mission-domain keys and names such as `feature_slug`, `feature_number`, `mission_key`, `legacy_aggregate_id`, `FeatureCreated`, and `FeatureClosed` are rejected on live paths.
+- Legacy mission-domain keys, names, and aggregate prefixes such as `feature_slug`, `feature_number`, `mission_key`, `legacy_aggregate_id`, `FeatureCreated`, `FeatureClosed`, and `aggregate_id="feature/…"` are rejected on live paths (the strict profile; see `COMPATIBILITY.md`).
 - `in_review` is part of the canonical lane vocabulary.
 - The conformance package includes historical-shape fixtures for TeamSpace migration dry-runs.
 
@@ -39,6 +71,12 @@ Development install:
 git clone https://github.com/Priivacy-ai/spec-kitty-events.git
 cd spec-kitty-events
 pip install -e ".[dev,conformance]"
+```
+
+Or, with [uv](https://docs.astral.sh/uv/), install the exact versions pinned by the committed `uv.lock` — what CI and `make test-fast`/`make test-full` resolve against. If `pyproject.toml` changes, re-run `uv lock` and commit the updated file (`uv sync --locked` fails on a stale lock):
+
+```bash
+uv sync --locked --extra dev --extra conformance
 ```
 
 ## Contract Highlights
@@ -101,7 +139,9 @@ result = validate_event(payload, "WPStatusChanged")
 assert result.valid
 ```
 
-### Validate a Full Envelope With Fail-Closed Cutover Checks
+### Validate a Full Envelope
+
+Build the envelope, then validate it:
 
 ```python
 from spec_kitty_events.conformance import validate_event
@@ -115,8 +155,11 @@ envelope = {
     "node_id": "runner-01",
     "lamport_clock": 1,
     "project_uuid": "12345678-1234-5678-1234-567812345678",
+    "project_slug": None,
     "correlation_id": "01ARZ3NDEKTSV4RRFFQ69G5FAV",
+    "causation_id": None,
     "schema_version": "3.0.0",
+    "data_tier": 0,
     "payload": {
         "mission_slug": "mission-001",
         "wp_id": "WP01",
@@ -131,11 +174,24 @@ result = validate_event(envelope, "WPStatusChanged", strict=True)
 assert result.valid
 ```
 
+For fail-closed envelope gating (`schema_version == "3.0.0"`, full key
+set, recursive forbidden-key walk), use the strict profile —
+`validate_event` does not enforce it itself (the example above carries
+all 14 `STRICT_ENVELOPE_KEYS`, so the strict-profile check below also
+passes):
+
+```python
+from spec_kitty_events.strict import validate_strict_envelope
+
+errors = validate_strict_envelope(envelope)
+assert not errors
+```
+
 ## Schemas And Conformance
 
 - Committed JSON Schemas are generated from the canonical Pydantic models.
 - Replay streams and golden reducer outputs ship in the package.
-- Conformance validation combines Pydantic validation, committed JSON Schemas, and cutover artifact checks.
+- Conformance validation combines Pydantic validation and committed JSON Schemas; the opt-in strict profile adds fail-closed envelope gating.
 
 Run the drift and conformance gates:
 
@@ -150,47 +206,6 @@ pytest --pyargs spec_kitty_events.conformance -v
 - Use `build_id` to identify the emitting build and `node_id` to identify the emitting node.
 - Do not rely on runtime translation of legacy mission-domain fields.
 - Use offline rewrite or migration jobs if you need to transform historical pre-cutover data.
-
-## Legacy Envelope Normalization (`legacy_envelope_v1`)
-
-`spec_kitty_events.legacy` publishes a named, frozen contract for promoting
-known legacy event shapes to canonical 3.x envelopes. Three legacy shapes are
-recognized in v1: `pre_3_0_envelope`, `feature_keys_envelope`, and
-`awaiting_review_synonym`.
-
-```python
-from spec_kitty_events.legacy import (
-    LegacyEnvelopeNormalizer,
-    NormalizedEnvelope,
-    UnnormalizableLegacyDiagnostic,
-)
-from spec_kitty_events.conformance.validators import validate_event
-
-result = LegacyEnvelopeNormalizer().normalize(stored_legacy_row)
-
-match result:
-    case NormalizedEnvelope(canonical=canonical, raw=raw, legacy_shape=shape):
-        conformance = validate_event(canonical, canonical["event_type"], strict=True)
-        # ship to materializer, retain raw for audit
-    case UnnormalizableLegacyDiagnostic(reason=reason, shape_hints=hints, raw=raw):
-        # classify as legacy / business-rule diagnostic; never silent
-```
-
-Guarantees:
-
-- **Audit preservation**: both result variants carry the original `raw` dict.
-- **Determinism**: same input always yields the same output (including the
-  minted `project_uuid` via UUID5 over `(node_id, build_id)`).
-- **No silent aliases**: every field-name change is captured by the
-  `legacy_shape` identifier; un-normalizable rows surface as structured
-  diagnostics, never silent passes.
-- **Idempotency**: calling `normalize()` on an already-canonical envelope
-  returns `UnnormalizableLegacyDiagnostic(reason="unrecognized_legacy_shape")`.
-
-The contract is named `legacy_envelope_v1` and frozen. Future legacy shapes
-ship as `legacy_envelope_v2` alongside v1 for a deprecation window.
-
-Mission: `canonical-producer-contracts-legacy-envelope-01KS7JM3`.
 
 ## Local-Only Event Classification (`LOCAL_ONLY_EVENT_TYPES`)
 
@@ -213,72 +228,14 @@ update their lint exemption files.
 
 Mission: `canonical-producer-contracts-legacy-envelope-01KS7JM3`.
 
-## Identity-Boundary CI Gate
-
-The `cross-repo-harness-tests` required check runs the
-[`spec-kitty-end-to-end-testing`](https://github.com/Priivacy-ai/spec-kitty-end-to-end-testing)
-harness's identity-boundary unit tests on every PR. The harness is checked
-out at a **pinned commit SHA** and the PR's HEAD copy of
-`spec_kitty_events` is installed over the harness's frozen lockfile via
-`uv pip install -e ../events`. If a PR breaks SaaS-side resolution
-assumptions (envelope shape, identity field names, recognition rules), the
-unit suite turns red and merge is blocked. Workflow file:
-[`.github/workflows/cross-repo-harness-tests.yml`](.github/workflows/cross-repo-harness-tests.yml).
-
-**Pinned e2e SHA**: `193f5c0eb07c8fdb6943d91d205ab892b98d6dfc`
-
-### SHA-bump procedure
-
-When an intentional, breaking contract change ships in this repo that
-requires a matching harness update:
-
-1. Get the new e2e SHA after the harness update lands:
-   ```bash
-   unset GITHUB_TOKEN
-   gh api repos/Priivacy-ai/spec-kitty-end-to-end-testing/commits/main --jq .sha
-   ```
-2. Verify the new SHA still contains `tests/unit/identity_boundary/` and
-   `tests/identity_boundary/unit/`:
-   ```bash
-   gh api repos/Priivacy-ai/spec-kitty-end-to-end-testing/contents/tests/unit/identity_boundary --ref <NEW_SHA>
-   gh api repos/Priivacy-ai/spec-kitty-end-to-end-testing/contents/tests/identity_boundary/unit --ref <NEW_SHA>
-   ```
-3. Update the `ref:` field in
-   `.github/workflows/cross-repo-harness-tests.yml`.
-4. Open the bump PR; CI will exercise the new SHA against the new contract
-   before merge.
-
-### Sibling gates
-
-This is one of three coordinated CI gates tracked under
-[`Priivacy-ai/spec-kitty#1247`](https://github.com/Priivacy-ai/spec-kitty/issues/1247):
-
-- `cross-repo-harness-tests` here (this repo).
-- `drift-detector` in [`spec-kitty`](https://github.com/Priivacy-ai/spec-kitty) — workflow `.github/workflows/drift-detector.yml`.
-- `identity-boundary-canary` in [`spec-kitty-saas`](https://github.com/Priivacy-ai/spec-kitty-saas) — workflow `.github/workflows/canary-gate.yml`.
-
-### Admin action required (one-time)
-
-After this gate merges, a repo admin must register the check as required on
-`main`:
-
-1. Open https://github.com/Priivacy-ai/spec-kitty-events/settings/branches.
-2. Edit the rule for `main`.
-3. Under "Require status checks to pass before merging", add the exact name
-   `cross-repo-harness-tests`.
-4. Save.
-
-Until that step is done, the workflow still runs on every PR but its red
-status does not block merge.
-
 ## Versioning
 
 This package now publishes the TeamSpace migration release as package `5.0.0`.
 
 - `2.x` documentation and mixed-field operation are no longer the public contract.
-- Consumers should treat the cutover artifact, recursive forbidden-key helper, and committed fixtures as the authoritative compatibility surface.
+- Consumers should treat the strict profile, recursive forbidden-key helper, and committed fixtures as the authoritative compatibility surface.
 - The envelope schema version intentionally remains `3.0.0`.
 
 ## License
 
-All rights reserved. This repository is owned by Priivacy AI.
+MIT — see [LICENSE](LICENSE).

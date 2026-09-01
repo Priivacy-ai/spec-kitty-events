@@ -14,13 +14,13 @@ from dataclasses import dataclass
 from typing import Any, Callable, Dict, Tuple, Type, Union
 
 from pydantic import BaseModel, ValidationError as PydanticValidationError
-from spec_kitty_events.cutover import assert_canonical_cutover_signal
 
 from spec_kitty_events.build_lifecycle import (
     BuildHeartbeatPayload,
     BuildRegisteredPayload,
 )
 from spec_kitty_events.gates import GateFailedPayload, GatePassedPayload
+from spec_kitty_events.harness_observation import HARNESS_OBSERVATION, HarnessObservationPayload
 from spec_kitty_events.lifecycle import (
     FollowUpRecordedPayload,
     MissionClosedPayload,
@@ -113,14 +113,6 @@ from spec_kitty_events.connector import (
     ConnectorDegradedPayload,
     ConnectorRevokedPayload,
     ConnectorReconnectedPayload,
-)
-from spec_kitty_events.sync import (
-    SyncIngestAcceptedPayload,
-    SyncIngestRejectedPayload,
-    SyncRetryScheduledPayload,
-    SyncDeadLetteredPayload,
-    SyncReplayCompletedPayload,
-    ExternalReferenceLinkedPayload,
 )
 from spec_kitty_events.profile_invocation import (
     ProfileInvocationStartedPayload,
@@ -250,13 +242,6 @@ _EVENT_TYPE_TO_MODEL: Dict[str, Any] = {
     "ConnectorDegraded": ConnectorDegradedPayload,
     "ConnectorRevoked": ConnectorRevokedPayload,
     "ConnectorReconnected": ConnectorReconnectedPayload,
-    # Sync lifecycle contracts (2.7.0)
-    "SyncIngestAccepted": SyncIngestAcceptedPayload,
-    "SyncIngestRejected": SyncIngestRejectedPayload,
-    "SyncRetryScheduled": SyncRetryScheduledPayload,
-    "SyncDeadLettered": SyncDeadLetteredPayload,
-    "SyncReplayCompleted": SyncReplayCompletedPayload,
-    "ExternalReferenceLinked": ExternalReferenceLinkedPayload,
     # Profile invocation contracts (3.1.0)
     "ProfileInvocationStarted": ProfileInvocationStartedPayload,
     # Retrospective contracts (4.1.0)
@@ -290,6 +275,9 @@ _EVENT_TYPE_TO_MODEL: Dict[str, Any] = {
     # no JSON schema entry yet (the schema layer is optional secondary).
     "MissionReopened": MissionReopenedPayload,
     "FollowUpRecorded": FollowUpRecordedPayload,
+    # HarnessObservation vocabulary (F1-T1, 7.0.0). F1 is the single owner
+    # of this vocabulary; see spec_kitty_events.harness_observation.
+    HARNESS_OBSERVATION: HarnessObservationPayload,
 }
 
 # Event type to JSON Schema name mapping (used with load_schema())
@@ -371,13 +359,6 @@ _EVENT_TYPE_TO_SCHEMA: Dict[str, str] = {
     "ConnectorDegraded": "connector_degraded_payload",
     "ConnectorRevoked": "connector_revoked_payload",
     "ConnectorReconnected": "connector_reconnected_payload",
-    # Sync lifecycle contracts (2.7.0)
-    "SyncIngestAccepted": "sync_ingest_accepted_payload",
-    "SyncIngestRejected": "sync_ingest_rejected_payload",
-    "SyncRetryScheduled": "sync_retry_scheduled_payload",
-    "SyncDeadLettered": "sync_dead_lettered_payload",
-    "SyncReplayCompleted": "sync_replay_completed_payload",
-    "ExternalReferenceLinked": "external_reference_linked_payload",
     # Profile invocation contracts (3.1.0)
     "ProfileInvocationStarted": "profile_invocation_started_payload",
     # Retrospective contracts (4.1.0)
@@ -392,6 +373,8 @@ _EVENT_TYPE_TO_SCHEMA: Dict[str, str] = {
     # Legacy retrospective terminal contracts (3.1.0)
     "RetrospectiveCompleted": "retrospective_completed_payload",
     "RetrospectiveSkipped": "retrospective_skipped_payload",
+    # HarnessObservation vocabulary (F1-T1, 7.0.0).
+    HARNESS_OBSERVATION: "harness_observation_payload",
 }
 
 
@@ -499,8 +482,7 @@ def _validate_with_schema(
         ImportError: If strict=True and jsonschema is unavailable.
     """
     try:
-        import jsonschema  # type: ignore[import-untyped]
-        from jsonschema import Draft202012Validator
+        from jsonschema import Draft202012Validator  # type: ignore[import-untyped]
     except ImportError:
         if strict:
             raise ImportError(
@@ -564,40 +546,22 @@ def validate_event(
     """
     if event_type not in _EVENT_TYPE_TO_MODEL:
         raise ValueError(
-            f"Unknown event type: {event_type!r}. "
-            f"Known types: {sorted(_EVENT_TYPE_TO_MODEL)}"
+            f"Unknown event type: {event_type!r}. Known types: {sorted(_EVENT_TYPE_TO_MODEL)}"
         )
 
     model_class = _EVENT_TYPE_TO_MODEL[event_type]
     schema_name = _EVENT_TYPE_TO_SCHEMA.get(event_type)
 
-    envelope = None
     model_payload = payload
     if (
         event_type != "Event"
         and isinstance(payload.get("payload"), dict)
         and payload.get("event_type") == event_type
     ):
-        envelope = payload
         model_payload = payload["payload"]
 
-    cutover_violations: Tuple[ModelViolation, ...] = ()
-    if envelope is not None or event_type == "Event":
-        candidate_envelope = envelope or payload
-        try:
-            assert_canonical_cutover_signal(candidate_envelope)
-        except (TypeError, ValueError) as exc:
-            cutover_violations = (
-                ModelViolation(
-                    field="schema_version",
-                    message=str(exc),
-                    violation_type="cutover_policy",
-                    input_value=candidate_envelope,
-                ),
-            )
-
     # Layer 1: Pydantic validation
-    model_violations = cutover_violations + _validate_with_model(model_payload, model_class)
+    model_violations = _validate_with_model(model_payload, model_class)
 
     # Layer 1.5: Semantic (business-rule) validation. Run only when:
     #   (a) pydantic shape validation produced no violations (so the model
@@ -622,9 +586,7 @@ def validate_event(
         schema_skipped = True
 
     # Determine overall validity
-    valid = len(model_violations) == 0 and (
-        len(schema_violations) == 0 or schema_skipped
-    )
+    valid = len(model_violations) == 0 and (len(schema_violations) == 0 or schema_skipped)
 
     return ConformanceResult(
         valid=valid,

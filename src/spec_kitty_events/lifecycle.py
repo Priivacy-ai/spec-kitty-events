@@ -43,17 +43,19 @@ REVIEW_ROLLBACK: str = "ReviewRollback"
 MISSION_REOPENED: str = "MissionReopened"
 FOLLOW_UP_RECORDED: str = "FollowUpRecorded"
 
-MISSION_EVENT_TYPES: FrozenSet[str] = frozenset({
-    MISSION_CREATED,
-    MISSION_CLOSED,
-    MISSION_STARTED,
-    MISSION_COMPLETED,
-    MISSION_CANCELLED,
-    PHASE_ENTERED,
-    REVIEW_ROLLBACK,
-    MISSION_REOPENED,
-    FOLLOW_UP_RECORDED,
-})
+MISSION_EVENT_TYPES: FrozenSet[str] = frozenset(
+    {
+        MISSION_CREATED,
+        MISSION_CLOSED,
+        MISSION_STARTED,
+        MISSION_COMPLETED,
+        MISSION_CANCELLED,
+        PHASE_ENTERED,
+        REVIEW_ROLLBACK,
+        MISSION_REOPENED,
+        FOLLOW_UP_RECORDED,
+    }
+)
 
 # ── Section 2: MissionStatus Enum ────────────────────────────────────────────
 
@@ -75,121 +77,163 @@ class MissionStatus(str, Enum):
     REOPENED = "reopened"
 
 
-TERMINAL_MISSION_STATUSES: FrozenSet[MissionStatus] = frozenset({
-    MissionStatus.COMPLETED,
-    MissionStatus.CANCELLED,
-})
+TERMINAL_MISSION_STATUSES: FrozenSet[MissionStatus] = frozenset(
+    {
+        MissionStatus.COMPLETED,
+        MissionStatus.CANCELLED,
+    }
+)
 
 # ── Section 3: Lifecycle Payload Models ──────────────────────────────────────
 
 
 class MissionStartedPayload(BaseModel):
-    """Typed payload for MissionStarted events."""
+    """Typed payload for MissionStarted events.
 
-    model_config = ConfigDict(frozen=True)
+    Hardened by F1-T1 (7.0.0, strict journal profile): ``extra="forbid"``.
+    ``mission_slug`` is added *before* strictness (draft §3.3 step 1) because
+    the live spec-kitty producer (``emitter.py`` ``emit_mission_started``)
+    always builds this payload and sets ``payload["mission_slug"] = ...``
+    when a slug is known — display/back-compat only, ``mission_id`` is the
+    identity (``emitter.py:11-22``).
+    """
 
-    mission_id: str = Field(
-        ..., min_length=1, description="Mission identifier"
-    )
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    mission_id: str = Field(..., min_length=1, description="Mission identifier")
     mission_type: str = Field(
         ...,
         min_length=1,
         description="Mission type (e.g., 'software-dev', 'research', 'plan')",
     )
-    initial_phase: str = Field(
-        ..., min_length=1, description="First phase of the mission"
-    )
-    actor: str = Field(
-        ..., min_length=1, description="Actor who started the mission"
+    initial_phase: str = Field(..., min_length=1, description="First phase of the mission")
+    actor: str = Field(..., min_length=1, description="Actor who started the mission")
+    mission_slug: Optional[str] = Field(
+        None,
+        min_length=1,
+        description="Canonical mission slug (display/back-compat; mission_id is the identity)",
     )
 
 
 class MissionCreatedPayload(BaseModel):
-    """Typed payload for MissionCreated catalog events."""
+    """Typed payload for MissionCreated catalog events.
+
+    ``actor`` (8.0.0) carries the opaque identifier of whoever created the
+    mission so the broadcast moment can say WHO (E2E-MVP §1.1 renders
+    "<actor> created mission <slug>"). Optional — not required — because the
+    live producer built these payloads without it before 8.0.0; requiring it
+    would fail every in-flight emission at upgrade instead of enriching the
+    moment once producers catch up.
+    """
 
     model_config = ConfigDict(frozen=True, extra="forbid")
 
     mission_id: Optional[str] = Field(
-        None, min_length=1, description="Canonical machine-facing mission identity (ULID)"
+        None,
+        min_length=1,
+        description=(
+            "Canonical machine-facing mission identity (ULID); optional, rides "
+            "alongside mission_slug so a consumer can join this moment against "
+            "PhaseEntered (whose frame ref is mission_id) for the same mission "
+            "aggregate (spec-kitty-events#69)"
+        ),
     )
-    mission_slug: str = Field(
-        ..., min_length=1, description="Canonical mission slug"
-    )
-    mission_number: Optional[int] = Field(
-        ..., ge=1, description="Canonical mission number"
-    )
+    mission_slug: str = Field(..., min_length=1, description="Canonical mission slug")
+    mission_number: Optional[int] = Field(..., ge=1, description="Canonical mission number")
     mission_type: str = Field(
         ..., min_length=1, description="Canonical mission workflow/template type"
     )
     target_branch: str = Field(
         ..., min_length=1, description="Target branch for the mission planning artifacts"
     )
-    wp_count: int = Field(
-        ..., ge=0, description="Work-package count at mission creation time"
+    wp_count: int = Field(..., ge=0, description="Work-package count at mission creation time")
+    actor: str | None = Field(
+        None,
+        min_length=1,
+        description=(
+            "Opaque actor identifier of who created the mission "
+            "(broadcast under the moment's ``actor`` key)"
+        ),
     )
-    friendly_name: str = Field(
-        ..., min_length=1, description="Human-friendly mission title"
-    )
+    friendly_name: str = Field(..., min_length=1, description="Human-friendly mission title")
     purpose_tldr: str = Field(
         ..., min_length=1, description="One-line stakeholder-facing mission summary"
     )
     purpose_context: str = Field(
         ..., min_length=1, description="Short stakeholder-facing context paragraph"
     )
-    created_at: Optional[str] = Field(
-        None, min_length=1, description="Mission creation timestamp"
-    )
+    created_at: Optional[str] = Field(None, min_length=1, description="Mission creation timestamp")
 
 
 class MissionClosedPayload(BaseModel):
-    """Typed payload for MissionClosed catalog events."""
+    """Typed payload for MissionClosed catalog events.
+
+    ``actor`` (8.0.0) mirrors ``MissionCreatedPayload.actor`` — the opaque
+    identifier of whoever closed the mission — optional for the same
+    back-compat reason.
+    """
 
     model_config = ConfigDict(frozen=True, extra="forbid")
 
-    mission_slug: str = Field(
-        ..., min_length=1, description="Canonical mission slug"
-    )
-    mission_number: int = Field(
-        ..., ge=1, description="Canonical mission number"
-    )
+    mission_slug: str = Field(..., min_length=1, description="Canonical mission slug")
+    mission_number: int = Field(..., ge=1, description="Canonical mission number")
     mission_type: str = Field(
         ..., min_length=1, description="Canonical mission workflow/template type"
+    )
+    actor: str | None = Field(
+        None,
+        min_length=1,
+        description=(
+            "Opaque actor identifier of who closed the mission "
+            "(broadcast under the moment's ``actor`` key)"
+        ),
+    )
+    mission_id: Optional[str] = Field(
+        None,
+        min_length=1,
+        description=(
+            "Canonical machine-facing mission identity (ULID); optional, rides "
+            "alongside mission_slug so a consumer can join this moment against "
+            "PhaseEntered (whose frame ref is mission_id) for the same mission "
+            "aggregate (spec-kitty-events#69)"
+        ),
     )
 
 
 class MissionCompletedPayload(BaseModel):
-    """Typed payload for MissionCompleted events."""
+    """Typed payload for MissionCompleted events.
 
-    model_config = ConfigDict(frozen=True)
+    Hardened by F1-T1 (7.0.0, strict journal profile): ``extra="forbid"``;
+    ``mission_slug`` added for the same reason as ``MissionStartedPayload``
+    (live producer: ``emitter.py`` ``emit_mission_completed``).
+    """
 
-    mission_id: str = Field(
-        ..., min_length=1, description="Mission identifier"
-    )
-    mission_type: str = Field(
-        ..., min_length=1, description="Mission type"
-    )
-    final_phase: str = Field(
-        ..., min_length=1, description="Last phase before completion"
-    )
-    actor: str = Field(
-        ..., min_length=1, description="Actor who completed the mission"
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    mission_id: str = Field(..., min_length=1, description="Mission identifier")
+    mission_type: str = Field(..., min_length=1, description="Mission type")
+    final_phase: str = Field(..., min_length=1, description="Last phase before completion")
+    actor: str = Field(..., min_length=1, description="Actor who completed the mission")
+    mission_slug: Optional[str] = Field(
+        None,
+        min_length=1,
+        description="Canonical mission slug (display/back-compat; mission_id is the identity)",
     )
 
 
 class MissionCancelledPayload(BaseModel):
-    """Typed payload for MissionCancelled events."""
+    """Typed payload for MissionCancelled events.
 
-    model_config = ConfigDict(frozen=True)
+    Hardened by F1-T1 (7.0.0, strict journal profile): ``extra="forbid"``.
+    No ``mission_slug`` field is added — no live producer exists in
+    spec-kitty/src (grep, F1 draft §2.2); spec-kitty-saas only consumes it.
+    """
 
-    mission_id: str = Field(
-        ..., min_length=1, description="Mission identifier"
-    )
-    reason: str = Field(
-        ..., min_length=1, description="Reason for cancellation (required)"
-    )
-    actor: str = Field(
-        ..., min_length=1, description="Actor who cancelled the mission"
-    )
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    mission_id: str = Field(..., min_length=1, description="Mission identifier")
+    reason: str = Field(..., min_length=1, description="Reason for cancellation (required)")
+    actor: str = Field(..., min_length=1, description="Actor who cancelled the mission")
     cancelled_wp_ids: List[str] = Field(
         default_factory=list,
         description="WP IDs affected by cancellation",
@@ -207,12 +251,20 @@ class MissionOriginBoundPayload(BaseModel):
     model_config = ConfigDict(frozen=True, extra="forbid")
 
     mission_slug: str = Field(..., min_length=1, description="Canonical mission slug.")
-    provider: str = Field(..., min_length=1, description="External tracker provider (e.g. 'github', 'linear').")
-    external_issue_id: str = Field(..., min_length=1, description="Provider-native issue identifier.")
+    provider: str = Field(
+        ..., min_length=1, description="External tracker provider (e.g. 'github', 'linear')."
+    )
+    external_issue_id: str = Field(
+        ..., min_length=1, description="Provider-native issue identifier."
+    )
     external_issue_key: str = Field(..., min_length=1, description="Display key (e.g. 'PROJ-123').")
-    external_issue_url: str = Field(..., min_length=1, description="Browser URL to the external issue.")
+    external_issue_url: str = Field(
+        ..., min_length=1, description="Browser URL to the external issue."
+    )
     title: str = Field(..., min_length=1, description="External issue title.")
-    mission_id: Optional[str] = Field(None, min_length=1, description="Canonical mission ULID (when known).")
+    mission_id: Optional[str] = Field(
+        None, min_length=1, description="Canonical mission ULID (when known)."
+    )
 
 
 class MissionReopenedPayload(BaseModel):
@@ -234,18 +286,12 @@ class MissionReopenedPayload(BaseModel):
     mission_id: str = Field(
         ..., min_length=1, description="Canonical machine identity (ULID); lookup key."
     )
-    mission_slug: str = Field(
-        ..., min_length=1, description="Human handle (display)."
-    )
-    reason: str = Field(
-        ..., min_length=1, description="Audit reason for the re-open (non-empty)."
-    )
+    mission_slug: str = Field(..., min_length=1, description="Human handle (display).")
+    reason: str = Field(..., min_length=1, description="Audit reason for the re-open (non-empty).")
     reopened_by: str = Field(
         ..., min_length=1, description="Detected actor who re-opened the mission."
     )
-    reopened_at: str = Field(
-        ..., min_length=1, description="Event time (ISO-8601 UTC)."
-    )
+    reopened_at: str = Field(..., min_length=1, description="Event time (ISO-8601 UTC).")
     cleared_merge: Optional[Dict[str, Any]] = Field(
         None,
         description="Snapshot of the merged_* fields cleared from meta.json "
@@ -272,11 +318,10 @@ class FollowUpRecordedPayload(BaseModel):
     mission_id: str = Field(
         ..., min_length=1, description="Canonical machine identity (ULID); attribution key."
     )
-    mission_slug: str = Field(
-        ..., min_length=1, description="Human handle (display)."
-    )
+    mission_slug: str = Field(..., min_length=1, description="Human handle (display).")
     follow_up_type: Literal["commit", "pr"] = Field(
-        ..., description="Discriminator: 'commit' (requires commit_sha) or 'pr' (requires pr_number)."
+        ...,
+        description="Discriminator: 'commit' (requires commit_sha) or 'pr' (requires pr_number).",
     )
     commit_sha: Optional[str] = Field(
         None, min_length=1, description="Commit SHA; required iff follow_up_type == 'commit'."
@@ -287,9 +332,7 @@ class FollowUpRecordedPayload(BaseModel):
     recorded_by: str = Field(
         ..., min_length=1, description="Detected actor who recorded the follow-up."
     )
-    recorded_at: str = Field(
-        ..., min_length=1, description="Event time (ISO-8601 UTC)."
-    )
+    recorded_at: str = Field(..., min_length=1, description="Event time (ISO-8601 UTC).")
 
     @model_validator(mode="after")
     def _check_discriminator(self) -> "FollowUpRecordedPayload":
@@ -304,47 +347,50 @@ class FollowUpRecordedPayload(BaseModel):
 
 
 class PhaseEnteredPayload(BaseModel):
-    """Typed payload for PhaseEntered events."""
+    """Typed payload for PhaseEntered events.
 
-    model_config = ConfigDict(frozen=True)
+    Hardened by F1-T1 (7.0.0, strict journal profile): ``extra="forbid"``;
+    ``mission_slug`` added for the same reason as ``MissionStartedPayload``
+    (live producer: ``emitter.py`` ``emit_phase_entered``).
+    """
 
-    mission_id: str = Field(
-        ..., min_length=1, description="Mission identifier"
-    )
-    phase_name: str = Field(
-        ..., min_length=1, description="Phase being entered"
-    )
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    mission_id: str = Field(..., min_length=1, description="Mission identifier")
+    phase_name: str = Field(..., min_length=1, description="Phase being entered")
     previous_phase: Optional[str] = Field(
         None, min_length=1, description="Phase being exited (None for initial)"
     )
-    actor: str = Field(
-        ..., min_length=1, description="Actor triggering phase transition"
+    actor: str = Field(..., min_length=1, description="Actor triggering phase transition")
+    mission_slug: Optional[str] = Field(
+        None,
+        min_length=1,
+        description="Canonical mission slug (display/back-compat; mission_id is the identity)",
     )
 
 
 class ReviewRollbackPayload(BaseModel):
-    """Typed payload for ReviewRollback events."""
+    """Typed payload for ReviewRollback events.
 
-    model_config = ConfigDict(frozen=True)
+    Hardened by F1-T1 (7.0.0, strict journal profile): ``extra="forbid"``.
+    No ``mission_slug`` field is added — no live producer exists in
+    spec-kitty/src (grep, F1 draft §2.2); spec-kitty-saas only consumes it.
+    """
 
-    mission_id: str = Field(
-        ..., min_length=1, description="Mission identifier"
-    )
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    mission_id: str = Field(..., min_length=1, description="Mission identifier")
     review_ref: str = Field(
         ...,
         min_length=1,
         description="Reference to the review that triggered rollback",
     )
-    target_phase: str = Field(
-        ..., min_length=1, description="Phase to roll back to"
-    )
+    target_phase: str = Field(..., min_length=1, description="Phase to roll back to")
     affected_wp_ids: List[str] = Field(
         default_factory=list,
         description="WP IDs affected by rollback",
     )
-    actor: str = Field(
-        ..., min_length=1, description="Actor triggering rollback"
-    )
+    actor: str = Field(..., min_length=1, description="Actor triggering rollback")
 
 
 # ── Section 4: Lifecycle Reducer Output Models ───────────────────────────────
@@ -373,18 +419,10 @@ class ReducedMissionState(BaseModel):
 
     model_config = ConfigDict(frozen=True)
 
-    mission_id: Optional[str] = Field(
-        None, description="Mission ID from MissionStarted"
-    )
-    mission_status: Optional[MissionStatus] = Field(
-        None, description="Current mission status"
-    )
-    mission_type: Optional[str] = Field(
-        None, description="Mission type from MissionStarted"
-    )
-    current_phase: Optional[str] = Field(
-        None, description="Current phase from PhaseEntered"
-    )
+    mission_id: Optional[str] = Field(None, description="Mission ID from MissionStarted")
+    mission_status: Optional[MissionStatus] = Field(None, description="Current mission status")
+    mission_type: Optional[str] = Field(None, description="Mission type from MissionStarted")
+    current_phase: Optional[str] = Field(None, description="Current phase from PhaseEntered")
     phases_entered: Tuple[str, ...] = Field(
         default_factory=tuple, description="Ordered list of phases entered"
     )
@@ -395,9 +433,7 @@ class ReducedMissionState(BaseModel):
         default_factory=tuple, description="Flagged issues"
     )
     event_count: int = Field(0, description="Total events processed")
-    last_processed_event_id: Optional[str] = Field(
-        None, description="Last event ID processed"
-    )
+    last_processed_event_id: Optional[str] = Field(None, description="Last event ID processed")
 
 
 # ── Section 5: Lifecycle Reducer ─────────────────────────────────────────────
@@ -654,12 +690,8 @@ def reduce_lifecycle_events(events: Sequence[Event]) -> ReducedMissionState:
     unique_events = dedup_events(sorted_events)
 
     # 3. Partition
-    mission_events = [
-        e for e in unique_events if e.event_type in MISSION_EVENT_TYPES
-    ]
-    wp_events = [
-        e for e in unique_events if e.event_type == WP_STATUS_CHANGED
-    ]
+    mission_events = [e for e in unique_events if e.event_type in MISSION_EVENT_TYPES]
+    wp_events = [e for e in unique_events if e.event_type == WP_STATUS_CHANGED]
 
     # 4. Reduce mission events with cancel-beats-re-open precedence
     mission_id: Optional[str] = None
@@ -679,16 +711,14 @@ def reduce_lifecycle_events(events: Sequence[Event]) -> ReducedMissionState:
         # Cancel-beats-re-open: sort so MissionCancelled is applied last
         group.sort(key=_cancel_last_key)
         for event in group:
-            mission_id, mission_status, mission_type, current_phase = (
-                _process_mission_event(
-                    event,
-                    mission_id,
-                    mission_status,
-                    mission_type,
-                    current_phase,
-                    phases_entered,
-                    anomalies,
-                )
+            mission_id, mission_status, mission_type, current_phase = _process_mission_event(
+                event,
+                mission_id,
+                mission_status,
+                mission_type,
+                current_phase,
+                phases_entered,
+                anomalies,
             )
 
     # 5. Delegate WP events

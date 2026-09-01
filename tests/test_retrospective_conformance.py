@@ -1,4 +1,5 @@
 """Conformance tests for retrospective event contracts."""
+
 from __future__ import annotations
 
 import pytest

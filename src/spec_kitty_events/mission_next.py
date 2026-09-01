@@ -17,22 +17,26 @@ from spec_kitty_events.models import Event
 # ── Section 1: Constants ─────────────────────────────────────────────────────
 
 MISSION_RUN_STARTED: str = "MissionRunStarted"
-NEXT_STEP_PLANNED: str = "NextStepPlanned"  # Reserved — payload contract deferred until runtime emits
+NEXT_STEP_PLANNED: str = (
+    "NextStepPlanned"  # Reserved — payload contract deferred until runtime emits
+)
 NEXT_STEP_ISSUED: str = "NextStepIssued"
 NEXT_STEP_AUTO_COMPLETED: str = "NextStepAutoCompleted"
 DECISION_INPUT_REQUESTED: str = "DecisionInputRequested"
 DECISION_INPUT_ANSWERED: str = "DecisionInputAnswered"
 MISSION_RUN_COMPLETED: str = "MissionRunCompleted"
 
-MISSION_NEXT_EVENT_TYPES: FrozenSet[str] = frozenset({
-    MISSION_RUN_STARTED,
-    NEXT_STEP_PLANNED,
-    NEXT_STEP_ISSUED,
-    NEXT_STEP_AUTO_COMPLETED,
-    DECISION_INPUT_REQUESTED,
-    DECISION_INPUT_ANSWERED,
-    MISSION_RUN_COMPLETED,
-})
+MISSION_NEXT_EVENT_TYPES: FrozenSet[str] = frozenset(
+    {
+        MISSION_RUN_STARTED,
+        NEXT_STEP_PLANNED,
+        NEXT_STEP_ISSUED,
+        NEXT_STEP_AUTO_COMPLETED,
+        DECISION_INPUT_REQUESTED,
+        DECISION_INPUT_ANSWERED,
+        MISSION_RUN_COMPLETED,
+    }
+)
 
 # ── Section 2: Value Objects ─────────────────────────────────────────────────
 
@@ -40,27 +44,30 @@ MISSION_NEXT_EVENT_TYPES: FrozenSet[str] = frozenset({
 class RuntimeActorIdentity(BaseModel):
     """Identity of a runtime actor (human, LLM, or service)."""
 
-    model_config = ConfigDict(frozen=True)
+    model_config = ConfigDict(frozen=True, extra="forbid")
 
-    actor_id: str = Field(
-        ..., min_length=1, description="Unique actor identifier"
-    )
+    actor_id: str = Field(..., min_length=1, description="Unique actor identifier")
     actor_type: str = Field(
-        ..., description="Actor category",
+        ...,
+        description="Actor category",
         pattern=r"^(human|llm|service)$",
     )
-    display_name: str = Field(
-        default="", description="Human-readable display name"
-    )
-    provider: Optional[str] = Field(
-        None, description="Provider (e.g., 'anthropic', 'openai')"
-    )
-    model: Optional[str] = Field(
-        None, description="Model identifier (e.g., 'claude-opus-4-6')"
-    )
-    tool: Optional[str] = Field(
-        None, description="Tool identifier"
-    )
+    display_name: str = Field(default="", description="Human-readable display name")
+    provider: Optional[str] = Field(None, description="Provider (e.g., 'anthropic', 'openai')")
+    model: Optional[str] = Field(None, description="Model identifier (e.g., 'claude-opus-4-6')")
+    tool: Optional[str] = Field(None, description="Tool identifier")
+
+    @property
+    def actor_label(self) -> str:
+        """Canonical string form of the actor for moments, logs, and display.
+
+        Exactly the required opaque ``actor_id`` — never ``display_name``
+        (or any other free-text field): moments are identifiers and
+        transition facts, and a label derived from prose would both leak
+        that text onto the team relay for the whole retention window and
+        make an oversize name drop the entire moment at the bound.
+        """
+        return self.actor_id
 
 
 # ── Section 3: Enum ──────────────────────────────────────────────────────────
@@ -73,115 +80,181 @@ class MissionRunStatus(str, Enum):
     COMPLETED = "completed"
 
 
-TERMINAL_RUN_STATUSES: FrozenSet[MissionRunStatus] = frozenset({
-    MissionRunStatus.COMPLETED,
-})
+TERMINAL_RUN_STATUSES: FrozenSet[MissionRunStatus] = frozenset(
+    {
+        MissionRunStatus.COMPLETED,
+    }
+)
 
 # ── Section 4: Payload Models ────────────────────────────────────────────────
+
+# Every payload below carries optional ``mission_id``/``mission_slug``: the
+# live CLI producer (specify_cli/sync/emitter.py) injects both keys post-hoc
+# into each mission-run payload it emits, so ``extra="forbid"`` models
+# without those fields would reject real ingress on both sides of the wire.
+# They stay optional so pre-8.0 journals keep validating.
 
 
 class MissionRunStartedPayload(BaseModel):
     """Payload for MissionRunStarted event."""
 
-    model_config = ConfigDict(frozen=True)
+    model_config = ConfigDict(frozen=True, extra="forbid")
 
     run_id: str = Field(..., min_length=1, description="Unique run identifier")
     mission_type: str = Field(
         ..., min_length=1, description="Mission workflow/template type being executed"
     )
-    actor: RuntimeActorIdentity = Field(
-        ..., description="Actor who started the run"
+    actor: RuntimeActorIdentity = Field(..., description="Actor who started the run")
+    mission_id: str | None = Field(
+        None,
+        min_length=1,
+        description="Canonical machine-facing mission identity (ULID) the run belongs to",
     )
+    mission_slug: str | None = Field(
+        None,
+        min_length=1,
+        description="Canonical mission slug (display; mission_id is the identity)",
+    )
+
+    @property
+    def actor_label(self) -> str:
+        """Single-label projection of ``actor`` (zeitgeist_attrs contract)."""
+        return self.actor.actor_label
 
 
 class NextStepIssuedPayload(BaseModel):
     """Payload for NextStepIssued event."""
 
-    model_config = ConfigDict(frozen=True)
+    model_config = ConfigDict(frozen=True, extra="forbid")
 
     run_id: str = Field(..., min_length=1, description="Run identifier")
     step_id: str = Field(..., min_length=1, description="Step being issued")
-    agent_id: str = Field(
-        ..., min_length=1, description="Agent handling the step"
+    agent_id: str = Field(..., min_length=1, description="Agent handling the step")
+    actor: RuntimeActorIdentity = Field(..., description="Actor who issued the step")
+    mission_id: str | None = Field(
+        None,
+        min_length=1,
+        description="Canonical machine-facing mission identity (ULID) the run belongs to",
     )
-    actor: RuntimeActorIdentity = Field(
-        ..., description="Actor who issued the step"
+    mission_slug: str | None = Field(
+        None,
+        min_length=1,
+        description="Canonical mission slug (display; mission_id is the identity)",
     )
+
+    @property
+    def actor_label(self) -> str:
+        """Single-label projection of ``actor`` (zeitgeist_attrs contract)."""
+        return self.actor.actor_label
 
 
 class NextStepAutoCompletedPayload(BaseModel):
     """Payload for NextStepAutoCompleted event."""
 
-    model_config = ConfigDict(frozen=True)
+    model_config = ConfigDict(frozen=True, extra="forbid")
 
     run_id: str = Field(..., min_length=1, description="Run identifier")
     step_id: str = Field(..., min_length=1, description="Step that completed")
-    agent_id: str = Field(
-        ..., min_length=1, description="Agent that completed the step"
+    agent_id: str = Field(..., min_length=1, description="Agent that completed the step")
+    result: str = Field(..., min_length=1, description="Step result (e.g., 'success', 'failed')")
+    actor: RuntimeActorIdentity = Field(..., description="Actor context for the completion")
+    mission_id: str | None = Field(
+        None,
+        min_length=1,
+        description="Canonical machine-facing mission identity (ULID) the run belongs to",
     )
-    result: str = Field(
-        ..., min_length=1, description="Step result (e.g., 'success', 'failed')"
+    mission_slug: str | None = Field(
+        None,
+        min_length=1,
+        description="Canonical mission slug (display; mission_id is the identity)",
     )
-    actor: RuntimeActorIdentity = Field(
-        ..., description="Actor context for the completion"
-    )
+
+    @property
+    def actor_label(self) -> str:
+        """Single-label projection of ``actor`` (zeitgeist_attrs contract)."""
+        return self.actor.actor_label
 
 
 class DecisionInputRequestedPayload(BaseModel):
     """Payload for DecisionInputRequested event."""
 
-    model_config = ConfigDict(frozen=True)
+    model_config = ConfigDict(frozen=True, extra="forbid")
 
     run_id: str = Field(..., min_length=1, description="Run identifier")
-    decision_id: str = Field(
-        ..., min_length=1, description="Unique decision identifier"
+    decision_id: str = Field(..., min_length=1, description="Unique decision identifier")
+    step_id: str = Field(..., min_length=1, description="Step requiring the decision")
+    question: str = Field(..., min_length=1, description="Question posed to the decision maker")
+    options: Tuple[str, ...] = Field(default_factory=tuple, description="Suggested answer options")
+    input_key: Optional[str] = Field(None, description="Input key for input-keyed decisions")
+    actor: RuntimeActorIdentity = Field(..., description="Actor who requested the decision")
+    mission_id: str | None = Field(
+        None,
+        min_length=1,
+        description="Canonical machine-facing mission identity (ULID) the run belongs to",
     )
-    step_id: str = Field(
-        ..., min_length=1, description="Step requiring the decision"
+    mission_slug: str | None = Field(
+        None,
+        min_length=1,
+        description="Canonical mission slug (display; mission_id is the identity)",
     )
-    question: str = Field(
-        ..., min_length=1, description="Question posed to the decision maker"
-    )
-    options: Tuple[str, ...] = Field(
-        default_factory=tuple, description="Suggested answer options"
-    )
-    input_key: Optional[str] = Field(
-        None, description="Input key for input-keyed decisions"
-    )
-    actor: RuntimeActorIdentity = Field(
-        ..., description="Actor who requested the decision"
-    )
+
+    @property
+    def actor_label(self) -> str:
+        """Single-label projection of ``actor`` (zeitgeist_attrs contract)."""
+        return self.actor.actor_label
 
 
 class DecisionInputAnsweredPayload(BaseModel):
     """Payload for DecisionInputAnswered event."""
 
-    model_config = ConfigDict(frozen=True)
+    model_config = ConfigDict(frozen=True, extra="forbid")
 
     run_id: str = Field(..., min_length=1, description="Run identifier")
-    decision_id: str = Field(
-        ..., min_length=1, description="Decision being answered"
+    decision_id: str = Field(..., min_length=1, description="Decision being answered")
+    answer: str = Field(..., min_length=1, description="The answer provided")
+    actor: RuntimeActorIdentity = Field(..., description="Actor who answered the decision")
+    mission_id: str | None = Field(
+        None,
+        min_length=1,
+        description="Canonical machine-facing mission identity (ULID) the run belongs to",
     )
-    answer: str = Field(
-        ..., min_length=1, description="The answer provided"
+    mission_slug: str | None = Field(
+        None,
+        min_length=1,
+        description="Canonical mission slug (display; mission_id is the identity)",
     )
-    actor: RuntimeActorIdentity = Field(
-        ..., description="Actor who answered the decision"
-    )
+
+    @property
+    def actor_label(self) -> str:
+        """Single-label projection of ``actor`` (zeitgeist_attrs contract)."""
+        return self.actor.actor_label
 
 
 class MissionRunCompletedPayload(BaseModel):
     """Payload for MissionRunCompleted event."""
 
-    model_config = ConfigDict(frozen=True)
+    model_config = ConfigDict(frozen=True, extra="forbid")
 
     run_id: str = Field(..., min_length=1, description="Run identifier")
     mission_type: str = Field(
         ..., min_length=1, description="Mission workflow/template type that completed"
     )
-    actor: RuntimeActorIdentity = Field(
-        ..., description="Actor context for the completion"
+    actor: RuntimeActorIdentity = Field(..., description="Actor context for the completion")
+    mission_id: str | None = Field(
+        None,
+        min_length=1,
+        description="Canonical machine-facing mission identity (ULID) the run belongs to",
     )
+    mission_slug: str | None = Field(
+        None,
+        min_length=1,
+        description="Canonical mission slug (display; mission_id is the identity)",
+    )
+
+    @property
+    def actor_label(self) -> str:
+        """Single-label projection of ``actor`` (zeitgeist_attrs contract)."""
+        return self.actor.actor_label
 
 
 # ── Section 5: Reducer Output Models ─────────────────────────────────────────
@@ -202,15 +275,11 @@ class ReducedMissionRunState(BaseModel):
 
     model_config = ConfigDict(frozen=True)
 
-    run_id: Optional[str] = Field(
-        default=None, description="Run ID from MissionRunStarted"
-    )
+    run_id: Optional[str] = Field(default=None, description="Run ID from MissionRunStarted")
     mission_type: Optional[str] = Field(
         default=None, description="Mission workflow/template type from MissionRunStarted"
     )
-    run_status: Optional[MissionRunStatus] = Field(
-        default=None, description="Current run status"
-    )
+    run_status: Optional[MissionRunStatus] = Field(default=None, description="Current run status")
     current_step_id: Optional[str] = Field(
         default=None, description="Currently issued step (None if idle or completed)"
     )
@@ -258,11 +327,7 @@ def reduce_mission_next_events(
         return ReducedMissionRunState()
 
     # 1. Filter
-    next_events = [
-        e
-        for e in events
-        if e.event_type in MISSION_NEXT_EVENT_TYPES
-    ]
+    next_events = [e for e in events if e.event_type in MISSION_NEXT_EVENT_TYPES]
 
     if not next_events:
         return ReducedMissionRunState()
@@ -294,36 +359,44 @@ def reduce_mission_next_events(
         if run_status in TERMINAL_RUN_STATUSES:
             if etype == MISSION_RUN_COMPLETED:
                 # Terminal idempotency: duplicate completion → anomaly
-                anomalies.append(MissionNextAnomaly(
-                    event_id=event.event_id,
-                    event_type=event.event_type,
-                    reason="Duplicate completion (terminal idempotency)",
-                ))
+                anomalies.append(
+                    MissionNextAnomaly(
+                        event_id=event.event_id,
+                        event_type=event.event_type,
+                        reason="Duplicate completion (terminal idempotency)",
+                    )
+                )
             else:
-                anomalies.append(MissionNextAnomaly(
-                    event_id=event.event_id,
-                    event_type=event.event_type,
-                    reason=f"Event after terminal state ({run_status})",
-                ))
+                anomalies.append(
+                    MissionNextAnomaly(
+                        event_id=event.event_id,
+                        event_type=event.event_type,
+                        reason=f"Event after terminal state ({run_status})",
+                    )
+                )
             continue
 
         if etype == MISSION_RUN_STARTED:
             if run_id is not None:
                 # Duplicate start: first wins
-                anomalies.append(MissionNextAnomaly(
-                    event_id=event.event_id,
-                    event_type=event.event_type,
-                    reason="Duplicate MissionRunStarted (first one wins)",
-                ))
+                anomalies.append(
+                    MissionNextAnomaly(
+                        event_id=event.event_id,
+                        event_type=event.event_type,
+                        reason="Duplicate MissionRunStarted (first one wins)",
+                    )
+                )
                 continue
             try:
                 payload_started = MissionRunStartedPayload(**event.payload)
             except Exception:
-                anomalies.append(MissionNextAnomaly(
-                    event_id=event.event_id,
-                    event_type=event.event_type,
-                    reason="Invalid MissionRunStarted payload",
-                ))
+                anomalies.append(
+                    MissionNextAnomaly(
+                        event_id=event.event_id,
+                        event_type=event.event_type,
+                        reason="Invalid MissionRunStarted payload",
+                    )
+                )
                 continue
             run_id = payload_started.run_id
             mission_type = payload_started.mission_type
@@ -332,29 +405,35 @@ def reduce_mission_next_events(
 
         # Check: event before start
         if run_id is None:
-            anomalies.append(MissionNextAnomaly(
-                event_id=event.event_id,
-                event_type=event.event_type,
-                reason="Event before MissionRunStarted",
-            ))
+            anomalies.append(
+                MissionNextAnomaly(
+                    event_id=event.event_id,
+                    event_type=event.event_type,
+                    reason="Event before MissionRunStarted",
+                )
+            )
             continue
 
         if etype == NEXT_STEP_ISSUED:
             try:
                 payload_issued = NextStepIssuedPayload(**event.payload)
             except Exception:
-                anomalies.append(MissionNextAnomaly(
-                    event_id=event.event_id,
-                    event_type=event.event_type,
-                    reason="Invalid NextStepIssued payload",
-                ))
+                anomalies.append(
+                    MissionNextAnomaly(
+                        event_id=event.event_id,
+                        event_type=event.event_type,
+                        reason="Invalid NextStepIssued payload",
+                    )
+                )
                 continue
             if payload_issued.run_id != run_id:
-                anomalies.append(MissionNextAnomaly(
-                    event_id=event.event_id,
-                    event_type=event.event_type,
-                    reason=f"run_id mismatch: expected '{run_id}', got '{payload_issued.run_id}'",
-                ))
+                anomalies.append(
+                    MissionNextAnomaly(
+                        event_id=event.event_id,
+                        event_type=event.event_type,
+                        reason=f"run_id mismatch: expected '{run_id}', got '{payload_issued.run_id}'",
+                    )
+                )
                 continue
             current_step_id = payload_issued.step_id
 
@@ -362,18 +441,22 @@ def reduce_mission_next_events(
             try:
                 payload_completed = NextStepAutoCompletedPayload(**event.payload)
             except Exception:
-                anomalies.append(MissionNextAnomaly(
-                    event_id=event.event_id,
-                    event_type=event.event_type,
-                    reason="Invalid NextStepAutoCompleted payload",
-                ))
+                anomalies.append(
+                    MissionNextAnomaly(
+                        event_id=event.event_id,
+                        event_type=event.event_type,
+                        reason="Invalid NextStepAutoCompleted payload",
+                    )
+                )
                 continue
             if payload_completed.run_id != run_id:
-                anomalies.append(MissionNextAnomaly(
-                    event_id=event.event_id,
-                    event_type=event.event_type,
-                    reason=f"run_id mismatch: expected '{run_id}', got '{payload_completed.run_id}'",
-                ))
+                anomalies.append(
+                    MissionNextAnomaly(
+                        event_id=event.event_id,
+                        event_type=event.event_type,
+                        reason=f"run_id mismatch: expected '{run_id}', got '{payload_completed.run_id}'",
+                    )
+                )
                 continue
             if payload_completed.step_id not in completed_steps:
                 completed_steps.append(payload_completed.step_id)
@@ -384,26 +467,32 @@ def reduce_mission_next_events(
             try:
                 payload_req = DecisionInputRequestedPayload(**event.payload)
             except Exception:
-                anomalies.append(MissionNextAnomaly(
-                    event_id=event.event_id,
-                    event_type=event.event_type,
-                    reason="Invalid DecisionInputRequested payload",
-                ))
+                anomalies.append(
+                    MissionNextAnomaly(
+                        event_id=event.event_id,
+                        event_type=event.event_type,
+                        reason="Invalid DecisionInputRequested payload",
+                    )
+                )
                 continue
             if payload_req.run_id != run_id:
-                anomalies.append(MissionNextAnomaly(
-                    event_id=event.event_id,
-                    event_type=event.event_type,
-                    reason=f"run_id mismatch: expected '{run_id}', got '{payload_req.run_id}'",
-                ))
+                anomalies.append(
+                    MissionNextAnomaly(
+                        event_id=event.event_id,
+                        event_type=event.event_type,
+                        reason=f"run_id mismatch: expected '{run_id}', got '{payload_req.run_id}'",
+                    )
+                )
                 continue
             if payload_req.decision_id in pending_decisions:
                 # Duplicate decision request → anomaly (idempotent)
-                anomalies.append(MissionNextAnomaly(
-                    event_id=event.event_id,
-                    event_type=event.event_type,
-                    reason=f"Duplicate decision request '{payload_req.decision_id}'",
-                ))
+                anomalies.append(
+                    MissionNextAnomaly(
+                        event_id=event.event_id,
+                        event_type=event.event_type,
+                        reason=f"Duplicate decision request '{payload_req.decision_id}'",
+                    )
+                )
             else:
                 pending_decisions[payload_req.decision_id] = payload_req
 
@@ -411,18 +500,22 @@ def reduce_mission_next_events(
             try:
                 payload_ans = DecisionInputAnsweredPayload(**event.payload)
             except Exception:
-                anomalies.append(MissionNextAnomaly(
-                    event_id=event.event_id,
-                    event_type=event.event_type,
-                    reason="Invalid DecisionInputAnswered payload",
-                ))
+                anomalies.append(
+                    MissionNextAnomaly(
+                        event_id=event.event_id,
+                        event_type=event.event_type,
+                        reason="Invalid DecisionInputAnswered payload",
+                    )
+                )
                 continue
             if payload_ans.run_id != run_id:
-                anomalies.append(MissionNextAnomaly(
-                    event_id=event.event_id,
-                    event_type=event.event_type,
-                    reason=f"run_id mismatch: expected '{run_id}', got '{payload_ans.run_id}'",
-                ))
+                anomalies.append(
+                    MissionNextAnomaly(
+                        event_id=event.event_id,
+                        event_type=event.event_type,
+                        reason=f"run_id mismatch: expected '{run_id}', got '{payload_ans.run_id}'",
+                    )
+                )
                 continue
             answered_decisions[payload_ans.decision_id] = payload_ans
             # Clear from pending when answered
@@ -432,18 +525,22 @@ def reduce_mission_next_events(
             try:
                 payload_done = MissionRunCompletedPayload(**event.payload)
             except Exception:
-                anomalies.append(MissionNextAnomaly(
-                    event_id=event.event_id,
-                    event_type=event.event_type,
-                    reason="Invalid MissionRunCompleted payload",
-                ))
+                anomalies.append(
+                    MissionNextAnomaly(
+                        event_id=event.event_id,
+                        event_type=event.event_type,
+                        reason="Invalid MissionRunCompleted payload",
+                    )
+                )
                 continue
             if payload_done.run_id != run_id:
-                anomalies.append(MissionNextAnomaly(
-                    event_id=event.event_id,
-                    event_type=event.event_type,
-                    reason=f"run_id mismatch: expected '{run_id}', got '{payload_done.run_id}'",
-                ))
+                anomalies.append(
+                    MissionNextAnomaly(
+                        event_id=event.event_id,
+                        event_type=event.event_type,
+                        reason=f"run_id mismatch: expected '{run_id}', got '{payload_done.run_id}'",
+                    )
+                )
                 continue
             run_status = MissionRunStatus.COMPLETED
 

@@ -1,7 +1,8 @@
 {
   "$id": "spec-kitty-events/phase_entered_payload",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "description": "Typed payload for PhaseEntered events.",
+  "additionalProperties": false,
+  "description": "Typed payload for PhaseEntered events.\n\nHardened by F1-T1 (7.0.0, strict journal profile): ``extra=\"forbid\"``;\n``mission_slug`` added for the same reason as ``MissionStartedPayload``\n(live producer: ``emitter.py`` ``emit_phase_entered``).",
   "properties": {
     "actor": {
       "description": "Actor triggering phase transition",
@@ -14,6 +15,20 @@
       "minLength": 1,
       "title": "Mission Id",
       "type": "string"
+    },
+    "mission_slug": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Canonical mission slug (display/back-compat; mission_id is the identity)",
+      "title": "Mission Slug"
     },
     "phase_name": {
       "description": "Phase being entered",

@@ -4,6 +4,7 @@ Provides enums, event type constants, value objects, payload models,
 the ReducedMissionAuditState output model, and a reducer stub for the
 Mission Audit Lifecycle contract.
 """
+
 from __future__ import annotations
 
 from enum import Enum
@@ -27,13 +28,15 @@ MISSION_AUDIT_DECISION_REQUESTED: str = "MissionAuditDecisionRequested"
 MISSION_AUDIT_COMPLETED: str = "MissionAuditCompleted"
 MISSION_AUDIT_FAILED: str = "MissionAuditFailed"
 
-MISSION_AUDIT_EVENT_TYPES: FrozenSet[str] = frozenset({
-    MISSION_AUDIT_REQUESTED,
-    MISSION_AUDIT_STARTED,
-    MISSION_AUDIT_DECISION_REQUESTED,
-    MISSION_AUDIT_COMPLETED,
-    MISSION_AUDIT_FAILED,
-})
+MISSION_AUDIT_EVENT_TYPES: FrozenSet[str] = frozenset(
+    {
+        MISSION_AUDIT_REQUESTED,
+        MISSION_AUDIT_STARTED,
+        MISSION_AUDIT_DECISION_REQUESTED,
+        MISSION_AUDIT_COMPLETED,
+        MISSION_AUDIT_FAILED,
+    }
+)
 
 # ── Section 3: Enums ──────────────────────────────────────────────────────────
 
@@ -60,10 +63,12 @@ class AuditStatus(str, Enum):
     FAILED = "failed"
 
 
-TERMINAL_AUDIT_STATUSES: FrozenSet[AuditStatus] = frozenset({
-    AuditStatus.COMPLETED,
-    AuditStatus.FAILED,
-})
+TERMINAL_AUDIT_STATUSES: FrozenSet[AuditStatus] = frozenset(
+    {
+        AuditStatus.COMPLETED,
+        AuditStatus.FAILED,
+    }
+)
 
 # ── Section 4: Value Objects ──────────────────────────────────────────────────
 
@@ -273,25 +278,31 @@ def reduce_mission_audit_events(events: Sequence[Event]) -> ReducedMissionAuditS
 
         # Anomaly: event after terminal
         if terminal_seen:
-            anomalies_list.append(MissionAuditAnomaly(
-                kind="event_after_terminal",
-                event_id=event_id,
-                message=f"Event {event_type!r} arrived after terminal state",
-            ))
+            anomalies_list.append(
+                MissionAuditAnomaly(
+                    kind="event_after_terminal",
+                    event_id=event_id,
+                    message=f"Event {event_type!r} arrived after terminal state",
+                )
+            )
             continue
 
         # Anomaly: event before Requested (except Requested itself)
         if not requested_seen and event_type != MISSION_AUDIT_REQUESTED:
-            anomalies_list.append(MissionAuditAnomaly(
-                kind="event_before_requested",
-                event_id=event_id,
-                message=f"Event {event_type!r} arrived before MissionAuditRequested",
-            ))
+            anomalies_list.append(
+                MissionAuditAnomaly(
+                    kind="event_before_requested",
+                    event_id=event_id,
+                    message=f"Event {event_type!r} arrived before MissionAuditRequested",
+                )
+            )
             # Still process state transitions for robustness — do not skip
 
         if event_type == MISSION_AUDIT_REQUESTED:
             requested_seen = True
-            req_payload: MissionAuditRequestedPayload = MissionAuditRequestedPayload.model_validate(payload_dict)
+            req_payload: MissionAuditRequestedPayload = MissionAuditRequestedPayload.model_validate(
+                payload_dict
+            )
             mission_id = req_payload.mission_id
             run_id = req_payload.run_id
             mission_slug = req_payload.mission_slug
@@ -303,7 +314,9 @@ def reduce_mission_audit_events(events: Sequence[Event]) -> ReducedMissionAuditS
             # status stays PENDING after Requested
 
         elif event_type == MISSION_AUDIT_STARTED:
-            started_payload: MissionAuditStartedPayload = MissionAuditStartedPayload.model_validate(payload_dict)
+            started_payload: MissionAuditStartedPayload = MissionAuditStartedPayload.model_validate(
+                payload_dict
+            )
             audit_scope_hash = started_payload.audit_scope_hash
             if not mission_id:
                 mission_id = started_payload.mission_id
@@ -314,22 +327,28 @@ def reduce_mission_audit_events(events: Sequence[Event]) -> ReducedMissionAuditS
             audit_status = AuditStatus.RUNNING
 
         elif event_type == MISSION_AUDIT_DECISION_REQUESTED:
-            dec_payload: MissionAuditDecisionRequestedPayload = MissionAuditDecisionRequestedPayload.model_validate(payload_dict)
+            dec_payload: MissionAuditDecisionRequestedPayload = (
+                MissionAuditDecisionRequestedPayload.model_validate(payload_dict)
+            )
             # Anomaly: duplicate decision_id
             existing_ids = [d.decision_id for d in pending_decisions_list]
             if dec_payload.decision_id in existing_ids:
-                anomalies_list.append(MissionAuditAnomaly(
-                    kind="duplicate_decision_id",
-                    event_id=event_id,
-                    message=f"Duplicate decision_id: {dec_payload.decision_id!r}",
-                ))
+                anomalies_list.append(
+                    MissionAuditAnomaly(
+                        kind="duplicate_decision_id",
+                        event_id=event_id,
+                        message=f"Duplicate decision_id: {dec_payload.decision_id!r}",
+                    )
+                )
             else:
-                pending_decisions_list.append(PendingDecision(
-                    decision_id=dec_payload.decision_id,
-                    question=dec_payload.question,
-                    context_summary=dec_payload.context_summary,
-                    severity=dec_payload.severity,
-                ))
+                pending_decisions_list.append(
+                    PendingDecision(
+                        decision_id=dec_payload.decision_id,
+                        question=dec_payload.question,
+                        context_summary=dec_payload.context_summary,
+                        severity=dec_payload.severity,
+                    )
+                )
             if mission_id is None:
                 mission_id = dec_payload.mission_id
                 run_id = dec_payload.run_id
@@ -339,7 +358,9 @@ def reduce_mission_audit_events(events: Sequence[Event]) -> ReducedMissionAuditS
             audit_status = AuditStatus.AWAITING_DECISION
 
         elif event_type == MISSION_AUDIT_COMPLETED:
-            comp_payload: MissionAuditCompletedPayload = MissionAuditCompletedPayload.model_validate(payload_dict)
+            comp_payload: MissionAuditCompletedPayload = (
+                MissionAuditCompletedPayload.model_validate(payload_dict)
+            )
             verdict = comp_payload.verdict
             severity = comp_payload.severity
             findings_count = comp_payload.findings_count
@@ -356,7 +377,9 @@ def reduce_mission_audit_events(events: Sequence[Event]) -> ReducedMissionAuditS
             terminal_seen = True
 
         elif event_type == MISSION_AUDIT_FAILED:
-            fail_payload: MissionAuditFailedPayload = MissionAuditFailedPayload.model_validate(payload_dict)
+            fail_payload: MissionAuditFailedPayload = MissionAuditFailedPayload.model_validate(
+                payload_dict
+            )
             error_code = fail_payload.error_code
             error_message = fail_payload.error_message
             partial_artifact_ref = fail_payload.partial_artifact_ref

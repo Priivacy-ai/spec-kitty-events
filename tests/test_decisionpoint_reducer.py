@@ -6,6 +6,7 @@ ordering, authority-policy violations, LLM-policy violations, malformed payloads
 event-after-terminal anomaly, invalid transitions, golden-file replay, and V1
 interview-origin transitions with anomaly coverage.
 """
+
 from __future__ import annotations
 
 import json
@@ -29,10 +30,6 @@ from spec_kitty_events.decisionpoint import (
     DECISION_POINT_RESOLVED,
     DECISION_POINT_WIDENED,
     DecisionAuthorityRole,
-    DecisionPointDiscussingPayload,
-    DecisionPointOpenedPayload,
-    DecisionPointOverriddenPayload,
-    DecisionPointResolvedPayload,
     DecisionPointState,
     reduce_decision_point_events,
 )
@@ -46,6 +43,7 @@ _GOLDEN_DIR = Path(__file__).parent / "fixtures" / "decisionpoint_golden"
 
 
 # ── Payload helpers ────────────────────────────────────────────────────────────
+
 
 def _base_payload(
     *,
@@ -71,8 +69,12 @@ def _base_payload(
         "rationale": "Best option after analysis",
         "alternatives_considered": ("Option A", "Option B"),
         "evidence_refs": ("ref-001",),
-        "state_entered_at": datetime(2026, 2, 27, 12, 0, lamport_offset, tzinfo=timezone.utc).isoformat(),
-        "recorded_at": datetime(2026, 2, 27, 12, 0, lamport_offset, tzinfo=timezone.utc).isoformat(),
+        "state_entered_at": datetime(
+            2026, 2, 27, 12, 0, lamport_offset, tzinfo=timezone.utc
+        ).isoformat(),
+        "recorded_at": datetime(
+            2026, 2, 27, 12, 0, lamport_offset, tzinfo=timezone.utc
+        ).isoformat(),
     }
 
 
@@ -99,6 +101,7 @@ def _event(
 
 
 # ── Named event factories ─────────────────────────────────────────────────────
+
 
 def _opened_event(
     lamport: int = 1,
@@ -186,6 +189,7 @@ def _overridden_event(
 
 # ── Tests: Empty and basic transitions ─────────────────────────────────────────
 
+
 def test_empty_stream() -> None:
     result = reduce_decision_point_events([])
     assert result.state is None
@@ -249,6 +253,7 @@ def test_only_opened_stays_open() -> None:
 
 # ── Tests: Reducer output fields ──────────────────────────────────────────────
 
+
 def test_reducer_captures_last_actor_fields() -> None:
     events = [_opened_event(1), _discussing_event(2)]
     result = reduce_decision_point_events(events)
@@ -269,6 +274,7 @@ def test_reducer_output_is_frozen() -> None:
 
 # ── Tests: Deduplication ───────────────────────────────────────────────────────
 
+
 def test_deduplication() -> None:
     e1 = _opened_event(1)
     e2 = _discussing_event(2)
@@ -284,6 +290,7 @@ def test_deduplication() -> None:
 
 # ── Tests: Deterministic ordering ─────────────────────────────────────────────
 
+
 def test_deterministic_with_reversed_input() -> None:
     """Reducer must sort by (lamport_clock, timestamp, event_id) for determinism."""
     e1 = _opened_event(1)
@@ -295,11 +302,14 @@ def test_deterministic_with_reversed_input() -> None:
 
 # ── Tests: Authority policy (FR-003) ───────────────────────────────────────────
 
+
 def test_authority_policy_resolved_requires_human_mission_owner() -> None:
     """resolved requires actor_type=human, authority_role=mission_owner, flag=True."""
     events = [
         _opened_event(1),
-        _resolved_event(2, actor_type="llm", authority_role="advisory", mission_owner_authority_flag=False),
+        _resolved_event(
+            2, actor_type="llm", authority_role="advisory", mission_owner_authority_flag=False
+        ),
     ]
     result = reduce_decision_point_events(events)
     assert result.state == DecisionPointState.OPEN  # didn't transition
@@ -350,6 +360,7 @@ def test_authority_policy_human_mission_owner_but_flag_false() -> None:
 
 
 # ── Tests: LLM policy (FR-003) ────────────────────────────────────────────────
+
 
 def test_llm_allowed_in_p0_with_advisory_role() -> None:
     """LLM actors allowed in phase=P0 with advisory role and no authority flag."""
@@ -439,6 +450,7 @@ def test_llm_rejected_with_authority_flag() -> None:
 
 # ── Tests: Invalid transitions ─────────────────────────────────────────────────
 
+
 def test_invalid_transition_discussing_before_open() -> None:
     """Cannot go to discussing without first opening."""
     events = [_discussing_event(1)]
@@ -479,6 +491,7 @@ def test_invalid_transition_open_after_open() -> None:
 
 # ── Tests: Event after terminal ────────────────────────────────────────────────
 
+
 def test_event_after_terminal_overridden() -> None:
     """No events accepted after terminal overridden state."""
     events = [
@@ -510,6 +523,7 @@ def test_multiple_events_after_terminal() -> None:
 
 # ── Tests: Malformed payloads ──────────────────────────────────────────────────
 
+
 def test_malformed_payload_missing_fields() -> None:
     """Payload missing required fields produces malformed_payload anomaly."""
     events = [
@@ -535,6 +549,7 @@ def test_malformed_payload_does_not_crash() -> None:
 
 # ── Tests: Non-DP events are filtered ──────────────────────────────────────────
 
+
 def test_non_dp_events_filtered_silently() -> None:
     """Non-DecisionPoint events are filtered out, not recorded as anomalies."""
     non_dp = Event(
@@ -556,6 +571,7 @@ def test_non_dp_events_filtered_silently() -> None:
 
 
 # ── Tests: Multiple anomaly accumulation ───────────────────────────────────────
+
 
 def test_multiple_anomaly_types_accumulated() -> None:
     """Different anomaly types can coexist in a single reduction."""
@@ -581,6 +597,7 @@ def test_multiple_anomaly_types_accumulated() -> None:
 
 
 # ── Golden-file replay ────────────────────────────────────────────────────────
+
 
 def _serialize_events_jsonl(events: list[Event]) -> str:
     lines = []
@@ -630,9 +647,7 @@ def _golden_replay(
         input_path.write_text(_serialize_events_jsonl(events))
         result = reduce_decision_point_events(events)
         output_data = result.model_dump(mode="json")
-        output_path.write_text(
-            json.dumps(output_data, sort_keys=True, indent=2) + "\n"
-        )
+        output_path.write_text(json.dumps(output_data, sort_keys=True, indent=2) + "\n")
         pytest.skip(f"Golden files written for {name!r}; run again to validate")
 
     loaded_events = _load_events_from_jsonl(input_path)
@@ -640,8 +655,7 @@ def _golden_replay(
     actual = result.model_dump(mode="json")
     expected = _canonicalize_output(json.loads(output_path.read_text()))
     assert actual == expected, (
-        f"Golden replay mismatch for {name!r}. "
-        f"Re-run with golden files deleted to regenerate."
+        f"Golden replay mismatch for {name!r}. Re-run with golden files deleted to regenerate."
     )
 
 
@@ -1125,7 +1139,6 @@ def test_reducer_closed_locally_while_widened_without_prior_widening_raises_anom
 
 def test_reducer_origin_mismatch_across_events_produces_anomaly() -> None:
     """Opened(ADR) → Resolved(interview): origin_mismatch anomaly, events still applied."""
-    adr_resolved = _adr_resolved_payload(lamport=2)
     # Swap origin_surface to interview to create a mismatch
     interview_resolved = _interview_resolved_payload(
         terminal_outcome="resolved", final_answer="PostgreSQL", lamport=2
@@ -1177,7 +1190,9 @@ def test_reducer_overridden_after_resolved_still_works_interview() -> None:
         _make_event(DECISION_POINT_OPENED, _interview_opened_payload(lamport=1), lamport=1),
         _make_event(
             DECISION_POINT_RESOLVED,
-            _interview_resolved_payload(terminal_outcome="resolved", final_answer="PostgreSQL", lamport=2),
+            _interview_resolved_payload(
+                terminal_outcome="resolved", final_answer="PostgreSQL", lamport=2
+            ),
             lamport=2,
         ),
         _make_event(DECISION_POINT_OVERRIDDEN, _overridden_payload(lamport=3), lamport=3),

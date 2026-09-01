@@ -1,4 +1,5 @@
 """Unit tests for core data models."""
+
 import uuid
 from typing import Any, Dict
 import pytest
@@ -6,8 +7,13 @@ from datetime import datetime
 from pydantic import ValidationError as PydanticValidationError
 from ulid import ULID
 from spec_kitty_events.models import (
-    Event, ErrorEntry, ConflictResolution,
-    SpecKittyEventsError, StorageError, ValidationError, CyclicDependencyError,
+    Event,
+    ErrorEntry,
+    ConflictResolution,
+    SpecKittyEventsError,
+    StorageError,
+    ValidationError,
+    CyclicDependencyError,
     normalize_event_id,
 )
 
@@ -140,7 +146,9 @@ class TestEvent:
         build_description = Event.model_fields["build_id"].description
         node_description = Event.model_fields["node_id"].description
 
-        assert build_description is not None and "checkout or worktree identity" in build_description
+        assert (
+            build_description is not None and "checkout or worktree identity" in build_description
+        )
         assert node_description is not None and "causal emitter identity" in node_description
 
     def test_event_project_uuid_required(self):
@@ -569,7 +577,7 @@ class TestErrorEntry:
             action_attempted="Run pytest",
             error_message="AssertionError: test failed",
             resolution="Fixed bug in code",
-            agent="codex"
+            agent="codex",
         )
         assert entry.action_attempted == "Run pytest"
         assert entry.agent == "codex"
@@ -577,9 +585,7 @@ class TestErrorEntry:
     def test_error_entry_defaults(self):
         """Test error entry default values."""
         entry = ErrorEntry(
-            timestamp=datetime.now(),
-            action_attempted="Run pytest",
-            error_message="AssertionError"
+            timestamp=datetime.now(), action_attempted="Run pytest", error_message="AssertionError"
         )
         assert entry.resolution == ""
         assert entry.agent == "unknown"
@@ -590,7 +596,7 @@ class TestErrorEntry:
             ErrorEntry(
                 timestamp=datetime.now(),
                 action_attempted="",  # Invalid: empty string
-                error_message="Error"
+                error_message="Error",
             )
 
 
@@ -625,7 +631,7 @@ class TestConflictResolution:
             merged_event=event1,
             resolution_note="Selected node1 via tiebreaker",
             requires_manual_review=False,
-            conflicting_events=[event1, event2]
+            conflicting_events=[event1, event2],
         )
         assert resolution.merged_event == event1
         assert len(resolution.conflicting_events) == 2
@@ -686,9 +692,7 @@ class TestEventIdFormats:
 
     def test_uuid_hyphenated_accepted(self) -> None:
         """36-char hyphenated UUID accepted, lowercased."""
-        event = self._make_event(
-            event_id="550E8400-E29B-41D4-A716-446655440000"
-        )
+        event = self._make_event(event_id="550E8400-E29B-41D4-A716-446655440000")
         assert event.event_id == "550e8400-e29b-41d4-a716-446655440000"
 
     def test_uuid_bare_normalized(self) -> None:
@@ -698,9 +702,7 @@ class TestEventIdFormats:
 
     def test_uuid_uppercase_normalized(self) -> None:
         """Mixed-case UUID → lowercase."""
-        event = self._make_event(
-            event_id="550E8400-e29b-41D4-A716-446655440000"
-        )
+        event = self._make_event(event_id="550E8400-e29b-41D4-A716-446655440000")
         assert event.event_id == "550e8400-e29b-41d4-a716-446655440000"
 
     @pytest.mark.parametrize("length", [27, 28, 29, 30, 31, 33, 34, 35, 37, 40])
@@ -716,9 +718,7 @@ class TestEventIdFormats:
 
     def test_causation_id_uuid_accepted(self) -> None:
         """UUID format works for causation_id."""
-        event = self._make_event(
-            causation_id="550e8400-e29b-41d4-a716-446655440000"
-        )
+        event = self._make_event(causation_id="550e8400-e29b-41d4-a716-446655440000")
         assert event.causation_id == "550e8400-e29b-41d4-a716-446655440000"
 
     def test_causation_id_none_accepted(self) -> None:
@@ -728,9 +728,7 @@ class TestEventIdFormats:
 
     def test_correlation_id_uuid_accepted(self) -> None:
         """UUID format works for correlation_id."""
-        event = self._make_event(
-            correlation_id="550e8400-e29b-41d4-a716-446655440000"
-        )
+        event = self._make_event(correlation_id="550e8400-e29b-41d4-a716-446655440000")
         assert event.correlation_id == "550e8400-e29b-41d4-a716-446655440000"
 
     def test_normalize_event_id_function(self) -> None:
@@ -739,8 +737,14 @@ class TestEventIdFormats:
         assert normalize_event_id("01ARZ3NDEKTSV4RRFFQ69G5FAV") == "01ARZ3NDEKTSV4RRFFQ69G5FAV"
         assert normalize_event_id("01arz3ndektsv4rrffq69g5fav") == "01ARZ3NDEKTSV4RRFFQ69G5FAV"
         # UUID paths unchanged
-        assert normalize_event_id("550E8400E29B41D4A716446655440000") == "550e8400-e29b-41d4-a716-446655440000"
-        assert normalize_event_id("550e8400-e29b-41d4-a716-446655440000") == "550e8400-e29b-41d4-a716-446655440000"
+        assert (
+            normalize_event_id("550E8400E29B41D4A716446655440000")
+            == "550e8400-e29b-41d4-a716-446655440000"
+        )
+        assert (
+            normalize_event_id("550e8400-e29b-41d4-a716-446655440000")
+            == "550e8400-e29b-41d4-a716-446655440000"
+        )
         # Invalid Crockford rejected
         with pytest.raises(ValueError, match="Crockford"):
             normalize_event_id("abcdefghijklmnopqrstuvwxyz")

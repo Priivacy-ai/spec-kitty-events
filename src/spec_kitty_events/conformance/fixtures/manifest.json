@@ -186,46 +186,6 @@
       "min_version": "2.0.0"
     },
     {
-      "id": "event-missing-schema-version",
-      "path": "events/invalid/event_missing_schema_version.json",
-      "expected_result": "invalid",
-      "event_type": "Event",
-      "notes": "Event envelope missing the canonical cutover signal schema_version",
-      "min_version": "3.0.0"
-    },
-    {
-      "id": "event-wrong-cutover-major",
-      "path": "events/invalid/event_wrong_cutover_major.json",
-      "expected_result": "invalid",
-      "event_type": "Event",
-      "notes": "Event envelope uses unsupported cutover major version 2.x",
-      "min_version": "3.0.0"
-    },
-    {
-      "id": "event-forbidden-legacy-key",
-      "path": "events/invalid/event_forbidden_legacy_key.json",
-      "expected_result": "invalid",
-      "event_type": "Event",
-      "notes": "Event envelope payload contains forbidden legacy mission-domain key feature_slug",
-      "min_version": "3.0.0"
-    },
-    {
-      "id": "event-forbidden-legacy-event-name",
-      "path": "events/invalid/event_forbidden_legacy_event_name.json",
-      "expected_result": "invalid",
-      "event_type": "Event",
-      "notes": "Event envelope uses forbidden legacy event name FeatureCreated",
-      "min_version": "3.0.0"
-    },
-    {
-      "id": "event-forbidden-legacy-aggregate-name",
-      "path": "events/invalid/event_forbidden_legacy_aggregate_name.json",
-      "expected_result": "invalid",
-      "event_type": "Event",
-      "notes": "Event envelope uses forbidden legacy aggregate prefix feature/",
-      "min_version": "3.0.0"
-    },
-    {
       "id": "wp-status-changed-invalid-lane",
       "path": "events/invalid/wp_status_changed_invalid_lane.json",
       "expected_result": "invalid",
@@ -647,7 +607,7 @@
       "path": "dossier/invalid/dossier_artifact_indexed_missing_path.json",
       "event_type": "MissionDossierArtifactIndexed",
       "expected_result": "invalid",
-      "notes": "artifact_id.path is absent \u2014 Pydantic must reject",
+      "notes": "artifact_id.path is absent — Pydantic must reject",
       "min_version": "2.4.0"
     },
     {
@@ -762,7 +722,7 @@
       "path": "mission_audit/invalid/mission_audit_completed_missing_verdict.json",
       "event_type": "MissionAuditCompleted",
       "expected_result": "invalid",
-      "notes": "verdict field absent \u2014 Pydantic must reject with missing field violation",
+      "notes": "verdict field absent — Pydantic must reject with missing field violation",
       "min_version": "2.5.0"
     },
     {
@@ -770,7 +730,7 @@
       "path": "mission_audit/invalid/mission_audit_completed_missing_artifact_ref.json",
       "event_type": "MissionAuditCompleted",
       "expected_result": "invalid",
-      "notes": "artifact_ref absent \u2014 required (not Optional) per FR-006; Pydantic must reject",
+      "notes": "artifact_ref absent — required (not Optional) per FR-006; Pydantic must reject",
       "min_version": "2.5.0"
     },
     {
@@ -786,7 +746,7 @@
       "path": "mission_audit/invalid/mission_audit_decision_missing_id.json",
       "event_type": "MissionAuditDecisionRequested",
       "expected_result": "invalid",
-      "notes": "decision_id field absent \u2014 required with min_length=1",
+      "notes": "decision_id field absent — required with min_length=1",
       "min_version": "2.5.0"
     },
     {
@@ -795,7 +755,7 @@
       "fixture_type": "replay_stream",
       "event_type": "mixed",
       "expected_result": "valid",
-      "notes": "3-event pass lifecycle: Requested \u2192 Started \u2192 Completed(pass)",
+      "notes": "3-event pass lifecycle: Requested → Started → Completed(pass)",
       "min_version": "2.5.0"
     },
     {
@@ -804,7 +764,7 @@
       "fixture_type": "replay_stream",
       "event_type": "mixed",
       "expected_result": "valid",
-      "notes": "3-event fail lifecycle: Requested \u2192 Started \u2192 Failed(TIMEOUT)",
+      "notes": "3-event fail lifecycle: Requested → Started → Failed(TIMEOUT)",
       "min_version": "2.5.0"
     },
     {
@@ -813,7 +773,7 @@
       "fixture_type": "replay_stream",
       "event_type": "mixed",
       "expected_result": "valid",
-      "notes": "4-event decision checkpoint: Requested \u2192 Started \u2192 DecisionRequested \u2192 Completed",
+      "notes": "4-event decision checkpoint: Requested → Started → DecisionRequested → Completed",
       "min_version": "2.5.0"
     },
     {
@@ -822,7 +782,7 @@
       "fixture_type": "reducer_output",
       "event_type": "MissionAuditState",
       "expected_result": "valid",
-      "notes": "Golden reducer output for mission_audit_replay_pass.jsonl \u2014 audit_status=completed, verdict=pass",
+      "notes": "Golden reducer output for mission_audit_replay_pass.jsonl — audit_status=completed, verdict=pass",
       "min_version": "2.5.0"
     },
     {
@@ -831,7 +791,7 @@
       "fixture_type": "reducer_output",
       "event_type": "MissionAuditState",
       "expected_result": "valid",
-      "notes": "Golden reducer output for mission_audit_replay_fail.jsonl \u2014 audit_status=failed",
+      "notes": "Golden reducer output for mission_audit_replay_fail.jsonl — audit_status=failed",
       "min_version": "2.5.0"
     },
     {
@@ -840,7 +800,7 @@
       "fixture_type": "reducer_output",
       "event_type": "MissionAuditState",
       "expected_result": "valid",
-      "notes": "Golden reducer output for mission_audit_replay_decision_checkpoint.jsonl \u2014 pending_decisions cleared on Completed",
+      "notes": "Golden reducer output for mission_audit_replay_decision_checkpoint.jsonl — pending_decisions cleared on Completed",
       "min_version": "2.5.0"
     },
     {
@@ -912,7 +872,7 @@
       "path": "decisionpoint/invalid/decision_point_missing_decision_point_id.json",
       "event_type": "DecisionPointOpened",
       "expected_result": "invalid",
-      "notes": "decision_point_id field absent \u2014 required with min_length=1; Pydantic must reject",
+      "notes": "decision_point_id field absent — required with min_length=1; Pydantic must reject",
       "min_version": "2.6.0"
     },
     {
@@ -920,7 +880,7 @@
       "path": "decisionpoint/invalid/decision_point_missing_rationale.json",
       "event_type": "DecisionPointOpened",
       "expected_result": "invalid",
-      "notes": "rationale field absent \u2014 required audit field; Pydantic must reject",
+      "notes": "rationale field absent — required audit field; Pydantic must reject",
       "min_version": "2.6.0"
     },
     {
@@ -936,7 +896,7 @@
       "path": "decisionpoint/invalid/decision_point_invalid_authority_role.json",
       "event_type": "DecisionPointOpened",
       "expected_result": "invalid",
-      "notes": "authority_role='admin' not in DecisionAuthorityRole enum \u2014 authority-policy failure",
+      "notes": "authority_role='admin' not in DecisionAuthorityRole enum — authority-policy failure",
       "min_version": "2.6.0"
     },
     {
@@ -944,7 +904,7 @@
       "path": "decisionpoint/invalid/decision_point_empty_alternatives.json",
       "event_type": "DecisionPointOpened",
       "expected_result": "invalid",
-      "notes": "alternatives_considered is empty list \u2014 violates min_length=1 constraint",
+      "notes": "alternatives_considered is empty list — violates min_length=1 constraint",
       "min_version": "2.6.0"
     },
     {
@@ -952,7 +912,7 @@
       "path": "decisionpoint/invalid/decision_point_empty_evidence_refs.json",
       "event_type": "DecisionPointOpened",
       "expected_result": "invalid",
-      "notes": "evidence_refs is empty list \u2014 violates min_length=1 constraint",
+      "notes": "evidence_refs is empty list — violates min_length=1 constraint",
       "min_version": "2.6.0"
     },
     {
@@ -1040,7 +1000,7 @@
       "path": "decisionpoint/invalid/v1_resolved_missing_terminal_outcome.json",
       "event_type": "DecisionPointResolved",
       "expected_result": "invalid",
-      "notes": "V1 interview Resolved missing terminal_outcome \u2014 required field; Pydantic must reject",
+      "notes": "V1 interview Resolved missing terminal_outcome — required field; Pydantic must reject",
       "min_version": "4.0.0"
     },
     {
@@ -1048,7 +1008,7 @@
       "path": "decisionpoint/invalid/v1_widened_missing_thread_ref.json",
       "event_type": "DecisionPointWidened",
       "expected_result": "invalid",
-      "notes": "V1 Widened missing thread_ref \u2014 required field; JSON Schema and Pydantic must reject",
+      "notes": "V1 Widened missing thread_ref — required field; JSON Schema and Pydantic must reject",
       "min_version": "4.0.0"
     },
     {
@@ -1056,7 +1016,7 @@
       "path": "decisionpoint/invalid/v1_opened_interview_missing_origin_flow.json",
       "event_type": "DecisionPointOpened",
       "expected_result": "invalid",
-      "notes": "V1 interview Opened missing origin_flow \u2014 required field; Pydantic must reject",
+      "notes": "V1 interview Opened missing origin_flow — required field; Pydantic must reject",
       "min_version": "4.0.0"
     },
     {
@@ -1064,7 +1024,7 @@
       "path": "decisionpoint/invalid/v1_participant_identity_empty_external_refs.json",
       "event_type": "DecisionPointWidened",
       "expected_result": "invalid",
-      "notes": "V1 Widened with ParticipantIdentity.external_refs={} \u2014 must set at least one of slack_user_id, slack_team_id, teamspace_member_id",
+      "notes": "V1 Widened with ParticipantIdentity.external_refs={} — must set at least one of slack_user_id, slack_team_id, teamspace_member_id",
       "min_version": "4.0.0"
     },
     {
@@ -1072,7 +1032,7 @@
       "path": "decisionpoint/invalid/v1_resolved_interview_deferred_with_final_answer.json",
       "event_type": "DecisionPointResolved",
       "expected_result": "invalid",
-      "notes": "V1 interview Resolved: terminal_outcome=deferred AND final_answer set \u2014 cross-field rule violation; Pydantic model_validator must reject",
+      "notes": "V1 interview Resolved: terminal_outcome=deferred AND final_answer set — cross-field rule violation; Pydantic model_validator must reject",
       "min_version": "4.0.0"
     },
     {
@@ -1081,7 +1041,7 @@
       "fixture_type": "replay_stream",
       "event_type": "mixed",
       "expected_result": "valid",
-      "notes": "4-event full lifecycle: Opened \u2192 Discussing \u2192 Resolved \u2192 Overridden",
+      "notes": "4-event full lifecycle: Opened → Discussing → Resolved → Overridden",
       "min_version": "2.6.0"
     },
     {
@@ -1090,7 +1050,7 @@
       "fixture_type": "replay_stream",
       "event_type": "mixed",
       "expected_result": "valid",
-      "notes": "2-event shortcut: Opened \u2192 Resolved (skipping Discussing)",
+      "notes": "2-event shortcut: Opened → Resolved (skipping Discussing)",
       "min_version": "2.6.0"
     },
     {
@@ -1099,7 +1059,7 @@
       "fixture_type": "replay_stream",
       "event_type": "mixed",
       "expected_result": "valid",
-      "notes": "4-event stream with event_after_terminal anomaly: Opened \u2192 Resolved \u2192 Overridden \u2192 Discussing(anomaly)",
+      "notes": "4-event stream with event_after_terminal anomaly: Opened → Resolved → Overridden → Discussing(anomaly)",
       "min_version": "2.6.0"
     },
     {
@@ -1108,7 +1068,7 @@
       "fixture_type": "reducer_output",
       "event_type": "DecisionPointState",
       "expected_result": "valid",
-      "notes": "Golden reducer output for decisionpoint_full_lifecycle.jsonl \u2014 state=overridden, 4 events, 0 anomalies",
+      "notes": "Golden reducer output for decisionpoint_full_lifecycle.jsonl — state=overridden, 4 events, 0 anomalies",
       "min_version": "2.6.0"
     },
     {
@@ -1117,7 +1077,7 @@
       "fixture_type": "reducer_output",
       "event_type": "DecisionPointState",
       "expected_result": "valid",
-      "notes": "Golden reducer output for decisionpoint_open_resolved.jsonl \u2014 state=resolved, 2 events, 0 anomalies",
+      "notes": "Golden reducer output for decisionpoint_open_resolved.jsonl — state=resolved, 2 events, 0 anomalies",
       "min_version": "2.6.0"
     },
     {
@@ -1126,7 +1086,7 @@
       "fixture_type": "reducer_output",
       "event_type": "DecisionPointState",
       "expected_result": "valid",
-      "notes": "Golden reducer output for decisionpoint_with_anomaly.jsonl \u2014 state=overridden, 1 anomaly (event_after_terminal)",
+      "notes": "Golden reducer output for decisionpoint_with_anomaly.jsonl — state=overridden, 1 anomaly (event_after_terminal)",
       "min_version": "2.6.0"
     },
     {
@@ -1215,7 +1175,7 @@
       "fixture_type": "replay_stream",
       "event_type": "mixed",
       "expected_result": "valid",
-      "notes": "6-event full connector lifecycle: Provisioned \u2192 HealthChecked(healthy) \u2192 Degraded \u2192 Reconnected \u2192 HealthChecked(healthy) \u2192 Revoked",
+      "notes": "6-event full connector lifecycle: Provisioned → HealthChecked(healthy) → Degraded → Reconnected → HealthChecked(healthy) → Revoked",
       "min_version": "2.7.0"
     },
     {
@@ -1224,148 +1184,7 @@
       "fixture_type": "reducer_output",
       "event_type": "ReducedConnectorState",
       "expected_result": "valid",
-      "notes": "Golden reducer output for connector-lifecycle-full.jsonl \u2014 state=revoked, 6 events, 0 anomalies",
-      "min_version": "2.7.0"
-    },
-    {
-      "id": "sync-ingest-accepted-batch",
-      "path": "sync/valid/sync-ingest-accepted-batch.json",
-      "expected_result": "valid",
-      "event_type": "SyncIngestAccepted",
-      "notes": "SyncIngestAccepted with ingest_batch_id and ingested_count=15",
-      "min_version": "2.7.0"
-    },
-    {
-      "id": "sync-ingest-accepted-single",
-      "path": "sync/valid/sync-ingest-accepted-single.json",
-      "expected_result": "valid",
-      "event_type": "SyncIngestAccepted",
-      "notes": "SyncIngestAccepted with ingested_count=1",
-      "min_version": "2.7.0"
-    },
-    {
-      "id": "sync-ingest-rejected-schema-mismatch",
-      "path": "sync/valid/sync-ingest-rejected-schema-mismatch.json",
-      "expected_result": "valid",
-      "event_type": "SyncIngestRejected",
-      "notes": "SyncIngestRejected with rejection_reason=payload_schema_mismatch",
-      "min_version": "2.7.0"
-    },
-    {
-      "id": "sync-retry-scheduled-first-attempt",
-      "path": "sync/valid/sync-retry-scheduled-first-attempt.json",
-      "expected_result": "valid",
-      "event_type": "SyncRetryScheduled",
-      "notes": "SyncRetryScheduled with retry_attempt=1 and max_retries=3",
-      "min_version": "2.7.0"
-    },
-    {
-      "id": "sync-dead-lettered-max-retries",
-      "path": "sync/valid/sync-dead-lettered-max-retries.json",
-      "expected_result": "valid",
-      "event_type": "SyncDeadLettered",
-      "notes": "SyncDeadLettered with total_attempts=3 and failure_reason=max_retries_exceeded",
-      "min_version": "2.7.0"
-    },
-    {
-      "id": "sync-replay-completed-full",
-      "path": "sync/valid/sync-replay-completed-full.json",
-      "expected_result": "valid",
-      "event_type": "SyncReplayCompleted",
-      "notes": "SyncReplayCompleted with replayed_count=42 and replay_source=dead_letter_queue",
-      "min_version": "2.7.0"
-    },
-    {
-      "id": "external-ref-linked-github-pr",
-      "path": "sync/valid/external-ref-linked-github-pr.json",
-      "expected_result": "valid",
-      "event_type": "ExternalReferenceLinked",
-      "notes": "ExternalReferenceLinked binding a GitHub PR to a mission WP",
-      "min_version": "2.7.0"
-    },
-    {
-      "id": "external-ref-linked-jira-issue",
-      "path": "sync/valid/external-ref-linked-jira-issue.json",
-      "expected_result": "valid",
-      "event_type": "ExternalReferenceLinked",
-      "notes": "ExternalReferenceLinked binding a Jira issue to a mission",
-      "min_version": "2.7.0"
-    },
-    {
-      "id": "sync-missing-delivery-id",
-      "path": "sync/invalid/sync-missing-delivery-id.json",
-      "expected_result": "invalid",
-      "event_type": "SyncIngestAccepted",
-      "notes": "SyncIngestAccepted payload missing delivery_id field",
-      "min_version": "2.7.0"
-    },
-    {
-      "id": "sync-missing-source-fingerprint",
-      "path": "sync/invalid/sync-missing-source-fingerprint.json",
-      "expected_result": "invalid",
-      "event_type": "SyncIngestAccepted",
-      "notes": "SyncIngestAccepted payload missing source_event_fingerprint field",
-      "min_version": "2.7.0"
-    },
-    {
-      "id": "sync-negative-retry-attempt",
-      "path": "sync/invalid/sync-negative-retry-attempt.json",
-      "expected_result": "invalid",
-      "event_type": "SyncRetryScheduled",
-      "notes": "SyncRetryScheduled with retry_attempt=0 (must be >= 1)",
-      "min_version": "2.7.0"
-    },
-    {
-      "id": "sync-missing-failure-reason",
-      "path": "sync/invalid/sync-missing-failure-reason.json",
-      "expected_result": "invalid",
-      "event_type": "SyncDeadLettered",
-      "notes": "SyncDeadLettered payload missing failure_reason field",
-      "min_version": "2.7.0"
-    },
-    {
-      "id": "sync-ingest-lifecycle",
-      "path": "sync/replay/sync-ingest-lifecycle.jsonl",
-      "fixture_type": "replay_stream",
-      "event_type": "mixed",
-      "expected_result": "valid",
-      "notes": "7-event sync ingest lifecycle: Accepted \u2192 Accepted(different) \u2192 Rejected \u2192 RetryScheduled \u2192 RetryScheduled(attempt 2) \u2192 DeadLettered \u2192 ReplayCompleted",
-      "min_version": "2.7.0"
-    },
-    {
-      "id": "sync-ingest-lifecycle-output",
-      "path": "sync/replay/sync-ingest-lifecycle_output.json",
-      "fixture_type": "reducer_output",
-      "event_type": "ReducedSyncState",
-      "expected_result": "valid",
-      "notes": "Golden reducer output for sync-ingest-lifecycle.jsonl \u2014 7 events, all outcome types covered",
-      "min_version": "2.7.0"
-    },
-    {
-      "id": "mixed-connector-sync-lifecycle",
-      "path": "replay/mixed-connector-sync-lifecycle.jsonl",
-      "fixture_type": "replay_stream",
-      "event_type": "mixed",
-      "expected_result": "valid",
-      "notes": "10-event interleaved connector and sync lifecycle stream",
-      "min_version": "2.7.0"
-    },
-    {
-      "id": "mixed-connector-sync-lifecycle-connector-output",
-      "path": "replay/mixed-connector-sync-lifecycle_connector_output.json",
-      "fixture_type": "reducer_output",
-      "event_type": "ReducedConnectorState",
-      "expected_result": "valid",
-      "notes": "Golden connector reducer output for mixed-connector-sync-lifecycle.jsonl \u2014 state=healthy, 10 events",
-      "min_version": "2.7.0"
-    },
-    {
-      "id": "mixed-connector-sync-lifecycle-sync-output",
-      "path": "replay/mixed-connector-sync-lifecycle_sync_output.json",
-      "fixture_type": "reducer_output",
-      "event_type": "ReducedSyncState",
-      "expected_result": "valid",
-      "notes": "Golden sync reducer output for mixed-connector-sync-lifecycle.jsonl \u2014 10 events, 5 unique delivery pairs",
+      "notes": "Golden reducer output for connector-lifecycle-full.jsonl — state=revoked, 6 events, 0 anomalies",
       "min_version": "2.7.0"
     },
     {
@@ -1971,22 +1790,725 @@
       "min_version": "5.2.0"
     },
     {
-      "id": "legacy-envelope-v1-pre30-normalizes",
-      "path": "legacy/pre_3_0_envelope_normalizes.json",
+      "id": "harness-observation-replay-lifecycle-with-observations",
+      "path": "harness_observation/replay/lifecycle_with_observations.jsonl",
       "expected_result": "valid",
-      "event_type": "LegacyEnvelope",
-      "fixture_type": "legacy_normalization",
-      "notes": "Pre-3.0 envelope without project_uuid; normalizer promotes to canonical shape.",
-      "min_version": "5.2.0"
+      "event_type": "HarnessObservationReplay",
+      "fixture_type": "replay_stream",
+      "notes": "R1 (F1 contract-freeze draft F1.md §4): a mission lifecycle stream (MissionStarted, 2x PhaseEntered, MissionCompleted) with five interleaved HarnessObservation events at surrounding lamport clocks. reduce_lifecycle_events() output (minus event_count and last_processed_event_id) is byte-identical to the golden in lifecycle_with_observations_output.json, which was computed from the mission-only stream -- proving observations are never reduced into mission/WP state.",
+      "min_version": "7.0.0"
     },
     {
-      "id": "legacy-envelope-v1-unrecognized-diagnostic",
-      "path": "legacy/unrecognized_legacy_diagnostic.json",
+      "id": "harness-observation-replay-lifecycle-with-observations-output",
+      "path": "harness_observation/replay/lifecycle_with_observations_output.json",
+      "fixture_type": "reducer_output",
+      "event_type": "ReducedMissionState",
+      "expected_result": "valid",
+      "notes": "Golden reducer output (event_count/last_processed_event_id stripped) for lifecycle_with_observations.jsonl -- computed from the mission-only sub-stream (HarnessObservation rows excluded); tests/integration/test_lifecycle_replay.py's R1 test asserts both the interleaved and clean streams reduce to exactly this.",
+      "min_version": "7.0.0"
+    },
+    {
+      "id": "harness-observation-presence-valid-minimal",
+      "path": "harness_observation/valid/presence_minimal.json",
+      "expected_result": "valid",
+      "event_type": "HarnessObservation",
+      "notes": "Minimal valid presence observation: harness, session_id, activity only.",
+      "min_version": "7.0.0"
+    },
+    {
+      "id": "harness-observation-presence-valid-full",
+      "path": "harness_observation/valid/presence_full.json",
+      "expected_result": "valid",
+      "event_type": "HarnessObservation",
+      "notes": "Presence observation with every optional field a presence kind allows (agent_id, repo, mission_slug, wp_id, path).",
+      "min_version": "7.0.0"
+    },
+    {
+      "id": "harness-observation-lane-signal-valid-minimal",
+      "path": "harness_observation/valid/lane_signal_minimal.json",
+      "expected_result": "valid",
+      "event_type": "HarnessObservation",
+      "notes": "Minimal valid lane_signal observation: mission_slug, wp_id, and lane are required for this kind.",
+      "min_version": "7.0.0"
+    },
+    {
+      "id": "harness-observation-focus-paused-valid-minimal",
+      "path": "harness_observation/valid/focus_paused_minimal.json",
+      "expected_result": "valid",
+      "event_type": "HarnessObservation",
+      "notes": "Minimal valid focus_paused observation: pause_reason is required for this kind.",
+      "min_version": "7.0.0"
+    },
+    {
+      "id": "harness-observation-focus-ended-valid-minimal",
+      "path": "harness_observation/valid/focus_ended_minimal.json",
+      "expected_result": "valid",
+      "event_type": "HarnessObservation",
+      "notes": "Minimal valid focus_ended observation: ended_reason is required for this kind.",
+      "min_version": "7.0.0"
+    },
+    {
+      "id": "harness-observation-path-valid-hyphenated-prose",
+      "path": "harness_observation/valid/observation_path_hyphenated_prose.json",
+      "expected_result": "valid",
+      "event_type": "HarnessObservation",
+      "notes": "X8 boundary (F1 draft F1.md Sec4): path is character-class valid (letters/digits/hyphens/dot only) even though it reads as prose-shaped injection text. F1's _REF grammar is a character-class + length bound, not a prose-shape rule; the segment-shape rejection of strings like this stays zeitgeist's single render-side authority (editor.py _MAX_SEGMENTS/_ident), applied at F3/Z3/Z8 ingest, not here. Committed deliberately under valid/ so the boundary is evidence-backed.",
+      "min_version": "7.0.0"
+    },
+    {
+      "id": "harness-observation-invalid-missing-kind",
+      "path": "harness_observation/invalid/missing_kind.json",
       "expected_result": "invalid",
-      "event_type": "LegacyEnvelope",
-      "fixture_type": "legacy_normalization",
-      "notes": "Envelope with no recognized legacy markers; normalizer surfaces UnnormalizableLegacyDiagnostic.",
-      "min_version": "5.2.0"
+      "event_type": "HarnessObservation",
+      "notes": "kind is required and absent.",
+      "min_version": "7.0.0"
+    },
+    {
+      "id": "harness-observation-invalid-presence-with-pause-reason",
+      "path": "harness_observation/invalid/presence_with_pause_reason.json",
+      "expected_result": "invalid",
+      "event_type": "HarnessObservation",
+      "notes": "X5: pause_reason is forbidden for kind=presence (only legal for focus_paused) per the per-kind field matrix.",
+      "min_version": "7.0.0"
+    },
+    {
+      "id": "harness-observation-invalid-forbidden-detail",
+      "path": "harness_observation/invalid/observation_forbidden_detail.json",
+      "expected_result": "invalid",
+      "event_type": "HarnessObservation",
+      "notes": "X6: detail is not a field on HarnessObservationPayload at all (extra=\"forbid\" rejects it); at the full-envelope level it is also a member of FORBIDDEN_OBSERVATION_KEYS (defense in depth, tested separately in tests/unit/test_strict.py).",
+      "min_version": "7.0.0"
+    },
+    {
+      "id": "harness-observation-invalid-lane-signal-missing-required",
+      "path": "harness_observation/invalid/lane_signal_missing_required.json",
+      "expected_result": "invalid",
+      "event_type": "HarnessObservation",
+      "notes": "lane_signal requires mission_slug, wp_id, and lane; all three are absent.",
+      "min_version": "7.0.0"
+    },
+    {
+      "id": "harness-observation-invalid-session-id-too-long",
+      "path": "harness_observation/invalid/session_id_too_long.json",
+      "expected_result": "invalid",
+      "event_type": "HarnessObservation",
+      "notes": "X9: session_id is 129 characters, one over the 128 max_length bound (mirrors zeitgeist editor.py FIELD_MAX).",
+      "min_version": "7.0.0"
+    },
+    {
+      "id": "class-taxonomy-envelope-strict-journal-valid-mission-started-with-slug",
+      "path": "class_taxonomy/envelope_strict_journal/valid_mission_started_with_slug.json",
+      "fixture_type": "strict_profile_only",
+      "expected_result": "valid",
+      "event_type": "MissionStarted",
+      "notes": "envelope_strict_journal class (F1-T1, not part of the frozen eight-class taxonomy in tests/test_conformance_classes.py -- see tests/test_envelope_strict_journal_class.py). C8: real producer shape, accepted.",
+      "min_version": "7.0.0"
+    },
+    {
+      "id": "class-taxonomy-envelope-strict-journal-skew-missing-version",
+      "path": "class_taxonomy/envelope_strict_journal/skew_missing_version.json",
+      "fixture_type": "strict_profile_only",
+      "expected_result": "invalid",
+      "event_type": "MissionStarted",
+      "notes": "envelope_strict_journal class. V1: schema_version key absent; collect-all yields two error codes.",
+      "min_version": "7.0.0"
+    },
+    {
+      "id": "class-taxonomy-envelope-strict-journal-skew-major-2",
+      "path": "class_taxonomy/envelope_strict_journal/skew_major_2.json",
+      "fixture_type": "strict_profile_only",
+      "expected_result": "invalid",
+      "event_type": "MissionStarted",
+      "notes": "envelope_strict_journal class. V2: schema_version wrong major.",
+      "min_version": "7.0.0"
+    },
+    {
+      "id": "class-taxonomy-envelope-strict-journal-unknown-event-type",
+      "path": "class_taxonomy/envelope_strict_journal/unknown_event_type.json",
+      "fixture_type": "strict_profile_only",
+      "expected_result": "invalid",
+      "event_type": "Sparkle",
+      "notes": "envelope_strict_journal class. U1: event_type not admitted by the strict profile.",
+      "min_version": "7.0.0"
+    },
+    {
+      "id": "class-taxonomy-envelope-strict-journal-envelope-extra-team-slug",
+      "path": "class_taxonomy/envelope_strict_journal/envelope_extra_team_slug.json",
+      "fixture_type": "strict_profile_only",
+      "expected_result": "invalid",
+      "event_type": "MissionStarted",
+      "notes": "envelope_strict_journal class. X1: envelope-level extra key team_slug.",
+      "min_version": "7.0.0"
+    },
+    {
+      "id": "class-taxonomy-envelope-strict-journal-timestamp-naive",
+      "path": "class_taxonomy/envelope_strict_journal/timestamp_naive.json",
+      "fixture_type": "strict_profile_only",
+      "expected_result": "invalid",
+      "event_type": "MissionStarted",
+      "notes": "envelope_strict_journal class. T2: naive (non-tz-aware) timestamp.",
+      "min_version": "7.0.0"
+    },
+    {
+      "id": "class-taxonomy-envelope-strict-journal-local-appender-envelope-5-0-0",
+      "path": "class_taxonomy/envelope_strict_journal/local_appender_envelope_5_0_0.json",
+      "fixture_type": "strict_profile_only",
+      "expected_result": "invalid",
+      "event_type": "MissionCreated",
+      "notes": "envelope_strict_journal class. X10: the actual spec-kitty local-appender envelope shape; three collect-all errors.",
+      "min_version": "7.0.0"
+    },
+    {
+      "id": "wp_status_changed_planned_doing",
+      "path": "zeitgeist_attrs/valid/wp_status_changed_planned_doing.json",
+      "expected_result": "valid",
+      "event_type": "WPStatusChanged",
+      "notes": "The MVP moment: a WP is seeded to planned; from_lane absent (key omitted) because the transition had no recorded origin lane (the only domain-valid edge out of no-recorded-lane is None -> planned); the two envelope attrs lead every projection.",
+      "min_version": "8.0.0"
+    },
+    {
+      "id": "wp_status_changed_structured_actor_label",
+      "path": "zeitgeist_attrs/valid/wp_status_changed_structured_actor_label.json",
+      "expected_result": "valid",
+      "event_type": "WPStatusChanged",
+      "notes": "Structured actor projects to the canonical actor_label string; decode is label-faithful, not dict-faithful.",
+      "min_version": "8.0.0"
+    },
+    {
+      "id": "wp_status_changed_done_drops_evidence",
+      "path": "zeitgeist_attrs/valid/wp_status_changed_done_drops_evidence.json",
+      "expected_result": "valid",
+      "event_type": "WPStatusChanged",
+      "notes": "Terminal-lane transition whose evidence bundle stays in the journal: UNBROADCAST_FIELDS excludes it before encoding, so projection succeeds.",
+      "min_version": "8.0.0"
+    },
+    {
+      "id": "wp_status_changed_forced_reason_stays_local",
+      "path": "zeitgeist_attrs/valid/wp_status_changed_forced_reason_stays_local.json",
+      "expected_result": "valid",
+      "event_type": "WPStatusChanged",
+      "notes": "A forced review-rejection rollback (in_review -> planned, force=True, no review_ref needed) broadcasts that it happened (force=true) but its reason is prose and stays in the local journal — identifiers only on the relay.",
+      "min_version": "8.0.0"
+    },
+    {
+      "id": "mission_created_identifiers_only",
+      "path": "zeitgeist_attrs/valid/mission_created_identifiers_only.json",
+      "expected_result": "valid",
+      "event_type": "MissionCreated",
+      "notes": "Int fields pin the str() encoding; friendly_name/purpose_tldr/purpose_context are prose and stay local — none of their text may appear in the attrs.",
+      "min_version": "8.0.0"
+    },
+    {
+      "id": "mission_closed_minimal",
+      "path": "zeitgeist_attrs/valid/mission_closed_minimal.json",
+      "expected_result": "valid",
+      "event_type": "MissionClosed",
+      "notes": "Smallest family: three payload attrs plus the two envelope identity attrs; its later timestamp proves occurred_at comes from the envelope.",
+      "min_version": "8.0.0"
+    },
+    {
+      "id": "phase_entered_optional_absent",
+      "path": "zeitgeist_attrs/valid/phase_entered_optional_absent.json",
+      "expected_result": "valid",
+      "event_type": "PhaseEntered",
+      "notes": "previous_phase None: key omitted on emit, default restored on read. expected_ref reflects the mission_id-derived ref (issue #18); a pre-8.2.0 consumer emitted mission_slug instead.",
+      "min_version": "8.2.0"
+    },
+    {
+      "id": "phase_entered_mission_slug_absent",
+      "path": "zeitgeist_attrs/valid/phase_entered_mission_slug_absent.json",
+      "expected_result": "valid",
+      "event_type": "PhaseEntered",
+      "notes": "mission_slug (optional display/back-compat) absent: ref derives from the required mission_id, not the compat field (issue #18).",
+      "min_version": "8.2.0"
+    },
+    {
+      "id": "mission_run_started_actor_label",
+      "path": "zeitgeist_attrs/valid/mission_run_started_actor_label.json",
+      "expected_result": "valid",
+      "event_type": "MissionRunStarted",
+      "notes": "RuntimeActorIdentity projects to one actor_label string; provider/model/tool ids are producer-asserted identity and never ride the relay (the relay attests the actor itself).",
+      "min_version": "8.0.0"
+    },
+    {
+      "id": "next_step_issued_actor_label",
+      "path": "zeitgeist_attrs/valid/next_step_issued_actor_label.json",
+      "expected_result": "valid",
+      "event_type": "NextStepIssued",
+      "notes": "Run-scoped step moment; the structured actor rides as its single label.",
+      "min_version": "8.0.0"
+    },
+    {
+      "id": "decision_input_requested_prose_stays_local",
+      "path": "zeitgeist_attrs/valid/decision_input_requested_prose_stays_local.json",
+      "expected_result": "valid",
+      "event_type": "DecisionInputRequested",
+      "notes": "The question and the suggested options are both prose/hints and stay local; the moment carries the decision's identity so a reader can go ask (or find the answer locally).",
+      "min_version": "8.0.0"
+    },
+    {
+      "id": "decision_input_answered_answer_stays_local",
+      "path": "zeitgeist_attrs/valid/decision_input_answered_answer_stays_local.json",
+      "expected_result": "valid",
+      "event_type": "DecisionInputAnswered",
+      "notes": "The answer is free text and stays local like every other prose field; the broadcast fact is 'dec-01 was answered by this actor at this time'.",
+      "min_version": "8.0.0"
+    },
+    {
+      "id": "mission_run_completed_actor_label",
+      "path": "zeitgeist_attrs/valid/mission_run_completed_actor_label.json",
+      "expected_result": "valid",
+      "event_type": "MissionRunCompleted",
+      "notes": "Run completion closes the ephemeral run narrative.",
+      "min_version": "8.0.0"
+    },
+    {
+      "id": "mission_created_value_over_bound",
+      "path": "zeitgeist_attrs/invalid/mission_created_value_over_bound.json",
+      "expected_result": "invalid",
+      "event_type": "MissionCreated",
+      "notes": "A 241-byte value exceeds the 240 B bound; encoding raises instead of truncating, so this creation moment does not broadcast.",
+      "min_version": "8.0.0"
+    },
+    {
+      "id": "decision_input_value_over_bound",
+      "path": "zeitgeist_attrs/invalid/decision_input_value_over_bound.json",
+      "expected_result": "invalid",
+      "event_type": "DecisionInputRequested",
+      "notes": "Inbound attrs are bound-checked against the same limit as emit, on a schema-legal key (the question itself is unbroadcast since the prose exclusion).",
+      "min_version": "8.0.0"
+    },
+    {
+      "id": "wp_status_changed_unknown_attr",
+      "path": "zeitgeist_attrs/invalid/wp_status_changed_unknown_attr.json",
+      "expected_result": "invalid",
+      "event_type": "WPStatusChanged",
+      "notes": "Keys outside the kind's closed schema are rejected, so vocabulary drift cannot smuggle fields past the reader.",
+      "min_version": "8.0.0"
+    },
+    {
+      "id": "unknown_event_type",
+      "path": "zeitgeist_attrs/invalid/unknown_event_type.json",
+      "expected_result": "invalid",
+      "event_type": "MissionOriginBound",
+      "notes": "Only the volatile vocabulary decodes; journal families have no attrs codec and fail closed.",
+      "min_version": "8.0.0"
+    },
+    {
+      "id": "next_step_auto_completed_actor_label",
+      "path": "zeitgeist_attrs/valid/next_step_auto_completed_actor_label.json",
+      "expected_result": "valid",
+      "event_type": "NextStepAutoCompleted",
+      "notes": "Auto-completion's result is a transition fact (not prose) and rides verbatim next to the actor label.",
+      "min_version": "8.0.0"
+    },
+    {
+      "id": "decision_point_opened_adr",
+      "path": "zeitgeist_attrs/valid/decision_point_opened_adr.json",
+      "expected_result": "valid",
+      "event_type": "DecisionPointOpened",
+      "notes": "ADR-origin Opened: rationale/alternatives_considered/evidence_refs stay local under their own names; the bounded summary folds rationale + alternatives into one deterministic clause order.",
+      "min_version": "8.2.0"
+    },
+    {
+      "id": "decision_point_opened_interview_multiple_options",
+      "path": "zeitgeist_attrs/valid/decision_point_opened_interview_multiple_options.json",
+      "expected_result": "valid",
+      "event_type": "DecisionPointOpened",
+      "notes": "Interview-origin Opened with three options: question/options stay local under their own names; the bounded summary joins question then every option, comma-separated, in declared order.",
+      "min_version": "8.2.0"
+    },
+    {
+      "id": "decision_point_opened_interview_missing_options",
+      "path": "zeitgeist_attrs/valid/decision_point_opened_interview_missing_options.json",
+      "expected_result": "valid",
+      "event_type": "DecisionPointOpened",
+      "notes": "Interview-origin Opened with no options offered (free-form question): the bounded summary omits the options clause entirely rather than emitting an empty one — deterministic omission, not a placeholder.",
+      "min_version": "8.2.0"
+    },
+    {
+      "id": "decision_point_resolved_adr",
+      "path": "zeitgeist_attrs/valid/decision_point_resolved_adr.json",
+      "expected_result": "valid",
+      "event_type": "DecisionPointResolved",
+      "notes": "ADR-origin Resolved: same identity as its Opened counterpart; rationale/alternatives_considered/evidence_refs stay local, folded into the bounded summary instead.",
+      "min_version": "8.2.0"
+    },
+    {
+      "id": "decision_point_resolved_interview_final_answer",
+      "path": "zeitgeist_attrs/valid/decision_point_resolved_interview_final_answer.json",
+      "expected_result": "valid",
+      "event_type": "DecisionPointResolved",
+      "notes": "Interview-origin Resolved, terminal_outcome=resolved: final_answer stays local under its own name; the bounded summary carries it as the sole clause (no rationale on a resolved outcome).",
+      "min_version": "8.2.0"
+    },
+    {
+      "id": "decision_point_resolved_interview_rationale_abandoned",
+      "path": "zeitgeist_attrs/valid/decision_point_resolved_interview_rationale_abandoned.json",
+      "expected_result": "valid",
+      "event_type": "DecisionPointResolved",
+      "notes": "Interview-origin Resolved, terminal_outcome=canceled (no final_answer on a non-resolved outcome): the bounded summary falls back to rationale as its sole clause.",
+      "min_version": "8.2.0"
+    },
+    {
+      "id": "decision_point_opened_multibyte_max_boundary",
+      "path": "zeitgeist_attrs/valid/decision_point_opened_multibyte_max_boundary.json",
+      "expected_result": "valid",
+      "event_type": "DecisionPointOpened",
+      "notes": "Multibyte, over-length question forces the bounded summary to its 240-byte max: deterministic UTF-8-safe truncation with a single trailing ellipsis marker, never splitting a multibyte codepoint or raising.",
+      "min_version": "8.2.0"
+    },
+    {
+      "id": "specify_started_minimal",
+      "path": "zeitgeist_attrs/valid/specify_started_minimal.json",
+      "expected_result": "valid",
+      "event_type": "SpecifyStarted",
+      "notes": "Minimal artifact-lifecycle Started moment: identity + actor + at, no summary source exists on this kind.",
+      "min_version": "8.2.0"
+    },
+    {
+      "id": "specify_completed_with_summary",
+      "path": "zeitgeist_attrs/valid/specify_completed_with_summary.json",
+      "expected_result": "valid",
+      "event_type": "SpecifyCompleted",
+      "notes": "Artifact-lifecycle Completed with a producer-supplied summary: the raw field folds straight into the bounded summary attr unchanged (already short prose).",
+      "min_version": "8.2.0"
+    },
+    {
+      "id": "plan_started_minimal",
+      "path": "zeitgeist_attrs/valid/plan_started_minimal.json",
+      "expected_result": "valid",
+      "event_type": "PlanStarted",
+      "notes": "Minimal artifact-lifecycle Started moment for the plan phase.",
+      "min_version": "8.2.0"
+    },
+    {
+      "id": "plan_completed_with_summary",
+      "path": "zeitgeist_attrs/valid/plan_completed_with_summary.json",
+      "expected_result": "valid",
+      "event_type": "PlanCompleted",
+      "notes": "Artifact-lifecycle Completed for the plan phase with a producer-supplied summary.",
+      "min_version": "8.2.0"
+    },
+    {
+      "id": "tasks_started_minimal",
+      "path": "zeitgeist_attrs/valid/tasks_started_minimal.json",
+      "expected_result": "valid",
+      "event_type": "TasksStarted",
+      "notes": "Minimal artifact-lifecycle Started moment for the tasks phase.",
+      "min_version": "8.2.0"
+    },
+    {
+      "id": "tasks_completed_with_summary",
+      "path": "zeitgeist_attrs/valid/tasks_completed_with_summary.json",
+      "expected_result": "valid",
+      "event_type": "TasksCompleted",
+      "notes": "Artifact-lifecycle Completed for the tasks phase with wp_count and a producer-supplied summary.",
+      "min_version": "8.2.0"
+    },
+    {
+      "id": "tasks_completed_missing_summary",
+      "path": "zeitgeist_attrs/valid/tasks_completed_missing_summary.json",
+      "expected_result": "valid",
+      "event_type": "TasksCompleted",
+      "notes": "Artifact-lifecycle Completed with no producer-supplied summary (None): the derived summary attr is omitted entirely rather than emitted empty — deterministic omission when the source prose is absent.",
+      "min_version": "8.2.0"
+    },
+    {
+      "id": "wp_status_changed_mission_id_present",
+      "path": "zeitgeist_attrs/valid/wp_status_changed_mission_id_present.json",
+      "expected_result": "valid",
+      "event_type": "WPStatusChanged",
+      "notes": "mission_id present alongside mission_slug: the family's ref field stays mission_slug (REF_FIELD_BY_EVENT_TYPE is unchanged), but mission_id now rides in attrs so a consumer can join this moment against PhaseEntered for the same mission aggregate (spec-kitty-events#69).",
+      "min_version": "9.0.0"
+    },
+    {
+      "id": "mission_closed_mission_id_present",
+      "path": "zeitgeist_attrs/valid/mission_closed_mission_id_present.json",
+      "expected_result": "valid",
+      "event_type": "MissionClosed",
+      "notes": "mission_id present alongside mission_slug: the family's ref field stays mission_slug (REF_FIELD_BY_EVENT_TYPE is unchanged), but mission_id now rides in attrs so a consumer can join this moment against PhaseEntered for the same mission aggregate (spec-kitty-events#69).",
+      "min_version": "9.0.0"
+    },
+    {
+      "id": "mission_created_mission_id_present",
+      "path": "zeitgeist_attrs/valid/mission_created_mission_id_present.json",
+      "expected_result": "valid",
+      "event_type": "MissionCreated",
+      "notes": "mission_id present alongside mission_slug: the family's ref field stays mission_slug (REF_FIELD_BY_EVENT_TYPE is unchanged), but mission_id now rides in attrs so a consumer can join this moment against PhaseEntered for the same mission aggregate (spec-kitty-events#69). MissionCreatedPayload already declared mission_id before this issue; this fixture is the first to exercise it with a non-null value.",
+      "min_version": "9.0.0"
+    },
+    {
+      "id": "decision_point_opened_value_over_bound",
+      "path": "zeitgeist_attrs/invalid/decision_point_opened_value_over_bound.json",
+      "expected_result": "invalid",
+      "event_type": "DecisionPointOpened",
+      "notes": "A 243-byte decision_point_id exceeds the 240 B bound; encoding raises instead of truncating this identity field. The new bounded-summary mechanism only ever truncates the derived summary attr — every raw scalar field, on any new event type, still fails closed exactly like the pre-existing vocabulary.",
+      "min_version": "8.2.0"
+    },
+    {
+      "id": "specify_completed_unknown_attr",
+      "path": "zeitgeist_attrs/invalid/specify_completed_unknown_attr.json",
+      "expected_result": "invalid",
+      "event_type": "SpecifyCompleted",
+      "notes": "friendly_name is not part of SpecifyCompleted's schema (it belongs to MissionCreated); keys outside a kind's closed schema are rejected on decode, so vocabulary drift or cross-kind confusion cannot smuggle fields past the reader.",
+      "min_version": "8.2.0"
+    },
+    {
+      "id": "mission_closed_non_string_value",
+      "path": "zeitgeist_attrs/invalid/mission_closed_non_string_value.json",
+      "expected_result": "invalid",
+      "event_type": "MissionClosed",
+      "notes": "Inbound attrs must be flat str:str; a JSON integer where a string is expected (mission_number) is rejected before any other decode check runs, matching the relay's own opaque str:str EventArgs shape.",
+      "min_version": "8.2.0"
+    },
+    {
+      "id": "mission_started_unknown_type",
+      "path": "zeitgeist_attrs/invalid/mission_started_unknown_type.json",
+      "expected_result": "invalid",
+      "event_type": "MissionStarted",
+      "notes": "MissionStarted is a journal-only event type with no zeitgeist-attrs codec; encoding a payload outside the volatile vocabulary fails closed instead of silently broadcasting it (events#22).",
+      "min_version": "8.2.0"
+    },
+    {
+      "id": "ops_invocation_started_minimal",
+      "path": "zeitgeist_attrs/valid/ops_invocation_started_minimal.json",
+      "expected_result": "valid",
+      "event_type": "OpsInvocationStarted",
+      "notes": "Minimal Ops Invocation Started moment: identity, action, actor, scope, attempt/contract_version defaults, and the derived detail_ref; no request_summary supplied.",
+      "min_version": "8.3.0"
+    },
+    {
+      "id": "ops_invocation_started_with_request_summary",
+      "path": "zeitgeist_attrs/valid/ops_invocation_started_with_request_summary.json",
+      "expected_result": "valid",
+      "event_type": "OpsInvocationStarted",
+      "notes": "request_summary is unbroadcast raw prose that folds into the derived, bounded summary attr rather than being emitted under its own key.",
+      "min_version": "8.3.0"
+    },
+    {
+      "id": "ops_invocation_started_retry_attempt",
+      "path": "zeitgeist_attrs/valid/ops_invocation_started_retry_attempt.json",
+      "expected_result": "valid",
+      "event_type": "OpsInvocationStarted",
+      "notes": "attempt=2 on the same invocation_id demonstrates the retry-correlation semantics: a stable invocation_id ties multiple Started attempts together while attempt disambiguates them.",
+      "min_version": "8.3.0"
+    },
+    {
+      "id": "ops_invocation_completed_success",
+      "path": "zeitgeist_attrs/valid/ops_invocation_completed_success.json",
+      "expected_result": "valid",
+      "event_type": "OpsInvocationCompleted",
+      "notes": "Completed moment for the retried invocation, outcome=success, no result_summary supplied.",
+      "min_version": "8.3.0"
+    },
+    {
+      "id": "ops_invocation_completed_failure_with_result_summary",
+      "path": "zeitgeist_attrs/valid/ops_invocation_completed_failure_with_result_summary.json",
+      "expected_result": "valid",
+      "event_type": "OpsInvocationCompleted",
+      "notes": "result_summary is unbroadcast raw and folds into the derived, bounded summary attr, mirroring request_summary on the Started side.",
+      "min_version": "8.3.0"
+    },
+    {
+      "id": "ops_invocation_started_multibyte_max_boundary",
+      "path": "zeitgeist_attrs/valid/ops_invocation_started_multibyte_max_boundary.json",
+      "expected_result": "valid",
+      "event_type": "OpsInvocationStarted",
+      "notes": "Multibyte, over-length request_summary forces the bounded summary to its 240-byte max: deterministic UTF-8-safe truncation with a single trailing ellipsis marker, never splitting a multibyte codepoint or raising, mirroring decision_point_opened_multibyte_max_boundary.json.",
+      "min_version": "8.3.0"
+    },
+    {
+      "id": "ops_invocation_started_value_over_bound",
+      "path": "zeitgeist_attrs/invalid/ops_invocation_started_value_over_bound.json",
+      "expected_result": "invalid",
+      "event_type": "OpsInvocationStarted",
+      "notes": "A 241-byte scope value exceeds the 240 B bound; encoding raises instead of truncating, so this invocation moment does not broadcast. Only the derived summary attr is ever allowed to truncate.",
+      "min_version": "8.3.0"
+    },
+    {
+      "id": "ops_invocation_started_unknown_contract_version",
+      "path": "zeitgeist_attrs/invalid/ops_invocation_started_unknown_contract_version.json",
+      "expected_result": "invalid",
+      "event_type": "OpsInvocationStarted",
+      "notes": "contract_version 2 names a payload-shape revision this decoder does not know (KNOWN_CONTRACT_VERSIONS_BY_EVENT_TYPE only lists \"1\" today); decode fails closed with a named error rather than silently misinterpreting a future revision's attrs (events#78's 'unknown-version' fixture requirement).",
+      "min_version": "8.3.0"
+    },
+    {
+      "id": "ops_invocation_started_missing_detail_ref",
+      "path": "zeitgeist_attrs/invalid/ops_invocation_started_missing_detail_ref.json",
+      "expected_result": "invalid",
+      "event_type": "OpsInvocationStarted",
+      "notes": "detail_ref is mechanically derived and never omitted for OpsInvocationStarted; decode fails closed when the required attr is missing (events#192).",
+      "min_version": "8.3.0"
+    },
+    {
+      "id": "ops_invocation_completed_missing_outcome",
+      "path": "zeitgeist_attrs/invalid/ops_invocation_completed_missing_outcome.json",
+      "expected_result": "invalid",
+      "event_type": "OpsInvocationCompleted",
+      "notes": "outcome is a required, non-Optional field on OpsInvocationCompletedPayload; to_zeitgeist_attrs can never omit it, so decode insists on its presence and fails closed when it is missing.",
+      "min_version": "8.3.0"
+    },
+    {
+      "id": "ops_invocation_completed_unrelated_detail_ref",
+      "path": "zeitgeist_attrs/invalid/ops_invocation_completed_unrelated_detail_ref.json",
+      "expected_result": "invalid",
+      "event_type": "OpsInvocationCompleted",
+      "notes": "detail_ref is mechanically derived from the moment's own event type and event_id; decode rejects a wire frame that points it at another event (events#190).",
+      "min_version": "9.1.2"
+    },
+    {
+      "id": "cutover-boundary-accept-schema-version-missing",
+      "path": "cutover_boundary/accepted_by_validate_event/schema_version_missing.json",
+      "expected_result": "valid",
+      "event_type": "MissionCreated",
+      "notes": "8.0.0 boundary: envelope without schema_version is no longer rejected by validate_event (cutover gate removed); strict-profile rejection covered by cutover-boundary-strict-schema-version-missing.",
+      "min_version": "8.0.0"
+    },
+    {
+      "id": "cutover-boundary-accept-schema-version-wrong-major",
+      "path": "cutover_boundary/accepted_by_validate_event/schema_version_wrong_major.json",
+      "expected_result": "valid",
+      "event_type": "MissionCreated",
+      "notes": "8.0.0 boundary: schema_version \"2.9.0\" is no longer rejected by validate_event (cutover gate removed); strict-profile rejection covered by cutover-boundary-strict-schema-version-wrong-major.",
+      "min_version": "8.0.0"
+    },
+    {
+      "id": "cutover-boundary-accept-aggregate-prefix-feature",
+      "path": "cutover_boundary/accepted_by_validate_event/aggregate_prefix_feature.json",
+      "expected_result": "valid",
+      "event_type": "MissionCreated",
+      "notes": "8.0.0 boundary: validate_event no longer applies the aggregate-prefix check (cutover gate removed); strict-profile rejection is covered by cutover-boundary-strict-aggregate-prefix-feature.",
+      "min_version": "8.0.0"
+    },
+    {
+      "id": "cutover-boundary-accept-envelope-level-legacy-key",
+      "path": "cutover_boundary/accepted_by_validate_event/envelope_level_legacy_key.json",
+      "expected_result": "valid",
+      "event_type": "MissionCreated",
+      "notes": "8.0.0 boundary: an envelope-level forbidden legacy key (mission_key) is not seen by validate_event, which does not run the recursive walker; strict-profile rejection covered by cutover-boundary-strict-forbidden-key-top-level.",
+      "min_version": "8.0.0"
+    },
+    {
+      "id": "cutover-boundary-strict-schema-version-missing",
+      "path": "cutover_boundary/rejected_by_strict_profile/schema_version_missing.json",
+      "expected_result": "invalid",
+      "event_type": "MissionCreated",
+      "notes": "Strict profile rejects what 8.0.0's validate_event accepts: missing schema_version yields ENVELOPE_SHAPE_INVALID + UNSUPPORTED_SCHEMA_VERSION from validate_strict_envelope.",
+      "min_version": "8.0.0"
+    },
+    {
+      "id": "cutover-boundary-strict-schema-version-wrong-major",
+      "path": "cutover_boundary/rejected_by_strict_profile/schema_version_wrong_major.json",
+      "expected_result": "invalid",
+      "event_type": "MissionCreated",
+      "notes": "Strict profile rejects what 8.0.0's validate_event accepts: schema_version \"2.9.0\" yields exactly UNSUPPORTED_SCHEMA_VERSION.",
+      "min_version": "8.0.0"
+    },
+    {
+      "id": "cutover-boundary-strict-forbidden-key-top-level",
+      "path": "cutover_boundary/rejected_by_strict_profile/forbidden_key_top_level.json",
+      "expected_result": "invalid",
+      "event_type": "MissionCreated",
+      "notes": "Strict profile rejects what 8.0.0's validate_event accepts: envelope-level mission_key yields ENVELOPE_SHAPE_INVALID (extra key) + FORBIDDEN_KEY.",
+      "min_version": "8.0.0"
+    },
+    {
+      "id": "cutover-boundary-strict-forbidden-key-nested-payload",
+      "path": "cutover_boundary/rejected_by_strict_profile/forbidden_key_nested_payload.json",
+      "expected_result": "invalid",
+      "event_type": "MissionCreated",
+      "notes": "Strict profile rejects what 8.0.0's validate_event accepts: payload-nested feature_slug yields FORBIDDEN_KEY (recursive walk) + PAYLOAD_SCHEMA_FAIL (extra=forbid).",
+      "min_version": "8.0.0"
+    },
+    {
+      "id": "cutover-boundary-strict-aggregate-prefix-feature",
+      "path": "cutover_boundary/rejected_by_strict_profile/aggregate_prefix_feature.json",
+      "expected_result": "invalid",
+      "event_type": "MissionCreated",
+      "notes": "Strict profile rejects what 8.0.0's validate_event accepts: the legacy aggregate prefix feature/ yields exactly FORBIDDEN_AGGREGATE_NAME -- the cutover-artifact prefix rule re-homed onto the strict profile (issue #10).",
+      "min_version": "8.0.0"
+    },
+    {
+      "id": "cutover-boundary-strict-legacy-event-name",
+      "path": "cutover_boundary/rejected_by_strict_profile/legacy_event_name.json",
+      "expected_result": "invalid",
+      "event_type": "FeatureCreated",
+      "notes": "Forbidden legacy event name FeatureCreated moved from the removed cutover gate to strict-profile membership: validate_strict_envelope reports exactly UNKNOWN_EVENT_TYPE.",
+      "min_version": "8.0.0"
+    },
+    {
+      "id": "status-diary-replay-fresh-mission",
+      "path": "status_diary/replay/status_diary_fresh_mission.jsonl",
+      "fixture_type": "replay_stream",
+      "event_type": "mixed",
+      "expected_result": "valid",
+      "notes": "Fresh mission: genesis seed -> planned -> claimed (policy_metadata claim triple) -> in_progress; runtime slots carried forward",
+      "min_version": "8.1.0"
+    },
+    {
+      "id": "status-diary-replay-fresh-mission-output",
+      "path": "status_diary/replay/status_diary_fresh_mission_output.json",
+      "fixture_type": "reducer_output",
+      "event_type": "State",
+      "expected_result": "valid",
+      "notes": "Golden reduce() output for status_diary_fresh-mission.jsonl (issue #41)",
+      "min_version": "8.1.0"
+    },
+    {
+      "id": "status-diary-replay-every-lane",
+      "path": "status_diary/replay/status_diary_every_lane.jsonl",
+      "fixture_type": "replay_stream",
+      "event_type": "mixed",
+      "expected_result": "valid",
+      "notes": "WP01 traverses every display lane planned..done (review_result + done evidence), WP02 detours through blocked, WP03 canceled mid-flight",
+      "min_version": "8.1.0"
+    },
+    {
+      "id": "status-diary-replay-every-lane-output",
+      "path": "status_diary/replay/status_diary_every_lane_output.json",
+      "fixture_type": "reducer_output",
+      "event_type": "State",
+      "expected_result": "valid",
+      "notes": "Golden reduce() output for status_diary_every-lane.jsonl (issue #41)",
+      "min_version": "8.1.0"
+    },
+    {
+      "id": "status-diary-replay-out-of-order-duplicates",
+      "path": "status_diary/replay/status_diary_out_of_order_duplicates.jsonl",
+      "fixture_type": "replay_stream",
+      "event_type": "mixed",
+      "expected_result": "valid",
+      "notes": "Same stream shuffled relative to (at, event_id) order with exact duplicate rows appended; dedup + sort make the fold deterministic",
+      "min_version": "8.1.0"
+    },
+    {
+      "id": "status-diary-replay-out-of-order-duplicates-output",
+      "path": "status_diary/replay/status_diary_out_of_order_duplicates_output.json",
+      "fixture_type": "reducer_output",
+      "event_type": "State",
+      "expected_result": "valid",
+      "notes": "Golden reduce() output for status_diary_out-of-order-duplicates.jsonl (issue #41)",
+      "min_version": "8.1.0"
+    },
+    {
+      "id": "status-diary-replay-unknown-kinds",
+      "path": "status_diary/replay/status_diary_unknown_kinds.jsonl",
+      "fixture_type": "replay_stream",
+      "event_type": "mixed",
+      "expected_result": "valid",
+      "notes": "Unknown event_type writers (DecisionPointOpened, future protocol events) and retrospective.* rows are ignored in place; annotation row still folds",
+      "min_version": "8.1.0"
+    },
+    {
+      "id": "status-diary-replay-unknown-kinds-output",
+      "path": "status_diary/replay/status_diary_unknown_kinds_output.json",
+      "fixture_type": "reducer_output",
+      "event_type": "State",
+      "expected_result": "valid",
+      "notes": "Golden reduce() output for status_diary_unknown-kinds.jsonl (issue #41)",
+      "min_version": "8.1.0"
     }
   ],
   "classes": {

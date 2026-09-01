@@ -4,6 +4,7 @@ Covers: happy-path pass, happy-path fail, decision checkpoint, empty stream,
 deduplication, 4 anomaly scenarios, terminal clears pending, partial artifact,
 3 golden-file replay scenarios.
 """
+
 from __future__ import annotations
 
 import json
@@ -65,6 +66,7 @@ _PARTIAL_ARTIFACT_REF = AuditArtifactRef(
 
 
 # ── Helper ─────────────────────────────────────────────────────────────────────
+
 
 def _event(
     event_type: str,
@@ -181,6 +183,7 @@ def _decision_event(decision_id: str = "dec-001", lamport: int = 3) -> Event:
 
 # ── Tests ─────────────────────────────────────────────────────────────────────
 
+
 def test_empty_stream() -> None:
     result = reduce_mission_audit_events([])
     assert result.audit_status == AuditStatus.PENDING
@@ -277,6 +280,7 @@ def test_anomaly_unrecognized_type_via_filter() -> None:
     """Non-audit events are silently filtered out; they don't appear in anomalies."""
     # Build an event with a non-audit event_type
     from spec_kitty_events.lifecycle import MISSION_STARTED
+
     non_audit_event = Event(
         event_id=str(ULID()),
         event_type=MISSION_STARTED,  # not in MISSION_AUDIT_EVENT_TYPES
@@ -314,6 +318,7 @@ def test_partial_artifact_on_failure() -> None:
 
 
 # ── Golden-file replay ─────────────────────────────────────────────────────────
+
 
 def _serialize_events_jsonl(events: list[Event]) -> str:
     lines = []
@@ -367,9 +372,7 @@ def _golden_replay(
         input_path.write_text(_serialize_events_jsonl(events))
         result = reduce_mission_audit_events(events)
         output_data = result.model_dump(mode="json")
-        output_path.write_text(
-            json.dumps(output_data, sort_keys=True, indent=2) + "\n"
-        )
+        output_path.write_text(json.dumps(output_data, sort_keys=True, indent=2) + "\n")
         pytest.skip(f"Golden files written for {name!r}; run again to validate")
 
     # Subsequent runs: load events from JSONL and compare
@@ -378,8 +381,7 @@ def _golden_replay(
     actual = result.model_dump(mode="json")
     expected = _canonicalize_output(json.loads(output_path.read_text()))
     assert actual == expected, (
-        f"Golden replay mismatch for {name!r}. "
-        f"Re-run with golden files deleted to regenerate."
+        f"Golden replay mismatch for {name!r}. Re-run with golden files deleted to regenerate."
     )
 
 

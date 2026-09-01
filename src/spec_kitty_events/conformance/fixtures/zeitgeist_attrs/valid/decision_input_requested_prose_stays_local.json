@@ -1,0 +1,37 @@
+{
+  "event_type": "DecisionInputRequested",
+  "envelope": {
+    "event_id": "e2e00000-0000-4000-8000-000000000010",
+    "timestamp": "2026-08-25T09:00:00+00:00"
+  },
+  "payload": {
+    "run_id": "run-01",
+    "decision_id": "dec-01",
+    "step_id": "step-07",
+    "question": "Ship as-is, or hold for the security review?",
+    "options": [
+      "yes",
+      "no",
+      "revise"
+    ],
+    "input_key": null,
+    "actor": {
+      "actor_id": "actor-01",
+      "actor_type": "llm",
+      "display_name": "Ox Alpha",
+      "provider": "anthropic",
+      "model": "ox-alpha",
+      "tool": "claude-code"
+    }
+  },
+  "expected_attrs": {
+    "event_id": "e2e00000-0000-4000-8000-000000000010",
+    "occurred_at": "2026-08-25T09:00:00+00:00",
+    "run_id": "run-01",
+    "decision_id": "dec-01",
+    "step_id": "step-07",
+    "actor": "actor-01"
+  },
+  "expected_ref": "run-01",
+  "notes": "The question and the suggested options are both prose/hints and stay local; the moment carries the decision's identity so a reader can go ask (or find the answer locally)."
+}

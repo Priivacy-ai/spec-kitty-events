@@ -54,17 +54,11 @@ CLASS_DIRS: tuple[str, ...] = (
 _ULID_RE = re.compile(r"^[0-9A-HJKMNP-TV-Z]{26}$")
 
 # Anything that *looks* like an ISO-8601 datetime (date+time+offset).
-_TIMESTAMP_RE = re.compile(
-    r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:?\d{2})$"
-)
+_TIMESTAMP_RE = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:?\d{2})$")
 
 
 _FIXTURES_ROOT = (
-    Path(__file__).resolve().parents[1]
-    / "src"
-    / "spec_kitty_events"
-    / "conformance"
-    / "fixtures"
+    Path(__file__).resolve().parents[1] / "src" / "spec_kitty_events" / "conformance" / "fixtures"
 )
 
 
@@ -78,9 +72,9 @@ def _iter_class_fixture_paths() -> Iterator[Path]:
             yield path
 
 
-def _walk_strings(value: Any, _path: tuple[str | int, ...] = ()) -> Iterator[
-    tuple[tuple[str | int, ...], str]
-]:
+def _walk_strings(
+    value: Any, _path: tuple[str | int, ...] = ()
+) -> Iterator[tuple[tuple[str | int, ...], str]]:
     """Yield ``(json_pointer_tuple, string_value)`` for every string leaf."""
     if isinstance(value, str):
         yield _path, value
@@ -131,6 +125,5 @@ def test_fixture_corpus_non_empty() -> None:
     """The eight-class fixture corpus must not be empty."""
     paths = _collect_fixture_paths()
     assert paths, (
-        "No fixtures found under the eight-class taxonomy directories. "
-        f"Searched: {CLASS_DIRS}"
+        f"No fixtures found under the eight-class taxonomy directories. Searched: {CLASS_DIRS}"
     )

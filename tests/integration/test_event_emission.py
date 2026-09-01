@@ -1,4 +1,5 @@
 """Integration test for event emission and clock synchronization."""
+
 import uuid
 from datetime import datetime
 from ulid import ULID

@@ -21,6 +21,7 @@ from spec_kitty_events.conformance import (
 def _make_ulid() -> str:
     """Generate a valid 26-character ULID-like string."""
     from ulid import ULID
+
     return str(ULID())
 
 
@@ -175,41 +176,6 @@ def test_validate_event_business_rule_force_without_reason() -> None:
     # Check that violation mentions force/reason
     violation_messages = [v.message for v in result.model_violations]
     assert any("reason" in msg.lower() for msg in violation_messages)
-
-
-def test_validate_event_rejects_missing_cutover_signal_on_envelope() -> None:
-    payload = {
-        "event_id": _make_ulid(),
-        "event_type": "WPStatusChanged",
-        "aggregate_id": "mission/WP01",
-        "timestamp": datetime.now(timezone.utc).isoformat(),
-        "node_id": "test-node",
-        "lamport_clock": 1,
-        "project_uuid": str(uuid4()),
-        "correlation_id": _make_ulid(),
-        "payload": _make_valid_status_transition(),
-    }
-    result = validate_event(payload, "WPStatusChanged")
-    assert result.valid is False
-    assert any("missing canonical cutover signal" in v.message for v in result.model_violations)
-
-
-def test_validate_event_rejects_forbidden_legacy_key_on_envelope() -> None:
-    payload = {
-        "event_id": _make_ulid(),
-        "event_type": "WPStatusChanged",
-        "aggregate_id": "mission/WP01",
-        "timestamp": datetime.now(timezone.utc).isoformat(),
-        "node_id": "test-node",
-        "lamport_clock": 1,
-        "project_uuid": str(uuid4()),
-        "correlation_id": _make_ulid(),
-        "schema_version": "3.0.0",
-        "payload": {**_make_valid_status_transition(), "feature_slug": "legacy"},
-    }
-    result = validate_event(payload, "WPStatusChanged")
-    assert result.valid is False
-    assert any("forbidden legacy keys" in v.message for v in result.model_violations)
 
 
 def test_validate_event_unknown_type_raises() -> None:

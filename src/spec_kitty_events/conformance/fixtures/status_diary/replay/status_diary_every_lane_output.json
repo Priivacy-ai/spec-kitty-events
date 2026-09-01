@@ -1,0 +1,43 @@
+{
+  "event_count": 15,
+  "last_event_id": "01JAAAA0000000000000000018",
+  "materialized_at": "2026-08-26T12:02:00+00:00",
+  "mission_number": "41",
+  "mission_slug": "041-reducer-unification",
+  "mission_type": "software-dev",
+  "summary": {
+    "approved": 0,
+    "blocked": 1,
+    "canceled": 1,
+    "claimed": 0,
+    "done": 1,
+    "for_review": 0,
+    "in_progress": 0,
+    "in_review": 0,
+    "planned": 0
+  },
+  "work_packages": {
+    "WP01": {
+      "actor": "claude",
+      "force_count": 0,
+      "lane": "done",
+      "last_event_id": "01JAAAA0000000000000000010",
+      "last_transition_at": "2026-08-26T10:06:00+00:00",
+      "review_result": null
+    },
+    "WP02": {
+      "actor": "claude",
+      "force_count": 0,
+      "lane": "blocked",
+      "last_event_id": "01JAAAA0000000000000000014",
+      "last_transition_at": "2026-08-26T11:02:00+00:00"
+    },
+    "WP03": {
+      "actor": "claude",
+      "force_count": 1,
+      "lane": "canceled",
+      "last_event_id": "01JAAAA0000000000000000018",
+      "last_transition_at": "2026-08-26T12:02:00+00:00"
+    }
+  }
+}

@@ -1,6 +1,7 @@
 {
   "$id": "spec-kitty-events/runtime_actor_identity",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
   "description": "Identity of a runtime actor (human, LLM, or service).",
   "properties": {
     "actor_id": {

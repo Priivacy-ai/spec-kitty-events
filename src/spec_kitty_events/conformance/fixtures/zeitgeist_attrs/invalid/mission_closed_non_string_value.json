@@ -1,0 +1,9 @@
+{
+  "event_type": "MissionClosed",
+  "attrs": {
+    "mission_number": 12
+  },
+  "direction": "from",
+  "expected_error": "ZeitgeistAttrsError",
+  "notes": "Attrs are opaque flat str:str on the wire; a JSON integer value (not the string \"12\") is rejected before any key-set or bound check runs, mirroring the unit-level regression pin."
+}

@@ -1,12 +1,11 @@
 """State-machine merge logic with priority-based conflict resolution."""
+
 from typing import List, Dict
 from spec_kitty_events.models import Event, ConflictResolution, ValidationError
 
 
 def state_machine_merge(
-    events: List[Event],
-    priority_map: Dict[str, int],
-    state_key: str = "state"
+    events: List[Event], priority_map: Dict[str, int], state_key: str = "state"
 ) -> ConflictResolution:
     """Merge concurrent state-machine events using priority-based selection.
 
@@ -88,16 +87,18 @@ def state_machine_merge(
         all_states = [_get_state(e) for e in events]
         unique_states = set(all_states)
         if len(unique_states) == 1:
-            resolution_note = f"All events have same state: {winner_state} (tiebroken by node '{winner_node_id}')"
+            resolution_note = (
+                f"All events have same state: {winner_state} (tiebroken by node '{winner_node_id}')"
+            )
         else:
             resolution_note = (
                 f"Selected state '{winner_state}' (priority={winner_priority}) "
-                f"from node '{winner_node_id}' over {len(events)-1} conflicting states"
+                f"from node '{winner_node_id}' over {len(events) - 1} conflicting states"
             )
 
     return ConflictResolution(
         merged_event=winner_event,
         resolution_note=resolution_note,
         requires_manual_review=False,  # Always automatic for MVP
-        conflicting_events=list(events)
+        conflicting_events=list(events),
     )

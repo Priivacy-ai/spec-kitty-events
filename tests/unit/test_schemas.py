@@ -1,4 +1,5 @@
 """Unit tests for the schemas subpackage loader API."""
+
 from __future__ import annotations
 
 import json

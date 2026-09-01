@@ -31,11 +31,7 @@ class TestMappingDeterminism:
         assert result in ("GatePassed", "GateFailed", None)
 
     @settings(deadline=None)
-    @given(
-        conclusion=st.text(min_size=1).filter(
-            lambda s: s not in KNOWN_CONCLUSIONS
-        )
-    )
+    @given(conclusion=st.text(min_size=1).filter(lambda s: s not in KNOWN_CONCLUSIONS))
     def test_unknown_always_raises(self, conclusion: str) -> None:
         """Unknown conclusions always raise UnknownConclusionError."""
         with pytest.raises(UnknownConclusionError):
@@ -47,8 +43,14 @@ class TestConclusionMapCompleteness:
 
     def test_covers_all_github_values(self) -> None:
         expected = {
-            "success", "failure", "timed_out", "cancelled",
-            "action_required", "neutral", "skipped", "stale",
+            "success",
+            "failure",
+            "timed_out",
+            "cancelled",
+            "action_required",
+            "neutral",
+            "skipped",
+            "stale",
         }
         assert set(_CONCLUSION_MAP.keys()) == expected
 

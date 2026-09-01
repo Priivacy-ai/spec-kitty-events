@@ -1,0 +1,19 @@
+{
+  "event_type": "OpsInvocationStarted",
+  "envelope": {
+    "event_id": "e2e00000-0000-4000-8000-000000000206",
+    "timestamp": "2026-08-25T09:00:00+00:00"
+  },
+  "payload": {
+    "invocation_id": "inv-07",
+    "action": "team.provision",
+    "actor": {
+      "actor_id": "actor-01",
+      "actor_type": "service"
+    },
+    "scope": "sssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss"
+  },
+  "direction": "to",
+  "expected_error": "ZeitgeistAttrsOverflowError",
+  "notes": "A 241-byte scope value exceeds the 240 B bound; encoding raises instead of truncating, so this invocation moment does not broadcast. Only the derived summary attr is ever allowed to truncate."
+}

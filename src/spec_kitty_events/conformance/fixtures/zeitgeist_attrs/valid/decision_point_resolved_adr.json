@@ -1,0 +1,49 @@
+{
+  "event_type": "DecisionPointResolved",
+  "envelope": {
+    "event_id": "e2e00000-0000-4000-8000-000000000104",
+    "timestamp": "2026-08-25T09:00:00+00:00"
+  },
+  "payload": {
+    "decision_point_id": "dp-adr-01",
+    "mission_id": "mission-demo",
+    "run_id": "run-01",
+    "mission_slug": "demo-mission",
+    "mission_type": "software-dev",
+    "phase": "plan",
+    "actor_id": "actor-01",
+    "actor_type": "human",
+    "authority_role": "mission_owner",
+    "mission_owner_authority_flag": true,
+    "mission_owner_authority_path": "owner.path",
+    "rationale": "Chose Redis: shared across workers, sub-ms reads.",
+    "alternatives_considered": [
+      "in-process LRU"
+    ],
+    "evidence_refs": [
+      "bench-report-01"
+    ],
+    "state_entered_at": "2026-08-25T08:55:00+00:00",
+    "recorded_at": "2026-08-25T09:10:00+00:00"
+  },
+  "expected_attrs": {
+    "event_id": "e2e00000-0000-4000-8000-000000000104",
+    "occurred_at": "2026-08-25T09:00:00+00:00",
+    "origin_surface": "adr",
+    "decision_point_id": "dp-adr-01",
+    "mission_id": "mission-demo",
+    "run_id": "run-01",
+    "mission_slug": "demo-mission",
+    "mission_type": "software-dev",
+    "phase": "plan",
+    "actor_id": "actor-01",
+    "actor_type": "human",
+    "authority_role": "mission_owner",
+    "mission_owner_authority_flag": "true",
+    "mission_owner_authority_path": "owner.path",
+    "state_entered_at": "2026-08-25T08:55:00+00:00",
+    "summary": "Chose Redis: shared across workers, sub-ms reads.; in-process LRU"
+  },
+  "expected_ref": "dp-adr-01",
+  "notes": "ADR-origin Resolved: same identity as its Opened counterpart; rationale/alternatives_considered/evidence_refs stay local, folded into the bounded summary instead."
+}

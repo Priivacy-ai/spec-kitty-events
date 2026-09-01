@@ -6,11 +6,11 @@ Covers:
 - Replay stream validation + golden reducer output comparison (3 streams)
 - Schema drift checks (5 payload models)
 """
+
 from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Any, Dict, List
 
 import pytest
 
@@ -38,11 +38,7 @@ _VALID_CASES = [c for c in _AUDIT_CASES if c.expected_valid]
 _INVALID_CASES = [c for c in _AUDIT_CASES if not c.expected_valid]
 
 _FIXTURES_DIR = (
-    Path(__file__).parent.parent
-    / "src"
-    / "spec_kitty_events"
-    / "conformance"
-    / "fixtures"
+    Path(__file__).parent.parent / "src" / "spec_kitty_events" / "conformance" / "fixtures"
 )
 
 
@@ -77,9 +73,7 @@ def test_invalid_fixture_fails_conformance(case: object) -> None:
 
     assert isinstance(case, FixtureCase)
     result = validate_event(case.payload, case.event_type, strict=True)
-    assert not result.valid, (
-        f"Fixture {case.id} should be invalid but passed validation"
-    )
+    assert not result.valid, f"Fixture {case.id} should be invalid but passed validation"
     assert len(result.model_violations) >= 1, (
         f"Fixture {case.id} is invalid but no model_violations were reported"
     )
@@ -121,9 +115,7 @@ def test_mission_audit_invalid_case_count() -> None:
         ),
     ],
 )
-def test_replay_stream_validates_and_matches_golden(
-    stream_id: str, output_id: str
-) -> None:
+def test_replay_stream_validates_and_matches_golden(stream_id: str, output_id: str) -> None:
     """Each JSONL line validates; reducer output matches committed golden file."""
     raw = load_replay_stream(stream_id)
     # Validate each event's payload
@@ -145,9 +137,7 @@ def test_replay_stream_validates_and_matches_golden(
     )
 
     manifest = json.loads(_MANIFEST_PATH.read_text())
-    golden_entry = next(
-        (e for e in manifest["fixtures"] if e["id"] == output_id), None
-    )
+    golden_entry = next((e for e in manifest["fixtures"] if e["id"] == output_id), None)
     assert golden_entry is not None, f"Golden manifest entry not found: {output_id}"
     golden_path = FIXTURES_DIR / golden_entry["path"]
     assert golden_path.exists(), f"Golden file not found: {golden_path}"

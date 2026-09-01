@@ -1,0 +1,61 @@
+{
+  "$id": "spec-kitty-events/mission_reopened_payload",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Typed payload for ``MissionReopened`` events.\n\nRecords that a merged/closed mission was returned to an actionable state.\nAppended *each* time (every re-open is a distinct fact \u2014 NOT deduped).\nAttribution is via ``mission_id`` (ULID); ``cleared_merge`` is an optional\nsnapshot of the ``merged_*`` fields removed from ``meta.json`` by the\nre-open command, retained for audit / reversibility.\n\nProducer: ``spec-kitty/src/specify_cli/status/lifecycle_events.py``\n``emit_mission_reopened``. Data-model:\n``mission-lifecycle-dispatch-drg-closeout-01KV0S99/data-model.md``.",
+  "properties": {
+    "cleared_merge": {
+      "anyOf": [
+        {
+          "additionalProperties": true,
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Snapshot of the merged_* fields cleared from meta.json (for reversibility/audit); null when no merge metadata was cleared.",
+      "title": "Cleared Merge"
+    },
+    "mission_id": {
+      "description": "Canonical machine identity (ULID); lookup key.",
+      "minLength": 1,
+      "title": "Mission Id",
+      "type": "string"
+    },
+    "mission_slug": {
+      "description": "Human handle (display).",
+      "minLength": 1,
+      "title": "Mission Slug",
+      "type": "string"
+    },
+    "reason": {
+      "description": "Audit reason for the re-open (non-empty).",
+      "minLength": 1,
+      "title": "Reason",
+      "type": "string"
+    },
+    "reopened_at": {
+      "description": "Event time (ISO-8601 UTC).",
+      "minLength": 1,
+      "title": "Reopened At",
+      "type": "string"
+    },
+    "reopened_by": {
+      "description": "Detected actor who re-opened the mission.",
+      "minLength": 1,
+      "title": "Reopened By",
+      "type": "string"
+    }
+  },
+  "required": [
+    "mission_id",
+    "mission_slug",
+    "reason",
+    "reopened_by",
+    "reopened_at"
+  ],
+  "title": "MissionReopenedPayload",
+  "type": "object"
+}

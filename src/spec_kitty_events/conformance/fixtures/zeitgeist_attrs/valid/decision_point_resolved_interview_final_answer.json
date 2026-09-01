@@ -1,0 +1,38 @@
+{
+  "event_type": "DecisionPointResolved",
+  "envelope": {
+    "event_id": "e2e00000-0000-4000-8000-000000000105",
+    "timestamp": "2026-08-25T09:00:00+00:00"
+  },
+  "payload": {
+    "origin_surface": "planning_interview",
+    "decision_point_id": "dp-iv-01",
+    "mission_id": "mission-demo",
+    "run_id": "run-01",
+    "mission_slug": "demo-mission",
+    "mission_type": "software-dev",
+    "terminal_outcome": "resolved",
+    "final_answer": "Postgres",
+    "resolved_by": "actor-01",
+    "state_entered_at": "2026-08-25T08:55:00+00:00",
+    "recorded_at": "2026-08-25T09:10:00+00:00"
+  },
+  "expected_attrs": {
+    "event_id": "e2e00000-0000-4000-8000-000000000105",
+    "occurred_at": "2026-08-25T09:00:00+00:00",
+    "origin_surface": "planning_interview",
+    "decision_point_id": "dp-iv-01",
+    "mission_id": "mission-demo",
+    "run_id": "run-01",
+    "mission_slug": "demo-mission",
+    "mission_type": "software-dev",
+    "terminal_outcome": "resolved",
+    "other_answer": "false",
+    "resolved_by": "actor-01",
+    "closed_locally_while_widened": "false",
+    "state_entered_at": "2026-08-25T08:55:00+00:00",
+    "summary": "Postgres"
+  },
+  "expected_ref": "dp-iv-01",
+  "notes": "Interview-origin Resolved, terminal_outcome=resolved: final_answer stays local under its own name; the bounded summary carries it as the sole clause (no rationale on a resolved outcome)."
+}

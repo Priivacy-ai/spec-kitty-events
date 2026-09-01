@@ -1,0 +1,8 @@
+{"event_id": "dp-opened-1", "event_type": "DecisionPointOpened", "mission_slug": "041-reducer-unification", "payload": {"question": "ship?"}}
+{"event_id": "future-1", "event_type": "SomeFutureProtocolEventV99", "mission_slug": "041-reducer-unification", "payload": {"anything": true}}
+{"at": "2026-08-26T13:00:00+00:00", "event_id": "retro-req-1", "event_name": "retrospective.requested", "payload": {"mode": null}}
+{"actor": "claude", "at": "2026-08-26T13:01:00+00:00", "event_id": "01JAAAA0000000000000000025", "evidence": null, "execution_mode": "worktree", "force": false, "from_lane": "genesis", "mission_slug": "041-reducer-unification", "reason": null, "review_ref": null, "to_lane": "planned", "wp_id": "WP01"}
+{"actor": "claude", "at": "2026-08-26T13:02:00+00:00", "delta": {"note": "picked up", "role": "implementer", "tracker_refs": ["TCK-1"]}, "event_id": "01JAAAA0000000000000000026", "kind": "annotation", "wp_id": "WP01"}
+{"actor": "claude", "at": "2026-08-26T13:03:00+00:00", "event_id": "01JAAAA0000000000000000027", "evidence": null, "execution_mode": "worktree", "force": false, "from_lane": "planned", "mission_slug": "041-reducer-unification", "policy_metadata": {"agent": "claude", "shell_pid": 77}, "reason": null, "review_ref": null, "to_lane": "claimed", "wp_id": "WP01"}
+{"event_id": "dp-resolved-1", "event_type": "DecisionPointResolved", "mission_slug": "041-reducer-unification", "payload": {"answer": "yes"}}
+{"actor": "claude", "at": "2026-08-26T13:04:00+00:00", "event_id": "01JAAAA0000000000000000028", "evidence": null, "execution_mode": "worktree", "force": false, "from_lane": "claimed", "mission_slug": "041-reducer-unification", "reason": null, "review_ref": null, "to_lane": "in_progress", "wp_id": "WP01"}

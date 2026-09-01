@@ -1,0 +1,33 @@
+{
+  "event_type": "MissionCreated",
+  "envelope": {
+    "event_id": "e2e00000-0000-4000-8000-000000000005",
+    "timestamp": "2026-08-25T09:00:00+00:00"
+  },
+  "payload": {
+    "mission_id": null,
+    "mission_slug": "demo-mission",
+    "mission_number": 12,
+    "mission_type": "software-dev",
+    "target_branch": "main",
+    "wp_count": 3,
+    "actor": "robert",
+    "friendly_name": "Board approved 40M for the counterparty rollout",
+    "purpose_tldr": "Bob Smith (bob@acme.com) is the counterparty contact.",
+    "purpose_context": "Broadcast through the team relay for 72 hours.",
+    "created_at": null
+  },
+  "expected_attrs": {
+    "event_id": "e2e00000-0000-4000-8000-000000000005",
+    "occurred_at": "2026-08-25T09:00:00+00:00",
+    "mission_slug": "demo-mission",
+    "mission_number": "12",
+    "mission_type": "software-dev",
+    "target_branch": "main",
+    "wp_count": "3",
+    "actor": "robert",
+    "summary": "Board approved 40M for the counterparty rollout; Bob Smith (bob@acme.com) is the counterparty contact."
+  },
+  "expected_ref": "demo-mission",
+  "notes": "Int fields pin the str() encoding; the raw friendly_name/purpose_tldr/purpose_context fields stay local under their own names — none of those field NAMES ever reach the attrs. friendly_name and purpose_tldr do feed the bounded, deterministic ``summary`` moment attribute (issue #77); purpose_context never does and its text appears nowhere. The optional actor is an opaque identifier and rides under the moment's ``actor`` key so the moment can say WHO created the mission."
+}

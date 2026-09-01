@@ -13,7 +13,6 @@ from typing import List
 MIT_CLASSIFIER = "License :: OSI Approved :: MIT License"
 
 REQUIRED_WHEEL_SUFFIXES = (
-    "spec_kitty_events/cutover.py",
     "spec_kitty_events/forbidden_keys.py",
     "spec_kitty_events/conformance/README.md",
     "spec_kitty_events/conformance/fixtures/manifest.json",
@@ -48,9 +47,7 @@ def validate_wheel_metadata(metadata: email.message.Message, label: str) -> List
     license_files = metadata.get_all("License-File", [])
 
     has_mit_classifier = MIT_CLASSIFIER in classifiers
-    has_mit_text = "mit" in (license_value or "").lower() or "mit" in (
-        license_expr or ""
-    ).lower()
+    has_mit_text = "mit" in (license_value or "").lower() or "mit" in (license_expr or "").lower()
 
     if not (has_mit_classifier or has_mit_text):
         issues.append(f"{label}: wheel METADATA must declare MIT license")
@@ -90,14 +87,10 @@ def main() -> int:
 
     package_prefix = args.package.replace("-", "_")
     wheels = sorted(
-        wheel
-        for wheel in dist_dir.glob("*.whl")
-        if wheel.name.startswith(package_prefix)
+        wheel for wheel in dist_dir.glob("*.whl") if wheel.name.startswith(package_prefix)
     )
     sdists = sorted(
-        sdist
-        for sdist in dist_dir.glob("*.tar.gz")
-        if sdist.name.startswith(package_prefix)
+        sdist for sdist in dist_dir.glob("*.tar.gz") if sdist.name.startswith(package_prefix)
     )
 
     if not wheels:

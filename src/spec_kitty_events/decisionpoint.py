@@ -16,6 +16,7 @@ V1 changes (spec-kitty-events 4.0.0):
   - Reducer branches on origin_surface; idempotently absorbs duplicate Widened;
     detects origin_mismatch and invalid_transition (closed_locally_without_widening).
 """
+
 from __future__ import annotations
 
 from datetime import datetime
@@ -64,13 +65,15 @@ DECISION_POINT_DISCUSSING: str = "DecisionPointDiscussing"
 DECISION_POINT_RESOLVED: str = "DecisionPointResolved"
 DECISION_POINT_OVERRIDDEN: str = "DecisionPointOverridden"
 
-DECISION_POINT_EVENT_TYPES: FrozenSet[str] = frozenset({
-    DECISION_POINT_OPENED,
-    DECISION_POINT_WIDENED,
-    DECISION_POINT_DISCUSSING,
-    DECISION_POINT_RESOLVED,
-    DECISION_POINT_OVERRIDDEN,
-})
+DECISION_POINT_EVENT_TYPES: FrozenSet[str] = frozenset(
+    {
+        DECISION_POINT_OPENED,
+        DECISION_POINT_WIDENED,
+        DECISION_POINT_DISCUSSING,
+        DECISION_POINT_RESOLVED,
+        DECISION_POINT_OVERRIDDEN,
+    }
+)
 
 # ── Section 3: Enums (FR-001) ────────────────────────────────────────────────
 
@@ -101,29 +104,37 @@ _EVENT_TO_STATE: dict[str, DecisionPointState] = {
 # Allowed transitions: from_state -> set of valid to_states
 _ALLOWED_TRANSITIONS: dict[Optional[DecisionPointState], FrozenSet[DecisionPointState]] = {
     None: frozenset({DecisionPointState.OPEN}),
-    DecisionPointState.OPEN: frozenset({
-        DecisionPointState.WIDENED,
-        DecisionPointState.DISCUSSING,
-        DecisionPointState.RESOLVED,
-    }),
-    DecisionPointState.WIDENED: frozenset({
-        DecisionPointState.WIDENED,
-        DecisionPointState.DISCUSSING,
-        DecisionPointState.RESOLVED,
-    }),
-    DecisionPointState.DISCUSSING: frozenset({
-        DecisionPointState.DISCUSSING,
-        DecisionPointState.RESOLVED,
-    }),
+    DecisionPointState.OPEN: frozenset(
+        {
+            DecisionPointState.WIDENED,
+            DecisionPointState.DISCUSSING,
+            DecisionPointState.RESOLVED,
+        }
+    ),
+    DecisionPointState.WIDENED: frozenset(
+        {
+            DecisionPointState.WIDENED,
+            DecisionPointState.DISCUSSING,
+            DecisionPointState.RESOLVED,
+        }
+    ),
+    DecisionPointState.DISCUSSING: frozenset(
+        {
+            DecisionPointState.DISCUSSING,
+            DecisionPointState.RESOLVED,
+        }
+    ),
     DecisionPointState.RESOLVED: frozenset({DecisionPointState.OVERRIDDEN}),
     DecisionPointState.OVERRIDDEN: frozenset(),
 }
 
 # States that require human mission-owner authority
-_AUTHORITY_REQUIRED_STATES: FrozenSet[DecisionPointState] = frozenset({
-    DecisionPointState.RESOLVED,
-    DecisionPointState.OVERRIDDEN,
-})
+_AUTHORITY_REQUIRED_STATES: FrozenSet[DecisionPointState] = frozenset(
+    {
+        DecisionPointState.RESOLVED,
+        DecisionPointState.OVERRIDDEN,
+    }
+)
 
 # ── Section 4: Anomaly Model ─────────────────────────────────────────────────
 
@@ -230,9 +241,9 @@ class _DecisionPointOpenedPayloadFactory:
         )
 
     @staticmethod
-    def model_validate(obj: Any) -> Union[
-        DecisionPointOpenedAdrPayload, DecisionPointOpenedInterviewPayload
-    ]:
+    def model_validate(
+        obj: Any,
+    ) -> Union[DecisionPointOpenedAdrPayload, DecisionPointOpenedInterviewPayload]:
         if isinstance(obj, dict) and "origin_surface" not in obj:
             obj = {**obj, "origin_surface": OriginSurface.ADR.value}
         return cast(
@@ -349,9 +360,9 @@ class _DecisionPointDiscussingPayloadFactory:
         )
 
     @staticmethod
-    def model_validate(obj: Any) -> Union[
-        DecisionPointDiscussingAdrPayload, DecisionPointDiscussingInterviewPayload
-    ]:
+    def model_validate(
+        obj: Any,
+    ) -> Union[DecisionPointDiscussingAdrPayload, DecisionPointDiscussingInterviewPayload]:
         if isinstance(obj, dict) and "origin_surface" not in obj:
             obj = {**obj, "origin_surface": OriginSurface.ADR.value}
         return cast(
@@ -466,9 +477,9 @@ class _DecisionPointResolvedPayloadFactory:
         )
 
     @staticmethod
-    def model_validate(obj: Any) -> Union[
-        DecisionPointResolvedAdrPayload, DecisionPointResolvedInterviewPayload
-    ]:
+    def model_validate(
+        obj: Any,
+    ) -> Union[DecisionPointResolvedAdrPayload, DecisionPointResolvedInterviewPayload]:
         if isinstance(obj, dict) and "origin_surface" not in obj:
             obj = {**obj, "origin_surface": OriginSurface.ADR.value}
         return cast(
@@ -659,20 +670,24 @@ def reduce_decision_point_events(
         # Determine target state from event type
         target_state = _EVENT_TO_STATE.get(event_type)
         if target_state is None:
-            anomalies.append(DecisionPointAnomaly(
-                kind="malformed_payload",
-                event_id=event_id,
-                message=f"Unknown event type in DecisionPoint family: {event_type!r}",
-            ))
+            anomalies.append(
+                DecisionPointAnomaly(
+                    kind="malformed_payload",
+                    event_id=event_id,
+                    message=f"Unknown event type in DecisionPoint family: {event_type!r}",
+                )
+            )
             continue
 
         # Check: event after terminal (overridden)
         if current_state == DecisionPointState.OVERRIDDEN:
-            anomalies.append(DecisionPointAnomaly(
-                kind="event_after_terminal",
-                event_id=event_id,
-                message=f"Event {event_type!r} arrived after terminal state 'overridden'",
-            ))
+            anomalies.append(
+                DecisionPointAnomaly(
+                    kind="event_after_terminal",
+                    event_id=event_id,
+                    message=f"Event {event_type!r} arrived after terminal state 'overridden'",
+                )
+            )
             continue
 
         # Idempotent Widened: before transition check, absorb duplicate silently
@@ -685,14 +700,16 @@ def reduce_decision_point_events(
         # Check: valid transition
         allowed = _ALLOWED_TRANSITIONS.get(current_state, frozenset())
         if target_state not in allowed:
-            anomalies.append(DecisionPointAnomaly(
-                kind="invalid_transition",
-                event_id=event_id,
-                message=(
-                    f"Invalid transition: {current_state.value if current_state else 'None'} "
-                    f"-> {target_state.value}"
-                ),
-            ))
+            anomalies.append(
+                DecisionPointAnomaly(
+                    kind="invalid_transition",
+                    event_id=event_id,
+                    message=(
+                        f"Invalid transition: {current_state.value if current_state else 'None'} "
+                        f"-> {target_state.value}"
+                    ),
+                )
+            )
             continue
 
         # Parse payload using appropriate adapter or class.
@@ -700,10 +717,7 @@ def reduce_decision_point_events(
         # discriminated union, default to "adr" so 3.x payloads still validate.
         payload_handler = _EVENT_TO_PAYLOAD[event_type]
         parse_dict = payload_dict
-        if (
-            isinstance(payload_handler, TypeAdapter)
-            and "origin_surface" not in payload_dict
-        ):
+        if isinstance(payload_handler, TypeAdapter) and "origin_surface" not in payload_dict:
             parse_dict = {**payload_dict, "origin_surface": OriginSurface.ADR.value}
         try:
             if isinstance(payload_handler, TypeAdapter):
@@ -711,11 +725,13 @@ def reduce_decision_point_events(
             else:
                 payload = payload_handler.model_validate(parse_dict)
         except Exception as exc:
-            anomalies.append(DecisionPointAnomaly(
-                kind="malformed_payload",
-                event_id=event_id,
-                message=f"Payload validation failed for {event_type!r}: {exc}",
-            ))
+            anomalies.append(
+                DecisionPointAnomaly(
+                    kind="malformed_payload",
+                    event_id=event_id,
+                    message=f"Payload validation failed for {event_type!r}: {exc}",
+                )
+            )
             continue
 
         # Origin surface tracking: detect mismatch across events for same decision_point_id
@@ -724,76 +740,88 @@ def reduce_decision_point_events(
             if origin_surface_seen is None:
                 origin_surface_seen = event_origin_surface
             elif origin_surface_seen != event_origin_surface:
-                anomalies.append(DecisionPointAnomaly(
-                    kind="origin_mismatch",
-                    event_id=event_id,
-                    message=(
-                        f"Event origin_surface={event_origin_surface!r} differs from prior "
-                        f"{origin_surface_seen!r} for decision_point_id="
-                        f"{payload_dict.get('decision_point_id', '?')!r}"
-                    ),
-                ))
+                anomalies.append(
+                    DecisionPointAnomaly(
+                        kind="origin_mismatch",
+                        event_id=event_id,
+                        message=(
+                            f"Event origin_surface={event_origin_surface!r} differs from prior "
+                            f"{origin_surface_seen!r} for decision_point_id="
+                            f"{payload_dict.get('decision_point_id', '?')!r}"
+                        ),
+                    )
+                )
                 # still apply the event per spec
 
         # Authority policy check for resolved/overridden (FR-003)
         # Apply only to ADR variants (which have authority_role field)
-        is_adr_variant = isinstance(payload, (
-            DecisionPointOpenedAdrPayload,
-            DecisionPointDiscussingAdrPayload,
-            DecisionPointResolvedAdrPayload,
-            DecisionPointOverriddenPayload,
-        ))
+        is_adr_variant = isinstance(
+            payload,
+            (
+                DecisionPointOpenedAdrPayload,
+                DecisionPointDiscussingAdrPayload,
+                DecisionPointResolvedAdrPayload,
+                DecisionPointOverriddenPayload,
+            ),
+        )
         if target_state in _AUTHORITY_REQUIRED_STATES and is_adr_variant:
             if (
                 payload.actor_type != "human"
                 or payload.authority_role != DecisionAuthorityRole.MISSION_OWNER
                 or not payload.mission_owner_authority_flag
             ):
-                anomalies.append(DecisionPointAnomaly(
-                    kind="authority_policy_violation",
-                    event_id=event_id,
-                    message=(
-                        f"{event_type!r} requires actor_type='human', "
-                        f"authority_role='mission_owner', and "
-                        f"mission_owner_authority_flag=True; got "
-                        f"actor_type={payload.actor_type!r}, "
-                        f"authority_role={payload.authority_role.value!r}, "
-                        f"mission_owner_authority_flag={payload.mission_owner_authority_flag!r}"
-                    ),
-                ))
+                anomalies.append(
+                    DecisionPointAnomaly(
+                        kind="authority_policy_violation",
+                        event_id=event_id,
+                        message=(
+                            f"{event_type!r} requires actor_type='human', "
+                            f"authority_role='mission_owner', and "
+                            f"mission_owner_authority_flag=True; got "
+                            f"actor_type={payload.actor_type!r}, "
+                            f"authority_role={payload.authority_role.value!r}, "
+                            f"mission_owner_authority_flag={payload.mission_owner_authority_flag!r}"
+                        ),
+                    )
+                )
                 continue
 
         # LLM policy check (FR-003) — ADR variants only
         if is_adr_variant and payload.actor_type == "llm":
             if payload.phase != "P0":
-                anomalies.append(DecisionPointAnomaly(
-                    kind="llm_policy_violation",
-                    event_id=event_id,
-                    message=(
-                        f"LLM actor only allowed in phase='P0'; "
-                        f"got phase={payload.phase!r}"
-                    ),
-                ))
+                anomalies.append(
+                    DecisionPointAnomaly(
+                        kind="llm_policy_violation",
+                        event_id=event_id,
+                        message=(
+                            f"LLM actor only allowed in phase='P0'; got phase={payload.phase!r}"
+                        ),
+                    )
+                )
                 continue
             if payload.authority_role not in (
                 DecisionAuthorityRole.ADVISORY,
                 DecisionAuthorityRole.INFORMED,
             ):
-                anomalies.append(DecisionPointAnomaly(
-                    kind="llm_policy_violation",
-                    event_id=event_id,
-                    message=(
-                        f"LLM actor must have advisory or informed role; "
-                        f"got authority_role={payload.authority_role.value!r}"
-                    ),
-                ))
+                anomalies.append(
+                    DecisionPointAnomaly(
+                        kind="llm_policy_violation",
+                        event_id=event_id,
+                        message=(
+                            f"LLM actor must have advisory or informed role; "
+                            f"got authority_role={payload.authority_role.value!r}"
+                        ),
+                    )
+                )
                 continue
             if payload.mission_owner_authority_flag:
-                anomalies.append(DecisionPointAnomaly(
-                    kind="llm_policy_violation",
-                    event_id=event_id,
-                    message="LLM actor must not carry mission-owner authority",
-                ))
+                anomalies.append(
+                    DecisionPointAnomaly(
+                        kind="llm_policy_violation",
+                        event_id=event_id,
+                        message="LLM actor must not carry mission-owner authority",
+                    )
+                )
                 continue
 
         # Apply transition
@@ -903,7 +931,9 @@ def reduce_decision_point_events(
             mission_slug = payload.mission_slug
             mission_type = payload.mission_type
             last_state_entered_at = payload.state_entered_at
-            last_rationale = payload.rationale  # may be None for terminal=resolved; required for deferred/canceled
+            last_rationale = (
+                payload.rationale
+            )  # may be None for terminal=resolved; required for deferred/canceled
             proj_terminal_outcome = payload.terminal_outcome
             proj_final_answer = payload.final_answer
             proj_other_answer = payload.other_answer
@@ -913,25 +943,29 @@ def reduce_decision_point_events(
             proj_closure_message = payload.closure_message
             # FR-009: summary is required when a widening event preceded Resolved.
             if proj_widening is not None and payload.summary is None:
-                anomalies.append(DecisionPointAnomaly(
-                    kind="missing_summary",
-                    event_id=event_id,
-                    message=(
-                        "DecisionPointResolved with origin=planning_interview requires "
-                        "summary when a prior DecisionPointWidened exists for this decision_point_id"
-                    ),
-                ))
+                anomalies.append(
+                    DecisionPointAnomaly(
+                        kind="missing_summary",
+                        event_id=event_id,
+                        message=(
+                            "DecisionPointResolved with origin=planning_interview requires "
+                            "summary when a prior DecisionPointWidened exists for this decision_point_id"
+                        ),
+                    )
+                )
             # closed_locally_while_widened: validate against widening state
             if payload.closed_locally_while_widened:
                 if proj_widening is None:
-                    anomalies.append(DecisionPointAnomaly(
-                        kind="invalid_transition",
-                        event_id=event_id,
-                        message=(
-                            f"closed_locally_while_widened=True without prior DecisionPointWidened "
-                            f"(event_id={event_id!r})"
-                        ),
-                    ))
+                    anomalies.append(
+                        DecisionPointAnomaly(
+                            kind="invalid_transition",
+                            event_id=event_id,
+                            message=(
+                                f"closed_locally_while_widened=True without prior DecisionPointWidened "
+                                f"(event_id={event_id!r})"
+                            ),
+                        )
+                    )
                     proj_closed_locally_while_widened = False
                 else:
                     proj_closed_locally_while_widened = True

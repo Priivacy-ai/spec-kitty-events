@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import pytest
 
 from spec_kitty_events.conformance.loader import load_fixtures, load_replay_stream
 from spec_kitty_events.conformance.validators import validate_event
@@ -70,7 +69,9 @@ class TestMissionNextConformanceInvalid:
 
     def test_missing_question(self) -> None:
         fixtures = load_fixtures("mission_next")
-        case = next(f for f in fixtures if f.id == "mission-next-decision-requested-missing-question")
+        case = next(
+            f for f in fixtures if f.id == "mission-next-decision-requested-missing-question"
+        )
         result = validate_event(case.payload, case.event_type, strict=True)
         assert not result.valid
 

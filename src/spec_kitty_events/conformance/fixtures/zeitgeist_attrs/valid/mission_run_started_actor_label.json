@@ -1,0 +1,32 @@
+{
+  "event_type": "MissionRunStarted",
+  "envelope": {
+    "event_id": "e2e00000-0000-4000-8000-000000000008",
+    "timestamp": "2026-08-25T09:00:00+00:00"
+  },
+  "payload": {
+    "run_id": "run-01",
+    "mission_type": "software-dev",
+    "actor": {
+      "actor_id": "actor-01",
+      "actor_type": "llm",
+      "display_name": "Ox Alpha",
+      "provider": "anthropic",
+      "model": "ox-alpha",
+      "tool": "claude-code"
+    },
+    "mission_id": "mission-demo",
+    "mission_slug": "demo-mission"
+  },
+  "expected_attrs": {
+    "event_id": "e2e00000-0000-4000-8000-000000000008",
+    "occurred_at": "2026-08-25T09:00:00+00:00",
+    "run_id": "run-01",
+    "mission_type": "software-dev",
+    "actor": "actor-01",
+    "mission_id": "mission-demo",
+    "mission_slug": "demo-mission"
+  },
+  "expected_ref": "run-01",
+  "notes": "RuntimeActorIdentity projects to its opaque actor_id as the single actor label — display_name/provider/model/tool are free text or producer-asserted identity and never ride the relay (the relay attests the actor itself). mission_id/mission_slug are optional identity keys the live CLI emitter injects post-hoc; they ride as identifiers."
+}

@@ -1,4 +1,5 @@
 """Build-time JSON Schema generation script for spec-kitty-events models."""
+
 from __future__ import annotations
 
 import argparse
@@ -26,6 +27,8 @@ from spec_kitty_events.lifecycle import (
     MissionCancelledPayload,
     PhaseEnteredPayload,
     ReviewRollbackPayload,
+    MissionReopenedPayload,
+    FollowUpRecordedPayload,
 )
 from spec_kitty_events.project_lifecycle import (
     PlanCompletedPayload,
@@ -37,7 +40,7 @@ from spec_kitty_events.project_lifecycle import (
     TasksStartedPayload,
     WPCreatedPayload,
 )
-from spec_kitty_events.cutover import CutoverArtifact
+from spec_kitty_events.harness_observation import HarnessObservationPayload
 from spec_kitty_events.gates import (
     GatePassedPayload,
     GateFailedPayload,
@@ -127,14 +130,6 @@ from spec_kitty_events.connector import (
     UserDisconnectedPayload,
     UserConnectionStatus,
 )
-from spec_kitty_events.sync import (
-    SyncIngestAcceptedPayload,
-    SyncIngestRejectedPayload,
-    SyncRetryScheduledPayload,
-    SyncDeadLetteredPayload,
-    SyncReplayCompletedPayload,
-    ExternalReferenceLinkedPayload,
-)
 from spec_kitty_events.profile_invocation import (
     ProfileInvocationStartedPayload,
 )
@@ -158,6 +153,11 @@ from spec_kitty_events.retrospective import (
 # Schema directory (same directory as this script)
 SCHEMA_DIR = Path(__file__).parent
 
+# Package root -- support_matrix.json lives beside the schemas/ subpackage,
+# not inside it (draft §3.4: "published copy: src/spec_kitty_events/support_matrix.json").
+PACKAGE_DIR = SCHEMA_DIR.parent
+SUPPORT_MATRIX_PATH = PACKAGE_DIR / "support_matrix.json"
+
 # Registry of models to generate schemas for
 PYDANTIC_MODELS: List[tuple[str, Type[BaseModel]]] = [
     ("event", Event),
@@ -171,6 +171,10 @@ PYDANTIC_MODELS: List[tuple[str, Type[BaseModel]]] = [
     ("mission_cancelled_payload", MissionCancelledPayload),
     ("phase_entered_payload", PhaseEnteredPayload),
     ("review_rollback_payload", ReviewRollbackPayload),
+    ("mission_reopened_payload", MissionReopenedPayload),
+    ("follow_up_recorded_payload", FollowUpRecordedPayload),
+    # HarnessObservation vocabulary (F1-T1, 7.0.0)
+    ("harness_observation_payload", HarnessObservationPayload),
     # Canonical project / artifact / WP lifecycle event contracts
     ("project_initialized_payload", ProjectInitializedPayload),
     ("specify_started_payload", SpecifyStartedPayload),
@@ -236,7 +240,6 @@ PYDANTIC_MODELS: List[tuple[str, Type[BaseModel]]] = [
     ("mission_audit_decision_requested_payload", MissionAuditDecisionRequestedPayload),
     ("mission_audit_completed_payload", MissionAuditCompletedPayload),
     ("mission_audit_failed_payload", MissionAuditFailedPayload),
-    ("cutover_artifact", CutoverArtifact),
     # DecisionPoint shared models (V1 / 4.0.0)
     ("summary_block", SummaryBlock),
     ("teamspace_ref", TeamspaceRef),
@@ -257,13 +260,6 @@ PYDANTIC_MODELS: List[tuple[str, Type[BaseModel]]] = [
     ("user_connected_payload", UserConnectedPayload),
     ("user_disconnected_payload", UserDisconnectedPayload),
     ("user_connection_status", UserConnectionStatus),
-    # Sync lifecycle contracts (2.7.0)
-    ("sync_ingest_accepted_payload", SyncIngestAcceptedPayload),
-    ("sync_ingest_rejected_payload", SyncIngestRejectedPayload),
-    ("sync_retry_scheduled_payload", SyncRetryScheduledPayload),
-    ("sync_dead_lettered_payload", SyncDeadLetteredPayload),
-    ("sync_replay_completed_payload", SyncReplayCompletedPayload),
-    ("external_reference_linked_payload", ExternalReferenceLinkedPayload),
     # Profile invocation contracts (3.1.0)
     ("profile_invocation_started_payload", ProfileInvocationStartedPayload),
     # Retrospective contracts (4.1.0)
@@ -406,6 +402,25 @@ def write_all_schemas(schemas: Dict[str, Dict[str, Any]]) -> None:
         write_schema_file(name, schema)
 
 
+def generate_support_matrix_json() -> str:
+    """Canonical JSON serialization of `spec_kitty_events.strict.SUPPORT_MATRIX`.
+
+    Delegates to `strict._support_matrix_canonical_json()` so there is one
+    formatter, not two copies of the same `json.dumps(..., sort_keys=True)`
+    call that could silently diverge.
+    """
+    from spec_kitty_events.strict import _support_matrix_canonical_json
+
+    return _support_matrix_canonical_json()
+
+
+def write_support_matrix_json() -> None:
+    """Write the published support_matrix.json package-data copy."""
+    content = generate_support_matrix_json()
+    SUPPORT_MATRIX_PATH.write_text(content, encoding="utf-8")
+    print(f"Generated {SUPPORT_MATRIX_PATH}")
+
+
 def check_drift() -> int:
     """Check if generated schemas match committed files.
 
@@ -442,11 +457,26 @@ def check_drift() -> int:
         print(f"Orphaned schema {orphan}", file=sys.stderr)
         drift_detected = True
 
+    # support_matrix.json (draft §3.4): generated, not hand-authored, and
+    # covered by this same --check gate so it can never silently go stale.
+    expected_support_matrix = generate_support_matrix_json()
+    if not SUPPORT_MATRIX_PATH.exists():
+        print(f"ERROR: Missing support matrix file: {SUPPORT_MATRIX_PATH}", file=sys.stderr)
+        drift_detected = True
+    else:
+        actual_support_matrix = SUPPORT_MATRIX_PATH.read_text(encoding="utf-8")
+        if actual_support_matrix != expected_support_matrix:
+            print(
+                f"ERROR: support_matrix.json drift detected at {SUPPORT_MATRIX_PATH}",
+                file=sys.stderr,
+            )
+            drift_detected = True
+
     if drift_detected:
         print("\nSchema drift detected. Run without --check to regenerate.", file=sys.stderr)
         return 1
 
-    print(f"All {len(schemas)} schemas are up to date.")
+    print(f"All {len(schemas)} schemas and support_matrix.json are up to date.")
     return 0
 
 
@@ -471,7 +501,8 @@ def main() -> int:
 
     schemas = generate_all_schemas()
     write_all_schemas(schemas)
-    print(f"\nSuccessfully generated {len(schemas)} schemas.")
+    write_support_matrix_json()
+    print(f"\nSuccessfully generated {len(schemas)} schemas and support_matrix.json.")
     return 0
 
 

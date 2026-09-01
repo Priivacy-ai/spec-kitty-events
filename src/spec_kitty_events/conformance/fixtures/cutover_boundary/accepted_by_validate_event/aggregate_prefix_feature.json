@@ -1,0 +1,23 @@
+{
+  "event_id": "01J00000000000000000000001",
+  "event_type": "MissionCreated",
+  "aggregate_id": "feature/123",
+  "payload": {
+    "mission_id": "01J0000000000000000000MS1",
+    "mission_slug": "fixture-mission",
+    "mission_number": 1,
+    "mission_type": "software-dev",
+    "target_branch": "main",
+    "wp_count": 3,
+    "friendly_name": "Fixture Mission",
+    "purpose_tldr": "Boundary fixture: forbidden legacy aggregate prefix feature/.",
+    "purpose_context": "Identical to the envelope_valid_canonical MissionCreated baseline except that aggregate_id uses the legacy 'feature' prefix. The prefix check shipped with the cutover artifact and was removed from validate_event in 8.0.0, so validate_event accepts this envelope; the strict profile rejects it (FORBIDDEN_AGGREGATE_NAME) -- the rule re-homed onto that profile per issue #10."
+  },
+  "timestamp": "2026-01-01T00:00:00+00:00",
+  "build_id": "build-2026-01-01-fixture",
+  "node_id": "fixture-node",
+  "lamport_clock": 1,
+  "correlation_id": "01J0000000000000000000CR01",
+  "project_uuid": "00000000-0000-0000-0000-000000000001",
+  "schema_version": "3.0.0"
+}

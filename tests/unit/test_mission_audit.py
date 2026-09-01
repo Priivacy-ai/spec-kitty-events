@@ -4,6 +4,7 @@ Covers T009: payload validation (round-trip, required fields, Literal constraint
 Field constraints, enum validation, AuditArtifactRef composition, frozen immutability,
 PendingDecision construction).
 """
+
 from __future__ import annotations
 
 import pytest
@@ -30,6 +31,7 @@ from spec_kitty_events.mission_audit import (
 
 # ── Shared fixtures ────────────────────────────────────────────────────────────
 
+
 def _make_content_hash_ref() -> ContentHashRef:
     return ContentHashRef(hash="abcdef1234567890", algorithm="sha256")
 
@@ -47,6 +49,7 @@ def _make_artifact_ref() -> AuditArtifactRef:
 
 
 # ── 1. Payload round-trips ─────────────────────────────────────────────────────
+
 
 def test_requested_payload_round_trip() -> None:
     original = MissionAuditRequestedPayload(
@@ -146,6 +149,7 @@ def test_failed_payload_round_trip() -> None:
 
 # ── 2. Required field rejection ────────────────────────────────────────────────
 
+
 def test_requested_payload_missing_mission_id_raises() -> None:
     with pytest.raises(ValidationError):
         MissionAuditRequestedPayload(  # type: ignore[call-arg]
@@ -218,6 +222,7 @@ def test_started_payload_missing_audit_scope_hash_raises() -> None:
 
 # ── 3. Literal constraint rejection ───────────────────────────────────────────
 
+
 def test_invalid_trigger_mode_raises() -> None:
     with pytest.raises(ValidationError):
         MissionAuditRequestedPayload(
@@ -250,6 +255,7 @@ def test_invalid_enforcement_mode_raises() -> None:
 
 # ── 4. Field constraint rejection ─────────────────────────────────────────────
 
+
 def test_negative_findings_count_raises() -> None:
     with pytest.raises(ValidationError):
         MissionAuditCompletedPayload(
@@ -281,6 +287,7 @@ def test_empty_mission_id_raises() -> None:
 
 
 # ── 5. Enum validation ─────────────────────────────────────────────────────────
+
 
 def test_invalid_audit_verdict_raises() -> None:
     with pytest.raises(ValidationError):
@@ -320,6 +327,7 @@ def test_invalid_audit_status_raises() -> None:
 
 # ── 6. AuditArtifactRef composition ───────────────────────────────────────────
 
+
 def test_audit_artifact_ref_round_trip() -> None:
     content_hash = _make_content_hash_ref()
     provenance = _make_provenance_ref()
@@ -335,6 +343,7 @@ def test_audit_artifact_ref_round_trip() -> None:
 
 
 # ── 7. Frozen immutability ─────────────────────────────────────────────────────
+
 
 def test_requested_payload_is_frozen() -> None:
     payload = MissionAuditRequestedPayload(
@@ -395,6 +404,7 @@ def test_reduced_state_is_frozen() -> None:
 
 # ── 8. PendingDecision construction ───────────────────────────────────────────
 
+
 def test_pending_decision_construction() -> None:
     pd = PendingDecision(
         decision_id="dec-001",
@@ -412,6 +422,7 @@ def test_pending_decision_construction() -> None:
 
 # ── 9. ReducedMissionAuditState defaults ──────────────────────────────────────
 
+
 def test_reduced_state_defaults() -> None:
     state = ReducedMissionAuditState()
     assert state.audit_status == AuditStatus.PENDING
@@ -423,6 +434,7 @@ def test_reduced_state_defaults() -> None:
 
 
 # ── 10. Constants ──────────────────────────────────────────────────────────────
+
 
 def test_mission_audit_event_types_count() -> None:
     assert len(MISSION_AUDIT_EVENT_TYPES) == 5

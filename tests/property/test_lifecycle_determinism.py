@@ -19,7 +19,6 @@ from spec_kitty_events.lifecycle import (
     MissionStartedPayload,
     MissionStatus,
     PhaseEnteredPayload,
-    ReducedMissionState,
     reduce_lifecycle_events,
 )
 from spec_kitty_events.models import Event
@@ -141,17 +140,13 @@ def _build_test_mission_sequence(
     return events
 
 
-def _shuffle_preserving_causal_order(
-    events: List[Event], rng: random.Random
-) -> List[Event]:
+def _shuffle_preserving_causal_order(events: List[Event], rng: random.Random) -> List[Event]:
     """Shuffle events while preserving causal order (Lamport clock)."""
     from itertools import groupby
 
     groups = []
     sorted_events = sorted(events, key=lambda e: e.lamport_clock)
-    for _clock, group_iter in groupby(
-        sorted_events, key=lambda e: e.lamport_clock
-    ):
+    for _clock, group_iter in groupby(sorted_events, key=lambda e: e.lamport_clock):
         group = list(group_iter)
         rng.shuffle(group)
         groups.append(group)

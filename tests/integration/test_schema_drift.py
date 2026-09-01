@@ -1,11 +1,11 @@
 """Integration tests for schema generation and drift detection."""
+
 from __future__ import annotations
 
 import subprocess
 import sys
 from pathlib import Path
 
-import pytest
 
 # V1 schemas added in spec-kitty-events 4.0.0
 _V1_REQUIRED_SCHEMAS = [
@@ -66,9 +66,7 @@ def test_schema_drift_check_detects_modification() -> None:
         capture_output=True,
         text=True,
     )
-    assert (
-        verify_result.returncode == 0
-    ), f"Schema restoration failed: {verify_result.stderr}"
+    assert verify_result.returncode == 0, f"Schema restoration failed: {verify_result.stderr}"
 
 
 def test_schema_drift_check_detects_orphaned_file() -> None:

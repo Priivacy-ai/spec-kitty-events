@@ -3,6 +3,7 @@
 Covers: constant values, enum members, payload validation, mandatory fields,
 and frozen model immutability.
 """
+
 from __future__ import annotations
 
 import uuid
@@ -51,15 +52,17 @@ class TestConstants:
 
     def test_event_types_frozenset(self) -> None:
         assert isinstance(CONNECTOR_EVENT_TYPES, frozenset)
-        assert CONNECTOR_EVENT_TYPES == frozenset({
-            "ConnectorProvisioned",
-            "ConnectorHealthChecked",
-            "ConnectorDegraded",
-            "ConnectorRevoked",
-            "ConnectorReconnected",
-            "UserConnected",
-            "UserDisconnected",
-        })
+        assert CONNECTOR_EVENT_TYPES == frozenset(
+            {
+                "ConnectorProvisioned",
+                "ConnectorHealthChecked",
+                "ConnectorDegraded",
+                "ConnectorRevoked",
+                "ConnectorReconnected",
+                "UserConnected",
+                "UserDisconnected",
+            }
+        )
         assert len(CONNECTOR_EVENT_TYPES) == 7
 
     def test_schema_version(self) -> None:
@@ -188,38 +191,44 @@ class TestPayloadValidation:
         assert p.previous_state == ConnectorState.REVOKED
         assert p.reconnect_strategy == ReconnectStrategy.AUTOMATIC
 
-    @pytest.mark.parametrize("missing_field", [
-        "connector_id",
-        "connector_type",
-        "provider",
-        "mission_id",
-        "project_uuid",
-        "actor_id",
-        "actor_type",
-        "endpoint_url",
-        "recorded_at",
-        "credentials_ref",
-        "config_hash",
-    ])
+    @pytest.mark.parametrize(
+        "missing_field",
+        [
+            "connector_id",
+            "connector_type",
+            "provider",
+            "mission_id",
+            "project_uuid",
+            "actor_id",
+            "actor_type",
+            "endpoint_url",
+            "recorded_at",
+            "credentials_ref",
+            "config_hash",
+        ],
+    )
     def test_provisioned_missing_mandatory_field_raises(self, missing_field: str) -> None:
         data = _provisioned_payload()
         del data[missing_field]
         with pytest.raises(ValidationError):
             ConnectorProvisionedPayload.model_validate(data)
 
-    @pytest.mark.parametrize("missing_field", [
-        "connector_id",
-        "connector_type",
-        "provider",
-        "mission_id",
-        "project_uuid",
-        "actor_id",
-        "actor_type",
-        "endpoint_url",
-        "recorded_at",
-        "health_status",
-        "latency_ms",
-    ])
+    @pytest.mark.parametrize(
+        "missing_field",
+        [
+            "connector_id",
+            "connector_type",
+            "provider",
+            "mission_id",
+            "project_uuid",
+            "actor_id",
+            "actor_type",
+            "endpoint_url",
+            "recorded_at",
+            "health_status",
+            "latency_ms",
+        ],
+    )
     def test_health_checked_missing_mandatory_field_raises(self, missing_field: str) -> None:
         data = _health_checked_payload()
         del data[missing_field]

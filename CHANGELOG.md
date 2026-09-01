@@ -7,6 +7,628 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [9.1.6] - 2026-09-01
+
+### Changed
+
+- No behavior change. Strict-typing fixes so `mypy --strict` (the public
+  release acceptance gate) passes: `zeitgeist_attrs` summary helpers now
+  read subclass payload fields via `getattr` (matching `_decision_summary`'s
+  existing idiom), and the packaged conformance test imports
+  `RuntimeActorIdentity` from its defining module with explicit callable
+  typing. Packaging: added `[project.urls]`; README license section now
+  states MIT (matching LICENSE and the classifier).
+
+## [9.1.5] - 2026-08-31
+
+### Fixed
+
+- Decode now rewrites a noncanonically-spelled derived `detail_ref` to the
+  canonical `event_id` spelling, keeping decoded `VolatileMoment` attrs
+  self-consistent (follow-up to the `9.1.2` decode guard; see
+  COMPATIBILITY.md "decoded detail refs follow canonical event IDs",
+  EXPERIMENTAL-spec-kitty-events#223).
+
+### Changed
+
+- Factored the ISO-8601/RFC-3339 timestamp shape-normalization helper
+  (previously byte-identical across `strict.py`, `retrospective.py`, and
+  `conformance/timestamp_semantics.py`) out into a private `_iso8601`
+  module. No behavior change: each module re-exports it under its existing
+  local name, so consumer imports are unaffected
+  (EXPERIMENTAL-spec-kitty-events#143).
+
+## [9.1.4] - 2026-08-30
+
+### Added
+
+- A packaged `zeitgeist_attrs` conformance fixture now rejects an inbound
+  `OpsInvocationStarted` frame missing its required derived `detail_ref`
+  attr, covering the decode requirement introduced with the Ops Invocation
+  moment contracts (EXPERIMENTAL-spec-kitty-events#192).
+
+## [9.1.3] - 2026-08-30
+
+### Fixed
+
+- `to_zeitgeist_attrs` now checks a contract-versioned payload's
+  `contract_version` against `KNOWN_CONTRACT_VERSIONS_BY_EVENT_TYPE` before
+  encoding, using the same `UnknownContractVersionError` as decode. A
+  producer on this version can no longer emit an Ops Invocation frame that
+  this same version refuses to decode
+  (EXPERIMENTAL-spec-kitty-events#191).
+
+## [9.1.0] - 2026-08-30
+
+### Added
+
+- Ops/Invocations bounded moment contracts: `OpsInvocationStarted` and
+  `OpsInvocationCompleted` join the volatile vocabulary so operations can
+  share the Team Kitty timeline with missions without reusing mission event
+  kinds (EXPERIMENTAL-spec-kitty-events#78). Each payload carries a stable
+  `invocation_id`, `action`, a projected `actor` label, a bounded `scope`,
+  an `attempt` counter for retry correlation, an explicit `contract_version`
+  (default `1`), and an optional unbroadcast `request_summary` /
+  `result_summary` that folds into the derived, bounded `summary` attr;
+  `OpsInvocationCompleted` additionally carries a required `outcome`
+  (`success`/`failure`). Both kinds derive an opaque `detail_ref` attr
+  (`"<event_type>:<event_id>"`) via the new `DETAIL_REF_SOURCE_EVENT_TYPES`
+  mechanism, first implementing the previously-reserved `DETAIL_REF_SYNTAX`.
+  `invocation_id` + `attempt` together express start/completion/retry
+  correlation and idempotency: a stable `invocation_id` ties every attempt
+  of the same logical invocation together, while `attempt` disambiguates
+  retries of the same invocation.
+- `from_zeitgeist_attrs` now validates a decoded kind's `contract_version`
+  attr against a new `KNOWN_CONTRACT_VERSIONS_BY_EVENT_TYPE` table (via the
+  new, generic `CONTRACT_VERSIONED_EVENT_TYPES` opt-in mechanism) and raises
+  the new `UnknownContractVersionError` on a version this package does not
+  know how to interpret, rather than silently misinterpreting a future
+  payload-shape revision's attrs. Currently opted in by the two Ops
+  Invocation kinds only; existing kinds are unaffected.
+- Nine new golden `zeitgeist_attrs` conformance fixtures cover the Ops
+  Invocation kinds: minimal/with-summary/retry-attempt Started, success/
+  failure-with-summary Completed, a multibyte 240-byte truncation boundary,
+  an over-bound raw field, an unknown `contract_version`, and a missing
+  required `outcome` key.
+
+This is explicitly post-MVP scope only: the CLI emitter, SaaS view, and
+detail-read service that would resolve a `detail_ref` are not implemented
+here.
+
+## [9.1.1] - 2026-08-30
+
+### Fixed
+
+- `_parse_iso8601` (`strict.py`, backing the packaged/exported
+  `validate_strict_envelope`), `_assert_iso8601_timestamp` (`retrospective.py`),
+  and `_extract_envelope_timestamp` (the packaged conformance helper
+  `timestamp_semantics.py`) now reshape a timestamp's fractional-second
+  digit count, basic/extended format, reduced time precision, and numeric
+  offset before calling `datetime.fromisoformat`, so those ISO-8601
+  spellings parse identically on Python 3.10 and 3.11+ instead of
+  splitting by interpreter (EXPERIMENTAL-spec-kitty-events#135, the mirror
+  of #122's rejection-split fix at these three sibling call sites).
+
+## [9.0.2] - 2026-08-29
+
+### Fixed
+
+- `strict.validate_strict_envelope`, the retrospective payload validators,
+  and the conformance timestamp helper now reject a doubled trailing `Z`
+  case-insensitively. A malformed mixed-case value such as
+  `...00zZ` can no longer be normalized into a form that some supported
+  interpreters accept (EXPERIMENTAL-spec-kitty-events#124).
+
+### Fixed
+
+- `COMPATIBILITY.md`'s `8.0.0` migration recipe for callers outside
+  `strict.STRICT_EVENT_TYPES` no longer crashes on a present-but-null (or
+  otherwise non-string) `aggregate_id`. The third check used
+  `record.get("aggregate_id", "").split("/", 1)[0]`, whose default only
+  applies when the key is *absent* — a wire record carrying
+  `aggregate_id: null` still raised `AttributeError` instead of mirroring
+  `strict.py`'s own `isinstance(aggregate_id, str)` guard, which treats a
+  non-string as not-forbidden rather than raising
+  (EXPERIMENTAL-spec-kitty-events#93, MINOR from PR #84 pass 2).
+- `from_zeitgeist_attrs`'s docstring no longer claims "values are not
+  reparsed here" as a blanket statement — `event_id` and `occurred_at` are
+  reparsed (via `normalize_event_id` and `datetime.fromisoformat`
+  respectively); the opacity claim now scopes to payload values only, with
+  the two envelope-sourced exceptions stated. Also dropped the two
+  unreachable-false `is not None` presence guards around that reparsing:
+  `event_id`/`occurred_at` are unconditionally required for every event
+  type (`ENVELOPE_ATTR_KEYS` is unioned into every kind's required keys),
+  so the earlier missing-keys check always raises first when either is
+  absent (EXPERIMENTAL-spec-kitty-events#67, consolidating the same defect
+  class as #61).
+- Added a `make test-floor` target (Python 3.10, the version `pyproject.toml`'s
+  `requires-python = ">=3.10"` promises) and wired it into `make test-full`, so
+  version-sensitive regression guards actually run on the declared support
+  floor. GitHub Actions are off programme-wide, so the `.github/workflows/`
+  3.10/3.11/3.12 matrix never runs; without this, a guard that only has teeth
+  on 3.10 (e.g. a trailing-Z `datetime` normalization that 3.12 accepts
+  unaided) could pass on the default interpreter while being dead code on the
+  floor, and a later refactor could delete it with the suite staying green
+  (EXPERIMENTAL-spec-kitty-events#123). This supersedes the narrower
+  `make test-full-310` lane added for #141, which ran only the
+  timestamp-parsing test files on 3.10 — `test-floor` runs the whole suite on
+  3.10, a strict superset, so that lane and its `TIMESTAMP_PARSING_TESTS` list
+  were removed as of this change to avoid running the same tests on 3.10
+  twice.
+- `test-floor` now runs in its own `UV_PROJECT_ENVIRONMENT` (`.venv-floor`)
+  instead of the default `.venv`. `uv run --python 3.10` replaces whatever
+  `.venv` it is pointed at, so with `test-full: test-floor` sharing the
+  default `.venv`, `test-floor` running first silently downgraded
+  `test-full`'s own coverage recipe to 3.10 too — dropping default-interpreter
+  coverage from `test-full` entirely, the opposite of the intended "3.10 as
+  well as the default interpreter" (squad finding on PR #130).
+- `from_zeitgeist_attrs` now enforces the same `event_id`/`occurred_at`
+  contract the envelope itself guarantees, instead of the weaker
+  emptiness/parses-at-all checks closing #28 left behind
+  (EXPERIMENTAL-spec-kitty-events#62). `event_id` must match one of the
+  three shapes `normalize_event_id` accepts (26-char Crockford-base32 ULID,
+  36-char hyphenated UUID, 32-char bare hex UUID) and is canonicalized to
+  its normalized case in the returned `VolatileMoment.attrs`, so two
+  spellings of the same id dedupe identically; `occurred_at` must parse as
+  ISO-8601 *and* be timezone-aware, since the encoder only ever emits an
+  aware `datetime`'s `isoformat()` and every downstream comparison (the
+  72-hour feed window, the staleness guard) is against an aware "now".
+- **Known gap, not yet closed**: `to_zeitgeist_attrs` does not yet reject a
+  value carrying a non-printable character (`not str.isprintable()`) on
+  encode, even though `from_zeitgeist_attrs` already rejects one on decode
+  (EXPERIMENTAL-spec-kitty-events#64). Until this closes, a producer whose
+  `actor`/`review_ref`/id field carries a stray control character can
+  broadcast successfully while a consumer's decode raises, silently
+  dropping the moment. The fix — encode failing closed with the same
+  `ZeitgeistAttrsControlCharacterError` decode already raises, before that
+  attrs dict reaches the relay — is open as
+  EXPERIMENTAL-spec-kitty-events#104 and not yet merged to `main`; this
+  bullet moves under a dated release heading, in past tense, once #104
+  lands.
+
+## [9.0.1] - 2026-08-29
+
+### Fixed
+
+- `zeitgeist_ref_for` now rejects a derived `ref` carrying control
+  characters, matching the check the module's decode side
+  (`from_zeitgeist_attrs`) already applies to attrs values
+  (EXPERIMENTAL-spec-kitty-events#106). The frame's `ref` is derived from
+  the same slug/id fields (`mission_slug`, `run_id`, ...) that ride as
+  attrs values, so it was the one field this module emits that a producer
+  could still smuggle a control character through unchecked.
+
+## [9.0.0] - 2026-08-28
+
+### Breaking
+
+- **`StatusTransitionPayload` (`WPStatusChanged`) and `MissionClosedPayload`
+  (`MissionClosed`) now accept a `mission_id` key in their `zeitgeist_attrs`
+  projection that every `<9.0.0` decode of these two families rejected as
+  unknown.** `from_zeitgeist_attrs`'s closed key vocabulary for a kind is
+  derived from its payload model's fields (`_schema_keys_for_model`); before
+  this release neither model declared `mission_id`, so a `<9.0.0` consumer's
+  decode of an attrs frame carrying that key raised
+  `ZeitgeistAttrsError("attrs carry keys outside the ... schema")` instead of
+  decoding it. This is exactly the "previously-rejected envelope now
+  accepted" case `contracts/versioning-and-compatibility.md` classifies as
+  major, regardless of the change being additive at the Pydantic-model
+  level — the accept/reject *boundary* moved, and consumers pinned to the
+  previous major fail closed on the new key the moment a producer emits it.
+  `MissionCreatedPayload` is unaffected by this classification: it already
+  declared `mission_id` before this release (prior, unrelated work), so its
+  decode boundary already admitted the key — this bump only widens
+  `StatusTransitionPayload`/`MissionClosedPayload`.
+  `REF_FIELD_BY_EVENT_TYPE` itself is unchanged — `PhaseEntered` keeps
+  `mission_id` as its ref and the other three keep `mission_slug` as
+  theirs; only the attrs vocabulary widens
+  (EXPERIMENTAL-spec-kitty-events#69, resolving
+  EXPERIMENTAL-spec-kitty-planning#1012, squad MAJOR on PR #196).
+
+### Added
+
+- `StatusTransitionPayload` (`WPStatusChanged`) and `MissionClosedPayload`
+  (`MissionClosed`) now declare an optional `mission_id` field (default
+  `None`). When a producer populates it, `mission_id` rides alongside
+  `mission_slug` in the `to_zeitgeist_attrs` projection for all three
+  mission-scoped families, so a consumer can join one of their moments
+  against a `PhaseEntered` moment (whose frame ref is `mission_id`) for the
+  same mission aggregate.
+- `tests/unit/test_zeitgeist_attrs.py::test_head_encode_rejected_by_previous_major_decode_boundary`
+  pins the breaking boundary directly: it encodes `mission_id` onto both
+  families with this release's models, then decodes the identical attrs
+  against a reconstructed `<9.0.0` closed key set and asserts the decode
+  raises — a durable regression guard against re-additivizing this change.
+
+### Required consumer action
+
+Producers (`spec-kitty`, `spec-kitty-saas`) MUST capability-gate rollout of
+populating `mission_id` on `WPStatusChanged`/`MissionClosed` exactly like the
+`6.0.0` `genesis`-lane precedent: do not populate the field for a broadcast
+until every consumer that will read it has upgraded its
+`spec-kitty-events` pin to `>=9.0.0`. A producer that populates `mission_id`
+while any live consumer is still pinned `<9.0.0` causes that consumer's
+`from_zeitgeist_attrs` to raise on decode, silently dropping the moment
+(mirrors `contracts/lane-vocabulary.md`'s "Consumers cannot be assumed to be
+typed" rollout risk). Bump the `spec-kitty-events` constraint to `>=9.0.0`
+before relying on the new key; omitting `mission_id` remains fully
+compatible with every prior major.
+
+Per `PROGRAM.md` §2: bump the pinned rev/version in every consumer that adopts
+`9.0.0` and name each one in that PR's Blast radius section.
+
+## [8.2.1] - 2026-08-27
+
+### Breaking
+
+- **Attrs keys are rejected when any dot-separated segment is forbidden, on
+  both encode and decode.** Before PR #139, `_forbidden_key_hits` checked only
+  an exact key or its trailing segment, so a key such as `token.sub`,
+  `url.href`, `team.name`, or `a.token.b` passed even though it contained a
+  member of `FORBIDDEN_ATTR_KEYS`. Starting at implementation commit
+  `d18a67a` (merged as `1e21a29`), every segment is scanned and those shapes
+  raise the existing forbidden-key error instead. This security fix is a
+  breaking accept/reject-boundary widening under
+  `contracts/versioning-and-compatibility.md`: envelopes that previously
+  encoded and decoded successfully are now rejected
+  (EXPERIMENTAL-spec-kitty-events#133; documentation follow-up #208).
+
+  The package still declared `8.2.1` when this took effect. That version had
+  already been declared at earlier trees, so the exact pin is the only
+  unambiguous historical boundary; the later `9.0.0` bump belongs to the
+  unrelated `mission_id` widening and must not be read as this fix's original
+  release. Consumers moving an exact git pin across `1e21a29` must remove or
+  rename attrs whose dot segments match `FORBIDDEN_ATTR_KEYS` before rollout.
+
+### Changed
+
+- At the original version-declaration commit, bumped the patch version only —
+  no source-code change. PR #139 later changed behavior while the package
+  still declared `8.2.1`; the `### Breaking` entry above records that distinct
+  exact-commit boundary. `8.2.0` had been
+  declared at two distinct trees on `main`: the commit three consumers had
+  already adopted (`c93dbfbf`, pinned by `EXPERIMENTAL-spec-kitty`,
+  `-saas`, and `-zeitgeist`), and a later repo-wide `ruff format` pass
+  (`b67b7e0`) that also carried a real behaviour change to
+  `from_zeitgeist_attrs`'s `event_id` handling — validated against the
+  three `normalize_event_id` shapes and rewritten in the decoded output,
+  instead of only rejected when empty and passed through verbatim. Per
+  `PROGRAM.md` §2 ("a shared package's version number is spent once"),
+  `8.2.0` keeps its single adopted meaning at `c93dbfbf`; every tree from
+  `b67b7e0` onward is `8.2.1` (EXPERIMENTAL-spec-kitty-events#170).
+
+### Known issues
+
+- **Not yet closed**: `to_zeitgeist_attrs` does not reject a value
+  carrying a non-printable character (`not str.isprintable()`) on encode,
+  even though `from_zeitgeist_attrs` already rejects one on decode
+  (EXPERIMENTAL-spec-kitty-events#64). Until this closes, a producer whose
+  `actor`/`review_ref`/id field carries a stray control character can
+  broadcast successfully while a consumer's decode raises, silently
+  dropping the moment. This bullet moves to `### Fixed`, in past tense,
+  once #64's encode-side check lands.
+
+## [8.2.0] - 2026-08-27
+
+### Added
+
+- Bounded moment-attribute projections for `DecisionPointOpened`,
+  `DecisionPointResolved`, the `Specify`/`Plan`/`Tasks` `Started`/`Completed`
+  lifecycle kinds, and a derived `summary` attr on `MissionCreated` and the
+  three artifact-lifecycle `*Completed` kinds (EXPERIMENTAL-spec-kitty-events#77).
+  `to_zeitgeist_attrs` now builds this `summary` attr, when the kind has one,
+  by joining a fixed, per-kind, deterministic sequence of source fields with
+  `"; "`; it is the one attr this module allows to carry short prose, and an
+  oversize `summary` is truncated (never rejected) to the 240-UTF-8-byte
+  bound with a trailing `"…"` marker, always split on a whole codepoint, and
+  omitted entirely rather than emitted empty when every source field is
+  blank. Every other attr keeps the module's existing fail-closed,
+  identifiers-only contract unchanged. `DecisionPointOpened`/
+  `DecisionPointResolved` reuse the existing discriminated-union payload
+  models unchanged (ADR vs. interview origin surfaces); `_schema_keys`/
+  `_required_schema_keys` now compute the union/intersection of allowed and
+  required keys across a kind's variants instead of assuming one payload
+  model per event type. 16 new golden fixtures (14 valid, 2 invalid) cover
+  max-boundary + multibyte truncation, missing optional prose, multiple
+  decision options, and round-trip decode for every newly-added event type.
+  `WPStatusChanged` is not given a `summary`: `StatusTransitionPayload` has
+  no bounded prose source field today, and adding one is out of scope for a
+  contract/projection-only change.
+
+### Fixed
+
+- `from_zeitgeist_attrs` now rejects an empty `event_id` and an
+  `occurred_at` that does not parse as ISO-8601, instead of decoding a
+  malformed envelope-sourced attr into a `VolatileMoment` a downstream
+  renderer would crash on or fail to dedupe
+  (EXPERIMENTAL-spec-kitty-events#28).
+- Keep E2 mission-run support-matrix `min_consumer_package` aligned with
+  `strict_since` and the conformance fixture `min_version` floor.
+- `zeitgeist_ref_for` now enforces `ZEITGEIST_ATTRS_MAX_BYTES` on the frame
+  `ref` it returns, matching the module's documented bound instead of
+  relying on every ref field also riding as a bounded attr value.
+- `PhaseEntered`'s frame `ref` now derives from the required `mission_id`
+  instead of the optional display/back-compat `mission_slug`, so a valid
+  payload without that compat field no longer loses identity on the relay.
+- **`zeitgeist_attrs` bounds now match zeitgeist's `EventArgs` schema**
+  (spec-kitty-events#16): the relay's schema bounds attrs keys at ≤64
+  *characters* and bounds values (and `ref`) at ≤240 characters **and**
+  independently at ≤240 UTF-8 bytes (`maxLength` and `maxUtf8Bytes: 240`
+  both present since zeitgeist commit `30d3ab4415`, closing zeitgeist#20).
+  The byte bound is the one that actually binds, since byte count is
+  always ≥ character count; `from_zeitgeist_attrs`'s existing UTF-8-byte
+  check on values now cites that schema as its authority. The
+  release-visible change is a new `ZEITGEIST_ATTR_KEY_MAX_CHARS = 64`
+  bound, now enforced on keys by both `to_zeitgeist_attrs` and
+  `from_zeitgeist_attrs`, which was previously unchecked (keys only went
+  through the 240-byte value scan).
+
+## [8.1.0] - 2026-08-26
+
+Reducer unification, step 1 of 3
+(EXPERIMENTAL-spec-kitty-events#41; milestone "Dossier hardening", Repo
+Dossier decision D): the CLI's status reducer moved into this package so the
+CLI and Team Kitty's repo dossier reduce `status.events.jsonl` with one
+implementation.
+
+### Added
+
+- **`spec_kitty_events.diary`** — the Spec Kitty status diary
+  (`status.events.jsonl`) contracts and the deterministic
+  diary → kanban-state reducer, moved verbatim from the CLI's
+  `specify_cli/status/{models,reducer}.py` (plus the pure halves of its
+  store/paths/mission-metadata helpers). Public entry points:
+  `reduce(events: Iterable[dict]) -> State` (raw wire rows in, reduced
+  state out), `parse_diary(rows) -> EventStream` (row partition), and
+  `reduce_parsed(transitions, annotations)` (the typed fold). Also reachable
+  as `spec_kitty_events.status.reduce` / `.State`.
+- Conformance fixtures `status_diary/replay/*.jsonl` with pinned golden
+  outputs (`*_output.json`): fresh mission, a WP through every display lane,
+  out-of-order + duplicate rows, and unknown non-lane event kinds ignored.
+  Loader helper: `load_reducer_output(fixture_id)`.
+- Row-partition contract, unchanged from the CLI store: `kind == "annotation"`
+  folds as an off-axis runtime-state annotation; an unknown `kind` fails loud
+  (`DiaryError`); rows carrying an `event_type` key or a `retrospective.*`
+  `event_name` are ignored in place — never fatal.
+
+### Changed
+
+- `Lane` in the diary module is declared `(str, Enum)` with an explicit
+  `__str__` instead of `enum.StrEnum`, because this package still supports
+  Python 3.10; the reducer's string snapshot slots are unchanged.
+- `State` serializes to exactly the shape the CLI writes as `status.json`,
+  minus the CLI-side `retrospective` attachment (computed by the CLI after
+  reduction).
+
+## [8.0.0] - 2026-08-25
+
+E2 (EXPERIMENTAL-spec-kitty-planning#3): the offline sync/replay story is
+deleted. The CLI→SaaS sync transport it served is no longer part of the
+design (see `design/ephemeral-team-status.html` in the planning repo) —
+mission/WP status reaches Team Kitty through each team's own Zeitgeist
+relay, not through this package's sync contracts.
+
+### Breaking
+
+- **Removed `spec_kitty_events.sync`** — `SYNC_*` constants,
+  `SyncIngest*`/`SyncRetryScheduled`/`SyncDeadLettered`/`SyncReplayCompleted`
+  and `ExternalReferenceLinked` payloads, `ReducedSyncState`,
+  `reduce_sync_events`, and their JSON schemas. It had no production
+  consumers.
+- **Removed `spec_kitty_events.legacy`** (`legacy_envelope_v1`):
+  `LegacyEnvelopeNormalizer`, `NormalizedEnvelope`,
+  `UnnormalizableLegacyDiagnostic`, `RECOGNIZED_LEGACY_SHAPES`. Legacy-shape
+  promotion was only ever consumed by the offline replay path.
+- **Removed `spec_kitty_events.cutover`**: `CUTOVER_ARTIFACT`,
+  `assert_canonical_cutover_signal`, and the rest of the artifact API.
+  Consequence for consumers of `validate_event`: the envelope-level
+  cutover gate (missing/wrong `schema_version`, forbidden legacy keys or
+  event/aggregate names) is gone from that function's result — envelopes
+  with a missing or non-canonical `schema_version="3.0.0"` signal can now
+  pass `validate_event` when their payload shape validates. Fail-closed
+  envelope gating still exists as the opt-in strict profile:
+  `spec_kitty_events.strict.validate_strict_envelope` enforces
+  `schema_version == "3.0.0"`, the recursive forbidden-key walk, and the
+  full envelope key set. The forbidden legacy aggregate-name prefixes the
+  gate also carried (`feature`, `feature_catalog`) are re-homed onto the
+  same profile — `strict.FORBIDDEN_LEGACY_AGGREGATE_NAMES` rejects them with
+  the new `FORBIDDEN_AGGREGATE_NAME` error code (issue #10) — so a strictly
+  validated live path fails closed on every legacy surface again.
+  `validate_event` itself stays lenient. The five conformance fixtures that
+  exercised the removed gate were deleted with it; the moved boundary is
+  pinned by `conformance/fixtures/cutover_boundary/`.
+- Removed fixture categories: `sync`, `legacy`, and the top-level `replay`
+  streams; `load_fixtures("sync")` now raises `ValueError`.
+- Consumers must pin `>=8.0.0`; there are no compatibility aliases.
+
+### Required consumer action
+
+Bump to `spec-kitty-events==8.0.0` in `spec-kitty` and `spec-kitty-saas`.
+Any code importing `spec_kitty_events.sync`, `.legacy`, or `.cutover`
+must be deleted or re-homed onto the strict profile / `forbidden_keys`
+modules.
+
+E2 (spec-kitty-rearchitecture): volatile mission/WP vocabulary + zeitgeist attrs codecs.
+
+### Changed
+
+- **Breaking:** the support matrix moved `WPStatusChanged`, `MissionCreated`,
+  `MissionClosed`, and `PhaseEntered` from `journal` to `volatile`
+  durability, and added six volatile rows for the mission-run family
+  (`MissionRunStarted`, `NextStepIssued`, `NextStepAutoCompleted`,
+  `DecisionInputRequested`, `DecisionInputAnswered`, `MissionRunCompleted`;
+  `introduced_in=2.3.0`). `SUPPORT_MATRIX` is now 30 rows (14 journal +
+  16 volatile) and `support_matrix_digest()` changed accordingly —
+  downstream candidates pinning the digest must re-pin.
+- The strict journal profile (`STRICT_EVENT_TYPES`, now 25 types) admits the
+  six mission-run types. `NextStepPlanned` stays excluded: its payload
+  contract is reserved. `validate_strict_envelope` therefore accepts
+  mission-run envelopes with `schema_version="3.0.0"`.
+- `RuntimeActorIdentity` and the six `mission_next` payload models now
+  reject unknown extra fields (`extra="forbid"`), matching every other
+  strict payload family; their generated JSON schemas gained
+  `additionalProperties: false`.
+
+### Added
+
+- `spec_kitty_events.zeitgeist_attrs`: the single owner of the mapping
+  between the volatile families and zeitgeist's bounded event-frame attrs
+  (`{str: str}`, ≤16 keys, ≤240 B per key/value, no forbidden keys).
+  `to_zeitgeist_attrs(payload, envelope)` projects a volatile payload onto
+  deterministic bounded attrs, leading with two envelope-sourced entries —
+  `event_id` (Team Kitty dedupes moments on it) and `occurred_at` (the
+  producer-declared occurrence time; relay receipt time carries neither).
+  `from_zeitgeist_attrs()` validates inbound attrs against the kind's
+  closed key vocabulary and returns a frozen `VolatileMoment`
+  (`kind`, `ref`, `attrs`). Encoding never truncates: an oversize value
+  raises instead, so that moment does not broadcast.
+- Moments are identifiers and transition facts only. Declared unbroadcast —
+  they stay in the local journal and are never part of any moment:
+  structured shapes (`StatusTransitionPayload.evidence`,
+  `DecisionInputRequestedPayload.options`) and free-text prose
+  (`friendly_name`, `purpose_tldr`, `purpose_context`, a decision's
+  `question` and `answer`, a forced transition's `reason`). Every family
+  carries its actor as one canonical label string under `actor`
+  (`actor_label`) — never as a field-for-field identity breakdown.
+- Conformance fixtures for both codec directions under
+  `conformance/fixtures/zeitgeist_attrs/` (13 valid goldens pinning exact
+  attrs bytes per volatile type, 4 invalid rejections), registered in
+  `manifest.json` under the new `zeitgeist_attrs` category.
+- `MissionCreatedPayload` and `MissionClosedPayload` gained an optional
+  plain-string `actor` (opaque identifier of who created/closed the
+  mission). Optional — not required — because producers built these
+  payloads without it before 8.0.0; requiring it would fail every in-flight
+  emission at upgrade. It rides under the moment's `actor` key so a
+  MissionCreated/Closed moment can say WHO (E2E-MVP §1.1).
+
+### Fixed (PR #11 fix round 3)
+
+- `RuntimeActorIdentity.actor_label` is exactly the required opaque
+  `actor_id`; it no longer falls back to `display_name`. The previous
+  display-name preference leaked free text onto the relay and made any
+  oversize `display_name` raise at the 240-byte bound, dropping the whole
+  moment. Goldens that pinned a display name now pin the actor id.
+- The six mission-run payloads (`MissionRunStarted`, `NextStepIssued`,
+  `NextStepAutoCompleted`, `DecisionInputRequested`,
+  `DecisionInputAnswered`, `MissionRunCompleted`) gained optional
+  `mission_id` / `mission_slug`. Without them, `extra="forbid"` rejected
+  every mission-run event the live CLI producer emits
+  (`specify_cli/sync/emitter.py` injects both keys post-hoc), breaking the
+  CLI→Teamspace ingress under both strict and lenient validation; both keys
+  now also ride/decode as moment identifiers.
+- `conformance/test_pyargs_entrypoint.py` excludes the `zeitgeist_attrs`
+  codec category from its event-fixture collection (those documents are
+  `{payload, expected_attrs}` codec specifications, not envelopes) and pins
+  the exclusion with a guard test: without it,
+  `pytest --pyargs spec_kitty_events.conformance` failed all 13 codec
+  entries while the in-repo suite stayed green.
+- Known consumer follow-up: spec-kitty-saas#73 — stray `mission_key` in
+  `apps/collaboration/tests/test_mission_next_conformance.py` (:24, :93,
+  :113) fails `extra_forbidden` against 8.0.0; drop it when bumping this
+  package there.
+
+## [7.0.0] - 2026-08-21
+
+F1-T1 (spec-kitty-rearchitecture, M1): strict journal profile + HarnessObservation.
+
+### Breaking
+
+- `MissionStartedPayload`, `MissionCompletedPayload`, `MissionCancelledPayload`,
+  `PhaseEnteredPayload`, and `ReviewRollbackPayload` now reject unknown extra
+  fields (`ConfigDict(extra="forbid")`; previously `frozen=True` only, so
+  extras were silently ignored). No field was renamed or removed. The
+  real spec-kitty producer output for `MissionStarted`/`PhaseEntered`/
+  `MissionCompleted` (which already sends `mission_slug`) stays valid,
+  because `mission_slug` is added to those three models (see `### Added`)
+  *before* this hardening lands.
+- `ValidationErrorCode` (closed enum) gains two members:
+  `UNKNOWN_EVENT_TYPE`, `UNSUPPORTED_SCHEMA_VERSION`. Any code that
+  exhaustively matches on `ValidationErrorCode` values must handle them.
+
+### Added
+
+- `spec_kitty_events.strict`: `STRICT_PROFILE_ID` (`"journal/v1"`),
+  `STRICT_ENVELOPE_KEYS` (the 14 `Event` fields, all required present
+  under the strict profile — nullable ones as explicit `null`),
+  `STRICT_EVENT_TYPES` (19 admitted event types), `STRICT_TIMESTAMP_RULES`,
+  and `validate_strict_envelope(record)` — a pure, deterministic,
+  collect-all structured validator over a raw envelope dict. `Event`
+  itself is unchanged and stays lenient; this is an opt-in profile for
+  new producers/readers (the forthcoming F2 journal writer/reader, D1
+  projector, Z1 client).
+- `spec_kitty_events.harness_observation`: a new, volatile
+  `HarnessObservation` event family. `ObservationKind` (closed, six
+  members: `presence`, `lane_signal`, `focus_started`, `focus_heartbeat`,
+  `focus_paused`, `focus_ended`), `PAYLOAD_ID_BY_KIND` (total map to
+  `harness.<kind>.v1`), `HARNESS_OBSERVATION_PAYLOAD_IDS` (exactly six),
+  `FORBIDDEN_OBSERVATION_KEYS` (v1), and `HarnessObservationPayload`
+  (`extra="forbid"`, per-kind required/optional/forbidden field matrix).
+  No time/TTL/user/team identity field exists on the payload by design —
+  observations are never reduced into mission/WP state.
+- `mission_slug: Optional[str] = None` added to `MissionStartedPayload`,
+  `MissionCompletedPayload`, and `PhaseEnteredPayload` (display/back-compat
+  field; `mission_id` remains the identity) — matches the shape the live
+  spec-kitty producer (`sync/emitter.py` `emit_mission_started` /
+  `emit_phase_entered` / `emit_mission_completed`) already emits.
+- New JSON schema: `harness_observation_payload.schema.json`. Regenerated
+  `mission_started_payload`, `mission_completed_payload`,
+  `mission_cancelled_payload`, `phase_entered_payload`, and
+  `review_rollback_payload` schemas (`additionalProperties: false`; three
+  gain an optional `mission_slug` property).
+- `spec_kitty_events.strict.SupportRow` / `SUPPORT_MATRIX` (24 rows: 18
+  journal + 6 observation, exactly six payload IDs) and
+  `support_matrix_digest()` — the machine-readable support matrix
+  described in the F1 contract-freeze draft §3.4, generated to
+  `support_matrix.json` (package data) by `schemas/generate.py` and
+  covered by its `--check` drift gate. `MissionReopenedPayload` and
+  `FollowUpRecordedPayload` (6.1.0) previously had no committed JSON
+  schema (see the `[6.1.0]` entry below); both now do
+  (`mission_reopened_payload.schema.json`,
+  `follow_up_recorded_payload.schema.json`), since every support-matrix
+  row must have one.
+- Real fixture files for the `harness_observation` category
+  (`conformance/fixtures/harness_observation/{valid,invalid}/`, 11
+  fixtures) and a ninth conformance class, `envelope_strict_journal`
+  (`conformance/fixtures/class_taxonomy/envelope_strict_journal/`, 7
+  fixtures pinning the strict-profile-only negatives with an ordered
+  `expected_error_codes` list), plus a replay golden proving
+  `HarnessObservation` is never reduced into mission/WP state
+  (`conformance/fixtures/harness_observation/replay/`) and a built-wheel
+  content test (`tests/test_wheel_contents.py`).
+- README.md's `**Package Version**` line is now pinned to
+  `spec_kitty_events.__version__` by a regression test (same shape as
+  the pre-existing `COMPATIBILITY.md` pin).
+
+### Fixed
+
+- `pyproject.toml`'s `harness_observation/{valid,invalid,replay}`
+  package-data globs, added ahead of any matching file, now resolve —
+  the fixtures named above exist and are verified present in a real
+  built wheel by `tests/test_wheel_contents.py`.
+
+### Known gaps carried into this release (see `COMPATIBILITY.md`)
+
+- Replay/property-based reducer-determinism goldens R3 (timestamp
+  ordering invariance) and R4 (hypothesis permutation property test) are
+  not added; R1, R2, R5, R6 are covered.
+  (`tests/integration/test_lifecycle_replay.py`,
+  `tests/property/test_lifecycle_determinism.py`.)
+- T7 (re-running the timestamp-semantics consumer-substitution fixture
+  against a `HarnessObservation` envelope) is not added.
+- C5's dedicated mirror test (asserting the exact symbol list
+  spec-kitty's `tests/contract/spec_kitty_events_consumer/
+  test_consumer_contract.py` imports) is not added; the full suite
+  passing and `__init__.py`'s exports being purely additive is indirect,
+  not dedicated, evidence.
+- `contracts/README.md` table rows for the new module/contract are not
+  updated.
+- Local-appender canonicalization (the `.kittify/canonical-events.jsonl` /
+  `status.events.jsonl` rows written by
+  `spec-kitty/src/specify_cli/status/lifecycle_events.py`) is out of scope
+  for this package; those rows fail the strict profile today and are left
+  untouched (fixture-backed: `class_taxonomy/envelope_strict_journal/
+  local_appender_envelope_5_0_0.json`, X10).
+
 ## [6.1.0] - 2026-06-14
 
 ### Added
@@ -325,7 +947,9 @@ To emit dossier events:
 ```python
 from spec_kitty_events import (
     MissionDossierArtifactIndexedPayload,
-    LocalNamespaceTuple, ArtifactIdentity, ContentHashRef,
+    LocalNamespaceTuple,
+    ArtifactIdentity,
+    ContentHashRef,
     MISSION_DOSSIER_ARTIFACT_INDEXED,
 )
 ```
@@ -337,6 +961,7 @@ To reduce a dossier event stream:
 
 ```python
 from spec_kitty_events import reduce_mission_dossier, NamespaceMixedStreamError
+
 try:
     state = reduce_mission_dossier(events)
 except NamespaceMixedStreamError:
@@ -529,6 +1154,7 @@ partition by namespace before calling `reduce_mission_dossier()`.
        PLANNED = "planned"
        DOING = "doing"
        ...
+
 
    # After:
    from spec_kitty_events import SyncLaneV1

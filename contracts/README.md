@@ -94,6 +94,7 @@ Load at runtime:
 
 ```python
 from spec_kitty_events.schemas import load_schema
+
 schema = load_schema("mission_audit_requested_payload")
 ```
 

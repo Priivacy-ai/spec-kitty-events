@@ -16,7 +16,6 @@ from spec_kitty_events.collaboration import (
     DRIVE_INTENT_SET,
     FOCUS_CHANGED,
     PARTICIPANT_JOINED,
-    PARTICIPANT_LEFT,
     PRESENCE_HEARTBEAT,
     PROMPT_STEP_EXECUTION_COMPLETED,
     PROMPT_STEP_EXECUTION_STARTED,
@@ -232,9 +231,7 @@ def _generate_10k_events() -> tuple[List[Event], Dict[str, ParticipantIdentity]]
                 "participant_id": pid,
                 "mission_id": _MISSION_ID,
                 "warning_id": warn_id,
-                "acknowledgement": rng.choice(
-                    ["continue", "hold", "reassign", "defer"]
-                ),
+                "acknowledgement": rng.choice(["continue", "hold", "reassign", "defer"]),
             }
         elif et == COMMENT_POSTED:
             comment_counter += 1

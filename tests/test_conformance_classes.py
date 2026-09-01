@@ -66,11 +66,7 @@ from spec_kitty_events.validation_errors import (
 # ---------------------------------------------------------------------------
 
 _FIXTURES_ROOT = (
-    Path(__file__).resolve().parents[1]
-    / "src"
-    / "spec_kitty_events"
-    / "conformance"
-    / "fixtures"
+    Path(__file__).resolve().parents[1] / "src" / "spec_kitty_events" / "conformance" / "fixtures"
 )
 _MANIFEST_PATH = _FIXTURES_ROOT / "manifest.json"
 
@@ -250,10 +246,7 @@ def _validate_envelope(envelope: Any) -> _ValidationOutcome:
                         details={"actual_type": type(value).__name__},
                     ),
                 )
-            if (
-                value not in _CANONICAL_LANE_VALUES
-                and value not in LANE_ALIASES
-            ):
+            if value not in _CANONICAL_LANE_VALUES and value not in LANE_ALIASES:
                 return _ValidationOutcome(
                     ok=False,
                     error=ValidationError(
@@ -410,8 +403,7 @@ def test_fixture_outcome_matches_expected(entry: ClassFixtureEntry) -> None:
 
     if entry.expected == "valid":
         assert outcome.ok, (
-            f"Fixture {entry.path} expected to validate but failed with "
-            f"{outcome.error!r}"
+            f"Fixture {entry.path} expected to validate but failed with {outcome.error!r}"
         )
         # Additionally assert the canonical fixture survives the real
         # public Event.model_validate entry point (envelope SSOT).
@@ -424,8 +416,7 @@ def test_fixture_outcome_matches_expected(entry: ClassFixtureEntry) -> None:
 
     # expected == "invalid"
     assert not outcome.ok, (
-        f"Fixture {entry.path} expected to be rejected but the validator "
-        f"accepted it."
+        f"Fixture {entry.path} expected to be rejected but the validator accepted it."
     )
     assert outcome.error is not None
     actual_code = outcome.error.code.value
@@ -496,9 +487,7 @@ def test_invalid_fixtures_have_expected_error_code() -> None:
         assert entry.expected_error_code is not None, (
             f"Invalid manifest entry {entry.id} missing expected_error_code."
         )
-        assert entry.expected_error_code in {
-            code.value for code in ValidationErrorCode
-        }, (
+        assert entry.expected_error_code in {code.value for code in ValidationErrorCode}, (
             f"Invalid manifest entry {entry.id} declares unknown error code "
             f"{entry.expected_error_code!r}."
         )

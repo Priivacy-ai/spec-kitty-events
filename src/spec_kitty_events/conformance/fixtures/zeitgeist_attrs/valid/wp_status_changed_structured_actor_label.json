@@ -1,0 +1,35 @@
+{
+  "event_type": "WPStatusChanged",
+  "envelope": {
+    "event_id": "e2e00000-0000-4000-8000-000000000002",
+    "timestamp": "2026-08-25T09:00:00+00:00"
+  },
+  "payload": {
+    "mission_slug": "demo-mission",
+    "wp_id": "WP02",
+    "from_lane": "claimed",
+    "to_lane": "in_progress",
+    "actor": {
+      "role": "implementer",
+      "profile": "ox-alpha"
+    },
+    "force": false,
+    "reason": null,
+    "execution_mode": "direct_repo",
+    "review_ref": null,
+    "evidence": null
+  },
+  "expected_attrs": {
+    "event_id": "e2e00000-0000-4000-8000-000000000002",
+    "occurred_at": "2026-08-25T09:00:00+00:00",
+    "mission_slug": "demo-mission",
+    "wp_id": "WP02",
+    "from_lane": "claimed",
+    "to_lane": "in_progress",
+    "actor": "ox-alpha",
+    "force": "false",
+    "execution_mode": "direct_repo"
+  },
+  "expected_ref": "demo-mission",
+  "notes": "Structured actor projects to the canonical actor_label string; decode is label-faithful, not dict-faithful."
+}

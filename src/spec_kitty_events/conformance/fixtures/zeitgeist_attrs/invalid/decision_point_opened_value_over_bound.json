@@ -1,0 +1,28 @@
+{
+  "event_type": "DecisionPointOpened",
+  "envelope": {
+    "event_id": "e2e00000-0000-4000-8000-000000000115",
+    "timestamp": "2026-08-25T09:00:00+00:00"
+  },
+  "payload": {
+    "decision_point_id": "ddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+    "mission_id": "mission-demo",
+    "run_id": "run-01",
+    "mission_slug": "demo-mission",
+    "mission_type": "software-dev",
+    "phase": "plan",
+    "actor_id": "actor-01",
+    "actor_type": "human",
+    "authority_role": "mission_owner",
+    "mission_owner_authority_flag": true,
+    "mission_owner_authority_path": "owner.path",
+    "rationale": "Need a caching layer to cut p95 latency.",
+    "alternatives_considered": ["Redis"],
+    "evidence_refs": ["bench-report-01"],
+    "state_entered_at": "2026-08-25T08:55:00+00:00",
+    "recorded_at": "2026-08-25T08:55:01+00:00"
+  },
+  "direction": "to",
+  "expected_error": "ZeitgeistAttrsOverflowError",
+  "notes": "A 243-byte decision_point_id exceeds the 240 B bound; encoding raises instead of truncating this identity field. The new bounded-summary mechanism only ever truncates the derived summary attr — every raw scalar field, on any new event type, still fails closed exactly like the pre-existing vocabulary."
+}

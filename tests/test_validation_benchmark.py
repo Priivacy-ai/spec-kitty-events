@@ -74,11 +74,7 @@ from spec_kitty_events.models import Event
 
 
 _FIXTURES_ROOT = (
-    Path(__file__).resolve().parents[1]
-    / "src"
-    / "spec_kitty_events"
-    / "conformance"
-    / "fixtures"
+    Path(__file__).resolve().parents[1] / "src" / "spec_kitty_events" / "conformance" / "fixtures"
 )
 _CLASS_TAXONOMY_ROOT = _FIXTURES_ROOT / "class_taxonomy"
 
@@ -130,10 +126,13 @@ def _validate_envelope(envelope: Any) -> bool:
         if field not in envelope:
             return False
 
-    if next(
-        find_forbidden_keys(envelope, forbidden=FORBIDDEN_LEGACY_KEYS),
-        None,
-    ) is not None:
+    if (
+        next(
+            find_forbidden_keys(envelope, forbidden=FORBIDDEN_LEGACY_KEYS),
+            None,
+        )
+        is not None
+    ):
         return False
 
     payload = envelope["payload"]
@@ -148,10 +147,7 @@ def _validate_envelope(envelope: Any) -> bool:
                 continue
             if not isinstance(value, str):
                 return False
-            if (
-                value not in _CANONICAL_LANE_VALUES
-                and value not in LANE_ALIASES
-            ):
+            if value not in _CANONICAL_LANE_VALUES and value not in LANE_ALIASES:
                 return False
 
     # Real Event model validation — the public envelope SSOT.

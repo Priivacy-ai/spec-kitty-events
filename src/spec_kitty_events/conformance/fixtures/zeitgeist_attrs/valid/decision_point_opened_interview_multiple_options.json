@@ -1,0 +1,49 @@
+{
+  "event_type": "DecisionPointOpened",
+  "envelope": {
+    "event_id": "e2e00000-0000-4000-8000-000000000102",
+    "timestamp": "2026-08-25T09:00:00+00:00"
+  },
+  "payload": {
+    "origin_surface": "planning_interview",
+    "decision_point_id": "dp-iv-01",
+    "mission_id": "mission-demo",
+    "run_id": "run-01",
+    "mission_slug": "demo-mission",
+    "mission_type": "software-dev",
+    "phase": "specify",
+    "origin_flow": "specify",
+    "question": "Which datastore should the mission use?",
+    "options": [
+      "Postgres",
+      "SQLite",
+      "DynamoDB"
+    ],
+    "input_key": "datastore-choice",
+    "step_id": "step-03",
+    "actor_id": "actor-01",
+    "actor_type": "human",
+    "state_entered_at": "2026-08-25T08:55:00+00:00",
+    "recorded_at": "2026-08-25T08:55:01+00:00"
+  },
+  "expected_attrs": {
+    "event_id": "e2e00000-0000-4000-8000-000000000102",
+    "occurred_at": "2026-08-25T09:00:00+00:00",
+    "origin_surface": "planning_interview",
+    "decision_point_id": "dp-iv-01",
+    "mission_id": "mission-demo",
+    "run_id": "run-01",
+    "mission_slug": "demo-mission",
+    "mission_type": "software-dev",
+    "phase": "specify",
+    "origin_flow": "specify",
+    "input_key": "datastore-choice",
+    "step_id": "step-03",
+    "actor_id": "actor-01",
+    "actor_type": "human",
+    "state_entered_at": "2026-08-25T08:55:00+00:00",
+    "summary": "Which datastore should the mission use?; Postgres, SQLite, DynamoDB"
+  },
+  "expected_ref": "dp-iv-01",
+  "notes": "Interview-origin Opened with three options: question/options stay local under their own names; the bounded summary joins question then every option, comma-separated, in declared order."
+}

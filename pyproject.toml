@@ -1,6 +1,6 @@
 [project]
 name = "spec-kitty-events"
-version = "6.1.0"
+version = "9.1.6"
 description = "Event log library with Lamport clocks and systematic error tracking"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -17,6 +17,10 @@ dependencies = [
     "pydantic>=2.0.0,<3.0.0",
     "python-ulid>=1.1.0",
 ]
+
+[project.urls]
+Homepage = "https://github.com/Priivacy-ai/spec-kitty-events"
+Changelog = "https://github.com/Priivacy-ai/spec-kitty-events/blob/main/CHANGELOG.md"
 
 [project.optional-dependencies]
 dev = [
@@ -42,6 +46,7 @@ license-files = ["LICENSE"]
 [tool.setuptools.package-data]
 spec_kitty_events = [
     "py.typed",
+    "support_matrix.json",
     "schemas/*.json",
     "conformance/fixtures/*.json",
     "conformance/README.md",
@@ -49,12 +54,12 @@ spec_kitty_events = [
     "conformance/fixtures/events/invalid/*.json",
     "conformance/fixtures/class_taxonomy/*/*.json",
     "conformance/fixtures/class_taxonomy/*/*/*.json",
+    "conformance/fixtures/cutover_boundary/*/*.json",
     "conformance/fixtures/lane_mapping/valid/*.json",
     "conformance/fixtures/lane_mapping/invalid/*.json",
     "conformance/fixtures/edge_cases/valid/*.json",
     "conformance/fixtures/edge_cases/invalid/*.json",
     "conformance/fixtures/edge_cases/replay/*.jsonl",
-    "conformance/fixtures/legacy/*.json",
     "conformance/fixtures/collaboration/valid/*.json",
     "conformance/fixtures/collaboration/invalid/*.json",
     "conformance/fixtures/glossary/valid/*.json",
@@ -77,18 +82,20 @@ spec_kitty_events = [
     "conformance/fixtures/connector/invalid/*.json",
     "conformance/fixtures/connector/replay/*.jsonl",
     "conformance/fixtures/connector/replay/*_output.json",
-    "conformance/fixtures/sync/valid/*.json",
-    "conformance/fixtures/sync/invalid/*.json",
-    "conformance/fixtures/sync/replay/*.jsonl",
-    "conformance/fixtures/sync/replay/*_output.json",
     "conformance/fixtures/profile_invocation/valid/*.json",
     "conformance/fixtures/profile_invocation/invalid/*.json",
     "conformance/fixtures/retrospective/valid/*.json",
     "conformance/fixtures/retrospective/invalid/*.json",
     "conformance/fixtures/analytics/valid/*.json",
     "conformance/fixtures/analytics/invalid/*.json",
-    "conformance/fixtures/replay/*.jsonl",
-    "conformance/fixtures/replay/*.json",
+    "conformance/fixtures/harness_observation/valid/*.json",
+    "conformance/fixtures/harness_observation/invalid/*.json",
+    "conformance/fixtures/harness_observation/replay/*.jsonl",
+    "conformance/fixtures/harness_observation/replay/*.json",
+    "conformance/fixtures/zeitgeist_attrs/valid/*.json",
+    "conformance/fixtures/zeitgeist_attrs/invalid/*.json",
+    "conformance/fixtures/status_diary/replay/*.jsonl",
+    "conformance/fixtures/status_diary/replay/*.json",
 ]
 
 [tool.pytest.ini_options]
@@ -97,6 +104,26 @@ python_files = "test_*.py"
 python_classes = "Test*"
 python_functions = "test_*"
 addopts = "--cov=src/spec_kitty_events --cov-report=term-missing --cov-report=html"
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+# .agents/skills/ holds symlinks into a local skills library (absolute paths,
+# not resolvable off their origin machine); `ruff format` walks Markdown for
+# embedded code fences by default and errors trying to read the dangling
+# links. Not part of this repo's own source or docs.
+extend-exclude = [".agents/"]
+
+[tool.ruff.lint]
+# Small, deliberate start (issue #12): syntax errors, pyflakes, and the
+# import/statement pycodestyle families. Widen only with a PR that says why.
+select = ["E4", "E7", "E9", "F"]
+
+[tool.ruff.lint.per-file-ignores]
+# __init__.py groups re-exports under section comments, with one constant
+# (LOCAL_ONLY_EVENT_TYPES) declared partway through; reordering to satisfy
+# E402 would scatter that structure for no behavioral gain.
+"src/spec_kitty_events/__init__.py" = ["E402"]
 
 [tool.mypy]
 python_version = "3.10"
@@ -130,4 +157,5 @@ dev = [
     "pytest-cov>=4.0.0",
     "hypothesis>=6.0.0",
     "jsonschema>=4.21.0,<5.0.0",
+    "ruff>=0.16,<0.17",
 ]

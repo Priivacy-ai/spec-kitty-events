@@ -2,6 +2,7 @@
 
 Tests: order independence (>=200 examples), idempotent dedup (>=200 examples).
 """
+
 from __future__ import annotations
 
 import uuid
@@ -208,9 +209,15 @@ def test_idempotent_dedup(original: list[Event]) -> None:
 # -- Property 3: Roster determinism with user events -------------------------
 
 # Pool with user-level events for roster-specific property testing.
-_USER_EVENT_POOL = [e for e in _VALID_EVENT_POOL if e.event_type in {
-    USER_CONNECTED, USER_DISCONNECTED,
-}]
+_USER_EVENT_POOL = [
+    e
+    for e in _VALID_EVENT_POOL
+    if e.event_type
+    in {
+        USER_CONNECTED,
+        USER_DISCONNECTED,
+    }
+]
 
 
 @given(st.lists(st.sampled_from(_VALID_EVENT_POOL), min_size=1, max_size=7))
@@ -220,7 +227,5 @@ def test_roster_determinism_with_user_events(events: list[Event]) -> None:
     from spec_kitty_events.status import status_event_sort_key
 
     result = reduce_connector_events(events)
-    canonical = reduce_connector_events(
-        sorted(events, key=status_event_sort_key)
-    )
+    canonical = reduce_connector_events(sorted(events, key=status_event_sort_key))
     assert result == canonical

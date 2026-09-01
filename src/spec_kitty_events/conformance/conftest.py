@@ -1,4 +1,5 @@
 """Shared pytest fixtures for conformance tests."""
+
 from __future__ import annotations
 
 import json
@@ -30,8 +31,10 @@ def fixture_cases(manifest: Dict[str, Any], fixtures_dir: Path) -> List[Dict[str
             continue
         fixture_path = fixtures_dir / entry["path"]
         payload: Any = json.loads(fixture_path.read_text(encoding="utf-8"))
-        cases.append({
-            **entry,
-            "payload": payload,
-        })
+        cases.append(
+            {
+                **entry,
+                "payload": payload,
+            }
+        )
     return cases

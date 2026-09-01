@@ -9,11 +9,12 @@ Covers:
 - V1-specific conformance: valid fixtures pass both schema and Pydantic (T021)
 - V1-specific conformance: invalid fixtures fail schema or Pydantic (T021)
 """
+
 from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 import pytest
 
@@ -23,10 +24,7 @@ from spec_kitty_events.conformance import (
     validate_event,
 )
 from spec_kitty_events.decisionpoint import (
-    DecisionPointDiscussingPayload,
-    DecisionPointOpenedPayload,
     DecisionPointOverriddenPayload,
-    DecisionPointResolvedPayload,
     DecisionPointWidenedPayload,
     DecisionPointResolvedInterviewPayload,
     _OPENED_ADAPTER,
@@ -45,11 +43,7 @@ _VALID_CASES = [c for c in _DP_CASES if c.expected_valid]
 _INVALID_CASES = [c for c in _DP_CASES if not c.expected_valid]
 
 _FIXTURES_DIR = (
-    Path(__file__).parent.parent
-    / "src"
-    / "spec_kitty_events"
-    / "conformance"
-    / "fixtures"
+    Path(__file__).parent.parent / "src" / "spec_kitty_events" / "conformance" / "fixtures"
 )
 
 # V1 fixture IDs (for targeted parametrize lists)
@@ -109,9 +103,7 @@ def test_invalid_fixture_fails_conformance(case: object) -> None:
 
     assert isinstance(case, FixtureCase)
     result = validate_event(case.payload, case.event_type, strict=True)
-    assert not result.valid, (
-        f"Fixture {case.id} should be invalid but passed validation"
-    )
+    assert not result.valid, f"Fixture {case.id} should be invalid but passed validation"
     assert len(result.model_violations) >= 1 or len(result.schema_violations) >= 1, (
         f"Fixture {case.id} is invalid but no violations were reported"
     )
@@ -175,9 +167,7 @@ def test_v1_invalid_fixture_count() -> None:
         ),
     ],
 )
-def test_replay_stream_validates_and_matches_golden(
-    stream_id: str, output_id: str
-) -> None:
+def test_replay_stream_validates_and_matches_golden(stream_id: str, output_id: str) -> None:
     """Each JSONL line validates; reducer output matches committed golden file."""
     raw = load_replay_stream(stream_id)
     # Validate each event's payload
@@ -199,9 +189,7 @@ def test_replay_stream_validates_and_matches_golden(
     )
 
     manifest = json.loads(_MANIFEST_PATH.read_text())
-    golden_entry = next(
-        (e for e in manifest["fixtures"] if e["id"] == output_id), None
-    )
+    golden_entry = next((e for e in manifest["fixtures"] if e["id"] == output_id), None)
     assert golden_entry is not None, f"Golden manifest entry not found: {output_id}"
     golden_path = FIXTURES_DIR / golden_entry["path"]
     assert golden_path.exists(), f"Golden file not found: {golden_path}"
@@ -257,9 +245,7 @@ def test_schema_drift(adapter_or_model: Any, schema_name: str) -> None:
 # ---------------------------------------------------------------------------
 
 
-@pytest.mark.parametrize(
-    "case", _V1_VALID_CASES, ids=[c.id for c in _V1_VALID_CASES]
-)
+@pytest.mark.parametrize("case", _V1_VALID_CASES, ids=[c.id for c in _V1_VALID_CASES])
 def test_v1_valid_fixture_passes_both_schema_and_pydantic(case: object) -> None:
     """Each V1 valid fixture must validate against its JSON Schema AND its Pydantic model."""
     from spec_kitty_events.conformance.loader import FixtureCase
@@ -292,8 +278,16 @@ def test_v1_valid_fixture_passes_both_schema_and_pydantic(case: object) -> None:
 
 @pytest.mark.parametrize(
     "case",
-    [c for c in _V1_INVALID_CASES if c.id != "decisionpoint-v1-resolved-interview-deferred-with-final-answer"],
-    ids=[c.id for c in _V1_INVALID_CASES if c.id != "decisionpoint-v1-resolved-interview-deferred-with-final-answer"],
+    [
+        c
+        for c in _V1_INVALID_CASES
+        if c.id != "decisionpoint-v1-resolved-interview-deferred-with-final-answer"
+    ],
+    ids=[
+        c.id
+        for c in _V1_INVALID_CASES
+        if c.id != "decisionpoint-v1-resolved-interview-deferred-with-final-answer"
+    ],
 )
 def test_v1_invalid_fixture_fails_schema(case: object) -> None:
     """Each V1 invalid fixture (except cross-field case) must fail schema or Pydantic validation."""
@@ -301,9 +295,7 @@ def test_v1_invalid_fixture_fails_schema(case: object) -> None:
 
     assert isinstance(case, FixtureCase)
     result = validate_event(case.payload, case.event_type, strict=True)
-    assert not result.valid, (
-        f"V1 fixture {case.id} should be invalid but passed validation"
-    )
+    assert not result.valid, f"V1 fixture {case.id} should be invalid but passed validation"
     assert len(result.model_violations) >= 1 or len(result.schema_violations) >= 1, (
         f"V1 fixture {case.id} is invalid but no violations were reported"
     )

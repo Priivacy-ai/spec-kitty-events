@@ -210,9 +210,7 @@ def test_C_004_status_transition_baseline_validates_against_committed_schema() -
         (SCHEMA_DIR / "status_transition_payload.schema.json").read_text(encoding="utf-8")
     )
     # Drop None fields that the schema may not accept under default JSON shapes.
-    instance = {
-        k: v for k, v in _baseline_status_transition().items() if v is not None
-    }
+    instance = {k: v for k, v in _baseline_status_transition().items() if v is not None}
     Draft202012Validator(schema).validate(instance)
 
 

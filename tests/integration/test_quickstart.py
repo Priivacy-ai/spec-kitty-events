@@ -1,4 +1,5 @@
 """Validation tests for quickstart.md examples."""
+
 import uuid
 from datetime import datetime
 from typing import List
@@ -95,7 +96,7 @@ class TestQuickstartExamples:
         # Step 2: Initialize Lamport Clock
         clock = LamportClock(
             node_id="alice-laptop",  # Unique stable ID for this node
-            storage=InMemoryClockStorage()
+            storage=InMemoryClockStorage(),
         )
 
         assert clock.current() == 0  # Starting clock
@@ -214,7 +215,7 @@ class TestQuickstartExamples:
                 lamport_clock=5,
                 project_uuid=TEST_PROJECT_UUID,
                 correlation_id=tag_corr_id,
-            )
+            ),
         ]
         merged_tags = merge_gset(tag_events)
         assert merged_tags == {"urgent", "backend"}
@@ -245,7 +246,7 @@ class TestQuickstartExamples:
                 lamport_clock=5,
                 project_uuid=TEST_PROJECT_UUID,
                 correlation_id=counter_corr_id,
-            )
+            ),
         ]
         merged_count = merge_counter(counter_events)
         assert merged_count == 4
@@ -255,13 +256,15 @@ class TestQuickstartExamples:
         error_log = ErrorLog(storage=InMemoryErrorStorage())
 
         # Log error when agent fails
-        error_log.log_error(ErrorEntry(
-            timestamp=datetime.now(),
-            action_attempted="Run pytest tests/test_merge.py",
-            error_message="AssertionError: Expected 'doing', got 'for_review'",
-            resolution="Fixed priority map (was reversed)",
-            agent="codex"
-        ))
+        error_log.log_error(
+            ErrorEntry(
+                timestamp=datetime.now(),
+                action_attempted="Run pytest tests/test_merge.py",
+                error_message="AssertionError: Expected 'doing', got 'for_review'",
+                resolution="Fixed priority map (was reversed)",
+                agent="codex",
+            )
+        )
 
         # Retrieve errors (most recent first)
         recent_errors = error_log.get_recent_errors(limit=5)

@@ -33,6 +33,7 @@ dmypy.json
 
 # Environments
 .venv/
+.venv-floor/
 venv/
 ENV/
 env/
@@ -47,7 +48,9 @@ env/
 # Agent directories (managed locally, may contain credentials)
 .claude/commands/
 .codex/
-uv.lock
+
+# uv.lock is committed (issue #8): `make test-full` must resolve identically
+# on every machine. Do not re-ignore it.
 
 # Added by Spec Kitty CLI (auto-managed)
 .claude/

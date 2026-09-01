@@ -61,10 +61,22 @@ class ValidationErrorCode(str, Enum):
     """
 
     FORBIDDEN_KEY = "FORBIDDEN_KEY"
+    # Added by 8.0.0 (issue #10): the forbidden legacy aggregate-name prefix
+    # rule re-homed from the deleted cutover artifact onto the strict
+    # profile. A dedicated code, not FORBIDDEN_KEY: that code is documented
+    # as a hit of the recursive KEY walker, while this one is a value-prefix
+    # finding on the envelope's ``aggregate_id``.
+    FORBIDDEN_AGGREGATE_NAME = "FORBIDDEN_AGGREGATE_NAME"
     UNKNOWN_LANE = "UNKNOWN_LANE"
     PAYLOAD_SCHEMA_FAIL = "PAYLOAD_SCHEMA_FAIL"
     ENVELOPE_SHAPE_INVALID = "ENVELOPE_SHAPE_INVALID"
     RAW_HISTORICAL_ROW = "RAW_HISTORICAL_ROW"
+    # Added by F1-T1 (spec_kitty_events.strict, 7.0.0): compatibility classes
+    # a consumer must be able to route on without string-matching exception
+    # text (today spec-kitty-saas matches "Unknown event type:" — see
+    # apps/sync/cutover_contract.py:368,437 in spec-kitty-saas).
+    UNKNOWN_EVENT_TYPE = "UNKNOWN_EVENT_TYPE"
+    UNSUPPORTED_SCHEMA_VERSION = "UNSUPPORTED_SCHEMA_VERSION"
 
 
 class ValidationError(BaseModel):

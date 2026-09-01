@@ -1,0 +1,9 @@
+{
+  "event_type": "MissionOriginBound",
+  "attrs": {
+    "mission_slug": "x"
+  },
+  "direction": "from",
+  "expected_error": "UnknownVolatileEventTypeError",
+  "notes": "Only the volatile vocabulary decodes; journal families have no attrs codec and fail closed."
+}

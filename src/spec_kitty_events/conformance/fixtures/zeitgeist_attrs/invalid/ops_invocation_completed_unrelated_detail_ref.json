@@ -1,0 +1,18 @@
+{
+  "event_type": "OpsInvocationCompleted",
+  "attrs": {
+    "event_id": "e2e00000-0000-4000-8000-000000000209",
+    "occurred_at": "2026-08-25T09:06:00+00:00",
+    "invocation_id": "inv-01",
+    "action": "team.provision",
+    "actor": "actor-01",
+    "scope": "scope-01",
+    "attempt": "1",
+    "contract_version": "1",
+    "outcome": "success",
+    "detail_ref": "OpsInvocationCompleted:e2e00000-0000-4000-8000-000000000199"
+  },
+  "direction": "from",
+  "expected_error": "ZeitgeistAttrsError",
+  "notes": "detail_ref is mechanically derived from the moment's own event type and event_id; decode rejects a wire frame that points it at another event (events#190)."
+}

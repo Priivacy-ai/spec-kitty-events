@@ -1,0 +1,13 @@
+{
+  "anomalies": [],
+  "current_phase": "tasks",
+  "mission_id": "M-R1",
+  "mission_status": "completed",
+  "mission_type": "software-dev",
+  "phases_entered": [
+    "specify",
+    "plan",
+    "tasks"
+  ],
+  "wp_states": {}
+}

@@ -1,0 +1,8 @@
+{
+  "kind": "lane_signal",
+  "harness": "codex",
+  "session_id": "sess-def456",
+  "mission_slug": "f1-t1-strict-journal",
+  "wp_id": "WP01",
+  "lane": "in_review"
+}

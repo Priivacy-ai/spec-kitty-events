@@ -7,6 +7,7 @@ Covers spec §7.6 conformance categories:
 - Round-trip schema conformance
 - Canonical reducer output snapshot regression
 """
+
 from __future__ import annotations
 
 import json
@@ -32,6 +33,7 @@ _INVALID_CASES = [c for c in _DOSSIER_CASES if not c.expected_valid]
 def test_valid_fixture_passes_conformance(case: object) -> None:
     """All valid dossier fixtures must pass dual-layer conformance validation."""
     from spec_kitty_events.conformance.loader import FixtureCase
+
     assert isinstance(case, FixtureCase)
     result = validate_event(case.payload, case.event_type, strict=True)
     assert result.valid, (
@@ -45,15 +47,12 @@ def test_valid_fixture_passes_conformance(case: object) -> None:
 def test_invalid_fixture_fails_conformance(case: object) -> None:
     """All invalid dossier fixtures must produce at least one violation."""
     from spec_kitty_events.conformance.loader import FixtureCase
+
     assert isinstance(case, FixtureCase)
     result = validate_event(case.payload, case.event_type, strict=True)
-    assert not result.valid, (
-        f"Fixture {case.id} should be invalid but passed validation"
-    )
+    assert not result.valid, f"Fixture {case.id} should be invalid but passed validation"
     total_violations = len(result.model_violations) + len(result.schema_violations)
-    assert total_violations >= 1, (
-        f"Fixture {case.id} is invalid but no violations were reported"
-    )
+    assert total_violations >= 1, f"Fixture {case.id} is invalid but no violations were reported"
 
 
 # ---------------------------------------------------------------------------
@@ -70,16 +69,14 @@ def test_dossier_fixture_count() -> None:
 def test_dossier_valid_case_count() -> None:
     """Loader must return exactly 10 valid dossier fixture cases."""
     assert len(_VALID_CASES) == 10, (
-        f"Expected 10 valid cases, got {len(_VALID_CASES)}: "
-        f"{[c.id for c in _VALID_CASES]}"
+        f"Expected 10 valid cases, got {len(_VALID_CASES)}: {[c.id for c in _VALID_CASES]}"
     )
 
 
 def test_dossier_invalid_case_count() -> None:
     """Loader must return exactly 5 invalid dossier fixture cases."""
     assert len(_INVALID_CASES) == 5, (
-        f"Expected 5 invalid cases, got {len(_INVALID_CASES)}: "
-        f"{[c.id for c in _INVALID_CASES]}"
+        f"Expected 5 invalid cases, got {len(_INVALID_CASES)}: {[c.id for c in _INVALID_CASES]}"
     )
 
 
@@ -134,9 +131,7 @@ def test_invalid_fixtures_produce_violations_in_at_least_one_layer() -> None:
     for case in _INVALID_CASES:
         result = validate_event(case.payload, case.event_type, strict=True)
         total = len(result.model_violations) + len(result.schema_violations)
-        assert total >= 1, (
-            f"{case.id}: invalid fixture produced zero violations in both layers"
-        )
+        assert total >= 1, f"{case.id}: invalid fixture produced zero violations in both layers"
 
 
 def test_all_valid_fixture_event_types_are_known() -> None:

@@ -3,8 +3,7 @@
 from __future__ import annotations
 
 import json
-from pathlib import Path
-from typing import Any, Dict, List
+from typing import Dict, List
 
 import pytest
 from pydantic import ValidationError as PydanticValidationError
@@ -92,16 +91,12 @@ class TestValidEventFixtures:
         assert instance is not None
 
     @pytest.mark.parametrize("path,event_type", VALID_EVENT_FILES)
-    def test_valid_fixture_passes_conformance(
-        self, path: str, event_type: str
-    ) -> None:
+    def test_valid_fixture_passes_conformance(self, path: str, event_type: str) -> None:
         full = _FIXTURES_DIR / path
         with open(full, encoding="utf-8") as f:
             data = json.load(f)
         result = validate_event(data, event_type)
-        assert result.valid is True, (
-            f"Conformance failure for {path}: {result.model_violations}"
-        )
+        assert result.valid is True, f"Conformance failure for {path}: {result.model_violations}"
 
     def test_canonical_valid_event_fixtures_exist(self) -> None:
         valid_dir = _FIXTURES_DIR / "events" / "valid"
@@ -136,14 +131,6 @@ INVALID_EVENT_FILES = [
     ("events/invalid/project_initialized_missing_actor.json", "ProjectInitialized"),
 ]
 
-CUTOVER_INVALID_EVENT_FILES = [
-    ("events/invalid/event_missing_schema_version.json", "Event"),
-    ("events/invalid/event_wrong_cutover_major.json", "Event"),
-    ("events/invalid/event_forbidden_legacy_key.json", "Event"),
-    ("events/invalid/event_forbidden_legacy_event_name.json", "Event"),
-    ("events/invalid/event_forbidden_legacy_aggregate_name.json", "Event"),
-]
-
 
 class TestInvalidEventFixtures:
     """Verify each invalid event fixture fails model validation."""
@@ -158,20 +145,7 @@ class TestInvalidEventFixtures:
             model_class.model_validate(data)
 
     @pytest.mark.parametrize("path,event_type", INVALID_EVENT_FILES)
-    def test_invalid_fixture_fails_conformance(
-        self, path: str, event_type: str
-    ) -> None:
-        full = _FIXTURES_DIR / path
-        with open(full, encoding="utf-8") as f:
-            data = json.load(f)
-        result = validate_event(data, event_type)
-        assert result.valid is False, f"Expected invalid for {path}"
-        assert len(result.model_violations) > 0
-
-    @pytest.mark.parametrize("path,event_type", CUTOVER_INVALID_EVENT_FILES)
-    def test_cutover_invalid_fixture_fails_conformance(
-        self, path: str, event_type: str
-    ) -> None:
+    def test_invalid_fixture_fails_conformance(self, path: str, event_type: str) -> None:
         full = _FIXTURES_DIR / path
         with open(full, encoding="utf-8") as f:
             data = json.load(f)
@@ -203,41 +177,6 @@ class TestInvalidEventFixtures:
         messages = [v.message for v in result.model_violations]
         assert any("reason" in m.lower() for m in messages)
 
-    def test_missing_schema_version_reports_cutover_signal_error(self) -> None:
-        full = _FIXTURES_DIR / "events/invalid/event_missing_schema_version.json"
-        with open(full, encoding="utf-8") as f:
-            data = json.load(f)
-        result = validate_event(data, "Event")
-        assert any("missing canonical cutover signal" in v.message for v in result.model_violations)
-
-    def test_wrong_cutover_major_reports_major_error(self) -> None:
-        full = _FIXTURES_DIR / "events/invalid/event_wrong_cutover_major.json"
-        with open(full, encoding="utf-8") as f:
-            data = json.load(f)
-        result = validate_event(data, "Event")
-        assert any("unsupported cutover major version" in v.message for v in result.model_violations)
-
-    def test_forbidden_legacy_key_reports_cutover_error(self) -> None:
-        full = _FIXTURES_DIR / "events/invalid/event_forbidden_legacy_key.json"
-        with open(full, encoding="utf-8") as f:
-            data = json.load(f)
-        result = validate_event(data, "Event")
-        assert any("forbidden legacy keys" in v.message for v in result.model_violations)
-
-    def test_forbidden_legacy_event_name_reports_cutover_error(self) -> None:
-        full = _FIXTURES_DIR / "events/invalid/event_forbidden_legacy_event_name.json"
-        with open(full, encoding="utf-8") as f:
-            data = json.load(f)
-        result = validate_event(data, "Event")
-        assert any("forbidden legacy event names" in v.message for v in result.model_violations)
-
-    def test_forbidden_legacy_aggregate_name_reports_cutover_error(self) -> None:
-        full = _FIXTURES_DIR / "events/invalid/event_forbidden_legacy_aggregate_name.json"
-        with open(full, encoding="utf-8") as f:
-            data = json.load(f)
-        result = validate_event(data, "Event")
-        assert any("forbidden legacy aggregate names" in v.message for v in result.model_violations)
-
 
 # ---------------------------------------------------------------------------
 # T024: Lane mapping fixtures
@@ -266,8 +205,7 @@ class TestLaneMappingFixtures:
         # is expected to cover the canonical Lane set MINUS `in_review`.
         expected = {lane.value for lane in Lane} - {"in_review"}
         assert canonical_values >= expected, (
-            f"Lane-mapping fixture missing canonical lanes: "
-            f"{sorted(expected - canonical_values)}"
+            f"Lane-mapping fixture missing canonical lanes: {sorted(expected - canonical_values)}"
         )
 
     def test_valid_mapping_expected_sync_values(self) -> None:
@@ -327,6 +265,7 @@ class TestEdgeCaseFixtures:
         assert len(result.model_violations) == 0
         # The model itself should resolve the alias
         from spec_kitty_events.status import StatusTransitionPayload, Lane
+
         model = StatusTransitionPayload.model_validate(data)
         assert model.to_lane == Lane.IN_PROGRESS
 
@@ -387,9 +326,7 @@ class TestEdgeCaseFixtures:
     ]
 
     @pytest.mark.parametrize("rel_path", REVIEW_REJECTION_INVALID_FIXTURES)
-    def test_review_rejection_invalid_fixture_rejected(
-        self, rel_path: str
-    ) -> None:
+    def test_review_rejection_invalid_fixture_rejected(self, rel_path: str) -> None:
         from spec_kitty_events.status import (
             StatusTransitionPayload,
             validate_transition,
@@ -401,25 +338,17 @@ class TestEdgeCaseFixtures:
         payload = StatusTransitionPayload.model_validate(data)
         result = validate_transition(payload)
 
-        assert result.valid is False, (
-            f"Expected {rel_path} to be rejected by validate_transition()"
-        )
+        assert result.valid is False, f"Expected {rel_path} to be rejected by validate_transition()"
         # At least one violation must name the canonical substrings of the
         # explicit review-rejection family guard.
-        matching = [
-            v
-            for v in result.violations
-            if "force=True" in v and "review-rejection" in v
-        ]
+        matching = [v for v in result.violations if "force=True" in v and "review-rejection" in v]
         assert matching, (
             f"No violation in {result.violations!r} contained both "
             f"'force=True' and 'review-rejection' for fixture {rel_path}"
         )
 
     @pytest.mark.parametrize("rel_path", REVIEW_REJECTION_VALID_FIXTURES)
-    def test_review_rejection_valid_fixture_accepted(
-        self, rel_path: str
-    ) -> None:
+    def test_review_rejection_valid_fixture_accepted(self, rel_path: str) -> None:
         from spec_kitty_events.status import (
             StatusTransitionPayload,
             validate_transition,
@@ -494,9 +423,7 @@ class TestManifest:
         required_fields = {"id", "path", "expected_result", "event_type", "notes", "min_version"}
         for entry in manifest["fixtures"]:
             missing = required_fields - set(entry.keys())
-            assert not missing, (
-                f"Entry {entry.get('id', '?')} missing fields: {missing}"
-            )
+            assert not missing, f"Entry {entry.get('id', '?')} missing fields: {missing}"
 
 
 # ---------------------------------------------------------------------------
@@ -542,8 +469,10 @@ class TestLoadFixtures:
     def test_events_invalid_cases_expected_valid_false(self) -> None:
         cases = load_fixtures("events")
         invalid_cases = [c for c in cases if not c.expected_valid]
-        # 10 historical invalid fixtures + 2 new lifecycle invalid fixtures.
-        assert len(invalid_cases) == 12
+        # 5 historical invalid fixtures + 2 new lifecycle invalid fixtures.
+        # (8.0.0 removed the five cutover-policy fixtures — the gate they
+        # exercised lived in the deleted spec_kitty_events.cutover.)
+        assert len(invalid_cases) == 7
 
     def test_fixture_case_has_payload(self) -> None:
         cases = load_fixtures("events")
@@ -567,8 +496,7 @@ class TestLoadFixtures:
                 continue
             result = validate_event(case.payload, case.event_type)
             assert result.valid is True, (
-                f"Fixture {case.id} expected valid but failed: "
-                f"{result.model_violations}"
+                f"Fixture {case.id} expected valid but failed: {result.model_violations}"
             )
 
     # Fixtures whose "invalid" classification is no longer truthful after
@@ -577,9 +505,11 @@ class TestLoadFixtures:
     # cleaned up by WP05 (fixture-suite ownership). Until then we skip them
     # in this iterator-style test rather than assert their (now-passing)
     # validation result is a failure.
-    _STALE_INVALID_FIXTURE_IDS = frozenset({
-        "wp-status-changed-invalid-lane",
-    })
+    _STALE_INVALID_FIXTURE_IDS = frozenset(
+        {
+            "wp-status-changed-invalid-lane",
+        }
+    )
 
     def test_invalid_event_fixtures_fail_model(self) -> None:
         """Verify that all invalid event fixtures actually fail validation."""
@@ -592,9 +522,7 @@ class TestLoadFixtures:
             if case.id in self._STALE_INVALID_FIXTURE_IDS:
                 continue
             result = validate_event(case.payload, case.event_type)
-            assert result.valid is False, (
-                f"Fixture {case.id} expected invalid but passed"
-            )
+            assert result.valid is False, f"Fixture {case.id} expected invalid but passed"
 
 
 # ---------------------------------------------------------------------------

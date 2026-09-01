@@ -146,13 +146,34 @@ from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
 from types import MappingProxyType
-from typing import Any, Dict, FrozenSet, List, Literal, Mapping, Optional, Sequence, Set, Tuple, Union
+from typing import (
+    Any,
+    Dict,
+    FrozenSet,
+    List,
+    Literal,
+    Mapping,
+    Optional,
+    Sequence,
+    Set,
+    Tuple,
+    Union,
+)
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
+# Diary-format contracts (issue #41): the CLI's ``status.events.jsonl`` ->
+# kanban-state reducer moved to :mod:`spec_kitty_events.diary`; re-exported
+# here so every consumer finds the shared entry point at
+# ``spec_kitty_events.status.reduce``.
+from spec_kitty_events.diary import DiaryError, State, parse_diary, reduce
 from spec_kitty_events.models import Event, SpecKittyEventsError, ValidationError
 
 logger = logging.getLogger(__name__)
+
+#: Names re-exported from :mod:`spec_kitty_events.diary` (see the import
+#: above): the shared ``status.events.jsonl`` -> kanban-state contract.
+diary_reexports = (DiaryError, State, parse_diary, reduce)
 
 
 class Lane(str, Enum):
@@ -196,32 +217,36 @@ class SyncLaneV2(str, Enum):
     DONE = "done"
 
 
-CANONICAL_TO_SYNC_V1: Mapping[Lane, SyncLaneV1] = MappingProxyType({
-    Lane.GENESIS: SyncLaneV1.PLANNED,
-    Lane.PLANNED: SyncLaneV1.PLANNED,
-    Lane.CLAIMED: SyncLaneV1.PLANNED,
-    Lane.IN_PROGRESS: SyncLaneV1.DOING,
-    Lane.FOR_REVIEW: SyncLaneV1.FOR_REVIEW,
-    Lane.IN_REVIEW: SyncLaneV1.FOR_REVIEW,
-    Lane.APPROVED: SyncLaneV1.DONE,
-    Lane.DONE: SyncLaneV1.DONE,
-    Lane.BLOCKED: SyncLaneV1.DOING,
-    Lane.CANCELED: SyncLaneV1.PLANNED,
-})
+CANONICAL_TO_SYNC_V1: Mapping[Lane, SyncLaneV1] = MappingProxyType(
+    {
+        Lane.GENESIS: SyncLaneV1.PLANNED,
+        Lane.PLANNED: SyncLaneV1.PLANNED,
+        Lane.CLAIMED: SyncLaneV1.PLANNED,
+        Lane.IN_PROGRESS: SyncLaneV1.DOING,
+        Lane.FOR_REVIEW: SyncLaneV1.FOR_REVIEW,
+        Lane.IN_REVIEW: SyncLaneV1.FOR_REVIEW,
+        Lane.APPROVED: SyncLaneV1.DONE,
+        Lane.DONE: SyncLaneV1.DONE,
+        Lane.BLOCKED: SyncLaneV1.DOING,
+        Lane.CANCELED: SyncLaneV1.PLANNED,
+    }
+)
 
 
-CANONICAL_TO_SYNC_V2: Mapping[Lane, SyncLaneV2] = MappingProxyType({
-    Lane.GENESIS: SyncLaneV2.PLANNED,
-    Lane.PLANNED: SyncLaneV2.PLANNED,
-    Lane.CLAIMED: SyncLaneV2.PLANNED,
-    Lane.IN_PROGRESS: SyncLaneV2.DOING,
-    Lane.FOR_REVIEW: SyncLaneV2.FOR_REVIEW,
-    Lane.IN_REVIEW: SyncLaneV2.FOR_REVIEW,
-    Lane.APPROVED: SyncLaneV2.APPROVED,
-    Lane.DONE: SyncLaneV2.DONE,
-    Lane.BLOCKED: SyncLaneV2.DOING,
-    Lane.CANCELED: SyncLaneV2.PLANNED,
-})
+CANONICAL_TO_SYNC_V2: Mapping[Lane, SyncLaneV2] = MappingProxyType(
+    {
+        Lane.GENESIS: SyncLaneV2.PLANNED,
+        Lane.PLANNED: SyncLaneV2.PLANNED,
+        Lane.CLAIMED: SyncLaneV2.PLANNED,
+        Lane.IN_PROGRESS: SyncLaneV2.DOING,
+        Lane.FOR_REVIEW: SyncLaneV2.FOR_REVIEW,
+        Lane.IN_REVIEW: SyncLaneV2.FOR_REVIEW,
+        Lane.APPROVED: SyncLaneV2.APPROVED,
+        Lane.DONE: SyncLaneV2.DONE,
+        Lane.BLOCKED: SyncLaneV2.DOING,
+        Lane.CANCELED: SyncLaneV2.PLANNED,
+    }
+)
 
 
 def canonical_to_sync_v1(lane: Lane) -> SyncLaneV1:
@@ -255,9 +280,7 @@ TERMINAL_LANES: FrozenSet[Lane] = frozenset({Lane.DONE, Lane.CANCELED})
 
 NON_DISPLAY_LANES: FrozenSet[Lane] = frozenset({Lane.GENESIS})
 
-DISPLAY_LANES: Tuple[Lane, ...] = tuple(
-    lane for lane in Lane if lane not in NON_DISPLAY_LANES
-)
+DISPLAY_LANES: Tuple[Lane, ...] = tuple(lane for lane in Lane if lane not in NON_DISPLAY_LANES)
 
 LANE_ALIASES: Dict[str, Lane] = {"doing": Lane.IN_PROGRESS}
 
@@ -333,9 +356,7 @@ class RepoEvidence(BaseModel):
     repo: str = Field(..., min_length=1, description="Repository identifier")
     branch: str = Field(..., min_length=1, description="Branch name")
     commit: str = Field(..., min_length=1, description="Commit SHA or reference")
-    files_touched: Optional[List[str]] = Field(
-        None, description="List of files modified"
-    )
+    files_touched: Optional[List[str]] = Field(None, description="List of files modified")
 
 
 class VerificationEntry(BaseModel):
@@ -355,9 +376,7 @@ class ReviewVerdict(BaseModel):
 
     reviewer: str = Field(..., min_length=1, description="Who reviewed")
     verdict: str = Field(..., min_length=1, description="Verdict string")
-    reference: Optional[str] = Field(
-        None, description="URL or reference for the review"
-    )
+    reference: Optional[str] = Field(None, description="URL or reference for the review")
 
 
 class DoneEvidence(BaseModel):
@@ -395,6 +414,16 @@ class StatusTransitionPayload(BaseModel):
     model_config = ConfigDict(frozen=True, extra="forbid")
 
     mission_slug: str = Field(..., min_length=1, description="Mission identifier")
+    mission_id: Optional[str] = Field(
+        None,
+        min_length=1,
+        description=(
+            "Canonical machine-facing mission identity (ULID); optional, rides "
+            "alongside mission_slug so a consumer can join this moment against "
+            "PhaseEntered (whose frame ref is mission_id) for the same mission "
+            "aggregate (spec-kitty-events#69)"
+        ),
+    )
     wp_id: str = Field(..., min_length=1, description="Work-package identifier")
     from_lane: Optional[Lane] = Field(
         None, description="Lane the WP is transitioning from (None for initial)"
@@ -413,12 +442,8 @@ class StatusTransitionPayload(BaseModel):
     reason: Optional[str] = Field(
         None, description="Reason for the transition (required when force=True)"
     )
-    execution_mode: ExecutionMode = Field(
-        ..., description="How the work-package is being executed"
-    )
-    review_ref: Optional[str] = Field(
-        None, description="Reference to an external review"
-    )
+    execution_mode: ExecutionMode = Field(..., description="How the work-package is being executed")
+    review_ref: Optional[str] = Field(None, description="Reference to an external review")
     evidence: Optional[DoneEvidence] = Field(
         None, description="Evidence bundle (required when to_lane=DONE)"
     )
@@ -474,13 +499,9 @@ class StatusTransitionPayload(BaseModel):
     def _check_business_rules(self) -> "StatusTransitionPayload":
         """Enforce business rules on the transition payload."""
         if self.force and (self.reason is None or self.reason.strip() == ""):
-            raise ValueError(
-                "force=True requires a non-empty reason"
-            )
+            raise ValueError("force=True requires a non-empty reason")
         if self.to_lane in {Lane.APPROVED, Lane.DONE} and self.evidence is None:
-            raise ValueError(
-                "to_lane in {'approved', 'done'} requires evidence"
-            )
+            raise ValueError("to_lane in {'approved', 'done'} requires evidence")
         return self
 
 
@@ -496,48 +517,50 @@ class TransitionError(SpecKittyEventsError):
 # Section 4: Validation
 # ---------------------------------------------------------------------------
 
-_ALLOWED_TRANSITIONS: FrozenSet[Tuple[Optional[Lane], Lane]] = frozenset({
-    # Initial
-    (None, Lane.PLANNED),
-    # Genesis seed (unseeded WP -> planned at finalize-tasks)
-    (Lane.GENESIS, Lane.PLANNED),
-    # Happy path
-    (Lane.PLANNED, Lane.CLAIMED),
-    (Lane.CLAIMED, Lane.IN_PROGRESS),
-    (Lane.IN_PROGRESS, Lane.FOR_REVIEW),
-    (Lane.IN_PROGRESS, Lane.APPROVED),
-    (Lane.FOR_REVIEW, Lane.IN_REVIEW),
-    (Lane.FOR_REVIEW, Lane.APPROVED),
-    (Lane.FOR_REVIEW, Lane.DONE),
-    (Lane.IN_REVIEW, Lane.APPROVED),
-    (Lane.IN_REVIEW, Lane.DONE),
-    (Lane.APPROVED, Lane.DONE),
-    # Review rollback
-    (Lane.FOR_REVIEW, Lane.IN_PROGRESS),
-    (Lane.FOR_REVIEW, Lane.PLANNED),
-    (Lane.IN_REVIEW, Lane.IN_PROGRESS),
-    (Lane.IN_REVIEW, Lane.FOR_REVIEW),
-    (Lane.IN_REVIEW, Lane.PLANNED),
-    (Lane.APPROVED, Lane.IN_PROGRESS),
-    (Lane.APPROVED, Lane.PLANNED),
-    # Abandon/reassign
-    (Lane.IN_PROGRESS, Lane.PLANNED),
-    # Unblock
-    (Lane.BLOCKED, Lane.IN_PROGRESS),
-})
+_ALLOWED_TRANSITIONS: FrozenSet[Tuple[Optional[Lane], Lane]] = frozenset(
+    {
+        # Initial
+        (None, Lane.PLANNED),
+        # Genesis seed (unseeded WP -> planned at finalize-tasks)
+        (Lane.GENESIS, Lane.PLANNED),
+        # Happy path
+        (Lane.PLANNED, Lane.CLAIMED),
+        (Lane.CLAIMED, Lane.IN_PROGRESS),
+        (Lane.IN_PROGRESS, Lane.FOR_REVIEW),
+        (Lane.IN_PROGRESS, Lane.APPROVED),
+        (Lane.FOR_REVIEW, Lane.IN_REVIEW),
+        (Lane.FOR_REVIEW, Lane.APPROVED),
+        (Lane.FOR_REVIEW, Lane.DONE),
+        (Lane.IN_REVIEW, Lane.APPROVED),
+        (Lane.IN_REVIEW, Lane.DONE),
+        (Lane.APPROVED, Lane.DONE),
+        # Review rollback
+        (Lane.FOR_REVIEW, Lane.IN_PROGRESS),
+        (Lane.FOR_REVIEW, Lane.PLANNED),
+        (Lane.IN_REVIEW, Lane.IN_PROGRESS),
+        (Lane.IN_REVIEW, Lane.FOR_REVIEW),
+        (Lane.IN_REVIEW, Lane.PLANNED),
+        (Lane.APPROVED, Lane.IN_PROGRESS),
+        (Lane.APPROVED, Lane.PLANNED),
+        # Abandon/reassign
+        (Lane.IN_PROGRESS, Lane.PLANNED),
+        # Unblock
+        (Lane.BLOCKED, Lane.IN_PROGRESS),
+    }
+)
 
 
-_REVIEW_REJECTION_FAMILY: FrozenSet[Tuple[Lane, Lane]] = frozenset({
-    (Lane.IN_PROGRESS, Lane.PLANNED),
-    (Lane.FOR_REVIEW, Lane.PLANNED),
-    (Lane.IN_REVIEW, Lane.PLANNED),
-    (Lane.APPROVED, Lane.PLANNED),
-})
+_REVIEW_REJECTION_FAMILY: FrozenSet[Tuple[Lane, Lane]] = frozenset(
+    {
+        (Lane.IN_PROGRESS, Lane.PLANNED),
+        (Lane.FOR_REVIEW, Lane.PLANNED),
+        (Lane.IN_REVIEW, Lane.PLANNED),
+        (Lane.APPROVED, Lane.PLANNED),
+    }
+)
 
 
-def _is_review_rejection_pair(
-    from_lane: Optional[Lane], to_lane: Lane
-) -> bool:
+def _is_review_rejection_pair(from_lane: Optional[Lane], to_lane: Lane) -> bool:
     """Return True iff (from_lane, to_lane) is in the review-rejection family.
 
     Bootstrap-planned (``from_lane is None``) is intentionally False so
@@ -573,9 +596,7 @@ def validate_transition(payload: StatusTransitionPayload) -> TransitionValidatio
 
     # Terminal lane check
     if payload.from_lane is not None and payload.from_lane in TERMINAL_LANES and not payload.force:
-        violations.append(
-            f"{payload.from_lane.value} is terminal; requires force=True to exit"
-        )
+        violations.append(f"{payload.from_lane.value} is terminal; requires force=True to exit")
 
     # Explicit review-rejection family guard.
     # Fires regardless of review_ref / reason; isolates `force=True` as the
@@ -606,9 +627,7 @@ def validate_transition(payload: StatusTransitionPayload) -> TransitionValidatio
             and payload.from_lane not in TERMINAL_LANES
         )
         if not (in_matrix or to_blocked or to_canceled):
-            violations.append(
-                f"Transition {payload.from_lane} -> {payload.to_lane} is not allowed"
-            )
+            violations.append(f"Transition {payload.from_lane} -> {payload.to_lane} is not allowed")
 
     # Guard conditions (checked regardless of force). The force-required
     # review-rejection family treats review_ref as optional when force=True;
@@ -617,15 +636,9 @@ def validate_transition(payload: StatusTransitionPayload) -> TransitionValidatio
     review_ref_required = (
         payload.from_lane in {Lane.FOR_REVIEW, Lane.IN_REVIEW, Lane.APPROVED}
         and payload.to_lane in {Lane.IN_PROGRESS, Lane.PLANNED}
-        and not (
-            payload.force
-            and _is_review_rejection_pair(payload.from_lane, payload.to_lane)
-        )
+        and not (payload.force and _is_review_rejection_pair(payload.from_lane, payload.to_lane))
     )
-    if (
-        review_ref_required
-        and (payload.review_ref is None or payload.review_ref.strip() == "")
-    ):
+    if review_ref_required and (payload.review_ref is None or payload.review_ref.strip() == ""):
         violations.append(
             f"{payload.from_lane.value if payload.from_lane is not None else 'None'} "
             f"-> {payload.to_lane.value} requires review_ref"
@@ -790,9 +803,7 @@ def reduce_status_events(events: Sequence[Event]) -> ReducedStatus:
     # 5. Rollback-aware reordering: group by (wp_id, lamport_clock)
     # Use insertion-order dict grouping to handle interleaving keys correctly.
     grouped: List[List[Tuple[Event, StatusTransitionPayload]]] = []
-    grouped_by_key: Dict[
-        Tuple[str, int], List[Tuple[Event, StatusTransitionPayload]]
-    ] = {}
+    grouped_by_key: Dict[Tuple[str, int], List[Tuple[Event, StatusTransitionPayload]]] = {}
     for event, payload in parsed:
         key = (payload.wp_id, event.lamport_clock)
         grouped_by_key.setdefault(key, []).append((event, payload))

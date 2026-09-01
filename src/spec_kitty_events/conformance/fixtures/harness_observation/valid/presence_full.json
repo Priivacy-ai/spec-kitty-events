@@ -1,0 +1,11 @@
+{
+  "kind": "presence",
+  "harness": "claude",
+  "session_id": "sess-abc123",
+  "agent_id": "agent-1",
+  "repo": "spec-kitty-events",
+  "mission_slug": "f1-t1-strict-journal",
+  "wp_id": "WP01",
+  "activity": "command",
+  "path": "src/spec_kitty_events/strict.py"
+}
